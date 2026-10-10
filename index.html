@@ -6891,6 +6891,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .tmm-pt.sel .tmm-piece{box-shadow:0 0 0 4px var(--gold), 0 6px 12px rgba(0,0,0,.45); transform:scale(1.06);}
   .tmm-piece.fresh{animation:tmmDrop .38s cubic-bezier(.3,1.5,.5,1);}
   .tmm-piece.win{animation:tmmWin .9s ease-in-out infinite; box-shadow:0 0 0 4px rgba(40,190,120,.85), 0 0 18px rgba(40,190,120,.7);}
+  .tmm-pt.goal-b::before, .tmm-pt.goal-w::before{background:#c9890a;}
+  .tmm-pt.goal-b:not(.has)::before, .tmm-pt.goal-w:not(.has)::before{width:18%; height:18%; box-shadow:0 0 0 4px rgba(201,137,10,.18);}
   .tmm-rules{margin:6px 4px 12px; font-size:12px; line-height:1.7; color:var(--text-muted); text-align:center;}
   @keyframes tmmDrop{from{transform:scale(1.7); opacity:0;} to{transform:scale(1); opacity:1;}}
   @keyframes tmmPulse{0%,100%{transform:scale(.85); opacity:.7;} 50%{transform:scale(1.1); opacity:1;}}
@@ -7188,14 +7190,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @media (prefers-reduced-motion:reduce){ .uno-lobby-row.empty,.wait-ring::before,.wait-dots b{animation:none !important;} }
 
   /* ===== غرفة الانتظار بنفس أجواء "اختار نوع التحدي" (كارت كحلي + شريط ذهبي + مسكوت) ===== */
-  .room-waiting{position:relative; margin-top:92px; padding:14px 14px 18px; border-radius:30px; font-family:'Cairo',sans-serif; color:#eef1ff;
+  .room-waiting{position:relative; margin-top:46px; padding:14px 14px 18px; border-radius:30px; font-family:'Cairo',sans-serif; color:#eef1ff;
     border:1.5px solid rgba(96,125,255,.38);
     background:radial-gradient(120% 60% at 50% 0%, rgba(80,110,230,.2), transparent 60%), linear-gradient(165deg,#1a2650 0%,#101a3d 55%,#0c1431 100%);
     box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px rgba(255,255,255,.03);}
   .room-waiting::before{content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; padding:1.5px;
     background:linear-gradient(135deg,rgba(255,200,60,.65),transparent 30%,transparent 70%,rgba(70,120,255,.7));
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude;}
-  .room-waiting > *:not(.ch-bg):not(.ch-mascot):not(.ch-bubble):not(.ch-bubble-crown){position:relative; z-index:1;}
+  .room-waiting > *:not(.ch-bg):not(.rw-badge){position:relative; z-index:1;}
   .room-waiting > .ch-bg{z-index:0;}
   .room-waiting > .ch-swords{width:76px; margin:4px auto 0;}
   .room-waiting > .ch-ttl{height:62px;}
@@ -7217,6 +7219,18 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     box-shadow:0 5px 0 #c27806, 0 16px 30px rgba(245,158,11,.38), inset 0 2px 0 rgba(255,255,255,.65), inset 0 -2px 6px rgba(190,100,0,.25);}
   .room-waiting .btn.btn-primary:disabled{filter:grayscale(.55); opacity:.6;}
   .room-waiting .btn:active{transform:translateY(2px) scale(.985);}
+  .rw-badge{position:absolute; top:-36px; left:50%; width:72px; height:72px; margin-left:-36px; z-index:3; display:flex; align-items:center; justify-content:center;}
+  .rw-emblem{position:relative; width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 50% 30%,#2b3d86,#0e1738 75%); border:2px solid #f7b92a; box-shadow:0 8px 22px rgba(0,0,0,.5), 0 0 22px rgba(255,194,26,.45), inset 0 1px 0 rgba(255,255,255,.2);}
+  .rw-emblem svg{width:44px; height:auto; display:block; filter:drop-shadow(0 3px 4px rgba(0,0,0,.4));}
+  .rw-pulse{position:absolute; inset:0; border-radius:50%; border:2px solid rgba(255,194,26,.7); animation:rwPulse 2.4s ease-out infinite;}
+  .rw-pulse.p2{animation-delay:1.2s;}
+  @keyframes rwPulse{0%{transform:scale(1); opacity:.8;} 100%{transform:scale(1.9); opacity:0;}}
+  .rw-title{display:flex; align-items:center; justify-content:center; gap:10px; margin:34px 0 12px;}
+  .rw-title span{font-weight:900; font-size:22px; letter-spacing:.3px; background:linear-gradient(180deg,#fff2b0,#ffc21a 60%,#e8a012); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; text-shadow:none; filter:drop-shadow(0 2px 8px rgba(255,194,26,.35));}
+  .rw-title i{flex:1; height:2px; border-radius:2px; background:linear-gradient(90deg,transparent,rgba(255,194,26,.75));}
+  .rw-title i:last-child{background:linear-gradient(270deg,transparent,rgba(255,194,26,.75));}
+  @media (prefers-reduced-motion:reduce){ .rw-pulse{animation:none !important;} }
   .uno-lobby-row{position:relative; overflow:hidden;}
   .uno-lobby-row.uno-row-in{animation:unoRowIn .5s cubic-bezier(.34,1.56,.64,1) both;}
   @keyframes unoRowIn{from{opacity:0; transform:translateY(-10px) scale(.96);}to{opacity:1; transform:none;}}
@@ -14075,7 +14089,7 @@ const GAMES_CATALOG = [
   {id:'millionaire', icon:'👑', title:'من سيربح المليون', sub:'أسئلة مسيحية بنفس نظام السلم والمساعدات الثلاثة', color:'linear-gradient(145deg,#1b2a6b,#0a0c28)'},
   {id:'chess', icon:'♟️', logo:'chess-logo.png', title:'الشطرنج', sub:'شطرنج كامل بكل القواعد ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#3a3a3a,#0c0c0c)'},
   {id:'checkers', icon:'⚫', title:'الداما', sub:'أسر إجباري وتتويج للملوك — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#7C4A2A,#3a2412)'},
-  {id:'tmm', icon:'⚪', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImsiIGN4PSIuMzUiIGN5PSIuMyIgcj0iLjgiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZiNmI2YiIvPjxzdG9wIG9mZnNldD0iLjY1IiBzdG9wLWNvbG9yPSIjMTYxNjE2Ii8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9InciIGN4PSIuMzUiIGN5PSIuMyIgcj0iLjgiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2NmY2ZjZiIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSI5MiIgaGVpZ2h0PSI5MiIgcng9IjE4IiBmaWxsPSIjZjRlZmU2Ii8+PGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+PHJlY3QgeD0iMjIiIHk9IjIyIiB3aWR0aD0iNTYiIGhlaWdodD0iNTYiLz48cGF0aCBkPSJNNTAgMjJWNzhNMjIgNTBINzgiLz48L2c+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLC4zNSkiIHN0cm9rZS13aWR0aD0iMS4yIj48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSI5LjUiIGZpbGw9InVybCgjaykiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjIyIiByPSI5LjUiIGZpbGw9InVybCgjaykiLz48Y2lyY2xlIGN4PSI3OCIgY3k9IjIyIiByPSI5LjUiIGZpbGw9InVybCgjaykiLz48Y2lyY2xlIGN4PSIyMiIgY3k9Ijc4IiByPSI5LjUiIGZpbGw9InVybCgjdykiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI5LjUiIGZpbGw9InVybCgjdykiLz48Y2lyY2xlIGN4PSI3OCIgY3k9IjUwIiByPSI5LjUiIGZpbGw9InVybCgjdykiLz48L2c+PC9zdmc+', title:'الطاحونة الصغيرة', sub:'حط 3 قطع وبعدين حرّك — رتّب 3 في خط واحد وكسّب خصمك، ضد الجهاز أو صديقك', color:'linear-gradient(145deg,#8a6d3b,#2b2112)'},
+  {id:'tmm', icon:'⚪', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImsiIGN4PSIuMzUiIGN5PSIuMyIgcj0iLjgiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZiNmI2YiIvPjxzdG9wIG9mZnNldD0iLjY1IiBzdG9wLWNvbG9yPSIjMTYxNjE2Ii8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9InciIGN4PSIuMzUiIGN5PSIuMyIgcj0iLjgiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2NmY2ZjZiIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSI5MiIgaGVpZ2h0PSI5MiIgcng9IjE4IiBmaWxsPSIjZjRlZmU2Ii8+PGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+PHJlY3QgeD0iMjIiIHk9IjIyIiB3aWR0aD0iNTYiIGhlaWdodD0iNTYiLz48cGF0aCBkPSJNNTAgMjJWNzhNMjIgNTBINzgiLz48L2c+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLC4zNSkiIHN0cm9rZS13aWR0aD0iMS4yIj48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSI5LjUiIGZpbGw9InVybCgjdykiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjIyIiByPSI5LjUiIGZpbGw9InVybCgjdykiLz48Y2lyY2xlIGN4PSI3OCIgY3k9IjIyIiByPSI5LjUiIGZpbGw9InVybCgjdykiLz48Y2lyY2xlIGN4PSIyMiIgY3k9Ijc4IiByPSI5LjUiIGZpbGw9InVybCgjaykiLz48Y2lyY2xlIGN4PSI1MCIgY3k9Ijc4IiByPSI5LjUiIGZpbGw9InVybCgjaykiLz48Y2lyY2xlIGN4PSI3OCIgY3k9Ijc4IiByPSI5LjUiIGZpbGw9InVybCgjaykiLz48L2c+PHBhdGggZD0iTTUwIDQwVjYwTTQ0IDU0TDUwIDYyTDU2IDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNjOTg5MGEiIHN0cm9rZS13aWR0aD0iMy41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIG9wYWNpdHk9Ii4wIi8+PC9zdmc+', title:'الطاحونة الصغيرة', sub:'حرّك قطعك التلاتة خطوة خطوة ووصّلها لناحية الخصم قبله — ضد الجهاز أو صديقك', color:'linear-gradient(145deg,#8a6d3b,#2b2112)'},
   {id:'backgammon', icon:'🎯', title:'طاولة الزهر', sub:'اللعبة الشرقية الكلاسيكية بزهرين — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#C9A227,#5C3A21)'},
   {id:'snakes', icon:'🐍', title:'سلم وثعبان', sub:'أول ما توصل 100 تكسب — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#5FE0A4,#2E5A8C)'},
 ];
@@ -14104,7 +14118,7 @@ const GH_SOLO_SUB = {
   chess:'شطرنج كامل بكل القواعد — كش ملك، تبييت، الأسر بالمرور، ترقية البيدق',
   checkers:'أسر إجباري ومتسلسل، وتتويج القطعة لما توصل آخر الصف',
   backgammon:'زهرين، بار، وخروج القطع — اللعبة الشرقية الكلاسيكية',
-  tmm:'3 قطع لكل لاعب: حطها بالدور وبعدين حرّك قطعة لخانة فاضية جنبها — أول واحد يرتّب 3 في خط يكسب',
+  tmm:'3 قطع لكل لاعب: حرّك قطعة خطوة بالدور — أول واحد يوصّل قطعه التلاتة لناحية الخصم يكسب',
   snakes:'ارمي الزهر واطلع بالسلالم وابعد عن الثعابين، أول ما توصل 100 تكسب',
 };
 function gameIconHtml(g){ return g.logo ? `<img class="game-logo-img" src="${g.logo}" alt="" draggable="false">` : g.icon; }
@@ -24777,11 +24791,9 @@ function renderCheckersGame(){
     ${S.winner ? nextProBtn('ck-reset') : ''}
   `;
 }
-/* ================= الطاحونة الصغيرة — Three Men's Morris (3 قطع لكل لاعب: حط الأول، وبعدين حرّك) ================= */
-const TMM_LINES_BASE = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8]];
-const TMM_LINES_DIAG = [[0,4,8],[2,4,6]];
+/* ================= الطاحونة الصغيرة — سباق 3 قطع: كل لاعب قدامه 3 قطع، بتتحرك خطوة بالدور، واللي يوصّل قطعه كلها لناحية الخصم يكسب ================= */
 const TMM_ADJ_CACHE = {};
-function tmmLines(diag){ return diag ? TMM_LINES_BASE.concat(TMM_LINES_DIAG) : TMM_LINES_BASE; }
+const TMM_GOAL = { B:[0,1,2], W:[6,7,8] };      /* الأسود (انت) بيبدأ من تحت ويروح فوق، والأبيض العكس */
 function tmmAdj(diag){
   const key = diag ? 'd' : 'o';
   if(TMM_ADJ_CACHE[key]) return TMM_ADJ_CACHE[key];
@@ -24794,38 +24806,32 @@ function tmmAdj(diag){
   }
   return (TMM_ADJ_CACHE[key] = adj);
 }
-function tmmMoves(board, placedCnt, p, diag){
-  const mv = [];
-  if(placedCnt < 3){ for(let j=0;j<9;j++) if(!board[j]) mv.push({from:null, to:j}); return mv; }
-  const adj = tmmAdj(diag);
+function tmmMoves(board, p, diag){
+  const mv = [], adj = tmmAdj(diag);
   for(let i=0;i<9;i++) if(board[i]===p) adj[i].forEach(j=>{ if(!board[j]) mv.push({from:i, to:j}); });
   return mv;
 }
-function tmmWinLine(board, p, diag){
-  const L = tmmLines(diag);
-  for(let k=0;k<L.length;k++){ const l=L[k]; if(board[l[0]]===p && board[l[1]]===p && board[l[2]]===p) return l; }
-  return null;
-}
-function tmmEval(b, t, diag){
-  const o = t==='B' ? 'W' : 'B'; let s = 0;
-  tmmLines(diag).forEach(l=>{
-    let me=0, op=0; l.forEach(i=>{ if(b[i]===t) me++; else if(b[i]===o) op++; });
-    if(me===2 && op===0) s += 3; else if(op===2 && me===0) s -= 3;
-  });
-  if(b[4]===t) s += 2; else if(b[4]===o) s -= 2;
+function tmmAtGoal(board, p){ let n = 0; TMM_GOAL[p].forEach(i=>{ if(board[i]===p) n++; }); return n; }
+function tmmWon(board, p){ return tmmAtGoal(board, p) === 3; }
+function tmmProg(board, p){           /* مجموع تقدّم القطع ناحية الخصم */
+  let s = 0;
+  for(let i=0;i<9;i++) if(board[i]===p){ const r = (i/3)|0; s += (p==='B' ? 2-r : r); }
   return s;
 }
-function tmmNega(b, pl, t, depth, a, be, diag){
+function tmmEval(b, t){
   const o = t==='B' ? 'W' : 'B';
-  const mv = tmmMoves(b, pl[t], t, diag);
+  return (tmmProg(b,t) - tmmProg(b,o)) + 3*(tmmAtGoal(b,t) - tmmAtGoal(b,o));
+}
+function tmmNega(b, t, depth, a, be, diag){
+  const o = t==='B' ? 'W' : 'B';
+  const mv = tmmMoves(b, t, diag);
   if(!mv.length) return -1000 - depth;
-  if(depth===0) return tmmEval(b, t, diag);
+  if(depth===0) return tmmEval(b, t);
   let best = -Infinity;
   for(let k=0;k<mv.length;k++){
-    const m = mv[k], nb = b.slice(), np = {B:pl.B, W:pl.W};
-    if(m.from===null) np[t]++; else nb[m.from] = null;
-    nb[m.to] = t;
-    const v = tmmWinLine(nb, t, diag) ? 1000 + depth : -tmmNega(nb, np, o, depth-1, -be, -a, diag);
+    const m = mv[k], nb = b.slice();
+    nb[m.from] = null; nb[m.to] = t;
+    const v = tmmWon(nb, t) ? 1000 + depth : -tmmNega(nb, o, depth-1, -be, -a, diag);
     if(v>best) best = v;
     if(best>a) a = best;
     if(a>=be) break;
@@ -24834,24 +24840,23 @@ function tmmNega(b, pl, t, depth, a, be, diag){
 }
 function tmmBotPick(S){
   const lv = aiLv('tmm'), t = S.turn, o = t==='B' ? 'W' : 'B';
-  const mv = tmmMoves(S.board, S.placed[t], t, S.diag);
+  const mv = tmmMoves(S.board, t, S.diag);
   if(!mv.length) return null;
-  const mist = ({easy:.55, medium:.25, hard:.06, expert:0})[lv];
-  if(Math.random() < (mist==null ? .06 : mist)) return aiPick(mv);
-  const depth = ({easy:1, medium:2, hard:4, expert:6})[lv] || 4;
+  const mist = ({easy:.5, medium:.22, hard:.05, expert:0})[lv];
+  if(Math.random() < (mist==null ? .05 : mist)) return aiPick(mv);
+  const depth = ({easy:1, medium:3, hard:5, expert:8})[lv] || 5;
   let best = -Infinity, pool = [];
   mv.forEach(m=>{
-    const nb = S.board.slice(), np = {B:S.placed.B, W:S.placed.W};
-    if(m.from===null) np[t]++; else nb[m.from] = null;
-    nb[m.to] = t;
-    const v = tmmWinLine(nb, t, S.diag) ? 1000 + depth : -tmmNega(nb, np, o, depth-1, -Infinity, Infinity, S.diag);
+    const nb = S.board.slice(); nb[m.from] = null; nb[m.to] = t;
+    let v = tmmWon(nb, t) ? 1000 + depth : -tmmNega(nb, o, depth-1, -Infinity, Infinity, S.diag);
+    if(S.seen && S.seen[nb.map(x=>x||'-').join('')+o]) v -= 6;   /* يتجنّب تكرار نفس الوضع عشان ميتعادلش */
     if(v>best){ best = v; pool = [m]; } else if(v===best) pool.push(m);
   });
   return aiPick(pool);
 }
 function tmmNewRound(S){
-  S.board = Array(9).fill(null); S.placed = {B:0, W:0}; S.turn = S.starter;
-  S.selected = null; S.winner = null; S.line = null; S.blocked = false;
+  S.board = [ 'W','W','W', null,null,null, 'B','B','B' ];
+  S.turn = S.starter; S.selected = null; S.winner = null; S.blocked = false;
   S.seen = {}; S.last = null; S.fresh = false;
 }
 function initTmmGame(){
@@ -24862,15 +24867,13 @@ function initTmmGame(){
 function tmmWinsNeeded(){ return (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.soloTmmWinsNeeded) || 2; }
 function tmmDo(S, m){
   const t = S.turn, o = t==='B' ? 'W' : 'B';
-  if(m.from===null) S.placed[t]++; else S.board[m.from] = null;
-  S.board[m.to] = t; S.last = m.to; S.fresh = true; S.selected = null;
-  try{ m.from===null ? SND.click() : SND.chessMove(); }catch(e){}
-  const line = tmmWinLine(S.board, t, S.diag);
-  if(line){ S.winner = t; S.line = line; }
+  S.board[m.from] = null; S.board[m.to] = t; S.last = m.to; S.fresh = true; S.selected = null;
+  try{ SND.chessMove(); }catch(e){}
+  if(tmmWon(S.board, t)){ S.winner = t; }
   else {
     S.turn = o;
-    if(!tmmMoves(S.board, S.placed[o], o, S.diag).length){ S.winner = t; S.blocked = true; S.turn = t; }
-    else if(S.placed.B>=3 && S.placed.W>=3){
+    if(!tmmMoves(S.board, o, S.diag).length){ S.winner = t; S.blocked = true; S.turn = t; }
+    else {
       const key = S.board.map(x=>x||'-').join('')+o;
       S.seen[key] = (S.seen[key]||0) + 1;
       if(S.seen[key] >= 3) S.winner = 'draw';
@@ -24905,12 +24908,7 @@ function tmmBotMove(){
 function doTmmPoint(i){
   const S = state.tmm; if(!S || S.winner) return;
   if(S.mode==='ai' && S.turn!=='B') return;
-  const t = S.turn, moves = tmmMoves(S.board, S.placed[t], t, S.diag);
-  if(S.placed[t] < 3){
-    const m = moves.find(x=>x.to===i);
-    if(m){ tmmDo(S, m); render(); tmmAfter(); }
-    return;
-  }
+  const t = S.turn, moves = tmmMoves(S.board, t, S.diag);
   if(S.selected!==null){
     const m = moves.find(x=>x.from===S.selected && x.to===i);
     if(m){ tmmDo(S, m); render(); tmmAfter(); return; }
@@ -24920,7 +24918,7 @@ function doTmmPoint(i){
   render();
 }
 function doTmmMode(mode){ initTmmGame(); state.tmm.mode = mode; render(); }
-function doTmmDiag(){ const d = !state.tmm.diag; initTmmGame(); state.tmm.diag = d; render(); }
+function doTmmDiag(){ const d = !state.tmm.diag; const m = state.tmm.mode; initTmmGame(); state.tmm.diag = d; state.tmm.mode = m; render(); }
 function doTmmNext(){
   const S = state.tmm; if(!S) return;
   if(S.matchOver){ const m=S.mode, d=S.diag; initTmmGame(); state.tmm.mode=m; state.tmm.diag=d; }
@@ -24933,28 +24931,28 @@ function renderTmmGame(){
   const S = state.tmm, ai = S.mode==='ai', X = [14,50,86];
   const nameOf = p => p==='B' ? (ai?'انت':'الأسود') : (ai?'الجهاز':'الأبيض');
   const t = S.turn, humanTurn = !S.winner && (!ai || t==='B');
-  const placing = !S.winner && S.placed[t] < 3;
-  const moves = S.winner ? [] : tmmMoves(S.board, S.placed[t], t, S.diag);
+  const moves = S.winner ? [] : tmmMoves(S.board, t, S.diag);
   const dests = (humanTurn && S.selected!==null) ? moves.filter(m=>m.from===S.selected).map(m=>m.to) : [];
+  const winner = S.winner && S.winner!=='draw' ? S.winner : null;
   const pts = [];
   for(let i=0;i<9;i++){
     const p = S.board[i];
-    const isWin = S.line && S.line.indexOf(i)>-1;
-    const canPlace = humanTurn && placing && !p;
-    let cls = 'tmm-pt' + (p?' has':'') + ((canPlace || dests.indexOf(i)>-1) ? ' dest' : '') + (S.selected===i ? ' sel' : '');
-    const piece = p ? `<span class="tmm-piece ${p==='B'?'b':'w'}${(S.fresh && S.last===i)?' fresh':''}${isWin?' win':''}"></span>` : '';
+    const isGoalOf = TMM_GOAL.B.indexOf(i)>-1 ? 'B' : (TMM_GOAL.W.indexOf(i)>-1 ? 'W' : '');
+    const inGoal = p && isGoalOf===p;
+    const cls = 'tmm-pt' + (p?' has':'') + (dests.indexOf(i)>-1 ? ' dest' : '') + (S.selected===i ? ' sel' : '') + (isGoalOf ? ' goal-'+isGoalOf.toLowerCase() : '');
+    const piece = p ? `<span class="tmm-piece ${p==='B'?'b':'w'}${(S.fresh && S.last===i)?' fresh':''}${(winner && p===winner && inGoal)?' win':''}"></span>` : '';
     pts.push(`<button type="button" class="${cls}" style="left:${X[i%3]}%;top:${X[(i/3)|0]}%" data-action="tmm-pt" data-i="${i}" aria-label="خانة ${i+1}">${piece}</button>`);
   }
   S.fresh = false;
-  const tray = p => `<div class="tmm-tray${(!S.winner && t===p)?' on':''}"><span class="tmm-chips">${[0,1,2].map(k=>`<i class="tmm-chip ${p==='B'?'b':'w'}${k<3-S.placed[p]?'':' used'}"></i>`).join('')}</span><span class="tmm-tname">${nameOf(p)}</span><b class="tmm-score">${S.score[p]}</b></div>`;
+  const tray = p => `<div class="tmm-tray${(!S.winner && t===p)?' on':''}"><span class="tmm-chips">${[0,1,2].map(k=>`<i class="tmm-chip ${p==='B'?'b':'w'}${k<tmmAtGoal(S.board,p)?'':' used'}"></i>`).join('')}</span><span class="tmm-tname">${nameOf(p)}</span><b class="tmm-score">${S.score[p]}</b></div>`;
   let status;
   if(S.winner==='draw') status = '🤝 تعادل — الحركات اتكررت 3 مرات';
   else if(S.winner){
-    const w = ai ? (S.winner==='B' ? '🎉 فزت بالجولة!' : '🤖 الجهاز كسب الجولة') : `🎉 فاز ${nameOf(S.winner)}`;
-    status = w + (S.blocked ? ' — الخصم اتحاصر ومعندوش حركة' : '');
+    const w = ai ? (S.winner==='B' ? '🎉 فزت بالجولة! وصّلت قطعك كلها' : '🤖 الجهاز وصّل قطعه وكسب الجولة') : `🎉 فاز ${nameOf(S.winner)} — وصّل قطعه كلها`;
+    status = w + (S.blocked ? ' (الخصم اتحاصر ومعندوش حركة)' : '');
   }
   else if(ai && t==='W') status = '🤖 الجهاز بيفكر...';
-  else status = `دور ${nameOf(t)} — ` + (placing ? 'حط قطعة في أي خانة فاضية' : (S.selected!==null ? 'اختار الخانة اللي تروحها' : 'اختار قطعة وحرّكها لخانة فاضية جنبها'));
+  else status = `دور ${nameOf(t)} — ` + (S.selected!==null ? 'اختار الخانة اللي تروحها' : 'اختار قطعة وحرّكها خطوة');
   const need = tmmWinsNeeded();
   return `
     <div class="back-row">
@@ -24974,7 +24972,7 @@ function renderTmmGame(){
     <div class="tmm-wrap">
       <div class="tmm-trays">${tray('W')}${tray('B')}</div>
       <div class="tmm-board"><svg class="tmm-lines" viewBox="0 0 100 100" aria-hidden="true"><rect x="14" y="14" width="72" height="72"/><path d="M50 14V86M14 50H86"/>${S.diag?'<path d="M14 14L86 86M86 14L14 86"/>':''}</svg>${pts.join('')}</div>
-      <div class="tmm-rules">كل لاعب معاه 3 قطع. حطوا قطعكم بالدور، وبعدها حرّك قطعة لخانة فاضية جنبها على الخط. اللي يرتّب 3 قطع في خط واحد يكسب، واللي يتحاصر ومعندوش حركة يخسر.${ai ? ` أول واحد يكسب ${need} جولات يكسب المعركة وياخد نقط.` : ''}</div>
+      <div class="tmm-rules">كل لاعب قدامه 3 قطع. بالدور كل واحد بيحرّك قطعة واحدة خطوة واحدة لخانة فاضية جنبها على الخط. أول واحد يوصّل قطعه التلاتة لناحية الخصم يكسب. واللي يتحاصر ومعندوش حركة يخسر.${ai ? ` أول واحد يكسب ${need} جولات يكسب المعركة وياخد نقط.` : ''}</div>
     </div>
     ${S.winner ? nextProBtn('tmm-next') : ''}
   `;
@@ -25406,31 +25404,8 @@ function renderRoomGamesInCategory(){
 }
 function roomWaitHead(){
   return `
-      <div class="ch-mascot"><svg viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="rwCr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#e8a012"/></linearGradient>
-          <radialGradient id="rwBd" cx=".35" cy=".25" r=".9"><stop offset="0" stop-color="#3a3647"/><stop offset=".55" stop-color="#17141f"/><stop offset="1" stop-color="#0c0a12"/></radialGradient>
-        </defs>
-        <ellipse cx="110" cy="96" rx="84" ry="54" fill="url(#rwBd)"/>
-        <ellipse cx="70" cy="70" rx="22" ry="9" fill="#fff" opacity=".1" transform="rotate(-25 70 70)"/>
-        <g transform="rotate(-9 112 50)">
-          <path d="M62 62 L66 22 L89 42 L112 12 L135 42 L158 22 L162 62 Q112 72 62 62Z" fill="url(#rwCr)" stroke="#b97708" stroke-width="2" stroke-linejoin="round"/>
-          <circle cx="66" cy="20" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/><circle cx="112" cy="10" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/><circle cx="158" cy="20" r="7" fill="#ffd34d" stroke="#b97708" stroke-width="1.5"/>
-          <path d="M72 56 Q112 64 152 56" stroke="#fff3b0" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
-        </g>
-        <g class="ch-eyes"><path d="M54 82 Q56 70 70 72 L104 76 Q112 78 120 76 L154 72 Q168 70 170 82 Q170 104 148 104 L132 104 Q118 104 114 94 Q112 90 110 94 Q106 104 92 104 L76 104 Q54 104 54 82Z" fill="#050408"/>
-        <path d="M64 80 Q80 76 98 82" stroke="#fff" stroke-width="3" opacity=".25" fill="none" stroke-linecap="round"/>
-        <path d="M128 80 Q142 76 156 80" stroke="#fff" stroke-width="3" opacity=".2" fill="none" stroke-linecap="round"/></g>
-        <path d="M88 118 Q112 130 136 118" stroke="#050408" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9"/>
-        <g fill="#fff" stroke="#c9ccd8" stroke-width="1.5">
-          <g class="ch-hl"><ellipse cx="46" cy="136" rx="26" ry="15"/></g><g class="ch-hr"><ellipse cx="174" cy="136" rx="26" ry="15"/></g>
-        </g>
-        <g stroke="#c9ccd8" stroke-width="1.6" stroke-linecap="round"><path d="M38 124 V134 M48 122 V134 M58 124 V134"/><path d="M162 124 V134 M172 122 V134 M182 124 V134"/></g>
-      </svg></div>
-      <svg class="ch-bubble-crown" viewBox="0 0 40 32"><path d="M4 26 L6 8 L14 16 L20 4 L26 16 L34 8 L36 26Z" fill="none" stroke="#f7b92a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
-<div class="ch-bubble">استنى أصحابك وابدأ اللعب!</div>
 <div class="ch-bg"><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="ch-swords"><svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+<div class="rw-badge"><span class="rw-pulse"></span><span class="rw-pulse p2"></span><div class="rw-emblem"><svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
           <defs><linearGradient id="rwBl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f6ff"/><stop offset=".5" stop-color="#b6c6e4"/><stop offset="1" stop-color="#7f93b8"/></linearGradient>
           <linearGradient id="rwHl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#d98d0c"/></linearGradient></defs>
           <path d="M60 4 L66 12 L60 18 L54 12Z" fill="url(#rwHl)"/><path d="M48 14 L60 4 L72 14 L70 20 L50 20Z" fill="url(#rwHl)" stroke="#b97708" stroke-width="1.2" stroke-linejoin="round"/>
@@ -25438,12 +25413,8 @@ function roomWaitHead(){
             <g transform="rotate(-42)"><path d="M0 -50 L9 -38 L9 14 L-9 14 L-9 -38Z" fill="url(#rwBl)" stroke="#6e82a8" stroke-width="1.2" stroke-linejoin="round"/><path d="M0 -50 V14" stroke="#fff" stroke-width="1.5" opacity=".6"/><rect x="-18" y="14" width="36" height="7" rx="3.5" fill="url(#rwHl)" stroke="#b97708" stroke-width="1"/><rect x="-4" y="21" width="8" height="16" rx="3" fill="#8a4a12"/><circle cx="0" cy="40" r="5.5" fill="url(#rwHl)" stroke="#b97708" stroke-width="1"/></g>
             <g transform="rotate(42)"><path d="M0 -50 L9 -38 L9 14 L-9 14 L-9 -38Z" fill="url(#rwBl)" stroke="#6e82a8" stroke-width="1.2" stroke-linejoin="round"/><path d="M0 -50 V14" stroke="#fff" stroke-width="1.5" opacity=".6"/><rect x="-18" y="14" width="36" height="7" rx="3.5" fill="url(#rwHl)" stroke="#b97708" stroke-width="1"/><rect x="-4" y="21" width="8" height="16" rx="3" fill="#8a4a12"/><circle cx="0" cy="40" r="5.5" fill="url(#rwHl)" stroke="#b97708" stroke-width="1"/></g>
           </g>
-        </svg></div>
-        <div class="ch-ttl">
-          <svg viewBox="0 0 300 74" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rwBr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd84f"/><stop offset="1" stop-color="#f6a712"/></linearGradient></defs>
-            <path d="M4 44 L22 38 L8 33 L44 26 L120 17 L204 15 L262 8 L296 12 L286 20 L298 27 L276 33 L292 42 L270 49 L284 58 L238 59 L150 66 L62 70 L18 67 L36 59 L6 55Z" fill="url(#rwBr)"/></svg>
-          <span>غرفة الانتظار</span>
-        </div>
+        </svg></div></div>
+<div class="rw-title"><i></i><span>غرفة الانتظار</span><i></i></div>
 `;
 }
 function roomCodeCard(code, game, noHead){
