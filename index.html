@@ -5824,6 +5824,41 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     .stack-hud-score{font-size:clamp(28px,10vw,44px);}
     .stack-hint{font-size:10.5px; margin-top:6px;}
   }
+  /* ============================= GAMES: CUBE (مكعب روبيك 3×3) ============================= */
+  .cube-overlay{position:fixed; inset:0; z-index:9500; overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; color:#101014;
+    background:radial-gradient(120% 80% at 50% 30%, #ffffff 0%, #eef0f5 60%, #dde1ea 100%);}
+  .cube-shell{position:relative; max-width:520px; margin:0 auto; height:100%; height:100dvh; display:flex; flex-direction:column; box-sizing:border-box; overflow:hidden;
+    padding:calc(6px + env(safe-area-inset-top,0px)) 10px calc(12px + env(safe-area-inset-bottom,0px));}
+  .cube-topbar{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .icon-btn.cube-back{background:#fff; border:1px solid rgba(0,0,0,.1); color:#15151b; box-shadow:0 2px 8px rgba(0,0,0,.08); transition:.15s;}
+  .icon-btn.cube-back:active{transform:scaleX(-1) scale(.9);}
+  .cube-title{flex:1; text-align:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; color:#15151b; letter-spacing:.2px;}
+  .cube-best-pill{background:#fff; border:1px solid rgba(0,0,0,.1); box-shadow:0 2px 8px rgba(0,0,0,.06); border-radius:999px; padding:6px 13px; display:flex; align-items:center; gap:5px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; color:#15151b; direction:ltr;}
+  .cube-best-pill b{font-size:13.5px; font-variant-numeric:tabular-nums; color:#b8860b;}
+  .cube-stage{position:relative; flex:1; min-height:0; margin-top:4px;}
+  .cube-stage canvas{position:absolute; left:0; top:0; display:block; touch-action:none; cursor:grab;}
+  .cube-hud{position:absolute; top:2%; left:0; right:0; z-index:3; text-align:center; pointer-events:none; direction:ltr;}
+  .cube-logo{display:flex; flex-direction:column; align-items:center; line-height:.9; font-family:'Cairo',sans-serif; font-weight:900; color:#0d0d12;}
+  .cube-logo small{font-size:clamp(14px,4.4vw,20px); letter-spacing:.34em; margin-right:-.34em;}
+  .cube-logo b{font-size:clamp(40px,13vw,64px); letter-spacing:.06em; margin-right:-.06em; text-shadow:0 3px 0 rgba(0,0,0,.08);}
+  .cube-timer{font-family:'Cairo',sans-serif; font-weight:900; font-size:clamp(44px,14vw,70px); line-height:1; color:#0d0d12; font-variant-numeric:tabular-nums; letter-spacing:.01em;}
+  .cube-moves{font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:rgba(13,13,18,.5); margin-top:2px; min-height:18px; direction:rtl;}
+  .cube-over{position:absolute; left:6px; right:6px; bottom:6px; z-index:6; display:none;}
+  .cube-over.on{display:block;}
+  .cube-over-card{display:flex; flex-direction:column; align-items:center; gap:2px; padding:16px 16px 14px; text-align:center; border-radius:22px; background:rgba(255,255,255,.94); border:1px solid rgba(0,0,0,.08); box-shadow:0 14px 40px rgba(20,24,50,.22); animation:cubeOverIn .35s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes cubeOverIn{from{opacity:0; transform:translateY(24px) scale(.94);} to{opacity:1; transform:none;}}
+  .cube-over-ico{font-size:34px; line-height:1;}
+  .cube-over-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; color:#15151b;}
+  .cube-over-time{font-family:'Cairo',sans-serif; font-weight:900; font-size:40px; line-height:1.1; color:#0d0d12; font-variant-numeric:tabular-nums; direction:ltr;}
+  .cube-over-sub{font-family:'Cairo',sans-serif; font-weight:700; font-size:12.5px; color:#6b5200;}
+  .cube-foot{flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:8px; min-height:74px; justify-content:flex-end;}
+  .cube-hint{text-align:center; font-family:'Cairo',Tajawal,Arial; font-weight:800; font-size:12px; letter-spacing:.2px; color:rgba(13,13,18,.55); padding:0 12px;}
+  .cube-btn{width:auto !important; min-width:170px; padding:11px 22px !important; font-size:14px !important;}
+  @media (max-height:640px){
+    .cube-logo b{font-size:clamp(32px,11vw,48px);}
+    .cube-timer{font-size:clamp(36px,12vw,54px);}
+    .cube-foot{min-height:62px;}
+  }
   /* ============================= GAMES: DARTS (لعبة النشان) ============================= */
   .darts-overlay{position:fixed; inset:0; z-index:9500; background:linear-gradient(180deg,#241a12,#120c08); overflow:hidden;}
   .darts-shell{max-width:520px; margin:0 auto; padding:calc(6px + env(safe-area-inset-top,0px)) 10px calc(10px + env(safe-area-inset-bottom,0px)); height:100%; height:100dvh; display:flex; flex-direction:column; box-sizing:border-box; overflow:hidden;}
@@ -10330,7 +10365,7 @@ async function loadGamePointsSettings(){
     soloXoReward:25, soloXoWinsNeeded:3, soloC4Reward:25, soloC4WinsNeeded:4,
     soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
     soloNumGuessReward:100, soloNumGuessMaxTries:6, soloPlaceMemReward:40,
-    soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5,
+    soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5, soloCubeReward:50,
     soloSnlReward:30, soloSnlWinsNeeded:3,
     visaMinWithdraw:600, visaRenewFee:100, visaValidDays:14};
   try{
@@ -10809,7 +10844,7 @@ let GAME_POINTS_SETTINGS = {first:100, second:50, third:30, leavePenalty:50, xoE
   soloXoReward:25, soloXoWinsNeeded:3, soloC4Reward:25, soloC4WinsNeeded:4,
   soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
   soloNumGuessReward:100, soloNumGuessMaxTries:6, soloPlaceMemReward:40,
-  soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5,
+  soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5, soloCubeReward:50,
   soloSnlReward:30, soloSnlWinsNeeded:3,
   soloReflexReward:30, soloReflexWinsNeeded:5, soloDartsReward:35, soloBowlingReward:40};
 function confLogoHtml(){
@@ -13878,7 +13913,7 @@ const ACH_GROUPS = [
   {cat:'تحديات خاصة', m:null, items:[['played',1,'b','بداية الرحلة','🚀','خض أول مباراة لك'],['comp',1,'s','الصامد','🛡️','كمّلت المباراة بعد انسحاب خصمك'],['dayWins',3,'s','ليلة الحظ','🌙','حقق 3 انتصارات في يوم واحد'],['bigwin',100,'g','الضربة الكبرى','💥','اكسب 100 نقطة أو أكثر في فوز واحد']]}
 ];
 const ACH_LEVELS = [[0,'مبتدئ'],[30,'لاعب'],[90,'محترف'],[180,'خبير'],[300,'أسطورة']];
-const ACH_KEYS = [['xo',/إكس أو/],['reflex',/أسرع/],['num',/الرقم/],['math',/الرياضيات/],['c4',/كونكت/],['bil',/البلياردو/],['stack',/برج/],['darts',/النشان/],['bowling',/البولينج/],['quiz',/سيربح المليون/],['ludo',/لودو/],['domino',/دومينو/],['chess',/شطرنج/],['uno',/أونو|uno/i],['checkers',/داما/],['backgammon',/طاولة/],['snakes',/سلم|ثعبان/],['memory',/ذاكرة/],['rps',/حجر/]];
+const ACH_KEYS = [['xo',/إكس أو/],['reflex',/أسرع/],['num',/الرقم/],['math',/الرياضيات/],['c4',/كونكت/],['bil',/البلياردو/],['stack',/برج/],['cube',/مكعب/],['darts',/النشان/],['bowling',/البولينج/],['quiz',/سيربح المليون/],['ludo',/لودو/],['domino',/دومينو/],['chess',/شطرنج/],['uno',/أونو|uno/i],['checkers',/داما/],['backgammon',/طاولة/],['snakes',/سلم|ثعبان/],['memory',/ذاكرة/],['rps',/حجر/]];
 function achDefs(){
   const out=[];
   ACH_GROUPS.forEach(g=>{
@@ -14234,7 +14269,7 @@ const GAME_CATEGORIES = [
 const GAME_CATEGORY_OF = {
   xo:'board', connect4:'board', domino:'board', ludo:'board', chess:'board', checkers:'board', tmm:'board', backgammon:'board', snakes:'board',
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
-  memory:'mind', revword:'mind', blocky:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
+  memory:'mind', revword:'mind', blocky:'mind', cube:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
   uno:'cards', rps:'cards',
   quiz:'party', mystery:'party', emojibible:'party', proverb:'party', fahmeen:'party', placemem:'mind', fazzura:'party',
 };
@@ -14319,6 +14354,7 @@ const GAMES_CATALOG = [
   {id:'bowling', icon:'🎳', title:'لعبة البولينج', sub:'10 فريمات واسترايك وسبير — ضد الجهاز', color:'linear-gradient(145deg,#6C4DFF,#1a1040)'},
   {id:'stack', icon:'🗼', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KPGRlZnM+CjxyYWRpYWxHcmFkaWVudCBpZD0ic2ciIGN4PSI1MCUiIGN5PSI5MiUiIHI9IjU1JSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDAiIHN0b3Atb3BhY2l0eT0iLjM4Ii8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KPGVsbGlwc2UgY3g9IjUwIiBjeT0iOTciIHJ4PSIyNiIgcnk9IjUuNSIgZmlsbD0idXJsKCNzZykiLz4KPGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLC4xNikiIHN0cm9rZS13aWR0aD0iMC42IiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHBvbHlnb24gcG9pbnRzPSI1MCw3MS4zNCA2OC44NCw4Mi4yMiA1MCw5My4xIDMxLjE2LDgyLjIyIiBmaWxsPSIjM0Y3RkUwIi8+Cjxwb2x5Z29uIHBvaW50cz0iNjguODQsODIuMjIgNTAsOTMuMSA1MCw5OC44OCA2OC44NCw4OCIgZmlsbD0iIzMyNjZiMyIvPgo8cG9seWdvbiBwb2ludHM9IjUwLDkzLjEgMzEuMTYsODIuMjIgMzEuMTYsODggNTAsOTguODgiIGZpbGw9IiMyODUxOGYiLz4KPHBvbHlnb24gcG9pbnRzPSI1My44Myw2Ny43NyA2OC41NSw3Ni4yNyA0OS43MSw4Ny4xNSAzNC45OCw3OC42NSIgZmlsbD0iIzRGQUNGRSIvPgo8cG9seWdvbiBwb2ludHM9IjY4LjU1LDc2LjI3IDQ5LjcxLDg3LjE1IDQ5LjcxLDkyLjkzIDY4LjU1LDgyLjA1IiBmaWxsPSIjM2Y4YWNiIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDkuNzEsODcuMTUgMzQuOTgsNzguNjUgMzQuOTgsODQuNDMgNDkuNzEsOTIuOTMiIGZpbGw9IiMzMzZlYTMiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS43MSw2NC4zNyA2NC40Myw3Mi44NyA1MC44OCw4MC42OSAzNi4xNiw3Mi4xOSIgZmlsbD0iIzVGRTBBNCIvPgo8cG9seWdvbiBwb2ludHM9IjY0LjQzLDcyLjg3IDUwLjg4LDgwLjY5IDUwLjg4LDg2LjQ3IDY0LjQzLDc4LjY1IiBmaWxsPSIjNGNiMzgzIi8+Cjxwb2x5Z29uIHBvaW50cz0iNTAuODgsODAuNjkgMzYuMTYsNzIuMTkgMzYuMTYsNzcuOTcgNTAuODgsODYuNDciIGZpbGw9IiMzZDhmNjkiLz4KPHBvbHlnb24gcG9pbnRzPSI0OS4xMiw1OC4yNSA1OS43Miw2NC4zNyA0Ni4xNyw3Mi4xOSAzNS41Nyw2Ni4wNyIgZmlsbD0iI0ZGRDg3MyIvPgo8cG9seWdvbiBwb2ludHM9IjU5LjcyLDY0LjM3IDQ2LjE3LDcyLjE5IDQ2LjE3LDc3Ljk3IDU5LjcyLDcwLjE1IiBmaWxsPSIjY2NhZDVjIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDYuMTcsNzIuMTkgMzUuNTcsNjYuMDcgMzUuNTcsNzEuODUgNDYuMTcsNzcuOTciIGZpbGw9IiNhMzhhNGEiLz4KPC9nPgo8cG9seWdvbiBwb2ludHM9IjQ5LjEyLDU4LjI1IDU5LjcyLDY0LjM3IDUzLjYsNjcuOSA0My42LDYyLjEiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4yOCIvPgo8L3N2Zz4K', title:'Stack', sub:'رصّ الطوب فوق بعضه بالظبط ووصّل لأعلى برج ممكن', color:'linear-gradient(145deg,#4FACFE,#845EC2)'},
   {id:'blocky', icon:'🧩', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkY4Nzg3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRTAzMTMxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJiIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZFMDY2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjU5RjAwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNzRDMEZDIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTk3MUMyIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOENFOTlBIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMkY5RTQ0Ii8+PC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8ZyBzdHJva2U9InJnYmEoMCwwLDAsLjI1KSIgc3Ryb2tlLXdpZHRoPSIxLjUiPgo8cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIzOCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9InVybCgjYSkiLz4KPHJlY3QgeD0iNTIiIHk9IjEwIiB3aWR0aD0iMzgiIGhlaWdodD0iMzgiIHJ4PSI5IiBmaWxsPSJ1cmwoI2IpIi8+CjxyZWN0IHg9IjEwIiB5PSI1MiIgd2lkdGg9IjM4IiBoZWlnaHQ9IjM4IiByeD0iOSIgZmlsbD0idXJsKCNjKSIvPgo8cmVjdCB4PSI1MiIgeT0iNTIiIHdpZHRoPSIzOCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9InVybCgjZCkiLz48L2c+CjxnIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsLjU1KSI+PHJlY3QgeD0iMTYiIHk9IjE2IiB3aWR0aD0iMTYiIGhlaWdodD0iNyIgcng9IjMuNSIvPjxyZWN0IHg9IjU4IiB5PSIxNiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIzLjUiLz48cmVjdCB4PSIxNiIgeT0iNTgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiByeD0iMy41Ii8+PHJlY3QgeD0iNTgiIHk9IjU4IiB3aWR0aD0iMTYiIGhlaWdodD0iNyIgcng9IjMuNSIvPjwvZz4KPHBhdGggZD0iTTUwIDMwbDQgMTEgMTEgNC0xMSA0LTQgMTEtNC0xMS0xMS00IDExLTR6IiBmaWxsPSIjZmZmIiBzdHJva2U9IiNCMTk3RkMiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==', title:'بلوكي بلاست', sub:'لوحة 8×8 — فجّر الصفوف والأعمدة، كومبو ومستويات وتراجع وتبديل قطع', color:'linear-gradient(145deg,#6C4DFF,#1d1b4d)'},
+  {id:'cube', icon:'🧊', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImNzIiBjeD0iNTAlIiBjeT0iNTAlIiByPSI1MCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDAiIHN0b3Atb3BhY2l0eT0iLjM1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDAwIiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50PjwvZGVmcz48ZWxsaXBzZSBjeD0iNTAiIGN5PSI5NSIgcng9IjMwIiByeT0iNC42IiBmaWxsPSJ1cmwoI2NzKSIvPjxwb2x5Z29uIHBvaW50cz0iNTAuMDAsMTAuMDAgODUuMDcsMzAuMjUgODUuMDcsNzAuNzUgNTAuMDAsOTEuMDAgMTQuOTMsNzAuNzUgMTQuOTMsMzAuMjUiIGZpbGw9IiMxNTE1MWIiIHN0cm9rZT0iIzE1MTUxYiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PGcgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZT0icmdiYSgwLDAsMCwuMjUpIj48cG9seWdvbiBwb2ludHM9IjUwLjAwLDExLjIxIDU5LjU5LDE2Ljc1IDUwLjAwLDIyLjI4IDQwLjQxLDE2Ljc1IiBmaWxsPSIjZjVmNWYyIi8+PHBvbHlnb24gcG9pbnRzPSIzOC4zMSwxNy45NiA0Ny45MCwyMy41MCAzOC4zMSwyOS4wMyAyOC43MiwyMy41MCIgZmlsbD0iI2ZmOGExZiIvPjxwb2x5Z29uIHBvaW50cz0iMjYuNjIsMjQuNzEgMzYuMjAsMzAuMjUgMjYuNjIsMzUuNzggMTcuMDMsMzAuMjUiIGZpbGw9IiNmZmQ2MGEiLz48cG9seWdvbiBwb2ludHM9IjYxLjY5LDE3Ljk3IDcxLjI4LDIzLjUwIDYxLjY5LDI5LjAzIDUyLjEwLDIzLjUwIiBmaWxsPSIjMWY2ZmUwIi8+PHBvbHlnb24gcG9pbnRzPSI1MC4wMCwyNC43MiA1OS41OSwzMC4yNSA1MC4wMCwzNS43OCA0MC40MSwzMC4yNSIgZmlsbD0iI2Y1ZjVmMiIvPjxwb2x5Z29uIHBvaW50cz0iMzguMzEsMzEuNDYgNDcuOTAsMzcuMDAgMzguMzEsNDIuNTMgMjguNzIsMzcuMDAiIGZpbGw9IiNlODM0M2IiLz48cG9seWdvbiBwb2ludHM9IjczLjM4LDI0LjcxIDgyLjk3LDMwLjI1IDczLjM4LDM1Ljc5IDYzLjgwLDMwLjI1IiBmaWxsPSIjMWZiODVhIi8+PHBvbHlnb24gcG9pbnRzPSI2MS42OSwzMS40NiA3MS4yOCwzNy4wMCA2MS42OSw0Mi41NCA1Mi4xMCwzNy4wMCIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iNTAuMDAsMzguMjEgNTkuNTksNDMuNzUgNTAuMDAsNDkuMjkgNDAuNDEsNDMuNzUiIGZpbGw9IiNmNWY1ZjIiLz48cG9seWdvbiBwb2ludHM9IjE1Ljk4LDMyLjA3IDI1LjU3LDM3LjYxIDI1LjU3LDQ4LjY4IDE1Ljk4LDQzLjE0IiBmaWxsPSIjMWZiODVhIi8+PHBvbHlnb24gcG9pbnRzPSIxNS45OCw0NS41NyAyNS41Nyw1MS4xMSAyNS41Nyw2Mi4xOCAxNS45OCw1Ni42NCIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iMTUuOTgsNTkuMDcgMjUuNTcsNjQuNjEgMjUuNTcsNzUuNjggMTUuOTgsNzAuMTQiIGZpbGw9IiMxZmI4NWEiLz48cG9seWdvbiBwb2ludHM9IjI3LjY3LDM4LjgyIDM3LjI2LDQ0LjM2IDM3LjI2LDU1LjQzIDI3LjY3LDQ5Ljg5IiBmaWxsPSIjZmY4YTFmIi8+PHBvbHlnb24gcG9pbnRzPSIyNy42Nyw1Mi4zMiAzNy4yNiw1Ny44NiAzNy4yNiw2OC45MyAyNy42Nyw2My4zOSIgZmlsbD0iIzFmYjg1YSIvPjxwb2x5Z29uIHBvaW50cz0iMjcuNjcsNjUuODIgMzcuMjYsNzEuMzYgMzcuMjYsODIuNDMgMjcuNjcsNzYuODkiIGZpbGw9IiNlODM0M2IiLz48cG9seWdvbiBwb2ludHM9IjM5LjM2LDQ1LjU3IDQ4Ljk1LDUxLjExIDQ4Ljk1LDYyLjE4IDM5LjM2LDU2LjY0IiBmaWxsPSIjZmZkNjBhIi8+PHBvbHlnb24gcG9pbnRzPSIzOS4zNiw1OS4wNyA0OC45NSw2NC42MSA0OC45NSw3NS42OCAzOS4zNiw3MC4xNCIgZmlsbD0iI2ZmZDYwYSIvPjxwb2x5Z29uIHBvaW50cz0iMzkuMzYsNzIuNTcgNDguOTUsNzguMTEgNDguOTUsODkuMTggMzkuMzYsODMuNjQiIGZpbGw9IiNlODM0M2IiLz48cG9seWdvbiBwb2ludHM9IjUxLjA1LDUxLjExIDYwLjY0LDQ1LjU3IDYwLjY0LDU2LjY0IDUxLjA1LDYyLjE4IiBmaWxsPSIjZmY4YTFmIi8+PHBvbHlnb24gcG9pbnRzPSI1MS4wNSw2NC42MSA2MC42NCw1OS4wNyA2MC42NCw3MC4xNCA1MS4wNSw3NS42OCIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iNTEuMDUsNzguMTEgNjAuNjQsNzIuNTcgNjAuNjQsODMuNjQgNTEuMDUsODkuMTgiIGZpbGw9IiMxZmI4NWEiLz48cG9seWdvbiBwb2ludHM9IjYyLjc0LDQ0LjM2IDcyLjMzLDM4LjgyIDcyLjMzLDQ5Ljg5IDYyLjc0LDU1LjQzIiBmaWxsPSIjZmZkNjBhIi8+PHBvbHlnb24gcG9pbnRzPSI2Mi43NCw1Ny44NiA3Mi4zMyw1Mi4zMiA3Mi4zMyw2My4zOSA2Mi43NCw2OC45MyIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iNjIuNzQsNzEuMzYgNzIuMzMsNjUuODIgNzIuMzMsNzYuODkgNjIuNzQsODIuNDMiIGZpbGw9IiMxZmI4NWEiLz48cG9seWdvbiBwb2ludHM9Ijc0LjQzLDM3LjYxIDg0LjAyLDMyLjA3IDg0LjAyLDQzLjE0IDc0LjQzLDQ4LjY4IiBmaWxsPSIjZTgzNDNiIi8+PHBvbHlnb24gcG9pbnRzPSI3NC40Myw1MS4xMSA4NC4wMiw0NS41NyA4NC4wMiw1Ni42NCA3NC40Myw2Mi4xOCIgZmlsbD0iI2ZmOGExZiIvPjxwb2x5Z29uIHBvaW50cz0iNzQuNDMsNjQuNjEgODQuMDIsNTkuMDcgODQuMDIsNzAuMTQgNzQuNDMsNzUuNjgiIGZpbGw9IiMxZjZmZTAiLz48L2c+PC9zdmc+', title:'مكعب روبيك', sub:'اضغط مرتين عشان يتخلط، وبعدين لف الطبقات بإصبعك لحد ما كل وش يبقى لون واحد — أسرع وقت بيتسجّل', color:'linear-gradient(145deg,#4FACFE,#6C4DFF)'},
   {id:'millionaire', icon:'👑', title:'من سيربح المليون', sub:'أسئلة مسيحية بنفس نظام السلم والمساعدات الثلاثة', color:'linear-gradient(145deg,#1b2a6b,#0a0c28)'},
   {id:'chess', icon:'♟️', logo:'chess-logo.png', title:'الشطرنج', sub:'شطرنج كامل بكل القواعد ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#3a3a3a,#0c0c0c)'},
   {id:'checkers', icon:'⚫', title:'الداما', sub:'أسر إجباري وتتويج للملوك — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#7C4A2A,#3a2412)'},
@@ -14346,6 +14382,7 @@ const GH_SOLO_SUB = {
   darts:'اسحب السهم لتحديد الهدف وسيبه يطير — أول واحد يوصل بالظبط لصفر من 101 نقطة يكسب',
   bowling:'حرّك الكورة يمين وشمال واسحبها لفوق بسرعة وسيبها — 10 فريمات، الاسترايك والسبير بيدّوك نقط زيادة، وأعلى مجموع يكسب',
   stack:'دوس في أي وقت عشان تنزّل الطوبة فوق اللي قبلها بالظبط — كل ما تظبط أكتر كل ما البرج يطول والسرعة تزيد',
+  cube:'اضغط مرتين عشان المكعب يتخلط، واسحب على أي وش عشان تلفّ طبقة (واسحب بره المكعب عشان تدوّره) — التايمر بيبدأ مع أول حركة، ولما كل وش يبقى لون واحد تكسب نقط',
   blocky:'لوحة 8×8 — اسحب البلوكات وفجّر الصفوف والأعمدة، كومبو بيضاعف النقط، مستويات بتصعب، وتراجع وتبديل قطع لما تتزنق.',
   millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 15 ثانية للسؤال، وكمّلهم كلهم واكسب 300 نقطة',
   chess:'شطرنج كامل بكل القواعد — كش ملك، تبييت، الأسر بالمرور، ترقية البيدق',
@@ -17877,6 +17914,443 @@ function stkDraw(){
     ctx.restore();
     stkDrawBlock(ctx, bx, bz, sx, sz, y0, y1, m.color, scale, cx, cy);
   }
+}
+/* ============================= GAMES: CUBE (مكعب روبيك 3×3 — ثلاثي الأبعاد بدون أي مكتبات خارجية) ============================= */
+/* رسم Canvas 2D بإسقاط منظوري: 27 قطعة، اسحب على أي وش عشان تلف الطبقة، واسحب بره المكعب عشان تدوّره كله.
+   اضغط مرتين على المكعب للبدء → بيتخلط تلقائي → التايمر بيبدأ مع أول حركة منك → ولما كل وش يبقى لون واحد تكسب. */
+const CUBE = {
+  D:7.4,                      /* بعد الكاميرا عن مركز المكعب */
+  N_SCRAMBLE:22,              /* عدد حركات الخلط */
+  SCRAMBLE_MS:110,            /* زمن كل حركة خلط */
+  TURN_MS:170,                /* زمن تثبيت الطبقة بعد ما تسيب إيدك */
+  COLS:['#e8343b','#ff8a1f','#f5f5f2','#ffd60a','#1fb85a','#1f6fe0'],   /* يمين، شمال، فوق، تحت، قدّام، ورا */
+  N:[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],
+  LIGHT:(function(){ const v=[-.35,.62,.72], l=Math.hypot(v[0],v[1],v[2]); return [v[0]/l,v[1]/l,v[2]/l]; })(),
+};
+CUBE.RGB = CUBE.COLS.map(h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]);
+
+/* ---------- رياضيات صغيرة ---------- */
+function cbMulV(M,v){ return [M[0][0]*v[0]+M[0][1]*v[1]+M[0][2]*v[2], M[1][0]*v[0]+M[1][1]*v[1]+M[1][2]*v[2], M[2][0]*v[0]+M[2][1]*v[1]+M[2][2]*v[2]]; }
+function cbMulM(A,B){ const R=[[0,0,0],[0,0,0],[0,0,0]]; for(let i=0;i<3;i++) for(let j=0;j<3;j++) R[i][j]=A[i][0]*B[0][j]+A[i][1]*B[1][j]+A[i][2]*B[2][j]; return R; }
+function cbRot(axis,a){ const c=Math.cos(a), s=Math.sin(a); return axis===0 ? [[1,0,0],[0,c,-s],[0,s,c]] : axis===1 ? [[c,0,s],[0,1,0],[-s,0,c]] : [[c,-s,0],[s,c,0],[0,0,1]]; }
+function cbRotQ(axis,k){ return cbRot(axis,k*Math.PI/2).map(r=>r.map(v=>Math.round(v)+0)); }
+function cbFaceIdx(n){ return n[0] ? (n[0]>0?0:1) : n[1] ? (n[1]>0?2:3) : (n[2]>0?4:5); }
+function cbFmt(ms, dec){
+  const t = Math.max(0, ms||0), s = Math.floor(t/1000), m = Math.floor(s/60);
+  return m + ':' + String(s%60).padStart(2,'0') + (dec ? '.' + Math.floor((t%1000)/100) : '');
+}
+function cbInPoly(P,x,y){
+  let c=false;
+  for(let i=0,j=P.length-1;i<P.length;j=i++){
+    const a=P[i], b=P[j];
+    if(((a.y>y)!==(b.y>y)) && (x < (b.x-a.x)*(y-a.y)/(b.y-a.y)+a.x)) c=!c;
+  }
+  return c;
+}
+
+/* ---------- حالة اللعبة ---------- */
+function cbInitCubies(){
+  const out=[];
+  for(let x=-1;x<=1;x++) for(let y=-1;y<=1;y++) for(let z=-1;z<=1;z++){
+    const p=[x,y,z];
+    const st = CUBE.N.map(n => (p[0]*n[0]+p[1]*n[1]+p[2]*n[2])===1 ? 1 : 0);   /* ملصق ملوّن بس على الأوجه اللي بره */
+    out.push({ p, R:[[1,0,0],[0,1,0],[0,0,1]], st });
+  }
+  return out;
+}
+function initCubeGame(){
+  state.cube = {
+    cubies:cbInitCubies(),
+    yaw:-.62, pitch:.52, vyaw:0, vpitch:0, V:null,
+    mode:'idle',                /* idle | scramble | ready | play | solved */
+    rot:null, anim:null, queue:[], drag:null,
+    t0:0, elapsed:0, moves:0, scrambled:false,
+    raf:null, lastTs:0, lastTap:0, lastTapX:0, lastTapY:0,
+    faces:[], cw:0, ch:0, dpr:1, S:60, S0:60, kS:1, cx:0, cy:0,
+    canvas:null, ctx:null, ui:{},
+  };
+}
+function cbBestMs(){ const st = state.pid ? myGameStats(state.pid) : {}; return st.cubeBest || 0; }
+function cbReward(){ const s = GAME_POINTS_SETTINGS || {}; return Math.max(0, s.soloCubeReward==null ? 50 : (+s.soloCubeReward||0)); }
+async function saveCubeBest(ms, moves){
+  if(!state.pid) return;
+  const st = myGameStats(state.pid);
+  st.cubeSolves = (st.cubeSolves||0) + 1;
+  if(!st.cubeBest || ms < st.cubeBest) st.cubeBest = ms;
+  if(!st.cubeBestMoves || moves < st.cubeBestMoves) st.cubeBestMoves = moves;
+  await saveGameStats(GAME_STATS);
+}
+
+/* ---------- فتح وقفل ---------- */
+function openCubeGame(){
+  initCubeGame();
+  const old = document.getElementById('cube-overlay'); if(old) old.remove();
+  const ov = document.createElement('div');
+  ov.id = 'cube-overlay'; ov.className = 'cube-overlay';
+  ov.innerHTML = `<div class="cube-shell" id="cube-shell"></div>`;
+  document.body.appendChild(ov);
+  cbRenderShell();
+  window.addEventListener('resize', cbOnResize);
+  window.addEventListener('orientationchange', cbOnResize);
+  SND.click();
+}
+function closeCubeGame(){
+  const g = state.cube;
+  if(g){ if(g.raf) cancelAnimationFrame(g.raf); g.raf = null; g.mode = 'closed'; }
+  window.removeEventListener('resize', cbOnResize);
+  window.removeEventListener('orientationchange', cbOnResize);
+  const ov = document.getElementById('cube-overlay'); if(ov) ov.remove();
+  state.cube = null;
+  SND.back();
+}
+function cbOnResize(){ if(document.getElementById('cube-overlay')){ cbFit(); setTimeout(cbFit, 250); } }
+
+function cbRenderShell(){
+  const g = state.cube, shell = document.getElementById('cube-shell'); if(!g || !shell) return;
+  const best = cbBestMs();
+  shell.innerHTML = `
+    <div class="cube-topbar">
+      <button type="button" class="icon-btn cube-back" data-action="cube-close" aria-label="رجوع">${ICO.back}</button>
+      <div class="cube-title">🧊 مكعب روبيك</div>
+      <div class="cube-best-pill">🏆 <b id="cube-best">${best ? cbFmt(best,1) : '--'}</b></div>
+    </div>
+    <div class="cube-stage" id="cube-stage">
+      <div class="cube-hud">
+        <div class="cube-logo" id="cube-logo"><small>THE</small><b>CUBE</b></div>
+        <div class="cube-timer" id="cube-timer" style="display:none">0:00</div>
+        <div class="cube-moves" id="cube-moves"></div>
+      </div>
+      <canvas id="cube-canvas"></canvas>
+      <div class="cube-over" id="cube-over"></div>
+    </div>
+    <div class="cube-foot">
+      <div class="cube-hint" id="cube-hint"></div>
+      <button type="button" class="btn btn-primary cube-btn" id="cube-btn" data-action="cube-start">🔀 ابدأ</button>
+    </div>`;
+  g.canvas = document.getElementById('cube-canvas');
+  g.ctx = g.canvas.getContext('2d');
+  g.canvas.addEventListener('pointerdown', cbPointerDown);
+  g.canvas.addEventListener('pointermove', cbPointerMove);
+  g.canvas.addEventListener('pointerup', cbPointerUp);
+  g.canvas.addEventListener('pointercancel', cbPointerUp);
+  g.ui = {};
+  cbFit(); requestAnimationFrame(cbFit);
+  cbSyncUi(true);
+  g.lastTs = performance.now();
+  g.raf = requestAnimationFrame(cbLoop);
+}
+function cbFit(){
+  const g = state.cube, st = document.getElementById('cube-stage'), cv = document.getElementById('cube-canvas');
+  if(!g || !st || !cv) return;
+  const w = Math.max(120, st.clientWidth), h = Math.max(120, st.clientHeight);
+  const dpr = Math.min(window.devicePixelRatio||1, 3);
+  g.cw = w; g.ch = h; g.dpr = dpr;
+  cv.style.width = w+'px'; cv.style.height = h+'px';
+  const bw = Math.round(w*dpr), bh = Math.round(h*dpr);
+  if(cv.width!==bw || cv.height!==bh){ cv.width = bw; cv.height = bh; }
+  g.S0 = Math.min(w*0.15, h*0.135);
+  g.cx = w/2;
+  g.kS = (g.mode==='solved') ? .86 : 1;
+  g.S = g.S0 * g.kS;
+  g.cy = h * (g.mode==='solved' ? .36 : .52);
+}
+
+/* ---------- الواجهة حسب الحالة ---------- */
+function cbSyncUi(force){
+  const g = state.cube; if(!g) return;
+  const m = g.mode, u = g.ui;
+  if(!force && u.mode===m) return;
+  u.mode = m;
+  const hint = document.getElementById('cube-hint'), btn = document.getElementById('cube-btn');
+  const logo = document.getElementById('cube-logo'), timer = document.getElementById('cube-timer'), over = document.getElementById('cube-over');
+  const H = {
+    idle:'اضغط مرتين على المكعب للبدء 👆👆',
+    scramble:'بنخلط المكعب... 🌀',
+    ready:'اسحب على أي وش عشان تلفّ طبقة — والتايمر بيبدأ مع أول حركة',
+    play:'اسحب بعيد عن المكعب عشان تدوّره وتشوف باقي الأوجه 🔄',
+    solved:'',
+  };
+  if(hint) hint.textContent = H[m] || '';
+  if(logo) logo.style.display = (m==='idle') ? '' : 'none';
+  if(timer) timer.style.display = (m==='idle') ? 'none' : '';
+  if(btn){
+    btn.style.display = (m==='scramble' || m==='solved') ? 'none' : '';
+    btn.textContent = (m==='idle') ? '🔀 ابدأ' : '🔀 خلط جديد';
+  }
+  if(m!=='solved' && over){ over.classList.remove('on'); over.innerHTML = ''; }
+  u.t = null; u.mv = null;
+}
+function cbTickHud(g){
+  if(g.mode==='play') g.elapsed = performance.now() - g.t0;
+  const shown = (g.mode==='play' || g.mode==='solved') ? g.elapsed : 0;
+  const txt = cbFmt(shown, g.mode==='solved');
+  if(g.ui.t !== txt){ g.ui.t = txt; const e = document.getElementById('cube-timer'); if(e) e.textContent = txt; }
+  const mv = (g.mode==='play' || g.mode==='solved') ? (g.moves + ' حركة') : '';
+  if(g.ui.mv !== mv){ g.ui.mv = mv; const e = document.getElementById('cube-moves'); if(e) e.textContent = mv; }
+}
+
+/* ---------- الخلط ---------- */
+function cbStartScramble(){
+  const g = state.cube; if(!g || g.mode==='scramble') return;
+  g.cubies = cbInitCubies(); g.rot = null; g.anim = null; g.drag = null;
+  g.moves = 0; g.elapsed = 0; g.t0 = 0; g.scrambled = false; g.mode = 'scramble';
+  const q = []; let la = -1, ll = 9, run = 0;
+  while(q.length < CUBE.N_SCRAMBLE){
+    const a = Math.floor(Math.random()*3), l = Math.floor(Math.random()*3) - 1;
+    if(a===la && l===ll) continue;
+    if(a===la && run>=2) continue;
+    q.push({ a, l, k: Math.random()<.5 ? -1 : 1 });
+    run = (a===la) ? run+1 : 1; la = a; ll = l;
+  }
+  g.queue = q; g.vyaw = 1.1;
+  cbSyncUi(true);
+  SND.click();
+  cbPumpScramble(g);
+}
+function cbPumpScramble(g){
+  const m = g.queue.shift();
+  if(!m){
+    if(cbIsSolved(g)){ g.mode = 'idle'; cbStartScramble(); return; }   /* نادر جدًا: لو الخلط رجّع المكعب محلول نخلط تاني */
+    g.mode = 'ready'; g.scrambled = true; cbSyncUi(); return;
+  }
+  g.rot = { axis:m.a, layer:m.l, ang:0 };
+  g.anim = { from:0, to:m.k*Math.PI/2, t0:performance.now(), dur:CUBE.SCRAMBLE_MS, k:m.k, scr:true };
+}
+
+/* ---------- حركة الطبقات ---------- */
+function cbCommit(g, axis, layer, k){
+  const M = cbRotQ(axis, k);
+  g.cubies.forEach(cb=>{
+    if(cb.p[axis]===layer){
+      cb.p = cbMulV(M, cb.p).map(v=>Math.round(v)+0);
+      cb.R = cbMulM(M, cb.R).map(r=>r.map(v=>Math.round(v)+0));
+    }
+  });
+}
+function cbIsSolved(g){
+  const seen = [-1,-1,-1,-1,-1,-1];
+  for(const cb of g.cubies){
+    for(let f=0; f<6; f++){
+      if(!cb.st[f]) continue;
+      const w = cbFaceIdx(cbMulV(cb.R, CUBE.N[f]).map(Math.round));
+      if(seen[w]===-1) seen[w] = f; else if(seen[w]!==f) return false;
+    }
+  }
+  return true;
+}
+function cbStepAnim(g, ts){
+  const a = g.anim; if(!a || !g.rot) return;
+  const p = Math.min(1, (ts - a.t0) / a.dur);
+  const e = a.scr ? (p<.5 ? 2*p*p : 1 - Math.pow(-2*p+2, 2)/2) : 1 - Math.pow(1-p, 3);
+  g.rot.ang = a.from + (a.to - a.from) * e;
+  if(p>=1) cbFinishAnim(g);
+}
+function cbFinishAnim(g){
+  const a = g.anim, r = g.rot;
+  g.anim = null;
+  if(r && a.k) cbCommit(g, r.axis, r.layer, a.k);
+  g.rot = null;
+  if(a.scr){ cbPumpScramble(g); return; }
+  if(a.k){
+    try{ SND.click(); }catch(e){}
+    g.moves++;
+    if(g.mode==='ready'){ g.mode = 'play'; g.t0 = performance.now(); cbSyncUi(); }
+    if(g.mode==='play' && cbIsSolved(g)) cbWin(g);
+  }
+}
+function cbWin(g){
+  g.mode = 'solved'; g.elapsed = performance.now() - g.t0; g.vyaw = .9;
+  const ms = g.elapsed, mv = g.moves;
+  const prev = cbBestMs(), newBest = !prev || ms < prev;
+  const pts = (g.scrambled && mv >= 5) ? cbReward() : 0;
+  saveCubeBest(ms, mv);
+  const bp = document.getElementById('cube-best'); if(bp) bp.textContent = cbFmt(newBest ? ms : prev, 1);
+  cbSyncUi(true);
+  cbShowOver(ms, mv, newBest, pts);
+  if(pts > 0) setTimeout(()=> awardSoloGamePoints(pts, 'حليت مكعب روبيك 🧊 ' + cbFmt(ms)), 900);
+  else { try{ SND.success(); }catch(e){} }
+}
+function cbShowOver(ms, mv, newBest, pts){
+  const el = document.getElementById('cube-over'); if(!el) return;
+  el.innerHTML = `
+    <div class="cube-over-card">
+      <div class="cube-over-ico">🎉</div>
+      <div class="cube-over-title">حليت المكعب!</div>
+      <div class="cube-over-time">${cbFmt(ms,1)}</div>
+      <div class="cube-over-sub">${mv} حركة${newBest ? ' · 🔥 رقم قياسي جديد' : ''}</div>
+      ${pts>0 ? `<div class="cube-over-sub">🏆 +${pts} نقطة</div>` : ''}
+      <button type="button" class="btn btn-primary" data-action="cube-start" style="width:100%;margin-top:8px;">🔀 مكعب جديد</button>
+    </div>`;
+  el.classList.add('on');
+}
+
+/* ---------- اللمس ---------- */
+function cbPt(e){
+  const g = state.cube, r = g.canvas.getBoundingClientRect();
+  return { x:(e.clientX - r.left) * (g.cw / (r.width||1)), y:(e.clientY - r.top) * (g.ch / (r.height||1)) };
+}
+function cbHit(g, x, y){
+  const fs = g.faces;
+  for(let i=fs.length-1; i>=0; i--) if(cbInPoly(fs[i].pts, x, y)) return fs[i];
+  return null;
+}
+function cbPointerDown(e){
+  const g = state.cube; if(!g || g.drag) return;
+  e.preventDefault();
+  const p = cbPt(e), now = performance.now();
+  if(g.mode==='idle' || g.mode==='solved'){
+    if(now - g.lastTap < 380 && Math.hypot(p.x-g.lastTapX, p.y-g.lastTapY) < 42){ g.lastTap = 0; cbStartScramble(); return; }
+    g.lastTap = now; g.lastTapX = p.x; g.lastTapY = p.y;
+  }
+  try{ g.canvas.setPointerCapture(e.pointerId); }catch(_){}
+  const canTurn = !g.anim && g.mode!=='scramble' && g.mode!=='solved';
+  const hit = canTurn ? cbHit(g, p.x, p.y) : null;
+  g.drag = { id:e.pointerId, sx:p.x, sy:p.y, lx:p.x, ly:p.y, lt:now, hit, kind: hit ? 'layer' : 'view', decided:false, lastAng:0, angVel:0 };
+  g.vyaw = 0; g.vpitch = 0;
+}
+function cbSetupTurn(g, d, dx, dy){
+  /* بنقيس سرعة نقطة المسك على الشاشة لو لفّينا حوالين كل محور ممكن، ونختار المحور اللي اتجاهه أقرب لاتجاه سحبة الصباع */
+  const h = d.hit, n = h.n;
+  const na = n[0] ? 0 : (n[1] ? 1 : 2);
+  const c = [h.p[0]+n[0]*.5, h.p[1]+n[1]*.5, h.p[2]+n[2]*.5];
+  const p0 = cbProject(g, c);
+  let best = null;
+  [(na+1)%3, (na+2)%3].forEach(r=>{
+    const q = cbMulV(cbRot(r, .06), c), p1 = cbProject(g, q);
+    const vel = [(p1.x-p0.x)/.06, (p1.y-p0.y)/.06], len = Math.hypot(vel[0], vel[1]);
+    if(len < 28) return;                                  /* الوش شبه جنب الكاميرا: الحركة مش بتبان */
+    const proj = (dx*vel[0] + dy*vel[1]) / len;
+    if(!best || Math.abs(proj) > Math.abs(best.proj)) best = { r, vel, len, proj };
+  });
+  if(!best) return false;
+  d.axis = best.r; d.layer = h.p[best.r]; d.vel = best.vel; d.len2 = best.len*best.len;
+  return true;
+}
+function cbPointerMove(e){
+  const g = state.cube; if(!g || !g.drag || e.pointerId!==g.drag.id) return;
+  e.preventDefault();
+  const d = g.drag, p = cbPt(e), now = performance.now();
+  const dx = p.x - d.sx, dy = p.y - d.sy;
+  if(!d.decided){
+    if(Math.hypot(dx,dy) < 9) return;
+    d.decided = true;
+    if(d.kind==='layer'){
+      if(cbSetupTurn(g, d, dx, dy)){
+        if(g.mode==='ready'){ g.mode = 'play'; g.t0 = now; cbSyncUi(); }
+      } else d.kind = 'view';
+    }
+    d.lx = p.x; d.ly = p.y; d.lt = now;
+  }
+  if(d.kind==='view'){
+    const mx = p.x - d.lx, my = p.y - d.ly, dt = Math.max(.008, (now - d.lt)/1000);
+    g.yaw += mx * .0095; g.pitch += my * .0095;
+    g.pitch = Math.max(-1.4, Math.min(1.4, g.pitch));
+    g.vyaw = g.vyaw*.5 + (mx*.0095/dt)*.5; g.vpitch = g.vpitch*.5 + (my*.0095/dt)*.5;
+  } else {
+    const ang = Math.max(-Math.PI, Math.min(Math.PI, 1.2 * (dx*d.vel[0] + dy*d.vel[1]) / d.len2));   /* الطبقة بتمشي مع صباعك وأسرع منه شوية */
+    const dt = Math.max(.008, (now - d.lt)/1000);
+    d.angVel = d.angVel*.5 + ((ang - d.lastAng)/dt)*.5; d.lastAng = ang;
+    g.rot = { axis:d.axis, layer:d.layer, ang };
+  }
+  d.lx = p.x; d.ly = p.y; d.lt = now;
+}
+function cbPointerUp(e){
+  const g = state.cube; if(!g || !g.drag || e.pointerId!==g.drag.id) return;
+  const d = g.drag; g.drag = null;
+  try{ g.canvas.releasePointerCapture(e.pointerId); }catch(_){}
+  if(d.kind==='layer' && d.decided && g.rot){
+    const ang = g.rot.ang, q = Math.PI/2;
+    let k = Math.round(ang / q);
+    if(k===0 && Math.abs(ang) > .12 && Math.abs(d.angVel) > 3.2 && Math.sign(d.angVel)===Math.sign(ang)) k = Math.sign(ang);   /* سحبة سريعة قصيرة = حركة كاملة */
+    const to = k * q;
+    g.anim = { from:ang, to, t0:performance.now(), dur: CUBE.TURN_MS * Math.max(.4, Math.min(1.2, Math.abs(to-ang)/q + .25)), k, scr:false };
+  }
+}
+
+/* ---------- الإسقاط والرسم ---------- */
+function cbProject(g, w){
+  const v = cbMulV(g.V, w), k = CUBE.D / (CUBE.D - v[2]);
+  return { x: g.cx + v[0]*g.S*k, y: g.cy - v[1]*g.S*k, z:v[2], k };
+}
+function cbBuildFaces(g){
+  const out = [], D = CUBE.D, V = g.V, rot = g.rot, L = CUBE.LIGHT;
+  const T = rot ? cbRot(rot.axis, rot.ang) : null;
+  for(let ci=0; ci<g.cubies.length; ci++){
+    const cb = g.cubies[ci];
+    let pos = cb.p, M = cb.R;
+    if(T && cb.p[rot.axis]===rot.layer){ pos = cbMulV(T, cb.p); M = cbMulM(T, cb.R); }
+    for(let f=0; f<6; f++){
+      const ln = CUBE.N[f];
+      const wn = [M[0][0]*ln[0]+M[0][1]*ln[1]+M[0][2]*ln[2], M[1][0]*ln[0]+M[1][1]*ln[1]+M[1][2]*ln[2], M[2][0]*ln[0]+M[2][1]*ln[1]+M[2][2]*ln[2]];
+      const c = [pos[0]+wn[0]*.5, pos[1]+wn[1]*.5, pos[2]+wn[2]*.5];
+      const cc = cbMulV(V, c), nc = cbMulV(V, wn);
+      if(nc[0]*cc[0] + nc[1]*cc[1] + nc[2]*(cc[2]-D) >= 0) continue;      /* وش بيبص بعيد عن الكاميرا */
+      const a = f>>1, ua = (a+1)%3, va = (a+2)%3;
+      const U = [M[0][ua],M[1][ua],M[2][ua]], W = [M[0][va],M[1][va],M[2][va]];
+      const body = [], stk = cb.st[f] ? [] : null;
+      for(let k=0; k<4; k++){
+        const su = (k===1||k===2) ? 1 : -1, sv = (k>=2) ? 1 : -1;
+        body.push(cbProject(g, [c[0]+(U[0]*su+W[0]*sv)*.5, c[1]+(U[1]*su+W[1]*sv)*.5, c[2]+(U[2]*su+W[2]*sv)*.5]));
+        if(stk) stk.push(cbProject(g, [c[0]+(U[0]*su+W[0]*sv)*.41, c[1]+(U[1]*su+W[1]*sv)*.41, c[2]+(U[2]*su+W[2]*sv)*.41]));
+      }
+      const dl = nc[0]*L[0] + nc[1]*L[1] + nc[2]*L[2];
+      out.push({ pts:body, sp:stk, z:cc[2], col: cb.st[f] ? f : -1, lum: .8 + .24*Math.max(0, dl), k: body[0].k,
+                 n:[Math.round(wn[0])+0, Math.round(wn[1])+0, Math.round(wn[2])+0], p:cb.p });
+    }
+  }
+  out.sort((a,b)=>a.z-b.z);
+  return out;
+}
+function cbPoly(ctx, P){ ctx.beginPath(); ctx.moveTo(P[0].x, P[0].y); for(let i=1;i<P.length;i++) ctx.lineTo(P[i].x, P[i].y); ctx.closePath(); }
+function cbDraw(g){
+  const ctx = g.ctx; if(!ctx) return;
+  g.V = cbMulM(cbRot(0, g.pitch), cbRot(1, g.yaw));
+  ctx.setTransform(g.dpr,0,0,g.dpr,0,0);
+  ctx.clearRect(0,0,g.cw,g.ch);
+  /* ظل ناعم تحت المكعب */
+  const sh = cbProject(g, [0,-2.2,0]), rx = 2.4*g.S*sh.k, ry = rx*(.16 + .2*Math.sin(Math.max(0,g.pitch)));
+  const gr = ctx.createRadialGradient(sh.x, sh.y, 0, sh.x, sh.y, rx);
+  gr.addColorStop(0,'rgba(25,30,50,.24)'); gr.addColorStop(1,'rgba(25,30,50,0)');
+  ctx.save(); ctx.translate(sh.x, sh.y); ctx.scale(1, ry/rx); ctx.translate(-sh.x, -sh.y);
+  ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(sh.x, sh.y, rx, 0, Math.PI*2); ctx.fill(); ctx.restore();
+  const faces = cbBuildFaces(g); g.faces = faces;
+  ctx.lineJoin = 'round';
+  for(const f of faces){
+    cbPoly(ctx, f.pts);
+    ctx.fillStyle = '#15151b'; ctx.strokeStyle = '#15151b'; ctx.lineWidth = .075*g.S*f.k;
+    ctx.fill(); ctx.stroke();
+    if(f.sp){
+      const rgb = CUBE.RGB[f.col], l = f.lum;
+      const col = 'rgb(' + Math.min(255,Math.round(rgb[0]*l)) + ',' + Math.min(255,Math.round(rgb[1]*l)) + ',' + Math.min(255,Math.round(rgb[2]*l)) + ')';
+      cbPoly(ctx, f.sp);
+      ctx.fillStyle = col; ctx.strokeStyle = col; ctx.lineWidth = .06*g.S*f.k;
+      ctx.fill(); ctx.stroke();
+    }
+  }
+}
+function cbLoop(ts){
+  const g = state.cube;
+  if(!g || g.mode==='closed' || !document.getElementById('cube-overlay')) return;
+  const dt = Math.min(.05, (ts - (g.lastTs||ts)) / 1000);
+  g.lastTs = ts;
+  if(!g.drag || g.drag.kind!=='view'){
+    g.yaw += g.vyaw*dt; g.pitch += g.vpitch*dt;
+    const decay = Math.pow(.04, dt);
+    g.vyaw *= decay; g.vpitch *= decay;
+    if(g.mode==='idle' && !g.drag) g.yaw += .42*dt;
+    else if(g.mode==='solved' && !g.drag) g.yaw += .35*dt;
+    else if(g.mode==='scramble') g.yaw += .9*dt;
+    g.pitch = Math.max(-1.4, Math.min(1.4, g.pitch));
+  }
+  /* وقت الفوز المكعب بيصغّر ويطلع فوق عشان بطاقة النتيجة متغطيهوش */
+  const solved = g.mode==='solved', e = Math.min(1, dt*6);
+  g.kS += ((solved ? .86 : 1) - g.kS) * e;
+  g.cy += (g.ch * (solved ? .36 : .52) - g.cy) * e;
+  g.S = g.S0 * g.kS;
+  cbStepAnim(g, ts);
+  cbDraw(g);
+  cbTickHud(g);
+  g.raf = requestAnimationFrame(cbLoop);
 }
 /* ============================= GAMES: DARTS (لعبة النشان) ============================= */
 const DRT = { W:400, H:620, cx:200, cyBoard:225, R:188, handY:540, turnSeconds:16,
@@ -32685,6 +33159,7 @@ document.addEventListener('click', (e)=>{
     if(gid==='darts'){ openDartsGame(); return; }
     if(gid==='bowling'){ openBowlingGame(); return; }
     if(gid==='stack'){ openStackGame(); return; }
+    if(gid==='cube'){ openCubeGame(); return; }
     if(gid==='blocky'){ openBlockyGame(); return; }
     if(gid==='millionaire'){ openMillionaireGame(); return; }
     if(gid==='revword'){ openRevWordGame(); return; }
@@ -32711,6 +33186,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='billiards-mode'){ bilSetMode(el.dataset.mode); }
   else if(action==='billiards-reset'){ bilResetGame(); }
   else if(action==='stack-close'){ closeStackGame(); }
+  else if(action==='cube-close'){ closeCubeGame(); }
+  else if(action==='cube-start'){ cbStartScramble(); }
   else if(action==='blk-close'){ closeBlockyGame(); }
   else if(action==='blk-reset'){ blkResetGame(); }
   else if(action==='blk-menu'){ blkOpenMenu(); }
@@ -36791,6 +37268,7 @@ function popTopOverlay(){
 }
 function handleHardwareBack(){
   if(popTopOverlay()) return true;
+  if(document.getElementById('cube-overlay')){ closeCubeGame(); return true; }
   if(state.friendTile){ setFriendTile(null); return true; }
   if(state.history && state.history.length>0){ goBack(); return true; }
   return false;
