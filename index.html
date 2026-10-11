@@ -8016,6 +8016,74 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   @keyframes fsPop{from{transform:scale(.4); opacity:0;} to{transform:none; opacity:1;}}
   @media (prefers-reduced-motion:reduce){ .fs-emo{animation:none;} }
 </style>
+<style id="boy-pull">
+/* ===== الواد اللي بيجيب فورم الدخول ===== */
+.bpull{position:relative; overflow:hidden; margin:-34px -14px 0; padding:58px 14px 16px;}
+.bp-row{position:relative; direction:ltr; display:flex;}
+.bp-form{flex:1; min-width:0; margin-left:80px; direction:rtl; will-change:transform;}
+.bp-form .card{margin-top:0 !important;}
+.bpull[data-st="intro"] .bp-form{transform:translateX(130%);}
+.bpull[data-st="intro"] .bp-walker{transform:translateX(-150px);}
+.bp-floor{position:absolute; left:-14px; right:-14px; bottom:-2px; height:2px; opacity:0; pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent); transition:opacity .5s ease;}
+.bpull[data-st="intro"] .bp-floor{opacity:.55;}
+.bp-defs{position:absolute; width:0; height:0; overflow:hidden;}
+.bp-walker{position:absolute; left:0; bottom:-2px; width:88px; z-index:3; direction:ltr; cursor:pointer; -webkit-user-select:none; user-select:none; will-change:transform;}
+.bp-fig{position:relative; width:88px; height:170px;}
+.bp-walker.flip .bp-fig{transform:scaleX(-1);}
+.bp-shadow{position:absolute; left:14px; right:14px; bottom:-3px; height:9px; border-radius:50%; background:rgba(0,0,0,.35); filter:blur(3px);}
+.bp-pose{position:absolute; inset:0; width:100%; height:100%; overflow:visible; display:none;}
+.bp-walker[data-pose="front"] .bp-front{display:block;}
+.bp-walker[data-pose="side"] .bp-side{display:block;}
+.bp-pose *{transform-box:view-box;}
+/* respiration + blink + head sway (front) */
+.bp-front .bp-bob{animation:bpBreath 3.2s ease-in-out infinite;}
+.bp-front .bp-head{transform-origin:60px 92px; animation:bpSway 5s ease-in-out infinite;}
+.bp-pose .eyes{transform-box:fill-box; transform-origin:center; animation:bpBlink 4.6s infinite;}
+@keyframes bpBreath{0%,100%{transform:translateY(0);}50%{transform:translateY(-1.6px);}}
+@keyframes bpSway{0%,100%{transform:rotate(-1.4deg);}50%{transform:rotate(1.6deg);}}
+@keyframes bpBlink{0%,93%,100%{transform:scaleY(1);}96%{transform:scaleY(.08);}}
+/* arms */
+.bp-front .arm-r{transform-origin:92px 106px; transition:transform .35s cubic-bezier(.3,1.4,.5,1);}
+.bp-front .arm-l{transform-origin:28px 106px;}
+.bp-walker.point .bp-front .arm-r{transform:rotate(-96deg);}
+.bp-walker.wave .bp-front .arm-r{animation:bpWave .42s ease-in-out infinite alternate; transform:rotate(-150deg);}
+@keyframes bpWave{from{transform:rotate(-158deg);}to{transform:rotate(-122deg);}}
+/* mouth */
+.bp-pose .mouth-talk{display:none; transform-box:fill-box; transform-origin:center;}
+.bp-walker.talk .mouth-smile{display:none;}
+.bp-walker.talk .mouth-talk{display:block; animation:bpTalk .26s ease-in-out infinite alternate;}
+@keyframes bpTalk{from{transform:scaleY(.25);}to{transform:scaleY(1);}}
+/* walking (side) */
+.bp-side .leg-n,.bp-side .leg-f,.bp-side .arm-n,.bp-side .arm-f{transform-origin:60px 150px;}
+.bp-side .arm-n,.bp-side .arm-f{transform-origin:60px 108px;}
+.bp-side .lean{transform-origin:60px 222px;}
+.bp-walker.walk .bp-side .leg-n{animation:bpLegA .72s ease-in-out infinite;}
+.bp-walker.walk .bp-side .leg-f{animation:bpLegB .72s ease-in-out infinite;}
+.bp-walker.walk .bp-side .arm-n{animation:bpLegB .72s ease-in-out infinite;}
+.bp-walker.walk .bp-side .arm-f{animation:bpLegA .72s ease-in-out infinite;}
+.bp-walker.walk .bp-side .bp-bob{animation:bpStep .36s ease-in-out infinite;}
+@keyframes bpLegA{0%,100%{transform:rotate(28deg);}50%{transform:rotate(-28deg);}}
+@keyframes bpLegB{0%,100%{transform:rotate(-28deg);}50%{transform:rotate(28deg);}}
+@keyframes bpStep{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+.bp-walker.pull .bp-side .lean{transform:rotate(7deg);}
+.bp-walker.pull .bp-side .arm-n{animation:none !important; transform:rotate(74deg);}
+/* bubble */
+.bp-bubble{position:absolute; bottom:calc(100% + 4px); left:50%; transform:translateX(-50%) scale(.5); transform-origin:50% 100%; opacity:0; pointer-events:none;
+  width:max-content; max-width:150px; padding:7px 11px; border-radius:14px; text-align:center; direction:rtl;
+  font-family:'Cairo',sans-serif; font-weight:800; font-size:11.5px; line-height:1.55; color:var(--text);
+  background:var(--surface-2); border:1.5px solid rgba(244,183,64,.55); box-shadow:0 8px 20px rgba(0,0,0,.3);
+  transition:opacity .22s ease, transform .3s cubic-bezier(.3,1.5,.5,1);}
+.bp-bubble::after{content:''; position:absolute; left:50%; bottom:-6px; width:10px; height:10px; margin-left:-5px; transform:rotate(45deg);
+  background:var(--surface-2); border-right:1.5px solid rgba(244,183,64,.55); border-bottom:1.5px solid rgba(244,183,64,.55);}
+.bp-bubble.on{opacity:1; transform:translateX(-50%) scale(1);}
+.bp-bubble.sm{max-width:106px;}
+/* submit button glow when the boy points at it */
+.bp-glow{animation:bpGlow 1s ease-in-out 2;}
+@keyframes bpGlow{0%,100%{box-shadow:0 0 0 0 rgba(244,183,64,0);}50%{box-shadow:0 0 0 6px rgba(244,183,64,.35), 0 0 24px rgba(244,183,64,.55);}}
+@media (prefers-reduced-motion:reduce){ .bp-pose *{animation:none !important;} }
+</style>
+
 <style id="login-glow-up">
 /* ===== Saved account card only ===== */
 .sa-card{padding:20px 16px; border-radius:26px; border:1.5px solid rgba(244,183,64,.6); overflow:hidden;
@@ -11539,6 +11607,146 @@ function renderSplash(){
   `;
 }
 
+/* ============================= BOY FETCHES THE LOGIN FORM ============================= */
+var BPS = window.BPS || (window.BPS = {tok:0, state:'idle', skip:false});
+const BP_DEFS = `<svg class="bp-defs" aria-hidden="true"><defs>
+  <linearGradient id="bpSkin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7D2B2"/><stop offset="1" stop-color="#E9B28B"/></linearGradient>
+  <linearGradient id="bpCap" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF4A50"/><stop offset=".6" stop-color="#E02A31"/><stop offset="1" stop-color="#B3161D"/></linearGradient>
+  <linearGradient id="bpJk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#B9BDC6"/><stop offset=".55" stop-color="#A2A7B1"/><stop offset="1" stop-color="#868B96"/></linearGradient>
+  <linearGradient id="bpPack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3F85F5"/><stop offset="1" stop-color="#1F55C2"/></linearGradient>
+</defs></svg>`;
+const BP_FRONT = `<svg class="bp-pose bp-front" viewBox="-6 0 132 230" aria-hidden="true"><g class="bp-bob">
+  <rect x="19" y="108" width="12" height="44" rx="6" fill="#2559C4"/><rect x="89" y="108" width="12" height="44" rx="6" fill="#2559C4"/>
+  <rect x="37" y="148" width="22" height="62" rx="9" fill="#2B2E3B"/><rect x="61" y="148" width="22" height="62" rx="9" fill="#2B2E3B"/>
+  <ellipse cx="46" cy="218" rx="16" ry="7" fill="#BFC4CE"/><ellipse cx="46" cy="214" rx="16" ry="7.5" fill="#F6F7F9"/>
+  <ellipse cx="74" cy="218" rx="16" ry="7" fill="#BFC4CE"/><ellipse cx="74" cy="214" rx="16" ry="7.5" fill="#F6F7F9"/>
+  <path d="M32 110 Q32 100 44 98 H76 Q88 100 88 110 L90 156 Q60 164 30 156Z" fill="url(#bpJk)"/>
+  <path d="M30 150 Q60 158 90 150 L90 157 Q60 165 30 157Z" fill="#7E838D"/>
+  <path d="M45 98 Q60 112 75 98 Q72 92 60 92 Q48 92 45 98Z" fill="#8A8F9A"/>
+  <path d="M52 100 L60 122 L68 100Z" fill="#23262F"/>
+  <path d="M60 122 V158" stroke="#5B606B" stroke-width="1.8"/><rect x="58.5" y="122" width="3" height="7" rx="1.2" fill="#D9DCE3"/>
+  <path d="M54 104 L53 126 M66 104 L67 126" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M47 100 L43 144 M73 100 L77 144" stroke="#2D68D8" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M38 142 L48 152 M82 142 L72 152" stroke="#6F747F" stroke-width="1.6" stroke-linecap="round"/>
+  <g class="arm-l"><rect x="20" y="102" width="16" height="52" rx="8" fill="url(#bpJk)"/><rect x="20" y="146" width="16" height="7" rx="3" fill="#7E838D"/><circle cx="28" cy="160" r="7" fill="url(#bpSkin)"/></g>
+  <g class="arm-r"><rect x="84" y="102" width="16" height="52" rx="8" fill="url(#bpJk)"/><rect x="84" y="146" width="16" height="7" rx="3" fill="#7E838D"/><circle cx="92" cy="160" r="7" fill="url(#bpSkin)"/></g>
+  <rect x="52" y="86" width="16" height="16" fill="#E0A982"/>
+  <g class="bp-head">
+    <circle cx="31" cy="66" r="6.5" fill="#E3AC85"/><circle cx="89" cy="66" r="6.5" fill="#E3AC85"/>
+    <ellipse cx="60" cy="64" rx="29" ry="30" fill="url(#bpSkin)"/>
+    <path d="M31 50 Q29 62 33 70 Q35 58 36 50Z M89 50 Q91 62 87 70 Q85 58 84 50Z" fill="#3B261B"/>
+    <circle cx="40" cy="84" r="5" fill="#FF8F7A" opacity=".28"/><circle cx="80" cy="84" r="5" fill="#FF8F7A" opacity=".28"/>
+    <g class="eyes"><ellipse cx="47" cy="69" rx="4.4" ry="5" fill="#fff"/><ellipse cx="73" cy="69" rx="4.4" ry="5" fill="#fff"/>
+      <circle cx="48" cy="70" r="3.1" fill="#2B1B12"/><circle cx="74" cy="70" r="3.1" fill="#2B1B12"/><circle cx="49" cy="69" r="1" fill="#fff"/><circle cx="75" cy="69" r="1" fill="#fff"/></g>
+    <circle cx="47" cy="69" r="10.5" fill="#fff" fill-opacity=".1" stroke="#1E212A" stroke-width="2.6"/><circle cx="73" cy="69" r="10.5" fill="#fff" fill-opacity=".1" stroke="#1E212A" stroke-width="2.6"/>
+    <path d="M57.5 67 Q60 64.5 62.5 67 M36.5 67 L31 65 M83.5 67 L89 65" stroke="#1E212A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M57 79 Q60 84 63 79" stroke="#C98C66" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path class="mouth-smile" d="M51 88 Q60 96 69 88" stroke="#7A3A2A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <ellipse class="mouth-talk" cx="60" cy="90" rx="6" ry="4.6" fill="#6B2A22"/>
+    <path d="M29 49 C27 20 44 8 60 8 C76 8 93 20 91 49 C80 43 40 43 29 49Z" fill="url(#bpCap)"/>
+    <path d="M40 22 Q52 12 68 15" stroke="#FF8A8E" stroke-width="3" fill="none" opacity=".6" stroke-linecap="round"/>
+    <circle cx="60" cy="8.5" r="2.6" fill="#A3131A"/>
+    <path d="M26 48 C40 56 80 56 94 48 C97 55 86 60 60 60 C34 60 23 55 26 48Z" fill="#B3171D"/>
+  </g></g></svg>`;
+const BP_SIDE = `<svg class="bp-pose bp-side" viewBox="-6 0 132 230" aria-hidden="true"><g class="lean"><g class="bp-bob">
+  <g class="arm-f"><rect x="54" y="104" width="13" height="50" rx="6.5" fill="#7E838D"/><circle cx="60.5" cy="159" r="6" fill="#DDA57E"/></g>
+  <g class="leg-f"><rect x="52" y="148" width="16" height="62" rx="7" fill="#20232E"/><path d="M50 208 h14 q13 0 17 8 v5 h-31z" fill="#D5D8DF"/></g>
+  <rect x="18" y="106" width="28" height="54" rx="10" fill="url(#bpPack)"/><rect x="21" y="136" width="16" height="19" rx="5" fill="#2559C4"/><rect x="26" y="99" width="12" height="9" rx="4" fill="#2559C4"/>
+  <path d="M44 110 Q44 100 56 100 H66 Q77 102 77 114 L77 156 Q60 162 44 156Z" fill="url(#bpJk)"/>
+  <path d="M44 150 Q60 158 77 150 V158 Q60 164 44 158Z" fill="#7E838D"/>
+  <path d="M75 108 V158" stroke="#5B606B" stroke-width="1.6"/>
+  <path d="M46 100 Q54 92 64 98 Q62 108 48 110Z" fill="#8A8F9A"/>
+  <path d="M50 102 L52 140" stroke="#2D68D8" stroke-width="5" stroke-linecap="round"/>
+  <g class="leg-n"><rect x="52" y="148" width="16" height="62" rx="7" fill="#2B2E3B"/><path d="M50 208 h14 q13 0 17 8 v5 h-31z" fill="#F6F7F9"/><path d="M50 218 h31 v3 h-31z" fill="#BFC4CE"/></g>
+  <rect x="55" y="88" width="14" height="16" fill="#E0A982"/>
+  <g class="bp-head">
+    <path d="M36 52 Q33 72 45 80 Q42 62 47 50Z" fill="#3B261B"/>
+    <circle cx="64" cy="64" r="29" fill="url(#bpSkin)"/><ellipse cx="93" cy="71" rx="5" ry="4.2" fill="#EDBB96"/>
+    <ellipse cx="54" cy="67" rx="6" ry="7.5" fill="#E3AC85"/>
+    <circle cx="86" cy="84" r="5" fill="#FF8F7A" opacity=".28"/>
+    <g class="eyes"><ellipse cx="81" cy="68" rx="4.4" ry="5" fill="#fff"/><circle cx="83.5" cy="69" r="3.1" fill="#2B1B12"/><circle cx="84.5" cy="68" r="1" fill="#fff"/></g>
+    <circle cx="80" cy="68" r="10.5" fill="#fff" fill-opacity=".1" stroke="#1E212A" stroke-width="2.6"/><path d="M69.5 66 L56 64" stroke="#1E212A" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M82 88 Q87 91 91 87" stroke="#7A3A2A" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+    <path d="M34 50 C32 20 48 7 64 7 C82 7 97 21 95 50 C84 44 44 44 34 50Z" fill="url(#bpCap)"/>
+    <path d="M45 21 Q57 11 73 14" stroke="#FF8A8E" stroke-width="3" fill="none" opacity=".6" stroke-linecap="round"/>
+    <path d="M70 47 C86 42 106 47 114 56 C106 61 86 59 70 57Z" fill="#B3171D"/>
+  </g>
+  <g class="arm-n"><rect x="53" y="104" width="14" height="50" rx="7" fill="url(#bpJk)"/><rect x="53" y="146" width="14" height="7" rx="3" fill="#7E838D"/><circle cx="60" cy="160" r="6.5" fill="url(#bpSkin)"/></g>
+</g></g></svg>`;
+function bpOpen(){
+  const st = BPS.state==='idle' ? 'intro' : 'done';
+  return `<div class="bpull" id="bpull" data-st="${st}">${BP_DEFS}<div class="bp-row"><div class="bp-floor"></div>
+    <div class="bp-walker" id="bp-walker" data-pose="front" aria-hidden="true"><div class="bp-bubble" id="bp-bubble"></div><div class="bp-fig"><div class="bp-shadow"></div>${BP_FRONT}${BP_SIDE}</div></div>
+    <div class="bp-form" id="bp-form" dir="rtl">`;
+}
+function bpClose(){ return `</div></div></div>`; }
+function bpAfterRender(){
+  const root = document.getElementById('bpull'); if(!root) return;
+  if(root.dataset.st!=='intro' || BPS.state!=='idle') return;
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches){ BPS.state='done'; root.dataset.st='done'; return; }
+  BPS.state='running'; BPS.skip=false; const tok = ++BPS.tok;
+  BPS.skipP = new Promise(r=>{ BPS.skipR = r; });
+  bpRun(root, tok).catch(()=>{}).then(()=>{ if(document.getElementById('bpull')===root) bpFinish(root); BPS.state='done'; });
+}
+function bpFinish(root){
+  try{ root.getAnimations({subtree:true}).forEach(a=>a.cancel()); }catch(e){}
+  root.dataset.st = 'done';
+  const w = root.querySelector('#bp-walker'); if(w){ w.className='bp-walker'; w.dataset.pose='front'; }
+  const b = root.querySelector('#bp-bubble'); if(b) b.classList.remove('on');
+}
+async function bpRun(root, tok){
+  const w = root.querySelector('#bp-walker'), form = root.querySelector('#bp-form'), bub = root.querySelector('#bp-bubble');
+  const row = root.querySelector('.bp-row');
+  const alive = ()=> BPS.tok===tok && document.getElementById('bpull')===root && !BPS.skip;
+  const go = async p => { await Promise.race([p, BPS.skipP]); if(!alive()) throw 0; };
+  const wait = ms => go(new Promise(r=>setTimeout(r,ms)));
+  const mv = (el,from,to,ms,ease)=>{ const a = el.animate([{transform:`translateX(${from}px)`},{transform:`translateX(${to}px)`}],{duration:ms,easing:ease,fill:'forwards'}); return a.finished.catch(()=>{}); };
+  const say = (txt,sm)=>{ bub.textContent = txt; bub.classList.toggle('sm',!!sm); bub.classList.add('on'); };
+  const hush = ()=> bub.classList.remove('on');
+  const set = (pose, cls)=>{ w.dataset.pose = pose; w.className = 'bp-walker ' + (cls||''); };
+  const BW = 88, W = row.clientWidth, mid = Math.max(0,(W-BW)/2), out = W + 150;
+  root.addEventListener('click', ()=>{ BPS.skip = true; BPS.skipR && BPS.skipR(); }, {once:true});
+  await wait(350);
+  /* 1) يمشي من الشمال لنص الشاشة */
+  set('side','walk');
+  await go(mv(w,-150,mid,1500,'cubic-bezier(.25,.6,.45,1)'));
+  /* 2) يقف ويقول "ثانية واحدة" */
+  set('front','talk wave');
+  say('ثانية واحدة! هجيبلك فورم الدخول 😉');
+  await wait(2300);
+  hush(); set('front','');
+  await wait(350);
+  /* 3) يمشي يمين ويختفي */
+  set('side','walk');
+  await go(mv(w,mid,out,1500,'cubic-bezier(.5,0,.85,.6)'));
+  set('side','');
+  await wait(650);
+  /* 4) يرجع وهو بيسحب الفورم وراه */
+  set('side','walk pull flip');
+  const k1 = mv(w,out,0,2800,'cubic-bezier(.22,.6,.3,1)'), k2 = mv(form,out,0,2800,'cubic-bezier(.22,.6,.3,1)');
+  await go(Promise.all([k1,k2]));
+  /* 5) يقف قدام الفورم ويشاور عليه */
+  set('front','');
+  await wait(300);
+  say('ده الفورم بتاعك ✨', true);
+  set('front','talk point');
+  const btn = document.getElementById('otp-submit-btn'); if(btn) btn.classList.add('bp-glow');
+  await wait(1500);
+  set('front','point');
+  await wait(1400);
+  hush(); if(btn) btn.classList.remove('bp-glow');
+}
+const BP_POKES = ['أهلاً بيك 👋','اكتب رقمك وادخل 😉','أنا هنا لو احتجت حاجة','يلا بينا نبدأ! 🚀'];
+let _bpPoke = 0, _bpT = 0;
+document.addEventListener('click', e=>{
+  const w = e.target.closest && e.target.closest('#bp-walker');
+  if(!w || BPS.state!=='done') return;
+  const b = document.getElementById('bp-bubble'); if(!b) return;
+  b.textContent = BP_POKES[_bpPoke++ % BP_POKES.length]; b.classList.add('sm','on');
+  w.classList.add('wave','talk'); clearTimeout(_bpT);
+  _bpT = setTimeout(()=>{ b.classList.remove('on'); w.classList.remove('wave','talk'); }, 2200);
+});
+
 /* ============================= RENDER: LOGIN ============================= */
 function renderLogin(){
   return `
@@ -11548,7 +11756,7 @@ function renderLogin(){
         <div class="brand-title">اجتماع جامعة</div>
         <div class="tag">بوابة المشاركين — سجّل حضورك وتابع نقاطك</div>
       </div>
-      ${savedAccountsHtml()}
+      ${bpOpen()}${savedAccountsHtml()}
       ${loginFormOpen() ? `<div class="card otp-card" style="margin-top:18px;">
         <div class="otp-lock">🔐</div>
         <div class="otp-title">تسجيل الدخول</div>
@@ -11557,7 +11765,7 @@ function renderLogin(){
         <input type="password" id="login-pass" class="field" autocomplete="current-password" placeholder="الباسورد" style="margin-top:10px;text-align:center;" dir="ltr" />
         <button type="button" class="btn btn-primary" id="otp-submit-btn" data-action="submit-login" style="margin-top:16px;width:100%;">دخول</button>
         ${(state._loginOther && savedAccountsGet().length) ? `<button type="button" class="sa-back" data-action="login-back-cards">رجوع لحسابك المحفوظ</button>` : ''}
-      </div>` : ''}
+      </div>` : ''}${bpClose()}
       ${CONF_SETTINGS.signupClosed ? '' : `<div class="signup-cta"><span>أول مرة تدخل؟</span><button type="button" class="btn btn-outline" data-action="go-signup" style="width:100%;margin-top:8px;">✨ أنشئ حسابك بنفسك</button></div>`}
       <div class="designer-credit">صُمم بواسطة <span class="designer-credit-name">Te epistoly</span></div>
     </div>
@@ -30395,7 +30603,7 @@ function render(){
   if(state.view!=='attendance') _attAnimOn = true;
   if(attViewActive()){ attRefresh(); attMaybeAdminInit(); }
   if(state.view==='admin' && state.adminUnlocked && !state.adminHub && state.adminTab==='attendance'){ attDrawAdminQr(); }
-  if(state.view==='login'){ attachOtpBoxes(); }
+  if(state.view==='login'){ attachOtpBoxes(); bpAfterRender(); } else { BPS.state='idle'; }
   if(state.view==='admin' && !state.adminUnlocked){ attachAdminOtpBoxes(); }
   if(state.view==='admin' && state.adminTab==='participants'){ attachPhotoCropInputs(); }
   if(state.view==='admin' && state.adminTab==='gallery'){ attachGalleryAdminInputs(); }
