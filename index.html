@@ -40,12 +40,16 @@
     if (z < MIN_ZOOM) z = MIN_ZOOM;
     if (z > MAX_ZOOM) z = MAX_ZOOM;
     z = Math.round(z * 100) / 100;
+    /* لعبة السلم والثعبان (اللعب + الانتظار) متصممة على مقاسات الشاشة نفسها، فالزوم التلقائي بيكبّرها ويقصّها — نلغيه طول ما شاشتها مفتوحة */
+    var snz = !!document.querySelector('.snz-fs');
+    if (snz) z = 1;
+    var snzFlip = (snz !== !!window.__snzZoomOff); window.__snzZoomOff = snz;
     // compare numbers with the last value we applied (style.zoom is a rounded string, so comparing it to z was always "changed" on tablets)
     var changed = lastZoom !== null && Math.abs(lastZoom - z) > 0.01;
     if (lastZoom === null || changed) document.documentElement.style.zoom = z;
     lastZoom = z;
     // re-render so any visible QR codes regenerate crisp at the new zoom level
-    if (changed) safeRender();
+    if (changed && !snzFlip) safeRender();
   }
   document.addEventListener('focusout', function(){
     if (!pendingRender) return;
@@ -53,6 +57,7 @@
   }, true);
   applyAutoScale();
   window.addEventListener('resize', applyAutoScale);
+  setInterval(function(){ if (!!document.querySelector('.snz-fs') !== !!window.__snzZoomOff) applyAutoScale(); }, 300);
   window.addEventListener('orientationchange', function(){ setTimeout(applyAutoScale, 250); });
 })();
 </script>
