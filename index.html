@@ -1031,6 +1031,40 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .su-band .su-step.done i{ background:linear-gradient(145deg,#F3DC9B,#C9A45C); border-color:transparent; color:#14213d; }
   .su-band .su-step.done span{ color:#E8C675; }
   .su-page .su-wrap{ position:relative; z-index:2; margin-top:-34px; }
+  /* ===== الولد اللي بيجيب فورم إنشاء الحساب ===== */
+  .su-page .su-wrap{ padding-bottom:150px; }
+  .su-page .su-wrap.su-intro{ overflow-x:clip; }
+  .su-page .su-card.su-hold, .su-page .su-foot.su-hold{ transform:translateX(112%); }
+  .su-boy-lane{ position:absolute; inset:0; pointer-events:none; z-index:40; }
+  .su-boy{ position:absolute; width:92px; height:150px; left:calc(50% - 46px); top:calc(100% - 142px); }
+  .su-boy .sb-fig{ width:100%; height:100%; transform-origin:50% 100%; }
+  .su-boy[data-dir="l"] .sb-fig{ transform:scaleX(-1); }
+  .su-boy svg{ width:100%; height:100%; overflow:visible; display:block; }
+  .sb-body{ animation:sbBreath 2.6s ease-in-out infinite; transform-origin:50px 150px; }
+  .sb-legL,.sb-legR{ transform-origin:50px 106px; } .sb-armF,.sb-armB{ transform-origin:50px 68px; }
+  .su-boy.walking .sb-body{ animation:sbBob .27s ease-in-out infinite alternate; }
+  .su-boy.walking .sb-legL{ animation:sbLeg .54s ease-in-out infinite alternate; }
+  .su-boy.walking .sb-legR{ animation:sbLeg .54s ease-in-out infinite alternate-reverse; }
+  .su-boy.walking .sb-armF{ animation:sbLeg .54s ease-in-out infinite alternate-reverse; }
+  .su-boy.walking .sb-armB{ animation:sbLeg .54s ease-in-out infinite alternate; }
+  .su-boy.pulling .sb-armB{ animation:none; transform:rotate(-100deg); }
+  .su-boy.pulling .sb-armF{ animation:sbTug .27s ease-in-out infinite alternate; }
+  .su-boy.waving .sb-armF{ animation:sbWave .38s ease-in-out infinite alternate; }
+  .sb-blink{ animation:sbBlink 4s infinite; transform-origin:50px 40px; }
+  @keyframes sbLeg{ from{ transform:rotate(-30deg);} to{ transform:rotate(30deg);} }
+  @keyframes sbTug{ from{ transform:rotate(-85deg);} to{ transform:rotate(-105deg);} }
+  @keyframes sbWave{ from{ transform:rotate(-135deg);} to{ transform:rotate(-170deg);} }
+  @keyframes sbBob{ from{ transform:translateY(0);} to{ transform:translateY(-3px);} }
+  @keyframes sbBreath{ 0%,100%{ transform:scaleY(1);} 50%{ transform:scaleY(1.018);} }
+  @keyframes sbBlink{ 0%,92%,100%{ transform:scaleY(1);} 95%{ transform:scaleY(.1);} }
+  .sb-bubble{ position:absolute; bottom:calc(100% + 4px); left:50%; transform:translateX(-50%) scale(.6); transform-origin:50% 100%; opacity:0; white-space:nowrap; background:#0f2147; color:#fff; font:800 12.5px 'Cairo','Tajawal',sans-serif; direction:rtl; padding:8px 13px; border-radius:14px; box-shadow:0 8px 20px -8px rgba(15,33,71,.6); border:1.5px solid #E8C675; transition:opacity .25s, transform .3s cubic-bezier(.3,1.5,.5,1); }
+  .sb-bubble::after{ content:''; position:absolute; top:100%; left:50%; margin-left:-6px; border:6px solid transparent; border-top-color:#E8C675; }
+  .sb-bubble.on{ opacity:1; transform:translateX(-50%) scale(1); }
+  .su-boy[data-stage="talk2"] .sb-bubble{ left:0; transform:scale(.6); transform-origin:0 100%; }
+  .su-boy[data-stage="talk2"] .sb-bubble.on{ transform:scale(1); }
+  .su-boy[data-stage="talk2"] .sb-bubble::after{ left:26px; }
+  .su-skip{ position:absolute; top:-6px; left:6px; z-index:45; background:rgba(15,33,71,.88); color:#E8C675; border:1px solid rgba(232,198,117,.5); border-radius:999px; font:800 11.5px 'Cairo','Tajawal',sans-serif; padding:6px 12px; cursor:pointer; }
+  @media (prefers-reduced-motion:reduce){ .su-boy .sb-body,.su-boy .sb-legL,.su-boy .sb-legR,.su-boy .sb-armF,.su-boy .sb-armB{ animation:none !important; } }
   .su-page .su-card{ background:#fff; border:1px solid #eee6d6; border-radius:30px; padding:22px 18px 14px; box-shadow:0 24px 50px -26px rgba(15,33,71,.45), 0 2px 0 rgba(255,255,255,.9) inset; backdrop-filter:none; -webkit-backdrop-filter:none; overflow:visible; }
   .su-page .su-card::before{ display:none; }
   .su-page .su-head{ padding-bottom:13px; border-bottom:1px solid #efe6d2; margin-bottom:2px; }
@@ -11651,12 +11685,69 @@ function suStepBody(step){
     ${suField('pass', suInput('signup-pass','🔑','كلمة المرور','password','autocomplete="new-password" dir="ltr"') + `<div class="hint" style="margin:6px 6px 0;text-align:start;">اكتب أي كلمة مرور تعجبك — حروف أو أرقام أو رموز (٤ خانات على الأقل)</div>`, E)}
     ${suField('pass2', suInput('signup-pass2','🔁','تأكيد كلمة المرور (اختياري)','password','autocomplete="new-password" dir="ltr"'), E)}`;
 }
+/* ===== الولد اللي بيجيب فورم إنشاء الحساب (أنيميشن الدخول) ===== */
+const SU_BOY_SVG = `<svg viewBox="0 0 100 160" aria-hidden="true"><ellipse cx="50" cy="156" rx="28" ry="4.5" fill="rgba(0,0,0,.22)"/><g class="sb-body">
+<g class="sb-legR"><rect x="44" y="104" width="13" height="42" rx="6.5" fill="#1f222b"/><path d="M42 144h20a6 6 0 0 1 0 12H40a4 4 0 0 1-4-4v-1a7 7 0 0 1 6-7z" fill="#f3f3f3" stroke="#cfd2d8" stroke-width="1"/></g>
+<g class="sb-armB"><rect x="45" y="64" width="11" height="36" rx="5.5" fill="#767b86"/><circle cx="50.5" cy="102" r="6" fill="#f2c9a5"/></g>
+<rect x="21" y="62" width="24" height="46" rx="9" fill="#2d6be0"/><rect x="25" y="72" width="16" height="14" rx="4" fill="#2459bd"/>
+<rect x="34" y="58" width="33" height="54" rx="13" fill="#9aa0ac"/><path d="M52 60v50" stroke="#7d828d" stroke-width="1.6"/><path d="M42 59q10 9 22 0" fill="none" stroke="#7d828d" stroke-width="3" stroke-linecap="round"/>
+<g class="sb-legL"><rect x="44" y="104" width="13" height="42" rx="6.5" fill="#2a2d38"/><path d="M42 144h20a6 6 0 0 1 0 12H40a4 4 0 0 1-4-4v-1a7 7 0 0 1 6-7z" fill="#fff" stroke="#cfd2d8" stroke-width="1"/></g>
+<rect x="44" y="50" width="12" height="11" rx="4" fill="#e8b88f"/>
+<g class="sb-armF"><rect x="45" y="64" width="11" height="36" rx="5.5" fill="#a9aeb9"/><circle cx="50.5" cy="102" r="6" fill="#f2c9a5"/></g>
+<circle cx="29" cy="38" r="4.5" fill="#e8b88f"/><circle cx="71" cy="38" r="4.5" fill="#e8b88f"/>
+<circle cx="50" cy="34" r="22" fill="#f2c9a5"/>
+<path d="M27.5 31A22.6 22.6 0 0 1 72.5 31Z" fill="#d9262c"/><path d="M58 30q17-3 28 6-14 5-28 1z" fill="#b51c22"/><circle cx="50" cy="12.5" r="2.6" fill="#b51c22"/>
+<g class="sb-blink"><circle cx="42" cy="40" r="6.8" fill="rgba(255,255,255,.55)" stroke="#20222a" stroke-width="2.2"/><circle cx="58" cy="40" r="6.8" fill="rgba(255,255,255,.55)" stroke="#20222a" stroke-width="2.2"/><path d="M48.8 40h2.4" stroke="#20222a" stroke-width="2.2"/><circle cx="43.5" cy="41" r="2" fill="#20222a"/><circle cx="59.5" cy="41" r="2" fill="#20222a"/></g>
+<path d="M44 50q6 5.5 12 0" fill="none" stroke="#8a4a35" stroke-width="2.2" stroke-linecap="round"/></g></svg>`;
+let SU_BOY_T = [];
+function suBoyClear(){ SU_BOY_T.forEach(clearTimeout); SU_BOY_T = []; }
+function suBoyHtml(intro){
+  return `<div class="su-boy-lane" aria-hidden="true"><div class="su-boy ${intro?'walking':''}" id="su-boy" data-stage="${intro?'in':'rest'}" data-dir="r" style="${intro?'left:-120px;top:70px;':''}"><div class="sb-bubble" id="su-bub"></div><div class="sb-fig">${SU_BOY_SVG}</div></div></div>${intro?'<button type="button" class="su-skip" id="su-skip">تخطي ⏭</button>':''}`;
+}
+function suBoyFinish(){
+  suBoyClear(); SU._introDone = true; SU._introRunning = false;
+  const boy = document.getElementById('su-boy'), card = document.getElementById('su-card'), foot = document.querySelector('.su-foot'), wrap = document.querySelector('.su-wrap');
+  if(card){ card.classList.remove('su-hold'); card.style.transition = ''; }
+  if(foot){ foot.classList.remove('su-hold'); foot.style.transition = ''; }
+  if(wrap) wrap.classList.remove('su-intro');
+  const sk = document.getElementById('su-skip'); if(sk) sk.remove();
+  if(boy){ boy.style.transition = ''; boy.style.left = ''; boy.style.top = ''; boy.dataset.stage = 'rest'; boy.dataset.dir = 'r'; boy.classList.remove('walking','pulling','waving'); const b = document.getElementById('su-bub'); if(b) b.classList.remove('on'); }
+}
+function suBoyIntro(){
+  suBoyClear();
+  const boy = document.getElementById('su-boy'), card = document.getElementById('su-card'), foot = document.querySelector('.su-foot'), bub = document.getElementById('su-bub');
+  if(!boy || !card || !bub) return;
+  const E = 'cubic-bezier(.4,.1,.3,1)';
+  const at = (ms, fn) => SU_BOY_T.push(setTimeout(() => { if(document.getElementById('su-boy') === boy) fn(); }, ms));
+  const mv = (el, props, ms, ease) => { el.style.transition = Object.keys(props).map(k => `${k} ${ms}ms ${ease||E}`).join(','); Object.assign(el.style, props); };
+  const say = t => { bub.textContent = t; bub.classList.add('on'); };
+  const hush = () => bub.classList.remove('on');
+  at(60,   () => mv(boy, {left:'calc(50% - 46px)'}, 1400, 'cubic-bezier(.2,.6,.4,1)'));
+  at(1500, () => { boy.classList.remove('walking'); boy.dataset.stage = 'talk1'; say('استنى ثانية! هجيبلك فورم إنشاء الحساب 😉'); });
+  at(3500, () => { hush(); boy.dataset.stage = 'out'; boy.classList.add('walking'); mv(boy, {left:'118%'}, 1200, 'cubic-bezier(.5,0,.8,.6)'); });
+  at(4800, () => {
+    boy.style.transition = 'none'; boy.dataset.dir = 'l'; boy.style.left = 'calc(112% + 0px)'; boy.dataset.stage = 'back'; void boy.offsetWidth;
+    boy.classList.add('pulling');
+    const t = 'transform 1900ms cubic-bezier(.3,.1,.25,1)';
+    mv(boy, {left:'0px'}, 1900, 'cubic-bezier(.3,.1,.25,1)');
+    card.style.transition = t; card.classList.remove('su-hold');
+    if(foot){ foot.style.transition = t + ' .2s'; foot.classList.remove('su-hold'); }
+  });
+  at(6800, () => { boy.classList.remove('walking','pulling'); boy.dataset.dir = 'r'; boy.dataset.stage = 'talk2'; boy.classList.add('waving'); say('اتفضل الفورم! 👋'); });
+  at(8600, () => { hush(); boy.classList.remove('waving'); boy.classList.add('walking'); boy.dataset.stage = 'down'; mv(boy, {top:'calc(100% - 142px)', left:'calc(50% - 46px)'}, 1500, 'cubic-bezier(.4,.1,.3,1)'); });
+  at(10200, suBoyFinish);
+}
+document.addEventListener('click', e => { if(e.target.closest && e.target.closest('#su-skip')) suBoyFinish(); });
 function renderSignup(){
   const step = SU.step || 1;
   const pct = (step-1)/(SU_STEPS.length-1);
   const prevPct = (SU._pct==null) ? pct : SU._pct; SU._pct = pct;
   const prevStep = SU._prev || step; SU._prev = step;
+  if(!SU._entered) SU._introDone = false;
   const enterCls = SU._entered ? '' : 'su-enter'; SU._entered = true;
+  const boyIntro = !SU._introDone && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if(!boyIntro) SU._introDone = true;
+  if(boyIntro){ SU._introRunning = true; SU._introAt = Date.now(); setTimeout(suBoyIntro, 40); }
   const steps = SU_STEPS.map(([n,t],i)=>`<div class="su-step ${i+1===step?'on':''} ${i+1<step?'done':''} ${(i+1===prevStep && step>prevStep)?'just':''}"><i>${i+1<step?'✓':n}</i><span>${t}</span></div>`).join('');
   const dirCls = SU.dir===-1 ? 'back' : '';
   return `
@@ -11672,8 +11763,8 @@ function renderSignup(){
         <div class="su-steps"><div class="bar" style="width:calc(66.66% * ${pct}); --from:calc(66.66% * ${prevPct});"></div>${steps}</div>
         <div class="su-cheer">${['خطوة صغيرة وتبقى معانا 💛','نص الطريق خلص 🔥 وكل الخانات هنا اختيارية','آخر خطوة وتاخد هديتك: +'+suAr(SU_WELCOME_POINTS)+' نقطة 🎁'][step-1]||''}</div>
       </div>
-      <div class="su-wrap">
-        <div class="su-card" id="su-card">
+      <div class="su-wrap${boyIntro?' su-intro':''}">
+        <div class="su-card${boyIntro?' su-hold':''}" id="su-card">
           <div class="su-body ${dirCls}" id="su-body">${suStepBody(step)}</div>
           <div class="su-nav">
             ${step>1?`<button type="button" class="btn btn-outline su-prev" data-action="su-prev">→ السابق</button>`:''}
@@ -11682,7 +11773,8 @@ function renderSignup(){
               : `<button type="button" class="btn btn-primary su-next" id="signup-submit-btn" data-action="submit-signup">إنشاء الحساب ←</button>`}
           </div>
         </div>
-        <div class="su-foot">لديك حساب بالفعل؟ <button type="button" data-action="signup-back">تسجيل الدخول</button></div>
+        <div class="su-foot${boyIntro?' su-hold':''}">لديك حساب بالفعل؟ <button type="button" data-action="signup-back">تسجيل الدخول</button></div>
+        ${suBoyHtml(boyIntro)}
       </div>
     </div>`;
 }
@@ -30268,6 +30360,8 @@ document.addEventListener('focusout', ()=>{ setTimeout(()=>{ const a=document.ac
 
 /* ============================= MASTER RENDER ============================= */
 function render(){
+  /* حماية: لو أنيميشن الولد شغال، أي render تاني (من تحديثات الداتا/الشبكة) كان بيعيد الأنيميشن من الأول — نتجاهله لحد ما يخلص */
+  if(state.view==='signup' && typeof SU!=='undefined' && SU._introRunning && (Date.now()-(SU._introAt||0))<13000 && document.getElementById('su-boy')) return;
   { const _s = document.getElementById('xo-side'); if(_s && state.view!=='game-xo') _s.remove(); }
   { const _d = document.getElementById('c4dlg'); if(_d && !/connect4/.test(state.view||'')) _d.remove(); }
   const extraForSaver = state.pid ? myExtra(state.pid) : null;
