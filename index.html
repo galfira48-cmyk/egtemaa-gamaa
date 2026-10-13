@@ -10481,7 +10481,7 @@ async function loadGamePointsSettings(){
     soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
     soloNumGuessReward:100, soloNumGuessMaxTries:6, soloPlaceMemReward:40,
     soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5, soloCubeReward:50,
-    soloSnlReward:30, soloSnlWinsNeeded:3,
+    soloSnlReward:30, soloSnlWinsNeeded:3, soloCrossMathReward:40,
     visaMinWithdraw:600, visaRenewFee:100, visaValidDays:14};
   try{
     const r = await window.storage.get('glavera-game-points-settings', true);
@@ -10960,7 +10960,7 @@ let GAME_POINTS_SETTINGS = {first:100, second:50, third:30, leavePenalty:50, xoE
   soloMathReward:50, soloMathQuestions:20, soloMathTimerSec:5,
   soloNumGuessReward:100, soloNumGuessMaxTries:6, soloPlaceMemReward:40,
   soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5, soloCubeReward:50,
-  soloSnlReward:30, soloSnlWinsNeeded:3,
+  soloSnlReward:30, soloSnlWinsNeeded:3, soloCrossMathReward:40,
   soloReflexReward:30, soloReflexWinsNeeded:5, soloDartsReward:35, soloBowlingReward:40};
 function confLogoHtml(){
   return CONF_SETTINGS && CONF_SETTINGS.logo
@@ -14441,6 +14441,7 @@ const GAME_CATEGORIES = [
 ];
 const GAME_CATEGORY_OF = {
   xo:'board', connect4:'board', domino:'board', ludo:'board', chess:'board', checkers:'board', tmm:'board', backgammon:'board', snakes:'board',
+  crossmath:'mind',
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
   memory:'mind', revword:'mind', blocky:'mind', cube:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
   uno:'cards', rps:'cards',
@@ -14533,6 +14534,7 @@ const GAMES_CATALOG = [
   {id:'checkers', icon:'⚫', title:'الداما', sub:'أسر إجباري وتتويج للملوك — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#7C4A2A,#3a2412)'},
   {id:'tmm', icon:'⚪', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImsiIGN4PSIuMzUiIGN5PSIuMyIgcj0iLjgiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZiNmI2YiIvPjxzdG9wIG9mZnNldD0iLjY1IiBzdG9wLWNvbG9yPSIjMTYxNjE2Ii8+PC9yYWRpYWxHcmFkaWVudD48cmFkaWFsR3JhZGllbnQgaWQ9InciIGN4PSIuMzUiIGN5PSIuMyIgcj0iLjgiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2NmY2ZjZiIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSI5MiIgaGVpZ2h0PSI5MiIgcng9IjE4IiBmaWxsPSIjZjRlZmU2Ii8+PGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+PHJlY3QgeD0iMjIiIHk9IjIyIiB3aWR0aD0iNTYiIGhlaWdodD0iNTYiLz48cGF0aCBkPSJNNTAgMjJWNzhNMjIgNTBINzgiLz48L2c+PGcgc3Ryb2tlPSJyZ2JhKDAsMCwwLC4zNSkiIHN0cm9rZS13aWR0aD0iMS4yIj48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSI5LjUiIGZpbGw9InVybCgjdykiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjIyIiByPSI5LjUiIGZpbGw9InVybCgjdykiLz48Y2lyY2xlIGN4PSI3OCIgY3k9IjIyIiByPSI5LjUiIGZpbGw9InVybCgjdykiLz48Y2lyY2xlIGN4PSIyMiIgY3k9Ijc4IiByPSI5LjUiIGZpbGw9InVybCgjaykiLz48Y2lyY2xlIGN4PSI1MCIgY3k9Ijc4IiByPSI5LjUiIGZpbGw9InVybCgjaykiLz48Y2lyY2xlIGN4PSI3OCIgY3k9Ijc4IiByPSI5LjUiIGZpbGw9InVybCgjaykiLz48L2c+PHBhdGggZD0iTTUwIDQwVjYwTTQ0IDU0TDUwIDYyTDU2IDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNjOTg5MGEiIHN0cm9rZS13aWR0aD0iMy41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIG9wYWNpdHk9Ii4wIi8+PC9zdmc+', title:'الطاحونة الصغيرة', sub:'حرّك قطعك التلاتة خطوة خطوة ووصّلها لناحية الخصم قبله — ضد الجهاز أو صديقك', color:'linear-gradient(145deg,#8a6d3b,#2b2112)'},
   {id:'backgammon', icon:'🎯', title:'طاولة الزهر', sub:'اللعبة الشرقية الكلاسيكية بزهرين — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#C9A227,#5C3A21)'},
+  {id:'crossmath', icon:'🧮', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9InAiIGN4PSIuMyIgY3k9Ii4yIiByPSIuOSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZjFkZmJhIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjY2RiMDgzIi8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMjAiIGZpbGw9InVybCgjcCkiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIxMSIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIuMjUiIHN0cm9rZT0iIzE3MjY1YSIgc3Ryb2tlLXdpZHRoPSIyLjYiLz48dGV4dCB4PSIyMiIgeT0iMjciIGZvbnQtc2l6ZT0iMTUiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTQyMDRhIj43PC90ZXh0PjxjaXJjbGUgY3g9IjUwIiBjeT0iMjIiIHI9IjExIiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4yNSIgc3Ryb2tlPSIjMTcyNjVhIiBzdHJva2Utd2lkdGg9IjIuNiIvPjxjaXJjbGUgY3g9Ijc4IiBjeT0iMjIiIHI9IjExIiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4yNSIgc3Ryb2tlPSIjMTcyNjVhIiBzdHJva2Utd2lkdGg9IjIuNiIvPjx0ZXh0IHg9Ijc4IiB5PSIyNyIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9IjgwMCIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNDIwNGEiPjEwPC90ZXh0PjxjaXJjbGUgY3g9IjIyIiBjeT0iNTAiIHI9IjExIiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4yNSIgc3Ryb2tlPSIjMTcyNjVhIiBzdHJva2Utd2lkdGg9IjIuNiIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjExIiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4yNSIgc3Ryb2tlPSIjMTcyNjVhIiBzdHJva2Utd2lkdGg9IjIuNiIvPjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjgwMCIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNDIwNGEiPjI8L3RleHQ+PGNpcmNsZSBjeD0iNzgiIGN5PSI1MCIgcj0iMTEiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjI1IiBzdHJva2U9IiMxNzI2NWEiIHN0cm9rZS13aWR0aD0iMi42Ii8+PGNpcmNsZSBjeD0iMjIiIGN5PSI3OCIgcj0iMTEiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjI1IiBzdHJva2U9IiMxNzI2NWEiIHN0cm9rZS13aWR0aD0iMi42Ii8+PGNpcmNsZSBjeD0iNTAiIGN5PSI3OCIgcj0iMTEiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjI1IiBzdHJva2U9IiMxNzI2NWEiIHN0cm9rZS13aWR0aD0iMi42Ii8+PGNpcmNsZSBjeD0iNzgiIGN5PSI3OCIgcj0iMTEiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjI1IiBzdHJva2U9IiMxNzI2NWEiIHN0cm9rZS13aWR0aD0iMi42Ii8+PHRleHQgeD0iNzgiIHk9IjgzIiBmb250LXNpemU9IjE1IiBmb250LXdlaWdodD0iODAwIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE0MjA0YSI+NzwvdGV4dD48L3N2Zz4=', title:'كروس ماث', sub:'معادلات متشابكة بأشكال مختلفة — + − × ÷ وعمليات مجهولة', color:'linear-gradient(145deg,#E8C99A,#8C5A2B)'},
   {id:'snakes', icon:'🐍', title:'سلم وثعبان', sub:'ارمي النرد واطلع بالسلالم وابعد عن الثعابين — ضد الجهاز أو لحد 4 لاعبين', color:'linear-gradient(145deg,#5FE0A4,#2E5A8C)'},
 ];
 /* ---------- admin: فتح/قفل ألعاب معينة ---------- */
@@ -14562,6 +14564,7 @@ const GH_SOLO_SUB = {
   checkers:'أسر إجباري ومتسلسل، وتتويج القطعة لما توصل آخر الصف',
   backgammon:'زهرين، بار، وخروج القطع — اللعبة الشرقية الكلاسيكية',
   tmm:'3 قطع لكل لاعب: حرّك قطعة خطوة بالدور — أول واحد يوصّل قطعه التلاتة لناحية الخصم يكسب',
+  crossmath:'ألغاز معادلات متشابكة بأشكال مختلفة (شبكات، صليب، سلّم، هرم) بـ + − × ÷ وعمليات مجهولة. 4 مستويات: من 3×3 البسيطة لحد شبكات ضخمة صعبة جدًا، وتحدي يومي',
   snakes:'ارمي النرد واطلع بالسلالم وابعد عن الثعابين، أول ما توصل 100 تكسب — لحد 4 لاعبين',
 };
 function gameIconHtml(g){ return g.logo ? `<img class="game-logo-img" src="${g.logo}" alt="" draggable="false">` : g.icon; }
@@ -15125,7 +15128,8 @@ const LVL_THEMES = {
   darts:   {crest:'🎯', g:['#4a1212','#120505','#FF6B6B'], ic:['🌱','🎯','🔥','👑'], ds:['سهامه بتتفرق في كل مكان','بيصيب كويس وبيشرد أحيانًا','تصويب ثابت وغلطات قليلة','قناص — بيصيب قلب الهدف']},
   ludo:    {crest:'🎲', g:['#3a2a12','#0c0b16','#F4B740'], ic:['🌱','🎲','🔥','👑'], ds:['بيحرّك قطعه عشوائي','بيلعب كويس وبيضيّع فرص','بياكل قطعك ويحمي قطعه','بيخطط لكل رمية — بلا رحمة']},
   numguess:{crest:'🔢', g:['#0e3a4a','#051118','#4FACFE'], ic:['🌱','🎯','🔥'], ds:[]},
-  placemem:{crest:'🧠', g:['#2a1a5c','#0a0716','#B07CFF'], ic:['🌱','🧠','🔥'], ds:[]}
+  placemem:{crest:'🧠', g:['#2a1a5c','#0a0716','#B07CFF'], ic:['🌱','🧠','🔥'], ds:[]},
+  crossmath:{crest:'🧮', g:['#4a3418','#150d05','#E8C99A'], ic:[], ds:[]}
 };
 const LVL_STARS = {easy:[2,3], medium:[3,4], hard:[3,4], expert:[5,5]};
 /* شاشة اختيار المستوى الموحّدة: بتتبني من قايمة مستويات + ثيم اللعبة، وبتستخدمها كل الألعاب اللي فيها مستويات */
@@ -33947,6 +33951,7 @@ document.addEventListener('click', (e)=>{
     if(gid==='billiards'){ openBilliardsGame(); return; }
     if(gid==='darts'){ openDartsGame(); return; }
     if(gid==='bowling'){ openBowlingGame(); return; }
+    if(gid==='crossmath'){ openCrossMathGame(); return; }
     if(gid==='stack'){ openStackGame(); return; }
     if(gid==='cube'){ openCubeGame(); return; }
     if(gid==='blocky'){ openBlockyGame(); return; }
@@ -43514,6 +43519,600 @@ function build(){
 var _r=window.render;
 if(typeof _r==='function'){window.render=function(){var r=_r.apply(this,arguments);try{build();}catch(e){}setTimeout(function(){try{build();}catch(e){}},120);return r;};}
 setTimeout(function(){try{build();}catch(e){}},400);
+})();
+</script>
+
+<style id="cm-css">
+/* =====================================================================
+   كروس ماث v3: أشكال متعددة (شبكات متشابكة / صليب / معيّن / سلّم / إطار / هرم) — بستايل كراسة الحبر الأصلي
+   ===================================================================== */
+.cm-ov{ position:fixed; inset:0; z-index:9600; display:flex; flex-direction:column; align-items:center; overflow:auto; color:#fff; direction:rtl;
+  font-family:'Cairo','Tajawal',sans-serif; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none;
+  padding:calc(12px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom)); background:var(--ovbg); }
+.cm-th-ink{ --ovbg:radial-gradient(120% 70% at 50% 0%,#22346b 0%,#101834 55%,#070b1a 100%);
+  --paper:repeating-linear-gradient(180deg,transparent 0 30px,rgba(92,66,28,.20) 30px 31px),url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .32  0 0 0 0 .14  0 0 0 .22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),radial-gradient(120% 90% at 28% 18%,#f1dfba 0%,#dfc596 62%,#cdb083 100%);
+  --pbox:0 20px 44px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.4),inset 0 0 70px rgba(120,80,20,.28);
+  --cbd:#17265a; --cbg:rgba(255,255,255,.16); --cgv:rgba(255,255,255,.26); --cbl:rgba(255,255,255,.42); --cfg:#14204a; --fill:#1f4fd1; --fillbd:#1f3a9c; --opfg:#14204a;
+  --font:'Playfair Display','Amiri',serif; --fw:800; --sel:#F4B740; --selbg:rgba(255,224,150,.75); --ok:#0b7d4b; --bad:#c0272d; --hintc:#0b7d4b; --cglow:none; --tglow:none;
+  --chipbg:radial-gradient(circle at 32% 28%,#f6e6c3,#dcc08e 75%); --chipfg:#14204a; --chipbd:#17265a; --chipsh:#8d6b35; }
+.cm-sh{ width:100%; max-width:460px; display:flex; flex-direction:column; gap:12px; margin:auto 0; }
+.cm-top{ display:flex; align-items:center; gap:8px; }
+.cm-x,.cm-hp{ flex:0 0 42px; width:42px; height:42px; border:0; border-radius:13px; color:#fff; font-size:17px; font-weight:900; background:rgba(255,255,255,.12); cursor:pointer; font-family:inherit; }
+.cm-x:active,.cm-hp:active{ transform:scale(.93); }
+.cm-ttl{ flex:1; text-align:center; font-size:17px; font-weight:900; letter-spacing:.2px; }
+.cm-ttl small{ display:block; font-size:11px; font-weight:700; opacity:.7; margin-top:1px; }
+.cm-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.cm-st{ padding:8px 4px; border-radius:14px; text-align:center; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.08); }
+.cm-st small{ display:block; font-size:10px; opacity:.72; font-weight:700; }
+.cm-st b{ font-size:15px; font-weight:900; font-variant-numeric:tabular-nums; }
+.cm-paper{ position:relative; border-radius:20px; padding:16px 14px; direction:ltr; background:var(--paper); box-shadow:var(--pbox); display:flex; justify-content:center; }
+.cm-paper.win{ animation:cmGlow 1.2s ease-out; }
+.cm-grid{ display:grid; justify-content:center; align-content:center; }
+.cm-t{ display:flex; align-items:center; justify-content:center; min-width:0; min-height:0; }
+.cm-c{ width:calc(var(--u)*.9); height:calc(var(--u)*.9); border-radius:52% 48% 50% 50% / 50% 52% 48% 50%; border:calc(var(--u)*.065) solid var(--cbd);
+  display:flex; align-items:center; justify-content:center; padding:0; margin:0; font-family:var(--font); font-weight:var(--fw); line-height:1; color:var(--cfg);
+  font-size:calc(var(--u)*.44); background:var(--cbg); box-shadow:var(--cglow); text-shadow:var(--tglow); transition:transform .15s, box-shadow .2s, background .2s, border-color .2s; position:relative; }
+.cm-c.l3{ font-size:calc(var(--u)*.34); letter-spacing:-.5px; }
+.cm-t:nth-child(3n) .cm-c{ border-radius:49% 51% 53% 47% / 52% 49% 51% 48%; }
+.cm-c.gv{ background:var(--cgv); cursor:default; }
+.cm-c.bl{ cursor:pointer; background:var(--cbl); }
+.cm-c.bl:active{ transform:scale(.94); }
+.cm-c.fl{ color:var(--fill); border-color:var(--fillbd); }
+.cm-c.ht{ color:var(--hintc); border-color:var(--hintc); }
+.cm-c.sl,.cm-o.sl{ transform:scale(1.07); border-color:var(--sel); background:var(--selbg); box-shadow:0 0 0 3px var(--sel),0 0 22px var(--sel); }
+.cm-c.er{ color:var(--bad); border-color:var(--bad); animation:cmShake .42s; }
+.cm-c.pop{ animation:cmPop .28s cubic-bezier(.2,1.5,.4,1); }
+.cm-c.hl{ box-shadow:0 0 0 3px var(--sel); animation:cmPulse 1s ease-in-out infinite; }
+.cm-o{ display:flex; align-items:center; justify-content:center; flex-direction:column; font-family:var(--font); font-weight:900; color:var(--opfg); font-size:calc(var(--u)*.42); line-height:1; text-shadow:var(--tglow); transition:color .25s, transform .25s; border:0; background:transparent; padding:0; }
+.cm-o.ok{ color:var(--ok); transform:scale(1.1); }
+.cm-o.bd{ color:var(--bad); }
+.cm-o.hl{ color:var(--sel); animation:cmPulse 1s ease-in-out infinite; }
+.cm-o.py{ font-size:calc(var(--u)*.36); } .cm-o.py i{ font-style:normal; font-size:.5em; opacity:.6; margin-top:1px; }
+.cm-o.slot{ width:calc(var(--u)*.46); height:calc(var(--u)*.46); border-radius:50%; border:2px dashed var(--cbd); cursor:pointer; color:var(--fill); font-size:calc(var(--u)*.3); }
+.cm-o.slot.em{ color:var(--cbd); opacity:.85; }
+.cm-o.slot.sl{ border-style:solid; }
+.cm-o.slot.lk{ color:var(--hintc); border-color:var(--hintc); border-style:solid; }
+.cm-hint-tag{ position:absolute; top:-6px; inset-inline-end:-4px; font-size:12px; }
+.cm-note{ text-align:center; font-size:12px; font-weight:700; opacity:.85; line-height:1.7; min-height:20px; }
+.cm-bankw{ padding:12px 10px 10px; border-radius:20px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); }
+.cm-bankt{ text-align:center; font-size:12px; font-weight:800; opacity:.75; margin-bottom:9px; }
+.cm-bank{ display:flex; flex-wrap:wrap; justify-content:center; gap:9px; direction:ltr; }
+.cm-chip{ min-width:50px; height:50px; padding:0 8px; border-radius:26px; border:3px solid var(--chipbd); cursor:pointer; font-family:var(--font); font-weight:800; font-size:20px; color:var(--chipfg); background:var(--chipbg); box-shadow:0 5px 0 var(--chipsh),0 9px 16px rgba(0,0,0,.4); transition:transform .12s, box-shadow .12s, opacity .2s; }
+.cm-chip:active{ transform:translateY(4px); box-shadow:0 1px 0 var(--chipsh),0 3px 8px rgba(0,0,0,.4); }
+.cm-chip.us{ opacity:.2; pointer-events:none; box-shadow:none; transform:scale(.9); }
+.cm-chip.op{ min-width:54px; font-size:24px; border-radius:50%; }
+.cm-tools{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.cm-tb{ height:48px; border:0; border-radius:15px; font-family:inherit; font-size:12.5px; font-weight:800; color:#fff; cursor:pointer; background:rgba(255,255,255,.13); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; }
+.cm-tb span{ font-size:16px; line-height:1; }
+.cm-tb:active{ transform:scale(.95); } .cm-tb:disabled{ opacity:.4; }
+.cm-tb.gold{ color:#241a00; background:linear-gradient(95deg,#F4B740,#FFDE94); }
+.cm-card{ padding:16px; border-radius:22px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.1); text-align:center; line-height:1.9; font-size:14px; font-weight:700; }
+.cm-big{ font-size:21px; font-weight:900; margin:2px 0 4px; }
+.cm-stars{ font-size:34px; letter-spacing:4px; color:#FFDE94; text-shadow:0 0 18px rgba(255,222,148,.6); margin:4px 0; }
+.cm-rs{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0 4px; }
+.cm-rs div{ padding:8px 4px; border-radius:13px; background:rgba(255,255,255,.09); font-size:11px; } .cm-rs b{ display:block; font-size:17px; font-weight:900; }
+.cm-btn{ height:52px; border:0; border-radius:16px; width:100%; font-family:inherit; font-size:15px; font-weight:900; cursor:pointer; color:#221900; background:linear-gradient(95deg,#F4B740,#FFDE94); }
+.cm-btn.alt{ color:#fff; background:rgba(255,255,255,.14); } .cm-btn:active{ transform:scale(.98); }
+.cm-help{ position:fixed; inset:0; z-index:9700; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(5,6,20,.82); direction:rtl; font-family:'Cairo','Tajawal',sans-serif; color:#fff; }
+.cm-help .cm-card{ max-width:400px; width:100%; text-align:start; max-height:100%; overflow:auto; background:linear-gradient(165deg,#2a3a7a,#141c3f); }
+.cm-help h4{ margin:0 0 8px; text-align:center; font-size:18px; font-weight:900; } .cm-help p{ margin:6px 0; font-size:13.5px; font-weight:700; }
+.cm-ex{ direction:ltr; text-align:center; font-family:'Playfair Display',serif; font-size:19px; font-weight:800; letter-spacing:1px; color:#FFDE94; padding:2px 0; }
+@keyframes cmShake{ 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+@keyframes cmPop{ 0%{transform:scale(.6)} 100%{transform:scale(1)} }
+@keyframes cmPulse{ 0%,100%{ filter:brightness(1); } 50%{ filter:brightness(1.45); } }
+@keyframes cmGlow{ 0%{box-shadow:0 0 0 0 rgba(124,255,178,0)} 40%{box-shadow:0 0 0 10px rgba(124,255,178,.55)} 100%{} }
+@media (max-height:700px){ .cm-sh{ gap:8px; } .cm-chip{ height:44px; min-width:44px; font-size:18px; } .cm-paper{ padding:10px 8px; } }
+@media (prefers-reduced-motion:reduce){ .cm-c,.cm-o,.cm-paper{ animation:none !important; transition:none !important; } }
+</style>
+<script id="cm-js">
+/* =====================================================================
+   كروس ماث v3
+   - أشكال: شبكات متشابكة، صليب، معيّن، سلّم، إطار، H، هرم
+   - معادلات طويلة بأولوية العمليات (× ÷ قبل + −) + عمليات مجهولة
+   - مولّد بيضمن حل واحد (solver بيتأكد) + 5 مستويات + أرواح + ذكاء تلقائي
+   ===================================================================== */
+(function(){
+'use strict';
+var OPS=['+','-','*','/'], SYM={'+':'+','-':'\u2212','*':'\u00D7','/':'\u00F7'};
+var LV={
+ easy:  {n:'سهل',ic:'🌱',ops:['+','-'],        lo:2,hi:15,max:15,frac:.5, minFrac:.4,hid:0,dec:0,deduce:true, lives:0,hints:3,mult:.5,par:60, shapes:['classic'],d:'جمع وطرح بأرقام صغيرة — كل رقم بيتحدد بالتفكير'},
+ medium:{n:'متوسط',ic:'⚡',ops:['+','-','*'],    lo:2,hi:40,max:40,frac:.62,minFrac:.5,hid:0,dec:0,deduce:true, lives:0,hints:3,mult:1,  par:110,shapes:['classic'],d:'دخلنا الضرب — اربط الصفوف بالأعمدة'},
+ hard:  {n:'صعب',ic:'🔥',ops:OPS,K:[11,12],chain:.5,lo:2,hi:40,max:999,frac:.72,minFrac:.54,hid:5,dec:3,deduce:false,lives:3,hints:2,mult:3,par:900, shapes:['rect5','cross5','rect56','pyr5','stairs5'],d:'صعب جدًا: أشكال كبيرة، معادلات طويلة، 5 عمليات مجهولة، 3 أرواح وتلميحين'},
+ expert:{n:'محترف',ic:'💎',ops:OPS,K:[12,14],chain:.6,lo:2,hi:50,max:999,frac:.8, minFrac:.6, hid:8,dec:5,deduce:false,lives:2,hints:1,mult:5,par:1500,shapes:['rect56','rect56','rect5','pyr6'],d:'أصعب مستوى: شبكات ضخمة وأرقام لحد 3 خانات، 8 عمليات مجهولة، روحين وتلميح واحد'},
+ daily: {n:'تحدي اليوم',ic:'🏆',ops:OPS,K:[8,9],chain:.3,lo:2,hi:20,max:199,frac:.6,minFrac:.45,hid:1,dec:2,deduce:true,lives:0,hints:3,mult:1.3,par:420,shapes:['rect5','cross5','stairs5','pyr4','H5'],d:''}
+};
+var ORDER=['easy','medium','hard','expert'];
+var MASKS={
+ rect4:['####','####','####','####'], rect5:['#####','#####','#####','#####','#####'], rect56:['######','######','######','######','######'],
+ cross5:['.###.','#####','#####','#####','.###.'], diamond5:['..#..','.###.','#####','.###.','..#..'], stairs5:['###..','####.','#####','.####','..###'],
+ frame5:['#####','#...#','#...#','#...#','#####'], H5:['#.#.#','#####','#.#.#','#####','#.#.#']
+};
+var SHAPE_LABEL={rect4:'▦ متشابكة 4×4',rect5:'▦ متشابكة 5×5',rect56:'▦ متشابكة 5×6',cross5:'✚ صليب',diamond5:'◇ معيّن',stairs5:'⟋ سلّم',frame5:'▢ إطار',H5:'☷ شكل H',pyr4:'🔺 هرم 4',pyr5:'🔺 هرم 5',pyr6:'🔺 هرم 6',classic:'▦ كلاسيك 3×3'};
+var G=null, TMR=null, T=[], RNG=Math.random, BUDGET=5000;
+
+/* ---------- أدوات ---------- */
+function esc(s){ try{ return escapeHtml(String(s==null?'':s)); }catch(e){ return String(s==null?'':s); } }
+function snd(n){ try{ SND[n](); }catch(e){} }
+function vib(p){ try{ vibrate(p); }catch(e){} }
+function pick(a){ return a[Math.floor(RNG()*a.length)]; }
+function ri(a,b){ return a+Math.floor(RNG()*(b-a+1)); }
+function shuf(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(RNG()*(i+1)),t=a[i];a[i]=a[j];a[j]=t; } return a; }
+function seeded(seed){ var a=seed>>>0; return function(){ a=(a+0x6D2B79F5)|0; var t=Math.imul(a^(a>>>15),1|a); t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296; }; }
+function hashStr(s){ var h=2166136261; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function dayStr(){ return new Date().toDateString(); }
+function stats(){ try{ return state.pid?myGameStats(state.pid):{}; }catch(e){ return {}; } }
+function later(fn,ms){ var id=setTimeout(fn,ms); T.push(id); return id; }
+function clearT(){ T.forEach(clearTimeout); T=[]; }
+function settings(){ return window.GAME_POINTS_SETTINGS||{}; }
+function fmt(s){ s=Math.max(0,Math.floor(s)); var m=Math.floor(s/60),r=s%60; return (m<10?'0':'')+m+':'+(r<10?'0':'')+r; }
+
+/* ---------- الحساب (أولوية العمليات) ---------- */
+function ev(a,op,b){
+  if(a==null||b==null) return null; var r;
+  if(op==='+') r=a+b; else if(op==='-') r=a-b; else if(op==='*') r=a*b;
+  else { if(b===0||a%b!==0) return null; r=a/b; }
+  return Math.abs(r)>99999?null:r;
+}
+function evalChain(v,o){
+  var nums=[v[0]],os=[],i;
+  for(i=0;i<o.length;i++){
+    if(o[i]==='*'||o[i]==='/'){ var r=ev(nums[nums.length-1],o[i],v[i+1]); if(r==null) return null; nums[nums.length-1]=r; }
+    else{ os.push(o[i]); nums.push(v[i+1]); }
+  }
+  var acc=nums[0]; for(i=0;i<os.length;i++){ acc=ev(acc,os[i],nums[i+1]); if(acc==null) return null; } return acc;
+}
+function okv(v,max){ return v!=null&&v>=1&&v<=max&&v===Math.floor(v); }
+
+/* ---------- بناء الأشكال ---------- */
+function finishP(P){
+  P.opBase=[]; var n=0; P.lines.forEach(function(L,li){ P.opBase[li]=n; n+=L.ops.length; });
+  P.cellLines=P.cells.map(function(){ return []; });
+  P.lines.forEach(function(L,li){ L.c.forEach(function(id){ P.cellLines[id].push(li); }); });
+  return P;
+}
+function buildLattice(eqs, shape){
+  var idMap={},cells=[],minr=99,minc=99,maxr=-1,maxc=-1;
+  eqs.forEach(function(e){ e.cells.forEach(function(rc){ var k=rc[0]+','+rc[1]; if(idMap[k]==null){ idMap[k]=cells.length; cells.push({lr:rc[0],lc:rc[1]}); }
+    minr=Math.min(minr,rc[0]); maxr=Math.max(maxr,rc[0]); minc=Math.min(minc,rc[1]); maxc=Math.max(maxc,rc[1]); }); });
+  cells.forEach(function(c){ c.r=2*(c.lr-minr); c.c=2*(c.lc-minc); });
+  var lines=eqs.map(function(e){
+    var ids=e.cells.map(function(rc){ return idMap[rc[0]+','+rc[1]]; }), k=ids.length-1, ot=[], et, i;
+    function mid(a){ var c=cells[ids[a]]; return e.o==='h'?{r:c.r,c:c.c+1}:{r:c.r+1,c:c.c}; }
+    for(i=0;i<k-1;i++) ot.push(mid(i)); et=mid(k-1);
+    return {c:ids,ops:new Array(k-1).fill('+'),ot:ot,et:et};
+  });
+  return finishP({shape:shape||'lattice',kind:'lattice',cells:cells,lines:lines,tr:2*(maxr-minr)+1,tc:2*(maxc-minc)+1,A:[],blanks:[],hidden:[],decoys:[]});
+}
+function layoutLattice(mask,K,chainP){
+  var R=mask.length,C=mask[0].length;
+  function ok(r,c){ return r>=0&&r<R&&c>=0&&c<C&&mask[r][c]==='#'; }
+  var cand=[],r,c,o,len,i;
+  for(r=0;r<R;r++) for(c=0;c<C;c++) for(len=3;len<=4;len++){
+    ['h','v'].forEach(function(o){ var cells=[],good=true; for(i=0;i<len;i++){ var rr=o==='h'?r:r+i, cc=o==='h'?c+i:c; if(!ok(rr,cc)){ good=false; break; } cells.push([rr,cc]); }
+      if(good) cand.push({o:o,r:r,c:c,len:len,cells:cells,line:o==='h'?r:c,st:o==='h'?c:r,en:(o==='h'?c:r)+len-1}); });
+  }
+  if(!cand.length) return null;
+  function compat(e,eqs){
+    for(var x=0;x<eqs.length;x++){ var f=eqs[x];
+      if(f===e) return false;
+      if(f.o===e.o&&f.line===e.line){
+        if(e.st<=f.en&&f.st<=e.en){ if(!(e.st===f.en||f.st===e.en)) return false; }
+        else if(e.st===f.en+1||f.st===e.en+1) return false;
+      } else if(f.o!==e.o){ var sh=0; e.cells.forEach(function(a){ f.cells.forEach(function(b){ if(a[0]===b[0]&&a[1]===b[1]) sh++; }); }); if(sh>1) return false; }
+    }
+    return true;
+  }
+  function touches(e,used){ return e.cells.some(function(a){ return used[a[0]+','+a[1]]; }); }
+  var eqs=[], used={}, first=pick(cand); eqs.push(first); first.cells.forEach(function(a){ used[a[0]+','+a[1]]=1; });
+  while(eqs.length<K){
+    var opts=cand.filter(function(e){ return compat(e,eqs)&&touches(e,used); }); if(!opts.length) break;
+    var tree=opts.filter(function(e){ var sh=0; e.cells.forEach(function(a){ if(used[a[0]+','+a[1]]) sh++; }); return sh===1; }); if(tree.length&&RNG()<.8) opts=tree;
+    var wantChain=RNG()<chainP, sub=opts.filter(function(e){ return (e.len===4)===wantChain; }); if(!sub.length) sub=opts;
+    var e=pick(sub); eqs.push(e); e.cells.forEach(function(a){ used[a[0]+','+a[1]]=1; });
+  }
+  return eqs;
+}
+function buildPyramid(n){
+  var cells=[],lines=[],ids={},i,j;
+  for(i=0;i<n;i++) for(j=0;j<n-i;j++){ ids[i+','+j]=cells.length; cells.push({r:n-1-i,c:i+2*j}); }
+  for(i=0;i<n-1;i++) for(j=0;j<n-1-i;j++){
+    lines.push({c:[ids[i+','+j],ids[i+','+(j+1)],ids[(i+1)+','+j]],ops:['+'],ot:[{r:n-1-i,c:i+2*j+1}],et:null});
+  }
+  return finishP({shape:'pyr'+n,kind:'pyramid',cells:cells,lines:lines,tr:n,tc:2*n-1,A:[],blanks:[],hidden:[],decoys:[]});
+}
+function classicP(){
+  var eqs=[],r,c; for(r=0;r<3;r++) eqs.push({o:'h',cells:[[r,0],[r,1],[r,2]]}); for(c=0;c<3;c++) eqs.push({o:'v',cells:[[0,c],[1,c],[2,c]]});
+  return buildLattice(eqs,'classic');
+}
+function fillClassic(P,L){
+  var ops=L.ops,max=L.max,opMax=(ops.indexOf('*')>=0)?Math.min(L.max,12):L.max;
+  for(var k=0;k<500;k++){
+    var A=new Array(9),o={};
+    A[0]=ri(2,opMax); A[1]=ri(2,opMax); A[3]=ri(2,opMax); A[4]=ri(2,opMax);
+    o.r0=pick(ops); o.r1=pick(ops); o.c0=pick(ops); o.c1=pick(ops);
+    A[2]=ev(A[0],o.r0,A[1]); A[5]=ev(A[3],o.r1,A[4]); A[6]=ev(A[0],o.c0,A[3]); A[7]=ev(A[1],o.c1,A[4]);
+    if(!okv(A[2],max)||!okv(A[5],max)||!okv(A[6],max)||!okv(A[7],max)) continue;
+    var cand=[]; ops.forEach(function(h){ ops.forEach(function(v){ var x=ev(A[6],h,A[7]),y=ev(A[2],v,A[5]); if(okv(x,max)&&x===y) cand.push([h,v,x]); }); });
+    if(!cand.length) continue;
+    var c=pick(cand); o.r2=c[0]; o.c2=c[1]; A[8]=c[2];
+    var seen={},d=0; A.forEach(function(v){ if(!seen[v]){ seen[v]=1; d++; } }); if(d<(ops.length<=2?6:7)) continue;
+    var ids=['r0','r1','r2','c0','c1','c2'],cs=[[0,1],[3,4],[6,7],[0,3],[1,4],[2,5]],bad=false;
+    for(var i=0;i<6;i++){ var op=o[ids[i]]; if((op==='*'||op==='/')&&(A[cs[i][0]]===1||A[cs[i][1]]===1)) bad=true; if(op==='+'&&A[cs[i][0]]===A[cs[i][1]]&&ops.length>2) bad=true; }
+    if(bad) continue;
+    P.A=A; P.lines.forEach(function(Ln,i){ Ln.ops=[o[ids[i]]]; }); return true;
+  }
+  return false;
+}
+/* ---------- تعبئة القيم ---------- */
+function fillValues(P,L){
+  var n=P.cells.length,val=new Array(n).fill(null),li;
+  for(li=0;li<P.lines.length;li++){
+    var Ln=P.lines[li],k=Ln.c.length-1,done=false;
+    for(var at=0;at<120&&!done;at++){
+      var ops=[],i; for(i=0;i<k-1;i++) ops.push(pick(L.ops));
+      var tmp=val.slice(),U=[]; for(i=0;i<k;i++) if(tmp[Ln.c[i]]==null) U.push(i);
+      var resSet=tmp[Ln.c[k]]!=null, good=true;
+      if(!resSet){ U.forEach(function(x){ tmp[Ln.c[x]]=ri(L.lo,L.hi); });
+        var vs=Ln.c.slice(0,k).map(function(id){ return tmp[id]; }), r=evalChain(vs,ops); if(!okv(r,L.max)) good=false; else tmp[Ln.c[k]]=r; }
+      else if(!U.length){ var vs2=Ln.c.slice(0,k).map(function(id){ return tmp[id]; }); good=(evalChain(vs2,ops)===tmp[Ln.c[k]]); }
+      else { for(i=0;i<U.length-1;i++) tmp[Ln.c[U[i]]]=ri(L.lo,L.hi);
+        var last=U[U.length-1],found=false,order=shuf(Array.apply(null,Array(L.hi)).map(function(_,q){ return q+1; }));
+        for(var q=0;q<order.length;q++){ tmp[Ln.c[last]]=order[q]; var vs3=Ln.c.slice(0,k).map(function(id){ return tmp[id]; }); if(evalChain(vs3,ops)===tmp[Ln.c[k]]){ found=true; break; } }
+        if(!found) good=false; }
+      if(good){ var hasMD=ops.some(function(o){ return o==='*'||o==='/'; });
+        if(hasMD&&Ln.c.slice(0,k).some(function(id){ return tmp[id]===1; })) good=false; }
+      if(good){ val=tmp; Ln.ops=ops; done=true; }
+    }
+    if(!done) return false;
+  }
+  var seen={},d=0; val.forEach(function(v){ if(!seen[v]){ seen[v]=1; d++; } });
+  if(d<Math.min(n-3,Math.ceil(n*.6))) return false;
+  P.A=val; return true;
+}
+function fillPyramid(P,L){
+  var n=parseInt(P.shape.slice(3),10),val=new Array(P.cells.length).fill(null),i;
+  for(i=0;i<n;i++) val[i]=ri(L.lo,L.hi);
+  for(var li=0;li<P.lines.length;li++){
+    var Ln=P.lines[li],a=val[Ln.c[0]],b=val[Ln.c[1]],opt=shuf(L.ops),got=false;
+    for(var q=0;q<opt.length;q++){ var r=ev(a,opt[q],b); if(okv(r,L.max)&&!((opt[q]==='*'||opt[q]==='/')&&(a===1||b===1))){ val[Ln.c[2]]=r; Ln.ops=[opt[q]]; got=true; break; } }
+    if(!got) return false;
+  }
+  var seen={},d=0; val.forEach(function(v){ if(!seen[v]){ seen[v]=1; d++; } }); if(d<val.length-2) return false;
+  P.A=val; return true;
+}
+/* ---------- Solver: عدّ الحلول (حل واحد مضمون) ---------- */
+function solveP(P,blankSet,hidSet,bank,limit,budget,propOnly){
+  var val=P.A.map(function(v,i){ return blankSet[i]?null:v; }),ops=[];
+  P.lines.forEach(function(L,li){ L.ops.forEach(function(o,oi){ ops.push(hidSet[li+':'+oi]?null:o); }); });
+  var cnt={}; bank.forEach(function(v){ cnt[v]=(cnt[v]||0)+1; });
+  var res={found:0,aborted:false,prop:false,nodes:0};
+  function info(li,val,ops){ var L=P.lines[li],k=L.c.length-1,un=0,uc=-1,uo=-1,vs=[],os=[],i;
+    for(i=0;i<=k;i++){ var v=val[L.c[i]]; if(v==null){ un++; uc=i; } vs.push(v); }
+    for(i=0;i<k-1;i++){ var o=ops[P.opBase[li]+i]; if(o==null){ un++; uo=i; } os.push(o); }
+    return {un:un,uc:uc,uo:uo,vs:vs,os:os,k:k}; }
+  function chk(I){ var r=evalChain(I.vs.slice(0,I.k),I.os); return r!=null&&r===I.vs[I.k]; }
+  function propagate(val,ops,cnt){
+    var ch=true;
+    while(ch){ ch=false;
+      for(var li=0;li<P.lines.length;li++){
+        var I=info(li,val,ops);
+        if(I.un===0){ if(!chk(I)) return false; continue; }
+        if(I.un!==1) continue;
+        if(I.uc>=0){ var good=[]; for(var key in cnt){ if(cnt[key]>0){ I.vs[I.uc]=+key; if(chk(I)) good.push(+key); } }
+          if(!good.length) return false; if(good.length===1){ val[P.lines[li].c[I.uc]]=good[0]; cnt[good[0]]--; ch=true; } }
+        else { var go=[]; for(var q=0;q<4;q++){ I.os[I.uo]=OPS[q]; if(chk(I)) go.push(OPS[q]); }
+          if(!go.length) return false; if(go.length===1){ ops[P.opBase[li]+I.uo]=go[0]; ch=true; } }
+      }
+    }
+    return true;
+  }
+  function search(val,ops,cnt,depth){
+    if(res.found>=limit||res.aborted) return;
+    if(++res.nodes>budget){ res.aborted=true; return; }
+    if(!propagate(val,ops,cnt)) return;
+    var unA=P.lines.map(function(L,li){ return info(li,val,ops).un; });
+    var best=null,bs=1e9,bd=1e9,i;
+    for(i=0;i<val.length;i++) if(val[i]==null){ var sc=Math.min.apply(null,P.cellLines[i].map(function(l){ return unA[l]; })); var dm=0; for(var k2 in cnt) if(cnt[k2]>0) dm++;
+      if(sc<bs||(sc===bs&&dm<bd)){ best={t:'c',i:i}; bs=sc; bd=dm; } }
+    for(i=0;i<ops.length;i++) if(ops[i]==null){ var li2=0; while(li2+1<P.lines.length&&P.opBase[li2+1]<=i) li2++; var sc2=unA[li2];
+      if(sc2<bs||(sc2===bs&&4<bd)){ best={t:'o',i:i}; bs=sc2; bd=4; } }
+    if(!best){ res.found++; return; }
+    if(depth===0) res.prop=false;
+    if(best.t==='c'){ for(var key in cnt){ if(res.found>=limit||res.aborted) return; if(cnt[key]>0){ var v2=val.slice(),o2=ops.slice(),c2=Object.assign({},cnt); v2[best.i]=+key; c2[key]--; search(v2,o2,c2,depth+1); } } }
+    else for(var q=0;q<4;q++){ if(res.found>=limit||res.aborted) return; var v3=val.slice(),o3=ops.slice(); o3[best.i]=OPS[q]; search(v3,o3,Object.assign({},cnt),depth+1); }
+  }
+  var v0=val.slice(),o0=ops.slice(),c0=Object.assign({},cnt);
+  if(propOnly){ if(propagate(v0,o0,c0)){ res.prop=v0.every(function(v){ return v!=null; })&&o0.every(function(o){ return o!=null; }); if(res.prop) res.found=1; } return res; }
+  search(v0,o0,c0,0); return res;
+}
+/* ---------- نحت اللغز: نخفي أكتر عدد ممكن مع الحفاظ على الحل الواحد ---------- */
+function carve(P,L){
+  var n=P.cells.length,nb=Math.round(n*L.frac),minb=Math.ceil(n*L.minFrac),blankSet={},hidSet={},nbc=0,nh=0,i,pass;
+  function bankOf(extra){ var b=[]; for(var i=0;i<n;i++) if(blankSet[i]) b.push(P.A[i]); return b.concat(extra||[]); }
+  function accept(extra){ var r=solveP(P,blankSet,hidSet,bankOf(extra),2,BUDGET,L.deduce); return L.deduce?r.prop:(r.found===1&&!r.aborted); }
+  var slots=[]; P.lines.forEach(function(Ln,li){ Ln.ops.forEach(function(o,oi){ slots.push(li+':'+oi); }); });
+  var tgt=Math.min(L.hid,slots.length); slots=shuf(slots);
+  for(i=0;i<slots.length&&nh<tgt;i++){ hidSet[slots[i]]=true; if(accept()) nh++; else delete hidSet[slots[i]]; }
+  if(nh<Math.ceil(tgt*.6)) return null;
+  for(pass=0;pass<2;pass++){ var order=shuf(P.cells.map(function(_,k){ return k; }));
+    for(i=0;i<order.length&&nbc<nb;i++){ var c=order[i]; if(blankSet[c]) continue; blankSet[c]=true; if(accept()) nbc++; else delete blankSet[c]; } }
+  if(nbc<minb) return null;
+  var decoys=[],d;
+  for(d=0;d<L.dec;d++){ var base=P.A[ri(0,n-1)],dv=base+pick([-3,-2,-1,1,2,3]); if(dv<1) dv=ri(2,L.hi); if(accept(decoys.concat([dv]))) decoys.push(dv); }
+  return {blankSet:blankSet,hidSet:hidSet,decoys:decoys};
+}
+function genRaw(lv){
+  var L=LV[lv],order=shuf(L.shapes),si,att;
+  for(si=0;si<order.length;si++){
+    var shape=order[si];
+    for(att=0;att<70;att++){
+      var P,eqs;
+      if(shape==='classic'){ P=classicP(); if(!fillClassic(P,L)) continue; }
+      else if(shape.indexOf('pyr')===0){ P=buildPyramid(+shape.charAt(3)); if(!fillPyramid(P,L)) continue; }
+      else { eqs=layoutLattice(MASKS[shape],ri(L.K[0],L.K[1]),L.chain); if(!eqs||eqs.length<L.K[0]-1) continue; P=buildLattice(eqs,shape); if(!fillValues(P,L)) continue; }
+      var c=carve(P,L); if(!c) continue;
+      P.blanks=[]; for(var i=0;i<P.cells.length;i++) if(c.blankSet[i]) P.blanks.push(i);
+      P.hidden=Object.keys(c.hidSet).map(function(k){ return k.split(':').map(Number); }); P.decoys=c.decoys; P.lv=lv;
+      return P;
+    }
+  }
+  return null;
+}
+function genPuzzle(lv,seed){ var prev=RNG; if(seed!=null) RNG=seeded(seed); try{ return genRaw(lv); } finally{ RNG=prev; } }
+/* لغز التدريب = نفس لغز الإعلان */
+function tutorialP(){
+  var P=classicP(), g=[[7,3,10],[5,2,3],[2,5,7]], ops=['+','-','+','-','+','-'];
+  P.cells.forEach(function(cl){ P.A.push(g[cl.lr][cl.lc]); }); P.lines.forEach(function(L,i){ L.ops=[ops[i]]; });
+  P.cells.forEach(function(cl,i){ if((cl.lr===0&&cl.lc===1)||(cl.lr===1&&cl.lc===0)||(cl.lr===1&&cl.lc===2)||(cl.lr===2&&cl.lc<2)) P.blanks.push(i); });
+  P.lv='easy'; P.tutorial=true; return P;
+}
+/* ---------- حالة اللعبة ---------- */
+function newState(lv,P,opts){
+  opts=opts||{}; P=P||genPuzzle(lv)||tutorialP(); if(P.tutorial&&!opts.tutorial) P.tutorial=false;
+  var n=P.cells.length,val=P.A.slice(),isB=new Array(n).fill(false);
+  P.blanks.forEach(function(i){ isB[i]=true; val[i]=null; });
+  var L=LV[lv];
+  G={lv:lv,P:P,val:val,isB:isB,opv:{},lock:new Array(n).fill(false),lockOp:{},bank:P.blanks.map(function(i){ return P.A[i]; }).concat(P.decoys||[]).sort(function(a,b){ return a-b; }),
+    sel:null,hist:[],t0:Date.now(),el:0,mist:0,hints:0,lives:L.lives,won:false,showErr:false,lastKey:'',tutorial:!!opts.tutorial,phase:'play',auto:!!opts.auto,daily:!!opts.daily,hintLine:null,hintItem:null};
+  G.sel=firstEmpty();
+}
+function hidKey(li,oi){ return li+':'+oi; }
+function isHid(key){ return G.P.hidden.some(function(h){ return hidKey(h[0],h[1])===key; }); }
+function items(){ return G.P.blanks.map(function(i){ return 'c:'+i; }).concat(G.P.hidden.map(function(h){ return 'o:'+hidKey(h[0],h[1]); })); }
+function itemEmpty(s){ return s.charAt(0)==='c'?G.val[+s.slice(2)]==null:!G.opv[s.slice(2)]; }
+function itemLocked(s){ return s.charAt(0)==='c'?G.lock[+s.slice(2)]:!!G.lockOp[s.slice(2)]; }
+function firstEmpty(from){ var it=items(),s=from?it.indexOf(from):-1,n=it.length; for(var k=1;k<=n;k++){ var x=it[(s+k+n)%n]; if(itemEmpty(x)&&!itemLocked(x)) return x; } return null; }
+function usedCount(v){ var n=0; G.P.blanks.forEach(function(i){ if(G.val[i]===v) n++; }); return n; }
+function bankCount(v){ return G.bank.filter(function(x){ return x===v; }).length; }
+function lineOps(li){ var L=G.P.lines[li]; return L.ops.map(function(o,oi){ var k=hidKey(li,oi); return isHid(k)?G.opv[k]:o; }); }
+function lineState(li){
+  var L=G.P.lines[li],k=L.c.length-1,vs=L.c.map(function(id){ return G.val[id]; }),os=lineOps(li);
+  if(vs.some(function(v){ return v==null; })||os.some(function(o){ return !o; })) return 'idle';
+  var r=evalChain(vs.slice(0,k),os); return (r!=null&&r===vs[k])?'ok':'bad';
+}
+function allFilled(){ return items().every(function(s){ return !itemEmpty(s); }); }
+function allOk(){ return G.P.lines.every(function(L,li){ return lineState(li)==='ok'; }); }
+function knownCell(i){ return G.val[i]!=null&&G.val[i]===G.P.A[i]?G.val[i]:null; }
+function knownOp(li,oi){ var k=hidKey(li,oi); return isHid(k)?(G.opv[k]===G.P.lines[li].ops[oi]?G.opv[k]:null):G.P.lines[li].ops[oi]; }
+function easyLine(){
+  for(var li=0;li<G.P.lines.length;li++){
+    var L=G.P.lines[li],un=[],i;
+    L.c.forEach(function(id){ if(knownCell(id)==null) un.push('c:'+id); });
+    L.ops.forEach(function(o,oi){ if(knownOp(li,oi)==null) un.push('o:'+hidKey(li,oi)); });
+    if(un.length===1&&!itemLocked(un[0])) return {li:li,item:un[0]};
+  }
+  return null;
+}
+function badItem(s){ if(s.charAt(0)!=='c') return false; var id=+s.slice(2); return G.P.cellLines[id].some(function(li){ return lineState(li)==='bad'; }); }
+
+/* ---------- ذكاء: مهارة + يومي + حفظ ---------- */
+function skill(){ var v=+stats().cmSkill; return isNaN(v)?0:Math.max(0,Math.min(3.99,v)); }
+function autoLevel(){ return ORDER[Math.min(3,Math.floor(skill()))]; }
+function dailyKey(){ return 'glv-cm-daily-'+(state.pid||'x'); }
+function dailyInfo(){ var o=null; try{ o=JSON.parse(localStorage.getItem(dailyKey())||'null'); }catch(e){} var y=new Date(Date.now()-864e5).toDateString(); if(!o) return {done:false,streak:0}; return {done:o.d===dayStr(),streak:(o.d===dayStr()||o.d===y)?o.streak:0}; }
+function saveKey(){ return 'glv-cm-save-'+(state.pid||'x'); }
+function persist(){ if(!G||G.won||G.tutorial||G.phase==='won'||G.phase==='lost') return;
+  try{ localStorage.setItem(saveKey(),JSON.stringify({lv:G.lv,P:G.P,val:G.val,opv:G.opv,lock:G.lock,lockOp:G.lockOp,el:G.el,mist:G.mist,hints:G.hints,lives:G.lives,auto:G.auto,daily:G.daily,day:dayStr()})); }catch(e){} }
+function savedGame(){ try{ var o=JSON.parse(localStorage.getItem(saveKey())||'null'); if(o&&o.P&&o.P.cells&&o.P.lines&&LV[o.lv]&&(!o.daily||o.day===dayStr())) return o; }catch(e){} return null; }
+function resume(){ var o=savedGame(); if(!o) return false; clearT(); clearInterval(TMR);
+  newState(o.lv,o.P,{auto:o.auto,daily:o.daily}); G.val=o.val; G.opv=o.opv||{}; G.lock=o.lock; G.lockOp=o.lockOp||{}; G.hints=o.hints||0; G.mist=o.mist||0; G.lives=o.lives==null?LV[o.lv].lives:o.lives;
+  G.el=o.el||0; G.t0=Date.now()-G.el*1000; G.sel=firstEmpty(); draw(); startTimer(); snd('click'); return true; }
+function reward(lv,stars){ var base=settings().soloCrossMathReward; base=(base==null?40:+base)||0; var sf=[0,.5,.75,1][stars]||.5; var r=Math.round(base*LV[lv].mult*sf); return base>0?Math.max(1,r):0; }
+/* مفيش حد يومي للمكافآت: كل لغز بتحله بياخد نقط */
+function rewardsLeft(){ return Infinity; }
+function lastLevel(){ try{ var v=localStorage.getItem('glv-cm-lv'); if(v==='auto'||LV[v]) return v; }catch(e){} return 'auto'; }
+
+/* ---------- الرسم ---------- */
+function ovEl(){ return document.getElementById('cm-ov'); }
+function head(sub){ return '<div class="cm-top"><button type="button" class="cm-x" data-cm="close" aria-label="إغلاق">✕</button><div class="cm-ttl">كروس ماث<small>'+esc(sub||'')+'</small></div>'
+  +'<button type="button" class="cm-hp" data-cm="help" aria-label="شرح اللعبة">؟</button></div>'; }
+function setShell(inner){ var ov=ovEl(); if(ov) ov.innerHTML='<div class="cm-sh">'+inner+'</div>'; }
+function tile(t,inner){ return '<div class="cm-t" style="grid-row:'+(t.r+1)+';grid-column:'+(t.c+1)+'">'+inner+'</div>'; }
+function boardHtml(){
+  var P=G.P,h='',ov=ovEl(),W=Math.min((ov?ov.clientWidth:380)-28,460)-28; if(!(W>100)) W=300;
+  var pyr=P.kind==='pyramid', units=pyr?P.tc:(P.tc+1)/2*1+(P.tc-1)/2*.5, u=Math.min(86,Math.floor(W/units));
+  var cols=[],rows=[],i; for(i=0;i<P.tc;i++) cols.push(pyr||i%2===0?u:Math.round(u*.5)); for(i=0;i<P.tr;i++) rows.push(pyr||i%2===0?u:Math.round(u*.5));
+  P.lines.forEach(function(L,li){
+    var st=lineState(li),cls=G.hintLine===li?' hl':(st==='ok'?' ok':st==='bad'?' bd':'');
+    L.ot.forEach(function(t,oi){ var key=hidKey(li,oi);
+      if(!isHid(key)) h+=tile(t,'<div class="cm-o'+(pyr?' py':'')+cls+'">'+SYM[L.ops[oi]]+(pyr?'<i>▲</i>':'')+'</div>');
+      else { var v=G.opv[key],sl=G.sel==='o:'+key;
+        h+=tile(t,'<button type="button" class="cm-o slot'+(v?'':' em')+(sl?' sl':'')+(G.lockOp[key]?' lk':'')+(G.hintLine===li?' hl':'')+'" data-cm="op" data-k="'+key+'">'+(v?SYM[v]:'؟')+'</button>'); }
+    });
+    if(L.et) h+=tile(L.et,'<div class="cm-o'+cls+'">=</div>');
+  });
+  P.cells.forEach(function(c,i){
+    var hl=G.hintLine!=null&&P.lines[G.hintLine].c.indexOf(i)>=0?' hl':'',v=G.val[i],l3=String(v!=null?v:P.A[i]).length>2?' l3':'';
+    if(!G.isB[i]) h+=tile(c,'<div class="cm-c gv'+l3+hl+'">'+P.A[i]+'</div>');
+    else { var cls='cm-c bl'+l3+hl; if(v!=null) cls+=G.lock[i]?' ht':' fl'; if(G.sel==='c:'+i&&!G.lock[i]) cls+=' sl'; if(G.showErr&&v!=null&&!G.lock[i]&&badItem('c:'+i)) cls+=' er';
+      h+=tile(c,'<button type="button" class="'+cls+'" data-cm="cell" data-i="'+i+'" aria-label="خانة فاضية">'+(v!=null?v:'')+(G.lock[i]?'<span class="cm-hint-tag">💡</span>':'')+'</button>'); }
+  });
+  return '<div class="cm-paper" id="cm-paper" style="--u:'+u+'px"><div class="cm-grid" style="grid-template-columns:'+cols.map(function(x){ return x+'px'; }).join(' ')+';grid-template-rows:'+rows.map(function(x){ return x+'px'; }).join(' ')+'">'+h+'</div></div>';
+}
+function bankHtml(){ var seen={},h=''; G.bank.forEach(function(v){ seen[v]=(seen[v]||0)+1; h+='<button type="button" class="cm-chip'+(seen[v]<=usedCount(v)?' us':'')+'" data-cm="chip" data-v="'+v+'">'+v+'</button>'; }); return h; }
+function opBankHtml(){ return OPS.map(function(o){ return '<button type="button" class="cm-chip op" data-cm="opchip" data-o="'+o+'">'+SYM[o]+'</button>'; }).join(''); }
+function noteText(){
+  if(G.hintLine!=null){ var L=G.P.lines[G.hintLine],vs=L.c.map(function(id){ var k=knownCell(id); return k==null?'؟':k; }),os=L.ops.map(function(o,oi){ var k=knownOp(G.hintLine,oi); return k==null?'؟':SYM[k]; }),s='';
+    for(var i=0;i<vs.length-1;i++) s+=vs[i]+' '+os[i]+' ';
+    return '💡 المعادلة دي ناقصها حاجة واحدة بس — فكّر فيها:<br><span dir="ltr" style="color:#FFDE94;font-weight:900;font-size:15px">'+s+'= '+vs[vs.length-1]+'</span>'; }
+  if(G.showErr) return '<span style="color:#ff9b9b">فيه معادلة مش مظبوطة — العلامات الحمرا بتوريك فين 🔍</span>';
+  if(G.P.lines.some(function(L){ return L.c.length>3; })) return 'ملحوظة: × و ÷ بيتحسبوا قبل + و −';
+  return G.sel?'اختار من اللي تحت 👇':'اضغط على خانة فاضية';
+}
+function draw(){
+  var ov=ovEl(); if(!ov||!G) return; persist();
+  var L=LV[G.lv],left=items().filter(function(s){ return itemEmpty(s); }).length,hl=Math.max(0,L.hints-G.hints),hasOps=G.P.hidden.length>0;
+  var lifeTxt=L.lives?('❤️'.repeat(Math.max(0,G.lives))+'<span style="opacity:.3">'+'❤️'.repeat(L.lives-Math.max(0,G.lives))+'</span>'):G.mist;
+  setShell(head((G.daily?'🏆 تحدي اليوم • ':'')+L.ic+' '+L.n+' • '+(SHAPE_LABEL[G.P.shape]||'')+(G.auto?' • 🧠':'')+(G.tutorial?' • تدريب':''))
+    +'<div class="cm-stats"><div class="cm-st"><small>الوقت</small><b id="cm-time">'+fmt(G.el)+'</b></div><div class="cm-st"><small>فاضل</small><b>'+left+'</b></div>'
+    +'<div class="cm-st"><small>'+(L.lives?'الأرواح':'الأخطاء')+'</small><b>'+lifeTxt+'</b></div><div class="cm-st"><small>التلميحات</small><b>'+hl+'</b></div></div>'
+    +boardHtml()+'<div class="cm-note">'+noteText()+'</div>'
+    +'<div class="cm-bankw"><div class="cm-bankt">الأرقام المتاحة'+(G.P.decoys.length?' • فيها '+G.P.decoys.length+' زيادة 😈':'')+'</div><div class="cm-bank">'+bankHtml()+'</div>'
+    +(hasOps?'<div class="cm-bankt" style="margin-top:12px">العمليات (للخانات المجهولة ؟)</div><div class="cm-bank">'+opBankHtml()+'</div>':'')+'</div>'
+    +'<div class="cm-tools"><button type="button" class="cm-tb" data-cm="undo"'+(G.hist.length?'':' disabled')+'><span>↩️</span>تراجع</button>'
+    +'<button type="button" class="cm-tb" data-cm="clear"><span>🧹</span>مسح</button>'
+    +'<button type="button" class="cm-tb gold" data-cm="hint"'+((G.hints>=L.hints&&G.hintLine!=null)||(L.hints===0)?' disabled':'')+'><span>💡</span>'+(G.hintLine!=null?'اكشف':'تلميح')+'</button>'
+    +'<button type="button" class="cm-tb" data-cm="new"><span>🔄</span>لغز جديد</button></div>'
+    +'<button type="button" class="cm-tb" style="height:38px;flex-direction:row;gap:6px" data-cm="levels">🎚️ غيّر المستوى</button>');
+}
+var LV_COL={easy:'#5FE0A4',medium:'#4FACFE',hard:'#FF9F43',expert:'#FF4D6D'};
+function ensureOv(){ var ov=ovEl(); if(!ov){ ov=document.createElement('div'); ov.id='cm-ov'; ov.className='cm-ov cm-th-ink'; document.body.appendChild(ov); } return ov; }
+function pickLevel(id){ ensureOv(); if(id==='resume'){ if(!resume()) startLevel(lastLevel()); } else if(id==='daily') startLevel('medium',false,{daily:true}); else startLevel(id); }
+/* شاشة اختيار المستوى = نفس الشاشة الموحّدة بتاعة باقي الألعاب (lvlScreen) بجوّ اللعبة */
+function showLevels(){
+  clearInterval(TMR); TMR=null;
+  var wasPlay=!!(G&&G.phase==='play'); if(wasPlay) G.phase='menu';
+  var st=stats(),di=dailyInfo(),sv=savedGame(),left=rewardsLeft(),cur=lastLevel(),lv=[];
+  if(sv) lv.push({id:'resume',name:'كمّل اللغز اللي سيبته',color:'#7CFFB2',icon:'▶️',stars:[0,0],desc:LV[sv.lv].n+' • '+(SHAPE_LABEL[sv.P.shape]||'')+' • وقت '+fmt(sv.el||0),pts:0});
+  if(!di.done) lv.push({id:'daily',name:'تحدي اليوم',color:'#F4B740',icon:'🏆',stars:[3,5],desc:'نفس اللغز لكل اللاعبين + مكافأة مضاعفة وسلسلة أيام'+(di.streak?' • 🔥 '+di.streak:''),pts:Math.round(reward('medium',3)*2)});
+  lv.push({id:'auto',name:'تلقائي (ذكي)',color:'#82AAFF',icon:'🧠',stars:[0,0],desc:'الصعوبة بتتأقلم مع أدائك • مستواك دلوقتي: '+LV[autoLevel()].n,pts:0});
+  ORDER.forEach(function(k,i){ var L=LV[k],bt=st['cmBest_'+k]; lv.push({id:k,name:L.n,color:LV_COL[k],icon:L.ic,stars:[i+2>4?5:i+1,5],desc:L.d+(bt?' • أفضل وقت '+fmt(bt):''),pts:reward(k,3)}); });
+  try{
+    lvlScreen({key:'crossmath',cur:cur,game:'كروس ماث',sub:(st.cmSolved?'حليت '+st.cmSolved+' لغز • ':'')+'كل لغز بتحله بياخد نقط 🏆',levels:lv,onPick:pickLevel,onBack:function(){ if(!G) close(); }});
+    var lo=document.getElementById('lvl-overlay'); if(lo){ lo.style.zIndex=9800; var bk=lo.querySelector('#lvl-back'); if(bk) bk.addEventListener('click',function(){ if(wasPlay&&G&&G.phase==='menu'){ G.phase='play'; startTimer(); } }); }
+  }catch(e){ pickLevel(cur); }
+}
+/* ---------- التحكم ---------- */
+function startLevel(lv,tut,opts){
+  clearT(); clearInterval(TMR); opts=opts||{}; var P=null;
+  if(tut){ P=tutorialP(); lv='easy'; opts.tutorial=true; }
+  else if(opts.daily){ lv='daily'; P=genPuzzle('daily',hashStr('cm-daily-'+dayStr())); }
+  else { try{ localStorage.setItem('glv-cm-lv',lv); }catch(e){} if(lv==='auto'){ opts.auto=true; lv=autoLevel(); } }
+  if(!tut) try{ localStorage.removeItem(saveKey()); }catch(e){}
+  var go=function(){ newState(lv,P,opts); draw(); startTimer(); snd('click'); };
+  if(!P&&!tut&&(lv==='hard'||lv==='expert')){ G=null; setShell(head('بنجهّز لك لغز…')+'<div class="cm-card"><div class="cm-big">⏳ لحظة…</div>بنولّد لغز صعب بحل واحد مضمون</div>'); later(go,60); } else go();
+}
+function startTimer(){ clearInterval(TMR); TMR=setInterval(function(){ if(!G||G.won||G.phase!=='play'||document.hidden){ if(G) G.t0=Date.now()-G.el*1000; return; } G.el=(Date.now()-G.t0)/1000; var e=document.getElementById('cm-time'); if(e) e.textContent=fmt(G.el); },500); }
+function push(h){ G.hist.push(h); G.hintLine=null; G.hintItem=null; G.showErr=false; }
+function placeCell(i,v){
+  if(!G||G.won||!G.isB[i]||G.lock[i]) return; var prev=G.val[i];
+  if(v!=null&&usedCount(v)>=bankCount(v)&&prev!==v) return;
+  push({t:'c',i:i,prev:prev}); G.val[i]=v; if(v!=null){ var n=firstEmpty('c:'+i); G.sel=n||('c:'+i); } afterChange('c:'+i);
+}
+function placeOp(key,o){
+  if(!G||G.won||G.lockOp[key]) return; push({t:'o',k:key,prev:G.opv[key]||null}); if(o) G.opv[key]=o; else delete G.opv[key];
+  if(o){ var n=firstEmpty('o:'+key); G.sel=n||('o:'+key); } afterChange('o:'+key);
+}
+function afterChange(s){
+  draw(); if(s.charAt(0)==='c'){ var e=document.querySelector('.cm-c[data-i="'+s.slice(2)+'"]'); if(e) e.classList.add('pop'); } snd('click');
+  if(allFilled()){
+    if(allOk()){ win(); return; }
+    var key=G.val.join(',')+JSON.stringify(G.opv); if(key!==G.lastKey){ G.lastKey=key; G.mist++; if(LV[G.lv].lives){ G.lives--; if(G.lives<=0){ lose(); return; } } }
+    G.showErr=true; snd('error'); vib([30,40,30]); draw();
+  }
+}
+function onCell(i){ if(!G||G.won||!G.isB[i]||G.lock[i]) return; var s='c:'+i; if(G.sel===s&&G.val[i]!=null){ placeCell(i,null); G.sel=s; draw(); return; } G.sel=s; snd('click'); draw(); }
+function onOp(k){ if(!G||G.won||G.lockOp[k]) return; var s='o:'+k; if(G.sel===s&&G.opv[k]){ placeOp(k,null); G.sel=s; draw(); return; } G.sel=s; snd('click'); draw(); }
+function onChip(v){
+  if(!G||G.won) return; var s=G.sel;
+  if(!s||s.charAt(0)!=='c'||itemLocked(s)) s=items().filter(function(x){ return x.charAt(0)==='c'&&itemEmpty(x)&&!itemLocked(x); })[0]||items().filter(function(x){ return x.charAt(0)==='c'&&!itemLocked(x); })[0];
+  if(s) placeCell(+s.slice(2),v);
+}
+function onOpChip(o){
+  if(!G||G.won) return; var s=G.sel;
+  if(!s||s.charAt(0)!=='o'||itemLocked(s)) s=items().filter(function(x){ return x.charAt(0)==='o'&&itemEmpty(x)&&!itemLocked(x); })[0]||items().filter(function(x){ return x.charAt(0)==='o'&&!itemLocked(x); })[0];
+  if(s) placeOp(s.slice(2),o);
+}
+function undo(){
+  if(!G||G.won||!G.hist.length) return; var h=G.hist.pop();
+  if(h.t==='c'){ if(G.lock[h.i]) return undo(); G.val[h.i]=h.prev; G.sel='c:'+h.i; } else { if(G.lockOp[h.k]) return undo(); if(h.prev) G.opv[h.k]=h.prev; else delete G.opv[h.k]; G.sel='o:'+h.k; }
+  G.hintLine=null; G.hintItem=null; G.showErr=false; draw(); snd('click');
+}
+function clearAll(){ if(!G||G.won) return; G.P.blanks.forEach(function(i){ if(!G.lock[i]) G.val[i]=null; }); G.P.hidden.forEach(function(h){ var k=hidKey(h[0],h[1]); if(!G.lockOp[k]) delete G.opv[k]; });
+  G.hist=[]; G.showErr=false; G.hintLine=null; G.hintItem=null; G.sel=firstEmpty(); draw(); snd('back'); }
+function hint(){
+  if(!G||G.won) return; var L=LV[G.lv]; if(!L.hints) return;
+  if(G.hintLine==null){ var f=easyLine(); if(f){ G.hintLine=f.li; G.hintItem=f.item; G.sel=f.item; snd('click'); draw(); return; } }
+  if(G.hints>=L.hints) return;
+  var s=null; if(G.hintItem&&!itemLocked(G.hintItem)) s=G.hintItem;
+  if(!s&&G.sel&&!itemLocked(G.sel)){ var sel=G.sel; var correct=sel.charAt(0)==='c'?G.val[+sel.slice(2)]===G.P.A[+sel.slice(2)]:(function(){ var p=sel.slice(2).split(':'); return G.opv[sel.slice(2)]===G.P.lines[+p[0]].ops[+p[1]]; })(); if(!correct) s=sel; }
+  if(!s) s=items().filter(function(x){ return !itemLocked(x)&&(itemEmpty(x)||x.charAt(0)==='c'&&G.val[+x.slice(2)]!==G.P.A[+x.slice(2)]||x.charAt(0)==='o'&&G.opv[x.slice(2)]!==G.P.lines[+x.slice(2).split(':')[0]].ops[+x.slice(2).split(':')[1]]); })[0];
+  if(!s) return;
+  if(s.charAt(0)==='c'){ var i=+s.slice(2),v=G.P.A[i]; G.val[i]=v; G.lock[i]=true;
+    if(usedCount(v)>bankCount(v)){ var o2=G.P.blanks.filter(function(j){ return j!==i&&!G.lock[j]&&G.val[j]===v; })[0]; if(o2!=null) G.val[o2]=null; }
+    G.hist=G.hist.filter(function(h){ return !(h.t==='c'&&h.i===i); }); }
+  else { var k=s.slice(2),p=k.split(':'); G.opv[k]=G.P.lines[+p[0]].ops[+p[1]]; G.lockOp[k]=true; G.hist=G.hist.filter(function(h){ return !(h.t==='o'&&h.k===k); }); }
+  G.hints++; G.hintLine=null; G.hintItem=null; G.showErr=false; G.sel=firstEmpty(); snd('click'); vib(15); draw();
+  if(allFilled()){ if(allOk()) win(); else { G.showErr=true; draw(); } }
+}
+function endCommon(){ clearInterval(TMR); TMR=null; G.el=(Date.now()-G.t0)/1000; G.showErr=false; G.sel=null; G.hintLine=null; try{ localStorage.removeItem(saveKey()); }catch(e){} }
+function lose(){
+  G.phase='lost'; endCommon(); var st=stats(); if(G.auto) st.cmSkill=Math.max(0,skill()-.3); try{ if(state.pid) saveGameStats(GAME_STATS); }catch(e){}
+  draw(); vib([60,40,60]); snd('error');
+  later(function(){ if(!G) return; setShell(head('خسرت الأرواح')+'<div class="cm-card"><div class="cm-big">💔 خلصت أرواحك</div>اللغز ده كان صعب! حلّه بالمنطق خطوة خطوة ومتخمنش.<br><span style="opacity:.75;font-size:12.5px">ركّز على المعادلة اللي ناقصها حاجة واحدة بس 💡</span></div>'
+    +'<button type="button" class="cm-btn" data-cm="next">لغز جديد ▶</button><button type="button" class="cm-btn alt" data-cm="levels">غيّر المستوى</button><button type="button" class="cm-btn alt" data-cm="close">خروج</button>'); },700);
+}
+function win(){
+  if(G.won) return; G.won=true; G.phase='won'; endCommon();
+  var L=LV[G.lv],fast=G.el<L.par,stars=(G.hints===0&&G.mist===0)?3:(G.hints<=1&&G.mist<=2)?2:1; draw();
+  var paper=document.getElementById('cm-paper'); if(paper) paper.classList.add('win'); vib([20,30,20,30,40]);
+  var st=stats(),bk='cmBest_'+G.lv,prevBest=st[bk],newBest=!prevBest||G.el<prevBest; st.cmSolved=(st.cmSolved||0)+1; if(newBest) st[bk]=Math.round(G.el);
+  var skBefore=skill(); if(G.auto&&!G.tutorial){ var d=stars===3?(fast?.35:.2):stars===2?.08:-.15; st.cmSkill=Math.max(0,Math.min(3.99,skBefore+d)); }
+  var r=reward(G.lv,stars); if(fast&&stars===3) r=Math.round(r*1.2);
+  var left=rewardsLeft(),streak=0;
+  if(G.daily){ var di=dailyInfo(); streak=di.streak+1; r=Math.round(reward('medium',3)*2)+Math.min(streak,7)*5; try{ localStorage.setItem(dailyKey(),JSON.stringify({d:dayStr(),streak:streak})); }catch(e){} }
+  try{ if(state.pid) saveGameStats(GAME_STATS); }catch(e){}
+  var canReward=r>0&&!!state.pid&&(G.daily||left>0);
+  later(function(){ if(!G||!G.won) return; var wasTut=G.tutorial,up=G.auto&&!wasTut&&autoLevel()!==ORDER[Math.min(3,Math.floor(skBefore))];
+    setShell(head('أحسنت!')+'<div class="cm-card"><div class="cm-big">'+(G.daily?'🏆 خلّصت تحدي اليوم!':'🎉 حليت اللغز!')+'</div><div class="cm-stars">'+'★'.repeat(stars)+'<span style="opacity:.3">'+'★'.repeat(3-stars)+'</span></div>'
+      +'<div class="cm-rs"><div><b>'+fmt(G.el)+'</b>الوقت</div><div><b>'+G.mist+'</b>الأخطاء</div><div><b>'+G.hints+'</b>التلميحات</div></div><div style="margin-top:8px;font-size:12.5px;line-height:1.9">'
+      +(newBest&&prevBest?'<span style="color:#7CFFB2">🏅 رقم قياسي جديد في '+L.n+'!</span><br>':'')+(fast&&stars===3?'⚡ أسرع من الوقت المتوقع (+20%)<br>':'')+(G.daily?'🔥 سلسلتك: '+streak+' يوم<br>':'')
+      +(up?'<span style="color:#FFDE94">⬆️ الذكاء رفع مستواك لـ '+LV[autoLevel()].n+'!</span><br>':'')
+      +(canReward?'<span style="color:#FFDE94;font-size:15px;font-weight:900">+'+r+' نقطة 🏆</span>':'<span style="opacity:.75">'+'اللغز ده من غير مكافأة'+'</span>')+'</div></div>'
+      +'<button type="button" class="cm-btn" data-cm="next">لغز جديد ▶</button><button type="button" class="cm-btn alt" data-cm="levels">غيّر المستوى</button><button type="button" class="cm-btn alt" data-cm="close">خروج</button>');
+    if(canReward){ try{ awardSoloGamePoints(r,G.daily?'خلّصت تحدي كروس ماث اليومي':'حليت لغز كروس ماث'); }catch(e){} } else { try{ launchConfetti(); SND.coinChime(); }catch(e){} }
+    if(wasTut){ try{ localStorage.setItem('glv_cm_tut','1'); }catch(e){} } },900);
+}
+function help(){
+  if(document.getElementById('cm-help')) return; var o=document.createElement('div'); o.className='cm-help'; o.id='cm-help';
+  o.innerHTML='<div class="cm-card"><h4>إزاي تلعب كروس ماث؟ 🧮</h4><p>① كل <b>صف</b> (شمال ← يمين) وكل <b>عمود</b> (فوق ← تحت) معادلة:</p><div class="cm-ex">7 + 3 = 10</div>'
+    +'<p>② في المعادلات الطويلة <b>× و ÷ بيتحسبوا الأول</b> قبل + و −: <span class="cm-ex" style="display:inline">2 + 3 × 4 = 14</span></p>'
+    +'<p>③ في الهرم: الرقم اللي فوق = ناتج العملية بين الرقمين اللي تحته.</p>'
+    +'<p>④ اضغط خانة فاضية واختار رقم. كل رقم مرة واحدة، وفيه أرقام زيادة بتغلّطك 😈</p>'
+    +'<p>⑤ علامة <b>؟</b> معناها العملية نفسها مجهولة — اختارها من تحت.</p>'
+    +'<p>⑥ التلميح 💡 أول ضغطة بتنوّر المعادلة وتشرحها، التانية بتكشف. في المستويات العالية فيه أرواح وتلميحات أقل!</p>'
+    +'<button type="button" class="cm-btn" style="margin-top:10px" data-cm="helpx">يلا نلعب 👍</button></div>';
+  document.body.appendChild(o);
+}
+function open(){
+  var old=ovEl(); if(old) old.remove(); snd('click'); G=null;
+  var seen=false; try{ seen=!!localStorage.getItem('glv_cm_tut'); }catch(e){}
+  if(!seen){ ensureOv(); startLevel('easy',true); help(); } else showLevels();
+}
+function close(){ clearT(); clearInterval(TMR); TMR=null; G=null; var h=document.getElementById('cm-help'); if(h) h.remove(); var ov=ovEl(); if(ov) ov.remove(); snd('back'); }
+document.addEventListener('click',function(e){
+  var t=e.target.closest&&e.target.closest('[data-cm]'); if(!t) return; var a=t.getAttribute('data-cm');
+  if(a==='close') close(); else if(a==='help') help();
+  else if(a==='helpx'){ var h=document.getElementById('cm-help'); if(h) h.remove(); try{ if(G&&G.tutorial) localStorage.setItem('glv_cm_tut','1'); }catch(_){} }
+  else if(a==='cell') onCell(+t.getAttribute('data-i')); else if(a==='op') onOp(t.getAttribute('data-k'));
+  else if(a==='chip') onChip(+t.getAttribute('data-v')); else if(a==='opchip') onOpChip(t.getAttribute('data-o'));
+  else if(a==='undo') undo(); else if(a==='clear') clearAll(); else if(a==='hint') hint();
+  else if(a==='new'||a==='next') startLevel(G&&G.auto?'auto':(G&&!G.daily&&!G.tutorial?G.lv:lastLevel()));
+  else if(a==='levels') showLevels();
+});
+var rsT=null; window.addEventListener('resize',function(){ clearTimeout(rsT); rsT=setTimeout(function(){ if(G&&G.phase==='play'&&ovEl()) draw(); },200); });
+window.openCrossMathGame=open;
+window.__cmGen=genPuzzle; window.__cmSolve=solveP; window.__cmLV=LV;
 })();
 </script>
 
