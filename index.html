@@ -43603,6 +43603,25 @@ setTimeout(function(){try{build();}catch(e){}},400);
 @keyframes cmGlow{ 0%{box-shadow:0 0 0 0 rgba(124,255,178,0)} 40%{box-shadow:0 0 0 10px rgba(124,255,178,.55)} 100%{} }
 @media (max-height:700px){ .cm-sh{ gap:8px; } .cm-chip{ height:44px; min-width:44px; font-size:18px; } .cm-paper{ padding:10px 8px; } }
 @media (prefers-reduced-motion:reduce){ .cm-c,.cm-o,.cm-paper{ animation:none !important; transition:none !important; } }
+
+.cm-tools{ grid-template-columns:repeat(5,1fr); } .cm-tb{ font-size:11.5px; }
+.cm-chip{ touch-action:none; } .cm-chip.us{ opacity:0; visibility:hidden; box-shadow:none; transform:none; }
+.cm-ghost{ position:fixed; z-index:9999; pointer-events:none; margin:0; transform:translate(-50%,-125%) scale(1.18); box-shadow:0 0 0 3px #F4B740,0 12px 22px rgba(0,0,0,.45); }
+.cm-c.dz,.cm-o.dz{ box-shadow:0 0 0 3px #F4B740,0 0 18px #F4B740; transform:scale(1.1); }
+.cm-c.cmf{ animation:cmFlash .9s ease-out; } @keyframes cmFlash{ 0%{ background:#4fb4ff; transform:scale(1.15); } 100%{ transform:scale(1); } }
+.cm-toast{ position:absolute; top:-2px; left:50%; transform:translateX(-50%); z-index:5; padding:5px 26px; border-radius:22px; pointer-events:none; direction:rtl; white-space:nowrap; font-weight:900; font-size:15px; color:#fff; background:linear-gradient(90deg,transparent,#2f8cff 18%,#2f8cff 82%,transparent); animation:cmToast 1.2s ease-out forwards; }
+@keyframes cmToast{ 0%{ opacity:0; transform:translate(-50%,-8px); } 15%,75%{ opacity:1; transform:translate(-50%,0); } 100%{ opacity:0; } }
+.cm-tip{ align-self:center; padding:9px 18px; border-radius:14px; font-size:13.5px; font-weight:900; color:#10204a; background:#fff; border:3px solid #4f8cff; box-shadow:0 4px 14px rgba(0,0,0,.35); animation:cmPulse 1.4s ease-in-out infinite; }
+.cm-tb.pls{ animation:cmPulse 1s ease-in-out infinite; box-shadow:0 0 0 3px #F4B740; }
+.cm-pz{ width:100%; min-height:240px; border:0; background:transparent; font-family:inherit; font-weight:900; font-size:17px; line-height:2; color:var(--cfg); cursor:pointer; direction:rtl; }
+.cm-optrow{ display:flex; gap:10px; justify-content:center; margin:8px 0; }
+.cm-opt{ min-width:58px; height:58px; border-radius:50%; border:2px solid rgba(255,255,255,.3); background:rgba(255,255,255,.1); color:#fff; font-size:26px; font-weight:900; font-family:'Playfair Display',serif; cursor:pointer; }
+.cm-opt.wd{ border-radius:16px; font-size:13px; padding:0 12px; font-family:inherit; } .cm-opt.on{ border-color:#4f8cff; background:#2a58c8; }
+.cm-th-night{ --ovbg:#05070d; --paper:linear-gradient(#10141f,#0a0d16); --pbox:0 20px 44px rgba(0,0,0,.6); --cbd:#8fb4ff; --cbg:rgba(143,180,255,.08); --cgv:rgba(143,180,255,.18); --cbl:rgba(143,180,255,.05); --cfg:#e8f0ff; --fill:#7cffb2; --fillbd:#3fbf84; --opfg:#cfe0ff; --font:'Playfair Display','Amiri',serif; --fw:800; --sel:#F4B740; --selbg:rgba(244,183,64,.25); --ok:#7cffb2; --bad:#ff6b73; --hintc:#7cffb2; --cglow:none; --tglow:none; --chipbg:#141a2b; --chipfg:#e8f0ff; --chipbd:#8fb4ff; --chipsh:#3c5a99; }
+.cm-th-clean{ --ovbg:linear-gradient(180deg,#e9effc,#cfdcf7); color:#10204a; --paper:#fff; --pbox:0 8px 24px rgba(30,60,140,.18); --cbd:#2a2a2a; --cbg:#fff3d1; --cgv:#ffe7a8; --cbl:#fff6dc; --cfg:#111; --fill:#0a8a3c; --fillbd:#2a2a2a; --opfg:#111; --font:'Playfair Display','Amiri',serif; --fw:900; --sel:#f26b21; --selbg:#fff; --ok:#0a8a3c; --bad:#d32f2f; --hintc:#0a8a3c; --cglow:none; --tglow:none; --chipbg:#e4f8ee; --chipfg:#0a8a3c; --chipbd:#2a2a2a; --chipsh:transparent; }
+.cm-th-clean .cm-x,.cm-th-clean .cm-hp,.cm-th-clean .cm-tb,.cm-th-clean .cm-btn.alt{ color:#10204a; background:rgba(255,255,255,.75); } .cm-th-clean .cm-tb.gold{ background:linear-gradient(95deg,#F4B740,#FFDE94); }
+.cm-th-clean .cm-st,.cm-th-clean .cm-bankw,.cm-th-clean .cm-card{ background:rgba(255,255,255,.65); border-color:rgba(0,0,0,.08); } .cm-th-clean .cm-chip{ box-shadow:none; } .cm-th-clean .cm-stars{ color:#e0a000; text-shadow:none; }
+@media (prefers-reduced-motion:reduce){ .cm-c.cmf,.cm-toast,.cm-tip{ animation:none !important; } }
 </style>
 <script id="cm-js">
 /* =====================================================================
@@ -43614,6 +43633,7 @@ setTimeout(function(){try{build();}catch(e){}},400);
 (function(){
 'use strict';
 var OPS=['+','-','*','/'], SYM={'+':'+','-':'\u2212','*':'\u00D7','/':'\u00F7'};
+try{ var _ds=localStorage.getItem('glv-cm-div'); if(_ds) SYM['/']=_ds; }catch(e){}
 var LV={
  easy:  {n:'سهل',ic:'🌱',ops:['+','-'],        lo:2,hi:15,max:15,frac:.5, minFrac:.4,hid:0,dec:0,deduce:true, lives:0,hints:3,mult:.5,par:60, shapes:['classic'],d:'جمع وطرح بأرقام صغيرة — كل رقم بيتحدد بالتفكير'},
  medium:{n:'متوسط',ic:'⚡',ops:['+','-','*'],    lo:2,hi:40,max:40,frac:.62,minFrac:.5,hid:0,dec:0,deduce:true, lives:0,hints:3,mult:1,  par:110,shapes:['classic'],d:'دخلنا الضرب — اربط الصفوف بالأعمدة'},
@@ -43872,7 +43892,7 @@ function newState(lv,P,opts){
   var n=P.cells.length,val=P.A.slice(),isB=new Array(n).fill(false);
   P.blanks.forEach(function(i){ isB[i]=true; val[i]=null; });
   var L=LV[lv];
-  G={lv:lv,P:P,val:val,isB:isB,opv:{},lock:new Array(n).fill(false),lockOp:{},bank:P.blanks.map(function(i){ return P.A[i]; }).concat(P.decoys||[]).sort(function(a,b){ return a-b; }),
+  G={lv:lv,P:P,val:val,isB:isB,opv:{},lock:new Array(n).fill(false),lockOp:{},bank:shuf(P.blanks.map(function(i){ return P.A[i]; }).concat(P.decoys||[])),paused:false,sorted:false,okPrev:[],
     sel:null,hist:[],t0:Date.now(),el:0,mist:0,hints:0,lives:L.lives,won:false,showErr:false,lastKey:'',tutorial:!!opts.tutorial,phase:'play',auto:!!opts.auto,daily:!!opts.daily,hintLine:null,hintItem:null};
   G.sel=firstEmpty();
 }
@@ -43925,7 +43945,7 @@ function lastLevel(){ try{ var v=localStorage.getItem('glv-cm-lv'); if(v==='auto
 /* ---------- الرسم ---------- */
 function ovEl(){ return document.getElementById('cm-ov'); }
 function head(sub){ return '<div class="cm-top"><button type="button" class="cm-x" data-cm="close" aria-label="إغلاق">✕</button><div class="cm-ttl">كروس ماث<small>'+esc(sub||'')+'</small></div>'
-  +'<button type="button" class="cm-hp" data-cm="help" aria-label="شرح اللعبة">؟</button></div>'; }
+  +(G&&G.phase==='play'?'<button type="button" class="cm-hp" data-cm="pause" aria-label="إيقاف مؤقت">'+(G.paused?'▶️':'⏸')+'</button>':'')+'<button type="button" class="cm-hp" data-cm="settings" aria-label="الإعدادات">⚙️</button><button type="button" class="cm-hp" data-cm="help" aria-label="شرح اللعبة">؟</button></div>'; }
 function setShell(inner){ var ov=ovEl(); if(ov) ov.innerHTML='<div class="cm-sh">'+inner+'</div>'; }
 function tile(t,inner){ return '<div class="cm-t" style="grid-row:'+(t.r+1)+';grid-column:'+(t.c+1)+'">'+inner+'</div>'; }
 function boardHtml(){
@@ -43943,7 +43963,7 @@ function boardHtml(){
   });
   P.cells.forEach(function(c,i){
     var hl=G.hintLine!=null&&P.lines[G.hintLine].c.indexOf(i)>=0?' hl':'',v=G.val[i],l3=String(v!=null?v:P.A[i]).length>2?' l3':'';
-    if(!G.isB[i]) h+=tile(c,'<div class="cm-c gv'+l3+hl+'">'+P.A[i]+'</div>');
+    if(!G.isB[i]) h+=tile(c,'<div class="cm-c gv'+l3+hl+'" data-i="'+i+'">'+P.A[i]+'</div>');
     else { var cls='cm-c bl'+l3+hl; if(v!=null) cls+=G.lock[i]?' ht':' fl'; if(G.sel==='c:'+i&&!G.lock[i]) cls+=' sl'; if(G.showErr&&v!=null&&!G.lock[i]&&badItem('c:'+i)) cls+=' er';
       h+=tile(c,'<button type="button" class="'+cls+'" data-cm="cell" data-i="'+i+'" aria-label="خانة فاضية">'+(v!=null?v:'')+(G.lock[i]?'<span class="cm-hint-tag">💡</span>':'')+'</button>'); }
   });
@@ -43966,17 +43986,17 @@ function draw(){
   setShell(head((G.daily?'🏆 تحدي اليوم • ':'')+L.ic+' '+L.n+' • '+(SHAPE_LABEL[G.P.shape]||'')+(G.auto?' • 🧠':'')+(G.tutorial?' • تدريب':''))
     +'<div class="cm-stats"><div class="cm-st"><small>الوقت</small><b id="cm-time">'+fmt(G.el)+'</b></div><div class="cm-st"><small>فاضل</small><b>'+left+'</b></div>'
     +'<div class="cm-st"><small>'+(L.lives?'الأرواح':'الأخطاء')+'</small><b>'+lifeTxt+'</b></div><div class="cm-st"><small>التلميحات</small><b>'+hl+'</b></div></div>'
-    +boardHtml()+'<div class="cm-note">'+noteText()+'</div>'
-    +'<div class="cm-bankw"><div class="cm-bankt">الأرقام المتاحة'+(G.P.decoys.length?' • فيها '+G.P.decoys.length+' زيادة 😈':'')+'</div><div class="cm-bank">'+bankHtml()+'</div>'
+    +(G.paused?pauseCover():tipHtml()+boardHtml())+'<div class="cm-note">'+noteText()+'</div>'
+    +'<div class="cm-bankw"'+(G.paused?' style="visibility:hidden"':'')+'><div class="cm-bankt">الأرقام المتاحة'+(G.P.decoys.length?' • فيها '+G.P.decoys.length+' زيادة 😈':'')+'</div><div class="cm-bank">'+bankHtml()+'</div>'
     +(hasOps?'<div class="cm-bankt" style="margin-top:12px">العمليات (للخانات المجهولة ؟)</div><div class="cm-bank">'+opBankHtml()+'</div>':'')+'</div>'
     +'<div class="cm-tools"><button type="button" class="cm-tb" data-cm="undo"'+(G.hist.length?'':' disabled')+'><span>↩️</span>تراجع</button>'
-    +'<button type="button" class="cm-tb" data-cm="clear"><span>🧹</span>مسح</button>'
+    +'<button type="button" class="cm-tb'+(G.tutorial&&G.hist.length>=2&&!G.sorted?' pls':'')+'" data-cm="sort"><span>🔢</span>رتّب</button><button type="button" class="cm-tb" data-cm="clear"><span>🧹</span>مسح</button>'
     +'<button type="button" class="cm-tb gold" data-cm="hint"'+((G.hints>=L.hints&&G.hintLine!=null)||(L.hints===0)?' disabled':'')+'><span>💡</span>'+(G.hintLine!=null?'اكشف':'تلميح')+'</button>'
     +'<button type="button" class="cm-tb" data-cm="new"><span>🔄</span>لغز جديد</button></div>'
-    +'<button type="button" class="cm-tb" style="height:38px;flex-direction:row;gap:6px" data-cm="levels">🎚️ غيّر المستوى</button>');
+    +'<button type="button" class="cm-tb" style="height:38px;flex-direction:row;gap:6px" data-cm="levels">🎚️ غيّر المستوى</button>'); afterDraw();
 }
 var LV_COL={easy:'#5FE0A4',medium:'#4FACFE',hard:'#FF9F43',expert:'#FF4D6D'};
-function ensureOv(){ var ov=ovEl(); if(!ov){ ov=document.createElement('div'); ov.id='cm-ov'; ov.className='cm-ov cm-th-ink'; document.body.appendChild(ov); } return ov; }
+function ensureOv(){ var ov=ovEl(); if(!ov){ ov=document.createElement('div'); ov.id='cm-ov'; ov.className='cm-ov cm-th-'+curTheme(); document.body.appendChild(ov); } return ov; }
 function pickLevel(id){ ensureOv(); if(id==='resume'){ if(!resume()) startLevel(lastLevel()); } else if(id==='daily') startLevel('medium',false,{daily:true}); else startLevel(id); }
 /* شاشة اختيار المستوى = نفس الشاشة الموحّدة بتاعة باقي الألعاب (lvlScreen) بجوّ اللعبة */
 function showLevels(){
@@ -44002,7 +44022,7 @@ function startLevel(lv,tut,opts){
   var go=function(){ newState(lv,P,opts); draw(); startTimer(); snd('click'); };
   if(!P&&!tut&&(lv==='hard'||lv==='expert')){ G=null; setShell(head('بنجهّز لك لغز…')+'<div class="cm-card"><div class="cm-big">⏳ لحظة…</div>بنولّد لغز صعب بحل واحد مضمون</div>'); later(go,60); } else go();
 }
-function startTimer(){ clearInterval(TMR); TMR=setInterval(function(){ if(!G||G.won||G.phase!=='play'||document.hidden){ if(G) G.t0=Date.now()-G.el*1000; return; } G.el=(Date.now()-G.t0)/1000; var e=document.getElementById('cm-time'); if(e) e.textContent=fmt(G.el); },500); }
+function startTimer(){ clearInterval(TMR); TMR=setInterval(function(){ if(!G||G.won||G.paused||G.phase!=='play'||document.hidden){ if(G) G.t0=Date.now()-G.el*1000; return; } G.el=(Date.now()-G.t0)/1000; var e=document.getElementById('cm-time'); if(e) e.textContent=fmt(G.el); },500); }
 function push(h){ G.hist.push(h); G.hintLine=null; G.hintItem=null; G.showErr=false; }
 function placeCell(i,v){
   if(!G||G.won||!G.isB[i]||G.lock[i]) return; var prev=G.val[i];
@@ -44074,7 +44094,7 @@ function win(){
   try{ if(state.pid) saveGameStats(GAME_STATS); }catch(e){}
   var canReward=r>0&&!!state.pid&&(G.daily||left>0);
   later(function(){ if(!G||!G.won) return; var wasTut=G.tutorial,up=G.auto&&!wasTut&&autoLevel()!==ORDER[Math.min(3,Math.floor(skBefore))];
-    setShell(head('أحسنت!')+'<div class="cm-card"><div class="cm-big">'+(G.daily?'🏆 خلّصت تحدي اليوم!':'🎉 حليت اللغز!')+'</div><div class="cm-stars">'+'★'.repeat(stars)+'<span style="opacity:.3">'+'★'.repeat(3-stars)+'</span></div>'
+    setShell(head('أحسنت!')+'<div class="cm-card"><div class="cm-big">'+(G.daily?'🏆 خلّصت تحدي اليوم!':'👑 مبروك! حليت اللغز')+'</div><div class="cm-stars">'+'★'.repeat(stars)+'<span style="opacity:.3">'+'★'.repeat(3-stars)+'</span></div>'
       +'<div class="cm-rs"><div><b>'+fmt(G.el)+'</b>الوقت</div><div><b>'+G.mist+'</b>الأخطاء</div><div><b>'+G.hints+'</b>التلميحات</div></div><div style="margin-top:8px;font-size:12.5px;line-height:1.9">'
       +(newBest&&prevBest?'<span style="color:#7CFFB2">🏅 رقم قياسي جديد في '+L.n+'!</span><br>':'')+(fast&&stars===3?'⚡ أسرع من الوقت المتوقع (+20%)<br>':'')+(G.daily?'🔥 سلسلتك: '+streak+' يوم<br>':'')
       +(up?'<span style="color:#FFDE94">⬆️ الذكاء رفع مستواك لـ '+LV[autoLevel()].n+'!</span><br>':'')
@@ -44097,11 +44117,12 @@ function help(){
 function open(){
   var old=ovEl(); if(old) old.remove(); snd('click'); G=null;
   var seen=false; try{ seen=!!localStorage.getItem('glv_cm_tut'); }catch(e){}
-  if(!seen){ ensureOv(); startLevel('easy',true); help(); } else showLevels();
+  if(!seen){ ensureOv(); startLevel('easy',true); var _dv=null; try{ _dv=localStorage.getItem('glv-cm-div'); }catch(e){} if(_dv) help(); else settingsDlg(true); } else showLevels();
 }
 function close(){ clearT(); clearInterval(TMR); TMR=null; G=null; var h=document.getElementById('cm-help'); if(h) h.remove(); var ov=ovEl(); if(ov) ov.remove(); snd('back'); }
 document.addEventListener('click',function(e){
   var t=e.target.closest&&e.target.closest('[data-cm]'); if(!t) return; var a=t.getAttribute('data-cm');
+  if(G&&G.paused&&['hint','undo','clear','sort'].indexOf(a)>=0) return;
   if(a==='close') close(); else if(a==='help') help();
   else if(a==='helpx'){ var h=document.getElementById('cm-help'); if(h) h.remove(); try{ if(G&&G.tutorial) localStorage.setItem('glv_cm_tut','1'); }catch(_){} }
   else if(a==='cell') onCell(+t.getAttribute('data-i')); else if(a==='op') onOp(t.getAttribute('data-k'));
@@ -44109,7 +44130,59 @@ document.addEventListener('click',function(e){
   else if(a==='undo') undo(); else if(a==='clear') clearAll(); else if(a==='hint') hint();
   else if(a==='new'||a==='next') startLevel(G&&G.auto?'auto':(G&&!G.daily&&!G.tutorial?G.lv:lastLevel()));
   else if(a==='levels') showLevels();
+  else if(a==='sort') sortBank(); else if(a==='pause') togglePause(); else if(a==='settings') settingsDlg();
+  else if(a==='div') setDiv(t.getAttribute('data-k')); else if(a==='theme') setTheme(t.getAttribute('data-k'));
+  else if(a==='setx'){ var s0=document.getElementById('cm-set'); var fst=s0&&s0.getAttribute('data-first'); if(s0) s0.remove(); try{ if(!localStorage.getItem('glv-cm-div')) localStorage.setItem('glv-cm-div',SYM['/']); }catch(_){} if(fst&&G&&G.tutorial) help(); }
 });
+
+/* ---------- مميزات جديدة (على طريقة Cross Math الأصلية) ---------- */
+var THEMES=[['ink','🖋️ كراسة'],['clean','☀️ فاتح'],['night','🌙 ليلي']];
+function curTheme(){ var t='ink'; try{ t=localStorage.getItem('glv-cm-th')||'ink'; }catch(e){} return THEMES.some(function(x){ return x[0]===t; })?t:'ink'; }
+function setTheme(k){ try{ localStorage.setItem('glv-cm-th',k); }catch(e){} var ov=ovEl(); if(ov) ov.className='cm-ov cm-th-'+k; refreshSet(); }
+function setDiv(k){ SYM['/']=k; try{ localStorage.setItem('glv-cm-div',k); }catch(e){} if(G&&G.phase==='play'&&ovEl()) draw(); refreshSet(); }
+function refreshSet(){ var o=document.getElementById('cm-set'); if(!o) return; var f=o.getAttribute('data-first'); o.remove(); settingsDlg(!!f); }
+function settingsDlg(first){
+  if(document.getElementById('cm-set')) return; var o=document.createElement('div'); o.className='cm-help'; o.id='cm-set'; if(first) o.setAttribute('data-first','1');
+  var d=SYM['/'];
+  o.innerHTML='<div class="cm-card"><h4>⚙️ الإعدادات</h4><p style="text-align:center">علامة القسمة — تقدر تغيّرها بعدين</p><div class="cm-ex">6 '+d+' 3 = 2</div><div class="cm-optrow">'
+    +[['\u00F7','\u00F7'],['/','/'],[':',':']].map(function(x){ return '<button type="button" class="cm-opt'+(d===x[0]?' on':'')+'" data-cm="div" data-k="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'
+    +'<p style="text-align:center">شكل اللعبة</p><div class="cm-optrow">'+THEMES.map(function(x){ return '<button type="button" class="cm-opt wd'+(curTheme()===x[0]?' on':'')+'" data-cm="theme" data-k="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</div>'
+    +'<button type="button" class="cm-btn" style="margin-top:12px" data-cm="setx">تمام 👍</button></div>';
+  document.body.appendChild(o);
+}
+function pauseCover(){ return '<div class="cm-paper"><button type="button" class="cm-pz" data-cm="pause">⏸<br>اللعبة واقفة — اضغط للمتابعة</button></div>'; }
+function togglePause(){ if(!G||G.phase!=='play') return; G.paused=!G.paused; if(!G.paused) G.t0=Date.now()-G.el*1000; snd('click'); draw(); }
+function tipHtml(){ if(!G||!G.tutorial) return ''; var n=G.hist.length,t=n===0?'👆 اضغط الرقم الصح من تحت':n===1?'✋ أو اسحب الرقم للخانة الصح':(!G.sorted?'🔢 اضغط «رتّب» عشان ترتّب الأرقام':''); return t?'<div class="cm-tip">'+t+'</div>':''; }
+function sortBank(){
+  if(!G||G.won||G.paused) return; var els=document.querySelectorAll('.cm-chip[data-cm="chip"]'),rc=[],idx=[],i;
+  for(i=0;i<els.length;i++){ var r=els[i].getBoundingClientRect(); rc.push({x:r.left,y:r.top}); idx.push(i); }
+  idx.sort(function(a,b){ return (G.bank[a]-G.bank[b])||(a-b); });
+  G.sortFrom=idx.map(function(k){ return rc[k]; }); G.bank=idx.map(function(k){ return G.bank[k]; }); G.sorted=true; snd('click'); draw();
+}
+function flashLine(li){ G.P.lines[li].c.forEach(function(id){ var e=document.querySelector('.cm-c[data-i="'+id+'"]'); if(e){ e.classList.remove('cmf'); void e.offsetWidth; e.classList.add('cmf'); } }); }
+function afterDraw(){
+  if(!G) return;
+  if(G.sortFrom){ var f=G.sortFrom; G.sortFrom=null; document.querySelectorAll('.cm-chip[data-cm="chip"]').forEach(function(el,j){ var o=f[j]; if(!o) return; var r=el.getBoundingClientRect(),dx=o.x-r.left,dy=o.y-r.top; if(!dx&&!dy) return;
+    el.style.transition='none'; el.style.transform='translate('+dx+'px,'+dy+'px)'; void el.offsetWidth; el.style.transition='transform .5s cubic-bezier(.3,1.2,.4,1)'; el.style.transform=''; }); }
+  var st=G.P.lines.map(function(L,li){ return lineState(li); }),prev=G.okPrev||[],nw=false;
+  st.forEach(function(s,li){ if(prev.length&&s==='ok'&&prev[li]!=='ok'){ flashLine(li); nw=true; } });
+  G.okPrev=st;
+  if(nw&&G.phase==='play'){ var p=document.getElementById('cm-paper'); if(p){ var t=document.createElement('div'); t.className='cm-toast'; t.textContent='✨ معادلة صح!'; p.appendChild(t); later(function(){ t.remove(); },1250); snd('click'); } }
+}
+/* سحب وإفلات الأرقام والعمليات */
+var DRG=null;
+document.addEventListener('pointerdown',function(e){ var c=e.target.closest&&e.target.closest('.cm-chip:not(.us)'); if(!c||!G||G.paused||G.phase!=='play') return; DRG={el:c,x:e.clientX,y:e.clientY,on:false,g:null,tg:null}; });
+document.addEventListener('pointermove',function(e){
+  if(!DRG) return; var dx=e.clientX-DRG.x,dy=e.clientY-DRG.y;
+  if(!DRG.on){ if(dx*dx+dy*dy<100) return; DRG.on=true; var g=DRG.el.cloneNode(true); g.className='cm-chip cm-ghost'; g.removeAttribute('data-cm'); document.body.appendChild(g); DRG.g=g; DRG.el.style.opacity='.3'; }
+  try{ e.preventDefault(); }catch(_){} DRG.g.style.left=e.clientX+'px'; DRG.g.style.top=e.clientY+'px';
+  DRG.g.style.display='none'; var u=document.elementFromPoint(e.clientX,e.clientY); DRG.g.style.display='';
+  var isOp=DRG.el.getAttribute('data-cm')==='opchip',t=u&&u.closest?u.closest(isOp?'[data-cm="op"]':'[data-cm="cell"]'):null;
+  if(DRG.tg&&DRG.tg!==t) DRG.tg.classList.remove('dz'); DRG.tg=t||null; if(t) t.classList.add('dz');
+},{passive:false});
+function endDrag(cancel){ if(!DRG) return; var d=DRG; DRG=null; if(!d.on) return; d.g.remove(); d.el.style.opacity=''; if(d.tg) d.tg.classList.remove('dz');
+  if(d.tg&&!cancel){ if(d.el.getAttribute('data-cm')==='opchip') placeOp(d.tg.getAttribute('data-k'),d.el.getAttribute('data-o')); else placeCell(+d.tg.getAttribute('data-i'),+d.el.getAttribute('data-v')); } }
+document.addEventListener('pointerup',function(){ endDrag(false); }); document.addEventListener('pointercancel',function(){ endDrag(true); });
 var rsT=null; window.addEventListener('resize',function(){ clearTimeout(rsT); rsT=setTimeout(function(){ if(G&&G.phase==='play'&&ovEl()) draw(); },200); });
 window.openCrossMathGame=open;
 window.__cmGen=genPuzzle; window.__cmSolve=solveP; window.__cmLV=LV;
