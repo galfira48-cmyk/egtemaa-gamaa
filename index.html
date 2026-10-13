@@ -42196,6 +42196,174 @@ load(true);
 })();
 
 </script>
+<script id="contests-module">
+/* ===== المسابقات: خانة في لوحة الأدمن + صفحة للمشاركين ===== */
+(function(){
+'use strict';
+if(window.__contests) return; window.__contests = 1;
+var KEY = 'glavera-contests-v1';
+var C = {list:[], t:0, sig:'', busy:false};
+var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+
+/* ---------- تخزين مشترك ---------- */
+async function jg(k, d){ try{ var r = await window.storage.get(k, true); if(!r || r.value==null) return d; return typeof r.value==='string' ? JSON.parse(r.value) : r.value; }catch(e){ return d; } }
+function ju(k, fn){
+  try{ return window.storage.update(k, function(cur){ var o=null; try{ o = cur ? JSON.parse(cur) : null; }catch(e){} return JSON.stringify(fn(o)); }, true); }
+  catch(e){ return Promise.resolve(null); }
+}
+function relevant(){ return state.view==='contests' || (state.view==='admin' && state.adminUnlocked && state.adminTab==='contests'); }
+async function doLoad(){
+  try{
+    var o = await jg(KEY, {list:[]}); C.list = (o && o.list) || [];
+    var sig = JSON.stringify(C.list), ch = sig!==C.sig; C.sig = sig; C.t = Date.now();
+    if(ch && relevant()){
+      var a = document.activeElement;
+      if(!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) render();
+    }
+  }catch(e){ console.error('contests load', e); }
+}
+function load(force){
+  if(!force && Date.now()-C.t < 20000) return Promise.resolve();
+  if(C.p) return force ? C.p.then(function(){ return doLoad(); }) : C.p;
+  C.p = doLoad().then(function(){ C.p = null; }); return C.p;
+}
+function ensure(){ load(false); }
+function person(pid){ return PARTICIPANTS.find(function(p){ return String(p.id)===String(pid); }); }
+function av(p){ return p ? meAvatarHtml(p, 'fx-av') : '<div class="fx-av"></div>'; }
+function find(id){ return C.list.find(function(c){ return c.id===id; }); }
+function mut(id, fn){ return ju(KEY, function(o){ o = o || {list:[]}; o.list = o.list || []; var c = o.list.find(function(x){ return x.id===id; }); if(c) fn(c, o); return o; }); }
+function fmt(ts){ try{ return new Date(ts).toLocaleDateString('ar-EG', {day:'numeric', month:'long'}); }catch(e){ return ''; } }
+
+/* ---------- الأدمن ---------- */
+function adminCard(c){
+  var ids = Object.keys(c.entries||{}), open = c.status!=='closed', win = c.winners||[];
+  var rows = ids.map(function(pid){
+    var p = person(pid); if(!p) return '';
+    var isW = win.indexOf(String(pid))>-1 || win.indexOf(pid)>-1;
+    return '<div class="ct-row"><div class="ct-who">'+av(p)+'<b>'+esc(p.name)+'</b></div>'
+      + '<div class="ct-acts"><button type="button" class="fx-act '+(isW?'wa':'')+'" data-ct="win" data-id="'+esc(c.id)+'" data-pid="'+esc(pid)+'"'+(c.paid?' disabled':'')+'>'+(isW?'🏆 فايز':'🏅 اختار فايز')+'</button>'
+      + (c.paid?'':'<button type="button" class="fx-act off" data-ct="kick" data-id="'+esc(c.id)+'" data-pid="'+esc(pid)+'" title="شيله من المسابقة">✕</button>')+'</div></div>';
+  }).join('');
+  var avail = PARTICIPANTS.filter(function(p){ return !(c.entries||{})[p.id]; });
+  var addSel = (!c.paid && avail.length) ? '<div class="ct-add"><select id="ct-sel-'+esc(c.id)+'" class="field"><option value="">➕ ضيف مشارك للمسابقة…</option>'
+    + avail.map(function(p){ return '<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>'; }).join('')+'</select>'
+    + '<button type="button" class="fx-act" data-ct="addp" data-id="'+esc(c.id)+'">إضافة</button></div>' : '';
+  var payBtn = '';
+  if(c.paid) payBtn = '<div class="fx-care-done">✅ اتوزّعت الجايزة ('+(+c.prize||0)+' نقطة لكل فايز)</div>';
+  else if(win.length) payBtn = '<button type="button" class="btn btn-primary" data-ct="pay" data-id="'+esc(c.id)+'">💰 وزّع الجايزة على '+win.length+' فايز'+((+c.prize)>0?' (+'+(+c.prize)+' نقطة لكل واحد)':'')+'</button>';
+  return '<div class="card ct-card '+(open?'':'closed')+'">'
+    + '<div class="ct-head"><span class="ct-ico">'+esc(c.icon||'🏆')+'</span><div class="ct-tt"><b>'+esc(c.title)+'</b><small>'+(open?'🟢 مفتوحة':'🔒 مقفولة')+' · '+ids.length+' مشترك'+((+c.prize)>0?' · جايزة '+(+c.prize)+' نقطة':'')+'</small></div></div>'
+    + (c.desc ? '<div class="ct-desc">'+esc(c.desc)+'</div>' : '')
+    + (rows ? '<div class="ct-list">'+rows+'</div>' : '<div class="fx-hint">لسه حد ما اشتركش.</div>')
+    + addSel
+    + '<div class="sar-actions" style="margin-top:10px">'
+    + '<button type="button" class="btn btn-ghost" data-ct="toggle" data-id="'+esc(c.id)+'">'+(open?'🔒 اقفل الاشتراك':'🔓 افتح الاشتراك')+'</button>'
+    + '<button type="button" class="btn btn-ghost" data-ct="del" data-id="'+esc(c.id)+'">🗑️ حذف</button></div>'
+    + (payBtn ? '<div style="margin-top:8px">'+payBtn+'</div>' : '')
+    + '</div>';
+}
+window.FXADMIN.contests = function(){
+  ensure();
+  var open = C.list.filter(function(c){ return c.status!=='closed'; }).length;
+  var entries = C.list.reduce(function(s,c){ return s+Object.keys(c.entries||{}).length; }, 0);
+  var kp = adminKpis([{num:C.list.length, lab:'مسابقات'},{num:open, lab:'مفتوحة', cls:open?'is-ok':''},{num:entries, lab:'اشتراكات'}]);
+  var form = '<div class="card fx-form">'
+    + '<div class="fx-sep" style="margin-top:0">مسابقة جديدة</div>'
+    + '<label class="emp-lab" for="ct-title">اسم المسابقة</label><input id="ct-title" class="field" placeholder="مثال: مسابقة حفظ آية الشهر" maxlength="80">'
+    + '<label class="emp-lab" for="ct-desc">الوصف / الشروط (اختياري)</label><textarea id="ct-desc" class="field" rows="2" maxlength="400" placeholder="إيه المطلوب من المشترك؟"></textarea>'
+    + '<div style="display:flex;gap:8px"><div style="flex:1"><label class="emp-lab" for="ct-ico">أيقونة</label><input id="ct-ico" class="field" value="🏆" maxlength="4"></div>'
+    + '<div style="flex:2"><label class="emp-lab" for="ct-prize">نقاط الجايزة لكل فايز</label><input id="ct-prize" class="field" type="number" min="0" max="1000" value="20"></div></div>'
+    + '<div class="sar-actions" style="margin-top:12px"><button type="button" class="btn btn-primary" data-ct="add">➕ إضافة المسابقة</button></div></div>';
+  var list = C.list.slice().sort(function(a,b){ return (a.status==='closed')-(b.status==='closed') || (b.at||0)-(a.at||0); }).map(adminCard).join('');
+  return kp + form + (list || adminEmptyState('🏆','مفيش مسابقات لسه','أضف أول مسابقة من الفورم اللي فوق، والمشاركين هيشتركوا فيها من صفحة «المسابقات»'));
+};
+
+/* ---------- صفحة المشارك ---------- */
+window.FXVIEWS.contests = function(){
+  ensure();
+  var pid = state.pid;
+  var head = '<div class="back-row"><button class="icon-btn" data-action="back">'+ICO.back+'</button><div class="back-title">المسابقات</div></div>'
+    + '<div class="opinion-hero"><div class="opinion-hero-ico">🏆</div><div class="opinion-hero-title">المسابقات</div><div class="opinion-hero-sub">اشترك واكسب جوايز ونقاط</div></div>';
+  if(!C.list.length) return head + '<div class="empty-note">مفيش مسابقات دلوقتي — ترقّب الجاي 💛</div>';
+  var cards = C.list.slice().sort(function(a,b){ return (a.status==='closed')-(b.status==='closed') || (b.at||0)-(a.at||0); }).map(function(c){
+    var open = c.status!=='closed', joined = !!(c.entries||{})[pid], n = Object.keys(c.entries||{}).length;
+    var winners = (c.winners||[]).map(function(w){ var p = person(w); return p ? p.name : ''; }).filter(Boolean);
+    var iWon = (c.winners||[]).map(String).indexOf(String(pid))>-1 && c.paid;
+    var act = open ? (joined ? '<div class="fx-care-done">✅ أنت مشترك في المسابقة دي</div>' : '<button type="button" class="btn btn-primary" data-ct="join" data-id="'+esc(c.id)+'">🙋 اشترك دلوقتي</button>')
+                   : (joined ? '<div class="fx-hint">كنت مشترك — الاشتراك اتقفل</div>' : '<div class="fx-hint">الاشتراك اتقفل</div>');
+    return '<div class="card ct-card '+(open?'':'closed')+'">'
+      + '<div class="ct-head"><span class="ct-ico">'+esc(c.icon||'🏆')+'</span><div class="ct-tt"><b>'+esc(c.title)+'</b><small>'+(open?'🟢 مفتوحة':'🔒 مقفولة')+' · '+n+' مشترك'+((+c.prize)>0?' · جايزة +'+(+c.prize)+' نقطة':'')+'</small></div></div>'
+      + (c.desc ? '<div class="ct-desc">'+esc(c.desc)+'</div>' : '')
+      + (iWon ? '<div class="fx-care-done">🎉 مبروك! أنت من الفايزين وخدت +'+(+c.prize||0)+' نقطة</div>' : (winners.length && c.paid ? '<div class="fx-hint">🏆 الفايزين: <b>'+esc(winners.join('، '))+'</b></div>' : act))
+      + '</div>';
+  }).join('');
+  return head + cards;
+};
+
+/* ---------- العمليات ---------- */
+async function addContest(){
+  var g = function(id){ var e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  var title = g('ct-title'); if(!title){ showToast('اكتب اسم المسابقة', true); return; }
+  var c = {id:'ct'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), title:title, desc:g('ct-desc'), icon:g('ct-ico')||'🏆',
+    prize:Math.max(0, Math.min(1000, parseInt(g('ct-prize'),10)||0)), status:'open', at:Date.now(), entries:{}, winners:[], paid:false};
+  await ju(KEY, function(o){ o = o || {list:[]}; o.list = o.list || []; o.list.push(c); return o; });
+  showToast('اتضافت المسابقة 🏆'); await load(true); render();
+}
+async function join(id){
+  var pid = state.pid; if(!pid) return;
+  var c = find(id); if(!c || c.status==='closed'){ showToast('الاشتراك اتقفل', true); return; }
+  await mut(id, function(x){ if(x.status==='closed') return; x.entries = x.entries||{}; if(!x.entries[pid]) x.entries[pid] = Date.now(); });
+  try{ SND.coinChime(); }catch(e){}
+  showToast('اتسجّل اشتراكك ✅'); await load(true); render();
+}
+async function pay(id){
+  if(C.busy) return; var c = find(id); if(!c || c.paid) return;
+  var win = (c.winners||[]).filter(function(w){ return (c.entries||{})[w]; }); if(!win.length){ showToast('اختار فايز الأول', true); return; }
+  if(!confirm('توزّع الجايزة على '+win.length+' فايز؟ العملية دي مش بترجع.')) return;
+  C.busy = true;
+  try{
+    var claimed = false;
+    await mut(id, function(x){ if(!x.paid){ x.paid = true; x.status = 'closed'; x.paidAt = Date.now(); claimed = true; } });
+    if(!claimed){ showToast('الجايزة اتوزّعت قبل كده', true); }
+    else {
+      var pts = +c.prize || 0;
+      if(pts>0){ win.forEach(function(w){ BONUS[w] = (BONUS[w]||0)+pts; }); await saveBonus(BONUS); }
+      win.forEach(function(w){ pushNotification(w, 'مبروك! كسبت في مسابقة «'+c.title+'»'+(pts?' +'+pts+' نقطة':'')+' 🏆', '🏆'); });
+      showToast('اتوزّعت الجايزة 🎉');
+    }
+  } finally { C.busy = false; }
+  await load(true); render();
+}
+document.addEventListener('click', function(e){
+  var el = e.target.closest && e.target.closest('[data-ct]'); if(!el || el.disabled) return;
+  var a = el.dataset.ct, id = el.dataset.id, pid = el.dataset.pid;
+  if(a==='add') addContest();
+  else if(a==='join') join(id);
+  else if(a==='pay') pay(id);
+  else if(a==='toggle') mut(id, function(c){ if(!c.paid) c.status = c.status==='closed' ? 'open' : 'closed'; }).then(function(){ return load(true); }).then(render);
+  else if(a==='win') mut(id, function(c){ if(c.paid) return; var w = (c.winners||[]).map(String), i = w.indexOf(String(pid)); if(i>-1) w.splice(i,1); else w.push(String(pid)); c.winners = w; }).then(function(){ return load(true); }).then(render);
+  else if(a==='kick') mut(id, function(c){ if(c.paid) return; delete (c.entries||{})[pid]; c.winners = (c.winners||[]).filter(function(w){ return String(w)!==String(pid); }); }).then(function(){ return load(true); }).then(render);
+  else if(a==='addp'){ var s = document.getElementById('ct-sel-'+id); var v = s && s.value; if(!v){ showToast('اختار مشارك الأول', true); return; } mut(id, function(c){ if(c.paid) return; c.entries = c.entries||{}; c.entries[v] = Date.now(); }).then(function(){ return load(true); }).then(render); }
+  else if(a==='del'){ if(confirm('تحذف المسابقة دي؟')) ju(KEY, function(o){ o = o||{list:[]}; o.list = (o.list||[]).filter(function(c){ return c.id!==id; }); return o; }).then(function(){ return load(true); }).then(render); }
+});
+
+/* ---------- القوائم ---------- */
+if(typeof NAV_TILE_ITEMS!=='undefined'){
+  NAV_TILE_ITEMS.push({page:'contests', icon:'🏆', labelKey:'المسابقات', subKey:'اشترك واكسب جوايز', color:'linear-gradient(145deg,#F4B740,#FF6B9D)'});
+}
+if(typeof BNAV_VIEW_TAB!=='undefined'){ BNAV_VIEW_TAB.contests = 'capabilities'; }
+if(typeof ADMIN_HUB_ITEMS!=='undefined'){
+  ADMIN_HUB_ITEMS.push({group:'games', tab:'contests', short:'إنشاء مسابقات وتوزيع الجوايز', desc:'إنشاء المسابقات، المشتركين فيها، اختيار الفايزين وتوزيع نقاط الجايزة', icon:'🏆', label:'المسابقات', color:'linear-gradient(145deg,#F4B740,#FF6B9D)'});
+}
+
+/* ---------- تنسيق ---------- */
+var st = document.createElement('style');
+st.textContent = '.ct-card{margin-bottom:10px}.ct-card.closed{opacity:.82}.ct-head{display:flex;align-items:center;gap:10px}.ct-ico{font-size:28px;line-height:1}.ct-tt{display:flex;flex-direction:column;gap:2px}.ct-tt small{color:var(--text-muted);font-size:11.5px}.ct-desc{margin:8px 0;font-size:13px;line-height:1.6;color:var(--text-muted)}.ct-list{display:flex;flex-direction:column;gap:6px;margin:8px 0}.ct-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:12px;background:var(--surface)}.ct-who{display:flex;align-items:center;gap:8px;min-width:0}.ct-who b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ct-acts{display:flex;gap:6px;flex:0 0 auto}.ct-add{display:flex;gap:8px;align-items:center;margin-top:6px}.ct-add select{flex:1;min-width:0}';
+document.head.appendChild(st);
+window.ctLoad = load;
+load(true);
+})();
+</script>
 <script id="eco-module">
 (function(){
 const K='glv-eco',W=6048e5,H=36e5,T=()=>Date.now(),fl=Math.floor;
