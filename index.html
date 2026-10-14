@@ -4930,6 +4930,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .social-tile:active{transform:scale(.9);}
   .social-tile.facebook:active, .social-tile.facebook:hover{ box-shadow:0 10px 26px rgba(24,119,242,.35); }
   .social-tile.facebook:active .st-fill, .social-tile.facebook:hover .st-fill{ fill:#1877F2; transform:scale(1.08); }
+  .social-tile.whatsapp:active, .social-tile.whatsapp:hover{ box-shadow:0 10px 26px rgba(37,211,102,.35); }
+  .social-tile.whatsapp:active .st-fill, .social-tile.whatsapp:hover .st-fill{ fill:#25D366; transform:scale(1.08); }
   .social-tile.instagram:active, .social-tile.instagram:hover{ box-shadow:0 10px 26px rgba(221,42,123,.35); }
   .social-tile.instagram:active .st-outline, .social-tile.instagram:hover .st-outline{ stroke:#DD2A7B; transform:scale(1.08); }
 
@@ -5863,6 +5865,33 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     .stack-hud-score{font-size:clamp(28px,10vw,44px);}
     .stack-hint{font-size:10.5px; margin-top:6px;}
   }
+  /* ---------- المعركة البحرية ---------- */
+  .bs-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:3px; padding:6px; border-radius:16px; background:linear-gradient(160deg,#0b3a63,#06203a); border:1.5px solid rgba(79,172,254,.45); max-width:420px; margin:0 auto;}
+  .bs-grid.small{max-width:230px; padding:4px; gap:2px;}
+  .bs-c{aspect-ratio:1; border:0; border-radius:6px; background:rgba(79,172,254,.16); color:#fff; font-size:15px; font-weight:900; padding:0; display:flex; align-items:center; justify-content:center; transition:transform .12s;}
+  .bs-grid.small .bs-c{font-size:11px; border-radius:4px;}
+  .bs-c:not(:disabled):active{transform:scale(.85); background:rgba(244,183,64,.5);}
+  .bs-c.ship{background:linear-gradient(145deg,#8fa6bd,#566b82); box-shadow:inset 0 -2px 0 rgba(0,0,0,.35);}
+  .bs-c.hit{background:rgba(255,94,98,.55); animation:bsPop .35s ease;}
+  .bs-c.sunk{background:#7a1c1c;}
+  .bs-c.miss{color:rgba(255,255,255,.6);}
+  .bs-lbl{text-align:center; font-weight:800; font-size:13px; color:var(--text-muted); margin:10px 0 4px;}
+  @keyframes bsPop{0%{transform:scale(.4)}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+  /* ---------- ارسم وخمّن ---------- */
+  .dg-cv{display:block; width:100%; aspect-ratio:4/3; background:#fff; border-radius:18px; border:2px solid rgba(244,183,64,.5); touch-action:none; box-shadow:0 8px 22px -10px rgba(0,0,0,.6);}
+  .dg-timer{position:relative; height:26px; border-radius:13px; background:rgba(255,255,255,.08); overflow:hidden; margin:6px 0;}
+  .dg-timer #dg-bar{height:100%; background:linear-gradient(90deg,#FF5E62,#F4B740,#5FE0A4); transition:width .4s linear;}
+  .dg-timer span{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:900; font-family:'Cairo',sans-serif;}
+  .dg-word{text-align:center; font-size:24px; font-weight:900; letter-spacing:2px; margin:4px 0 8px; color:var(--gold); direction:rtl;}
+  .dg-tools{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:10px;}
+  .dg-sw{width:30px; height:30px; border-radius:50%; border:2px solid rgba(255,255,255,.35); padding:0;}
+  .dg-sw.on{outline:3px solid var(--gold); outline-offset:2px;}
+  .dg-sz{min-width:36px; height:32px; border-radius:10px; border:1.5px solid rgba(255,255,255,.25); background:rgba(255,255,255,.08); color:var(--text); display:flex; align-items:center; justify-content:center;}
+  .dg-sz i{display:block; border-radius:50%; background:var(--text);}
+  .dg-sz.on{border-color:var(--gold); background:rgba(244,183,64,.2);}
+  .dg-feed{margin-top:10px; display:flex; flex-direction:column; gap:5px;}
+  .dg-f{padding:6px 12px; border-radius:12px; background:rgba(255,255,255,.07); font-size:14px; font-weight:700;}
+  .dg-f.ok{background:rgba(95,224,164,.18); color:#5FE0A4;}
   /* ============================= GAMES: CUBE (مكعب روبيك 3×3) ============================= */
   .cube-overlay{position:fixed; inset:0; z-index:9500; overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; color:#101014;
     background:radial-gradient(120% 80% at 50% 30%, #ffffff 0%, #eef0f5 60%, #dde1ea 100%);}
@@ -11118,6 +11147,8 @@ let PENDING_PARTICIPANT_PHOTO_UPLOADS = []; // نفس الفكرة بس لصور
 const SOCIAL_LINKS = [
   {key:'facebook', label:'فيسبوك', cls:'facebook', url:'https://www.facebook.com/share/1BQxTZtP3o/',
     svg:`<svg viewBox="0 0 24 24"><path class="st-fill" d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>`},
+  {key:'whatsapp', label:'واتساب', cls:'whatsapp', url:'https://chat.whatsapp.com/EdaBMmCZNONCd1H39t6ovU',
+    svg:`<svg viewBox="0 0 24 24"><path class="st-fill" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>`},
   {key:'instagram', label:'انستجرام', cls:'instagram', url:'https://www.instagram.com/te_epistoly?igsh=MWhtZ2xodG9mMXV4eQ==',
     svg:`<svg viewBox="0 0 24 24"><rect class="st-outline" x="3" y="3" width="18" height="18" rx="6"/><circle class="st-outline" cx="12" cy="12" r="4.2"/><circle class="st-fill" cx="17.4" cy="6.6" r="1.15" style="stroke:none;"/></svg>`},
 ];
@@ -14445,7 +14476,7 @@ const GAME_CATEGORY_OF = {
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
   memory:'mind', revword:'mind', blocky:'mind', cube:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
   uno:'cards', rps:'cards',
-  quiz:'party', mystery:'party', emojibible:'party', proverb:'party', stoptimer:'skill', uniqans:'party', fahmeen:'party', placemem:'mind', fazzura:'party',
+  quiz:'party', mystery:'party', emojibible:'party', proverb:'party', stoptimer:'skill', uniqans:'party', fahmeen:'party', placemem:'mind', fazzura:'party', drawguess:'party', battleship:'board',
 };
 /* rectangular category cards — tap one to open the games inside it */
 /* تحديث لحظي: لو الأدمن قفل/فتح لعبة، الشاشة بتتحدّث عند اللاعبين من غير ريفرش */
@@ -22817,6 +22848,10 @@ async function createGameRoom(gameType, paid){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], fs:null});
   } else if(gameType==='fazzura'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], fz:null});
+  } else if(gameType==='battleship'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], bs:null, bsA:null, bsB:null});
+  } else if(gameType==='drawguess'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], dg:null, dgS:null});
   } else if(gameType==='snakes'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], snl:null, maxPlayers:6});
   } else {
@@ -22848,11 +22883,11 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='stoptimer' || room.game==='uniqans' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura' || room.game==='snakes'){
+  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='stoptimer' || room.game==='uniqans' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura' || room.game==='drawguess' || room.game==='battleship' || room.game==='snakes'){
     room.players = room.players || [{id:room.hostId, name:room.hostName}];
     if(!room.players.some(x=>x.id===state.pid)){
       if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
-      const _cap = room.game==='snakes' ? Math.max(2, Math.min(6, room.maxPlayers||6)) : ((room.game==='fazzura' && room.fzJudge!==false) ? 5 : 4); if(room.players.length>=_cap){ showToast('الغرفة دي مكتملة ('+_cap+' لاعبين)', true); return; }
+      const _cap = room.game==='battleship' ? 2 : room.game==='drawguess' ? 6 : room.game==='snakes' ? Math.max(2, Math.min(6, room.maxPlayers||6)) : ((room.game==='fazzura' && room.fzJudge!==false) ? 5 : 4); if(room.players.length>=_cap){ showToast('الغرفة دي مكتملة ('+_cap+' لاعبين)', true); return; }
       room.players.push({id:state.pid, name:p ? p.name : 'لاعب'});
     }
     room.updatedAt = Date.now();
@@ -23381,6 +23416,7 @@ function startRoomPolling(){
         if(state.view==='room-uniqans' && prevRoom && freshRoom && prevRoom.ua && freshRoom.ua && prevRoom.ua.phase==='play' && freshRoom.ua.phase==='play' && prevRoom.ua.r===freshRoom.ua.r){
           const _ae2 = document.activeElement; if(_ae2 && _ae2.id==='ua-ans') return;
         }
+        if(state.view==='room-drawguess' && prevRoom && freshRoom && prevRoom.dg && freshRoom.dg && prevRoom.dg.gid===freshRoom.dg.gid && prevRoom.dg.t===freshRoom.dg.t && prevRoom.dg.phase==='draw' && freshRoom.dg.phase==='draw'){ dgLive(freshRoom); return; }
         render();
       }
     }catch(e){}
@@ -23420,6 +23456,8 @@ const ROOM_GAMES = [
   {id:'fahmeen',  sub:'اكتبوا أول حاجة تيجي في بالكم — اتطابقوا أو اتفردوا وراهنوا برقم'},
   {id:'placemem', sub:'احفظوا أماكن الصور في 5 ثواني وبعدين دوّروا عليها — الأسرع والصح ياخد نقط أكتر'},
   {id:'fazzura', sub:'فريقين أحمر وأزرق — اختاروا سؤال من اللوحة وجازفوا، ولو غلطتوا الفريق التاني يخطفها!'},
+  {id:'drawguess', sub:'ارسم بالدور والباقي يخمّنوا لايف — لحد 6 أصحاب'},
+  {id:'battleship', sub:'1 ضد 1 — رتّب أسطولك وغرّق أسطول صاحبك'},
 ];
 /* الألعاب دي متاحة بس في وضع الغرف (مع الأصحاب)، مش موجودة في هب الألعاب الفردي، فبناخدلها بيانات التايل من هنا */
 const ROOM_ONLY_TILES = {
@@ -23432,6 +23470,8 @@ const ROOM_ONLY_TILES = {
   fahmeen: {id:'fahmeen', icon:'🤝', title:'فاهمين بعض؟', sub:'اكتبوا أول حاجة تيجي في بالكم — اتطابقوا أو اتفردوا وراهنوا برقم', color:'linear-gradient(145deg,#6A1B9A,#E91E8C)'},
   placemem: {id:'placemem', icon:'🧠', title:'ذاكرة الأماكن', sub:'احفظوا أماكن الصور في 5 ثواني وبعدين دوّروا عليها — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#3B1F6E,#8E5BD1)'},
   fazzura: {id:'fazzura', icon:'🎯', title:'فزورة — لوحة النقاط', sub:'فريقين أحمر وأزرق — اختاروا سؤال من اللوحة وجازفوا، ولو غلطتوا الفريق التاني يخطفها!', color:'linear-gradient(145deg,#E8342A,#FFC21A)'},
+  drawguess: {id:'drawguess', icon:'🎨', title:'ارسم وخمّن', sub:'ارسم بالدور والباقي يخمّنوا لايف — لحد 6 أصحاب', color:'linear-gradient(145deg,#FF5E62,#FF9966)'},
+  battleship: {id:'battleship', icon:'⚓', title:'المعركة البحرية', sub:'1 ضد 1 — رتّب أسطولك وغرّق أسطول صاحبك، والإصابة بتدّيك دور تاني', color:'linear-gradient(145deg,#0b3a63,#4FACFE)'},
 };
 /* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
 /* بيتتبع مين من اللاعبين ظهر قبل كده في نفس الغرفة، عشان نعرض حركة "انضم الآن" مرة واحدة بس لكل لاعب */
@@ -24635,6 +24675,334 @@ function renderRoomSt(){
 document.addEventListener('pointerdown', function(e){
   try{ if(e.target && e.target.closest && e.target.closest('.st-stop')) state._stDownAt = Date.now(); }catch(_){}
 }, true);
+/* ================= ارسم وخمّن — لحد 6 أصحاب: كل واحد بيرسم كلمة بالدور والباقي يخمّنوا لايف، الأسرع ياخد نقط أكتر ================= */
+const DG_TITLE = 'ارسم وخمّن', DG_DUR = 75;
+const DG_COLORS = ['#111111','#E53935','#FB8C00','#FDD835','#43A047','#1E88E5','#8E24AA','#6D4C41','#FFFFFF'];
+const DG_WORDS = 'قطة,أسد,فيل,زرافة,سمكة,عصفورة,حصان,جمل,ثعبان,بطة,عربية,طيارة,مركب,دراجة,قطر,صاروخ,بيت,شجرة,شمس,قمر,نجمة,جبل,وردة,كنيسة,صليب,سفينة نوح,مذود,راعي,خروف,شمعة,جرس,موبايل,كمبيوتر,نضارة,ساعة,مفتاح,كرسي,سرير,تليفزيون,كورة,بيتزا,برجر,آيس كريم,موزة,بطيخ,كيكة,هدية,بالونة,تاج,قلب,مظلة,عين,جيتار,طبلة,ميكروفون,كاميرا,ثلاجة,مروحة,شنطة,حذاء,قبعة,روبوت,بركان,قوس قزح,برج,مصباح'.split(',');
+function dgOpts(){ return shuffleArray(DG_WORDS.slice()).slice(0,3); }
+function dgNew(ps){
+  const rounds = ps.length>=4 ? 1 : 2, order = [];
+  for(let r=0;r<rounds;r++) shuffleArray(ps.map(p=>p.id)).forEach(id=>order.push(id));
+  return { gid:Date.now()+'-'+Math.floor(Math.random()*1e6), order, t:0, total:order.length, phase:'pick', opts:dgOpts(), pickAt:Date.now(),
+    word:null, startedAt:0, scores:Object.fromEntries(ps.map(p=>[p.id,0])), correct:{}, feed:[], last:null, finished:false };
+}
+function dgWinner(room){
+  const D = room.dg; let best=null, bs=-1, tie=false;
+  (room.players||[]).forEach(p=>{ const s=D.scores[p.id]||0; if(s>bs){ best=p.id; bs=s; tie=false; } else if(s===bs) tie=true; });
+  return tie ? 'draw' : best;
+}
+function dgResolve(room){
+  const D = room.dg, dr = D.order[D.t], gains = {};
+  Object.keys(D.correct).forEach(id=>{ gains[id]=D.correct[id]; D.scores[id]=(D.scores[id]||0)+D.correct[id]; });
+  const k = Object.keys(D.correct).length;
+  gains[dr] = k*25; D.scores[dr] = (D.scores[dr]||0)+k*25;
+  D.last = { word:D.word, drawer:dr, gains }; D.phase = 'reveal';
+}
+function dgStartDraw(room, i){
+  const D = room.dg;
+  D.word = D.opts[i]; D.phase = 'draw'; D.startedAt = Date.now(); D.correct = {}; D.feed = [];
+  room.dgS = { k:D.gid+'-'+D.t, s:[] };
+}
+function dgHint(D){
+  const w = D.word||'', el = (Date.now()-D.startedAt)/(DG_DUR*1000);
+  const idx = []; for(let i=0;i<w.length;i++) if(w[i]!==' ') idx.push(i);
+  const show = new Set(el>0.7 ? [idx[0], idx[idx.length-1]] : (el>0.4 ? [idx[0]] : []));
+  return w.split('').map((c,i)=> c===' ' ? '  ' : (show.has(i) ? c : '_')).join(' ');
+}
+function renderRoomDgLobby(room){
+  const ps = room.players||[], isHost = room.hostId===state.pid;
+  const slots = [0,1,2,3,4,5].map(i=>{
+    const p = ps[i];
+    if(!p) return `<div class="uno-lobby-row empty"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em></span></div>`;
+    return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
+  }).join('');
+  return `<div class="room-waiting">${roomCodeCard(room.code, room.game)}
+    <div class="hint" style="text-align:center;margin:14px 0 10px;">شارك الكود مع أصحابك، لحد 6 لاعبين 🎨 — كل واحد يرسم بالدور والباقي يخمّنوا، والأسرع ياخد نقط أكتر</div>
+    <div class="uno-lobby-list">${slots}</div>
+    ${isHost ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-dg-start" ${ps.length<2?'disabled':''}>🎨 ابدأ اللعب (${ps.length}/6)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعبين اتنين على الأقل</div>':''}`
+      : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ اللعب</div>`}</div>`;
+}
+async function doRoomDgStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='drawguess' || room.hostId!==state.pid || room.status!=='waiting') return;
+  if((room.players||[]).length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
+  room.dg = dgNew(room.players); room.dgS = null; room.status = 'playing';
+  roomTouch(room); await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){} render();
+}
+async function doRoomDgPick(i){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode], D = room && room.dg;
+  if(!D || D.phase!=='pick' || D.order[D.t]!==state.pid || !D.opts[i]) return;
+  dgStartDraw(room, +i); roomTouch(room); await saveGameRooms(GAME_ROOMS);
+  try{ SND.click(); }catch(e){} render();
+}
+async function doRoomDgGuess(){
+  const inp = document.getElementById('dg-guess'), raw = String(inp ? inp.value : '').trim();
+  if(!fhNorm(raw)) return;
+  if(inp) inp.value = '';
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode], D = room && room.dg;
+  if(!D || D.phase!=='draw' || D.order[D.t]===state.pid || D.correct[state.pid]!=null) return;
+  if(!(room.players||[]).some(p=>p.id===state.pid)) return;
+  const ok = fhNorm(raw)===fhNorm(D.word);
+  if(ok){
+    const left = Math.max(0, DG_DUR-(Date.now()-D.startedAt)/1000);
+    D.correct[state.pid] = 50+Math.round(50*left/DG_DUR)+(Object.keys(D.correct).length===0?20:0);
+    D.feed.push({id:state.pid, ok:1});
+    if((room.players||[]).filter(p=>p.id!==D.order[D.t]).every(p=>D.correct[p.id]!=null)) dgResolve(room);
+  } else D.feed.push({id:state.pid, t:raw.slice(0,20)});
+  D.feed = D.feed.slice(-25);
+  roomTouch(room); await saveGameRooms(GAME_ROOMS);
+  if(ok){ try{ SND.cheer(); }catch(e){} launchConfetti(); }
+  if(room.dg.phase!=='draw' || ok) render(); else dgLive(room);
+}
+async function doRoomDgForce(gid, t){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode], D = room && room.dg;
+  if(!D || D.finished || D.gid!==gid || D.t!==t) return;
+  if(D.phase==='draw' && Date.now()-D.startedAt > DG_DUR*1000+600) dgResolve(room);
+  else if(D.phase==='pick' && Date.now()-D.pickAt > 25000) dgStartDraw(room, 0);
+  else return;
+  roomTouch(room); await saveGameRooms(GAME_ROOMS); render();
+}
+async function doRoomDgNext(rAttr){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode], D = room && room.dg;
+  if(!D) return;
+  if(D.finished){
+    if(rAttr!=='fin'){ render(); return; }
+    room.dg = dgNew(room.players||[]); room.dgS = null;
+  } else {
+    if(D.phase!=='reveal' || String(D.t)!==String(rAttr)){ render(); return; }
+    D.t++;
+    if(D.t>=D.total) D.finished = true;
+    else Object.assign(D, {phase:'pick', opts:dgOpts(), pickAt:Date.now(), word:null, correct:{}, feed:[]});
+  }
+  roomTouch(room); await saveGameRooms(GAME_ROOMS); render();
+  if(room.dg.finished){ try{ SND.coinChime(); }catch(e){} if(dgWinner(room)===state.pid) launchConfetti(); }
+}
+function dgPaint(cv, strokes){
+  const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0,0,cv.width,cv.height);
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  (strokes||[]).forEach(s=>{
+    g.strokeStyle = s.c; g.fillStyle = s.c; g.lineWidth = s.w; const p = s.p;
+    if(p.length<4){ g.beginPath(); g.arc(p[0],p[1],s.w/2,0,7); g.fill(); return; }
+    g.beginPath(); g.moveTo(p[0],p[1]); for(let i=2;i<p.length;i+=2) g.lineTo(p[i],p[i+1]); g.stroke();
+  });
+}
+async function dgFlush(){
+  const d = state.dgD, room = GAME_ROOMS[state.roomCode];
+  if(!d || !room || !room.dg || !d.dirty || d.busy) return;
+  d.dirty = false; d.busy = true;
+  room.dgS = { k:d.k, s:d.strokes.slice() };
+  try{ await saveGameRooms(GAME_ROOMS); } finally { d.busy = false; }
+  if(d.dirty) setTimeout(dgFlush, 300);
+}
+function dgTool(t, v){
+  const d = state.dgD; if(!d) return;
+  if(t==='color') d.color = v; else if(t==='size') d.size = +v;
+  else if(t==='undo'){ d.strokes.pop(); d.dirty = true; } else if(t==='clear'){ d.strokes = []; d.dirty = true; }
+  const cv = document.getElementById('dg-cv'); if(cv && (t==='undo'||t==='clear')){ dgPaint(cv, d.strokes); dgFlush(); }
+  document.querySelectorAll('.dg-sw').forEach(b=>b.classList.toggle('on', b.dataset.v===d.color));
+  document.querySelectorAll('.dg-sz').forEach(b=>b.classList.toggle('on', +b.dataset.v===d.size));
+  try{ SND.click(); }catch(e){}
+}
+function dgFeedHtml(room){
+  return (room.dg.feed||[]).slice(-8).reverse().map(f=> f.ok
+    ? `<div class="dg-f ok">✅ ${escapeHtml(stName(room,f.id))} عرف الكلمة!</div>`
+    : `<div class="dg-f"><b>${escapeHtml(stName(room,f.id))}:</b> ${escapeHtml(f.t)}</div>`).join('');
+}
+function dgScoresHtml(room){
+  const D = room.dg;
+  return (room.players||[]).map(p=>scorePill(gameAvatar(p.id), D.scores[p.id]||0, '', p.id===D.order[D.t])).join('');
+}
+function dgLive(room){
+  const D = room.dg, S = room.dgS, cv = document.getElementById('dg-cv');
+  if(cv && S && S.k===D.gid+'-'+D.t && D.order[D.t]!==state.pid){
+    const sig = S.s.length+':'+S.s.reduce((a,s)=>a+s.p.length,0);
+    if(state._dgSig!==sig){ state._dgSig = sig; dgPaint(cv, S.s); }
+  }
+  const f = document.getElementById('dg-feed'); if(f) f.innerHTML = dgFeedHtml(room);
+  const sc = document.getElementById('dg-scores'); if(sc) sc.innerHTML = dgScoresHtml(room);
+}
+function dgSetup(){
+  const room = GAME_ROOMS[state.roomCode], D = room && room.dg;
+  if(state._dgTimer){ clearInterval(state._dgTimer); state._dgTimer = 0; }
+  if(!D || state.view!=='room-drawguess' || D.finished) return;
+  const cv = document.getElementById('dg-cv'), me = D.order[D.t]===state.pid;
+  if(D.phase==='pick'){
+    const gid = D.gid, t = D.t;
+    state._dgTimer = setInterval(()=>{ if(Date.now()-D.pickAt > 25500){ clearInterval(state._dgTimer); doRoomDgForce(gid,t); } }, 1000);
+    return;
+  }
+  if(D.phase!=='draw' || !cv) return;
+  const k = D.gid+'-'+D.t;
+  if(me){
+    const d = state.dgD;
+    dgPaint(cv, d.strokes);
+    const pt = e=>{ const r = cv.getBoundingClientRect(); return [Math.round((e.clientX-r.left)/r.width*1000), Math.round((e.clientY-r.top)/r.height*750)]; };
+    cv.onpointerdown = e=>{ e.preventDefault(); try{ cv.setPointerCapture(e.pointerId); }catch(_){}
+      const [x,y] = pt(e); d.cur = {c:d.color, w:d.size*1.6, p:[x,y]}; d.strokes.push(d.cur); dgPaint(cv, d.strokes); };
+    cv.onpointermove = e=>{ if(!d.cur) return; e.preventDefault(); const [x,y] = pt(e), p = d.cur.p;
+      if(Math.abs(x-p[p.length-2])+Math.abs(y-p[p.length-1])<4) return; p.push(x,y);
+      const g = cv.getContext('2d'); g.strokeStyle = d.cur.c; g.lineWidth = d.cur.w; g.lineCap = 'round';
+      g.beginPath(); g.moveTo(p[p.length-4],p[p.length-3]); g.lineTo(x,y); g.stroke();
+      d.dirty = true; if(Date.now()-d.last>700){ d.last = Date.now(); dgFlush(); } };
+    cv.onpointerup = cv.onpointercancel = ()=>{ if(d.cur){ d.cur = null; d.dirty = true; dgFlush(); } };
+  } else { const S = room.dgS; if(S && S.k===k){ state._dgSig = ''; dgPaint(cv, S.s); dgLive(room); } else dgPaint(cv, []); }
+  const gid = D.gid, t = D.t;
+  state._dgTimer = setInterval(()=>{
+    const el = (Date.now()-D.startedAt)/1000, left = Math.max(0, Math.ceil(DG_DUR-el));
+    const tm = document.getElementById('dg-time'), br = document.getElementById('dg-bar'), h = document.getElementById('dg-hint');
+    if(tm) tm.textContent = left; if(br) br.style.width = (left/DG_DUR*100)+'%';
+    if(h && !me) h.textContent = dgHint(D);
+    if(left<=0){ clearInterval(state._dgTimer); doRoomDgForce(gid,t); }
+  }, 400);
+}
+function renderRoomDg(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate(DG_TITLE, room);
+  if(room.status==='waiting' || !room.dg) return roomHead(DG_TITLE, room) + renderRoomDgLobby(room);
+  const D = room.dg, ps = room.players||[], dr = D.order[D.t], me = dr===state.pid;
+  const amPlayer = ps.some(p=>p.id===state.pid);
+  const head = roomHead(DG_TITLE, room);
+  setTimeout(dgSetup, 0);
+  if(D.finished){
+    const w = dgWinner(room), sorted = ps.slice().sort((a,b)=>(D.scores[b.id]||0)-(D.scores[a.id]||0));
+    const title = w==='draw' ? '🤝 تعادل!' : (w===state.pid ? '🎉 انت رسام ومخمّن العصر!' : `🏆 ${escapeHtml(stName(room,w))} كسب`);
+    return `${head}<div class="xo-status">${title}</div><div style="margin-top:14px;">${sorted.map((p,i)=>`<div class="quiz-lb-row"><span class="quiz-lb-rank">#${i+1}</span>${gameAvatar(p.id)}<span class="quiz-lb-name">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}</span><b>${D.scores[p.id]||0}</b></div>`).join('')}</div>${nextProBtn('room-dg-next').replace('data-action="room-dg-next"','data-action="room-dg-next" data-r="fin"')}`;
+  }
+  const info = `<div class="quiz-score-row" id="dg-scores">${dgScoresHtml(room)}</div><div class="hint" style="text-align:center;margin:2px 0 6px;">دور ${D.t+1}/${D.total} • الرسام: ${escapeHtml(stName(room,dr))}${me?' (انت)':''}</div>`;
+  if(D.phase==='pick'){
+    return `${head}${info}<div class="xo-status">${me ? '🎨 اختار كلمة ترسمها' : '⏳ '+escapeHtml(stName(room,dr))+' بيختار كلمة...'}</div>` +
+      (me ? D.opts.map((w,i)=>`<button type="button" class="btn btn-primary" style="width:100%;margin-top:10px;" data-action="room-dg-pick" data-i="${i}">${escapeHtml(w)}</button>`).join('') : '');
+  }
+  if(D.phase==='reveal' && D.last){
+    const L = D.last, rows = ps.slice().sort((a,b)=>(L.gains[b.id]||0)-(L.gains[a.id]||0)).map(p=>`<div class="st-res-row${L.gains[p.id]&&p.id!==L.drawer?' first':''}">${gameAvatar(p.id)}<div class="st-res-main"><div class="st-res-name">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}${p.id===L.drawer?' 🎨':''}</div></div><div class="st-res-pts">+${L.gains[p.id]||0}</div></div>`).join('');
+    return `${head}${info}<div class="st-target"><small>الكلمة كانت</small><b>${escapeHtml(L.word)}</b></div><div style="margin-top:12px;">${rows}</div>${nextProBtn('room-dg-next').replace('data-action="room-dg-next"',`data-action="room-dg-next" data-r="${D.t}"`)}`;
+  }
+  const k = D.gid+'-'+D.t;
+  if(me && (!state.dgD || state.dgD.k!==k)) state.dgD = {k, strokes:[], cur:null, color:DG_COLORS[0], size:6, dirty:false, last:0};
+  const d = state.dgD || {};
+  const tools = me ? `<div class="dg-tools">${DG_COLORS.map(c=>`<button type="button" class="dg-sw${d.color===c?' on':''}" style="background:${c}" data-action="room-dg-tool" data-t="color" data-v="${c}"></button>`).join('')}
+      ${[3,6,12].map(s=>`<button type="button" class="dg-sz${d.size===s?' on':''}" data-action="room-dg-tool" data-t="size" data-v="${s}"><i style="width:${s+4}px;height:${s+4}px"></i></button>`).join('')}
+      <button type="button" class="dg-sz" data-action="room-dg-tool" data-t="undo">↩️</button><button type="button" class="dg-sz" data-action="room-dg-tool" data-t="clear">🗑️</button></div>` : '';
+  const guessBox = (!me && amPlayer) ? (D.correct[state.pid]!=null ? `<div class="xo-status">✅ جاوبت صح! +${D.correct[state.pid]}</div>`
+    : `<div style="display:flex;gap:8px;margin-top:8px;"><input class="field fh-input" id="dg-guess" maxlength="20" autocomplete="off" placeholder="خمّن الرسمة..." style="flex:1;"/><button type="button" class="btn btn-primary" data-action="room-dg-guess">خمّن</button></div>`) : '';
+  return `${head}${info}<div class="dg-timer"><div id="dg-bar" style="width:${Math.max(0,100-(Date.now()-D.startedAt)/(DG_DUR*10))}%"></div><span id="dg-time">${DG_DUR}</span></div>
+    <div class="dg-word" id="dg-hint">${me ? '✏️ ارسم: '+escapeHtml(D.word) : dgHint(D)}</div>
+    <canvas id="dg-cv" class="dg-cv" width="1000" height="750"></canvas>${tools}${guessBox}<div class="dg-feed" id="dg-feed">${dgFeedHtml(room)}</div>`;
+}
+/* ================= المعركة البحرية — 1 ضد 1: رتّب أسطولك سرًا وحاول تغرّق أسطول صاحبك، والإصابة بتدّيك دور تاني ================= */
+const BS_TITLE = 'المعركة البحرية', BS_N = 8, BS_SHIPS = [4,3,3,2];
+function bsRand(){
+  const used = new Set(), ships = [];
+  BS_SHIPS.forEach(len=>{
+    for(let tries=0; tries<500; tries++){
+      const h = Math.random()<.5, r = Math.floor(Math.random()*(h?BS_N:BS_N-len+1)), c = Math.floor(Math.random()*(h?BS_N-len+1:BS_N));
+      const cells = []; for(let k=0;k<len;k++) cells.push(h ? r*BS_N+c+k : (r+k)*BS_N+c);
+      const near = cells.some(i=>[-9,-8,-7,-1,0,1,7,8,9].some(d=>used.has(i+d) && Math.abs((i+d)%BS_N-i%BS_N)<=1));
+      if(near) continue;
+      cells.forEach(i=>used.add(i)); ships.push(cells); break;
+    }
+  });
+  return ships;
+}
+function bsNew(){ return { gid:Date.now()+'-'+Math.floor(Math.random()*1e6), phase:'place', turn:null, sh:{}, last:null, winner:null, finished:false }; }
+function bsKey(room, pid){ return room.players[0].id===pid ? 'bsA' : 'bsB'; }
+function bsFleet(room, pid){ return room[bsKey(room,pid)] || null; }
+function bsOpp(room){ return room.players.find(p=>p.id!==state.pid); }
+function renderRoomBsLobby(room){
+  const ps = room.players||[], isHost = room.hostId===state.pid;
+  const slots = [0,1].map(i=>{ const p = ps[i];
+    return p ? `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`
+      : `<div class="uno-lobby-row empty"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار خصم</em></span></div>`; }).join('');
+  return `<div class="room-waiting">${roomCodeCard(room.code, room.game)}
+    <div class="hint" style="text-align:center;margin:14px 0 10px;">⚓ 1 ضد 1 — رتّب أسطولك سرًا وغرّق أسطول صاحبك. الإصابة بتدّيك دور تاني!</div>
+    <div class="uno-lobby-list">${slots}</div>
+    ${isHost ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-bs-start" ${ps.length<2?'disabled':''}>⚓ ابدأ المعركة</button>` : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ</div>`}</div>`;
+}
+async function doRoomBsStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='battleship' || room.hostId!==state.pid || room.status!=='waiting') return;
+  if((room.players||[]).length<2){ showToast('محتاج خصم الأول', true); return; }
+  room.bs = bsNew(); room.bsA = null; room.bsB = null; room.status = 'playing'; state.bsDraft = null;
+  roomTouch(room); await saveGameRooms(GAME_ROOMS); try{ SND.coinChime(); }catch(e){} render();
+}
+function doRoomBsReroll(){ state.bsDraft = {gid:state.bsDraft&&state.bsDraft.gid, ships:bsRand()}; try{ SND.click(); }catch(e){} render(); }
+async function doRoomBsReady(){
+  const room0 = GAME_ROOMS[state.roomCode]; if(!room0 || !room0.bs || !state.bsDraft) return;
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode], D = room && room.bs;
+  if(!D || D.phase!=='place' || !room.players.some(p=>p.id===state.pid)) return;
+  room[bsKey(room,state.pid)] = state.bsDraft.ships;
+  if(room.bsA && room.bsB){ D.phase = 'fire'; D.turn = room.players[Math.floor(Math.random()*2)].id; }
+  roomTouch(room); await saveGameRooms(GAME_ROOMS); try{ SND.click(); }catch(e){} render();
+}
+async function doRoomBsFire(i){
+  i = +i;
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode], D = room && room.bs;
+  if(!D || D.phase!=='fire' || D.turn!==state.pid) return;
+  const opp = bsOpp(room), fl = bsFleet(room, opp.id); if(!fl) return;
+  D.sh[state.pid] = D.sh[state.pid] || [];
+  if(D.sh[state.pid].includes(i)) return;
+  D.sh[state.pid].push(i);
+  const ship = fl.find(s=>s.includes(i)), hit = !!ship, sunk = hit && ship.every(c=>D.sh[state.pid].includes(c));
+  D.last = {by:state.pid, i, hit, sunk};
+  if(fl.every(s=>s.every(c=>D.sh[state.pid].includes(c)))){ D.phase = 'end'; D.finished = true; D.winner = state.pid; }
+  else if(!hit) D.turn = opp.id;
+  roomTouch(room); await saveGameRooms(GAME_ROOMS);
+  try{ hit ? (vibrate(sunk?[40,40,80]:30), SND.coinChime()) : SND.click(); }catch(e){}
+  render(); if(D.winner===state.pid) launchConfetti();
+}
+async function doRoomBsNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.bs || !room.bs.finished) { render(); return; }
+  room.bs = bsNew(); room.bsA = null; room.bsB = null; state.bsDraft = null;
+  roomTouch(room); await saveGameRooms(GAME_ROOMS); render();
+}
+function bsGrid(cls, cellFn){
+  let h = `<div class="bs-grid ${cls}">`;
+  for(let i=0;i<BS_N*BS_N;i++){ const c = cellFn(i); h += `<button type="button" class="bs-c ${c[0]}" ${c[2]||'disabled'}>${c[1]||''}</button>`; }
+  return h + '</div>';
+}
+function renderRoomBs(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate(BS_TITLE, room);
+  if(room.status==='waiting' || !room.bs) return roomHead(BS_TITLE, room) + renderRoomBsLobby(room);
+  const D = room.bs, head = roomHead(BS_TITLE, room), ps = room.players||[];
+  const amPlayer = ps.some(p=>p.id===state.pid), opp = ps.find(p=>p.id!==state.pid) || ps[1];
+  const mine = bsFleet(room, state.pid), theirs = opp ? bsFleet(room, opp.id) : null;
+  const myShots = (D.sh[state.pid]||[]), oppShots = (opp && D.sh[opp.id])||[];
+  if(D.phase==='place'){
+    if(!state.bsDraft || state.bsDraft.gid!==D.gid) state.bsDraft = {gid:D.gid, ships:mine||bsRand()};
+    const cells = new Set([].concat(...state.bsDraft.ships));
+    return `${head}<div class="xo-status">${mine ? '✅ أسطولك جاهز — استنى الخصم...' : '🚢 رتّب أسطولك'}</div>
+      ${bsGrid('mine', i=>[cells.has(i)?'ship':'',''])}
+      ${mine ? '' : `<div style="display:flex;gap:10px;margin-top:12px;"><button type="button" class="btn btn-ghost" style="flex:1;" data-action="room-bs-reroll">🎲 ترتيب تاني</button><button type="button" class="btn btn-primary" style="flex:1;" data-action="room-bs-ready">✅ جاهز</button></div>`}`;
+  }
+  const myTurn = D.turn===state.pid && D.phase==='fire' && amPlayer;
+  const sunkCells = new Set(); if(theirs) theirs.forEach(s=>{ if(s.every(c=>myShots.includes(c))) s.forEach(c=>sunkCells.add(c)); });
+  const enemy = bsGrid('enemy', i=>{
+    const shot = myShots.includes(i), hit = shot && theirs && theirs.some(s=>s.includes(i));
+    if(sunkCells.has(i)) return ['sunk','☠️'];
+    if(shot) return [hit?'hit':'miss', hit?'💥':'•'];
+    return ['', '', myTurn ? `data-action="room-bs-fire" data-i="${i}"` : 'disabled'];
+  });
+  const mineSet = new Set(mine ? [].concat(...mine) : []);
+  const home = bsGrid('mine small', i=>{ const s = oppShots.includes(i), sh = mineSet.has(i);
+    return [sh?'ship':'' , s ? (sh?'💥':'•') : '']; });
+  const L = D.last, lastTxt = L ? `${L.by===state.pid?'انت':escapeHtml(stName(room,L.by))} ${L.sunk?'غرّق سفينة! 🔥':(L.hit?'أصاب! 💥':'ضرب في الميّه 🌊')}` : '';
+  let status = D.finished ? (D.winner===state.pid ? '🎉 غرّقت أسطول الخصم — كسبت!' : `🏆 ${escapeHtml(stName(room,D.winner))} كسب المعركة`) : (myTurn ? '🎯 دورك — اضرب!' : `⏳ دور ${escapeHtml(stName(room,D.turn))}`);
+  return `${head}<div class="xo-status">${status}</div><div class="hint" style="text-align:center;min-height:20px;">${lastTxt}</div>
+    <div class="bs-lbl">أسطول ${escapeHtml(opp?opp.name:'الخصم')}</div>${enemy}<div class="bs-lbl">أسطولك</div>${home}
+    ${D.finished ? nextProBtn('room-bs-next') : ''}`;
+}
 /* ================= إجابة فريدة — لعبة جماعية (2-4 لاعبين): الجهاز بيطلب حاجة من فئة، واللي إجابته تتطابق مع حد غيره يتقصى ================= */
 /* كل جولة فئة جديدة (اسم فنان، ماركة هدوم...) والكل بيكتب إجابته في 25 ثانية — الإجابة المتطابقة بين لاعبين بتتقصى،
    واللي إجابته مختلفة ياخد نقطة. الجولات مفتوحة من غير عدد محدد، وصاحب الغرفة بيقفل اللعبة وقت ما يحب */
@@ -30339,7 +30707,7 @@ function renderAdminHub(){
   const pendingR = REPORTS.filter(r=>!r.resolved).length;
   const pendingQ = QUESTIONS.filter(q=>!q.answered).length;
   const pendingCC = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
-  const badgeOf = tab => tab==='questions' ? pendingQ : tab==='reports' ? pendingR : tab==='trash' ? TRASH.length : tab==='cardshop' ? pendingCC : 0;
+  const badgeOf = tab => tab==='mymeeting' ? (window.myMeetingPending?window.myMeetingPending():0) : tab==='askfather' ? (window.askFatherPending?window.askFatherPending():0) : tab==='questions' ? pendingQ : tab==='reports' ? pendingR : tab==='trash' ? TRASH.length : tab==='cardshop' ? pendingCC : 0;
   const tile = it=>{
     const b = badgeOf(it.tab);
     return `<button type="button" class="admin-hub-tile adm3-tile" data-action="admin-hub-tile" data-tab="${it.tab}" data-search="${escapeHtml((it.label+' '+(it.desc||'')+' '+(it.short||'')).toLowerCase())}">
@@ -30416,6 +30784,8 @@ function adminInDetailView(){
     || (t==='attendance' && state.attNav && (state.attNav.type || state.attNav.page==='addtype'));
 }
 function adminPendingBadge(tab){
+  if(tab==='askfather') return window.askFatherPending ? window.askFatherPending() : 0;
+  if(tab==='mymeeting') return window.myMeetingPending ? window.myMeetingPending() : 0;
   if(tab==='questions') return QUESTIONS.filter(q=>!q.answered).length;
   if(tab==='reports') return REPORTS.filter(r=>!r.resolved).length;
   if(tab==='cardshop') return (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
@@ -31129,6 +31499,8 @@ function render(){
   else if(state.view==='room-fahmeen') html = renderRoomFh();
   else if(state.view==='room-placemem') html = renderRoomFs();
   else if(state.view==='room-fazzura') html = renderRoomFz();
+  else if(state.view==='room-drawguess') html = renderRoomDg();
+  else if(state.view==='room-battleship') html = renderRoomBs();
   else if(state.view==='settings') html = renderSettingsPage();
   else if(state.view==='attendance' || state.view==='attendance-scan') html = featureLockedForMe('attendance') ? renderMaintenancePage('الحضور','✅') : (state.view==='attendance' ? renderAttendancePage() : renderAttendanceScanPage());
   else if(state.view==='stay') html = renderStayPage();
@@ -33685,7 +34057,7 @@ function closeScanModal(){
 const NEXT_PRO_ACTIONS = new Set([
   'xo-reset','c4-reset','domino-reset','ludo-again','uno-next','room-uno-next',
   'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next',
-  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-st-next','room-ua-next','room-fh-next','room-fs-next','room-fz-next','pm-next',
+  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-st-next','room-ua-next','room-fh-next','room-fs-next','room-fz-next','room-dg-next','room-bs-next','pm-next',
   'chess-reset','ck-reset','bg-reset','snl-reset','room-snr-next'
 ]);
 const SPECTATE_BLOCKED_ACTIONS = new Set([
@@ -33701,6 +34073,8 @@ const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-pv-start','room-pv-pick','room-pv-next',
   'room-st-start','room-st-level','room-st-press','room-st-next',
   'room-ua-start','room-ua-submit','room-ua-next','room-ua-end',
+  'room-dg-start','room-dg-pick','room-dg-guess','room-dg-tool','room-dg-next',
+  'room-bs-start','room-bs-reroll','room-bs-ready','room-bs-fire','room-bs-next',
   'room-fh-start','room-fh-bet','room-fh-submit','room-fh-next',
   'room-fs-start','room-fs-pick','room-fs-next',
   'room-fz-start','room-fz-tile','room-fz-pick','room-fz-next','room-fz-end','room-fz-judge','room-fz-mode','room-fz-setjudge',
@@ -33716,6 +34090,7 @@ document.addEventListener('keydown', (e)=>{
     e.preventDefault();
     doRoomMysterySubmit();
   }
+  if(e.key==='Enter' && e.target && e.target.id==='dg-guess'){ e.preventDefault(); doRoomDgGuess(); return; }
   if(e.key==='Enter' && e.target && e.target.id==='ua-ans'){
     e.preventDefault();
     doRoomUaSubmit();
@@ -34123,6 +34498,16 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-ua-submit'){ doRoomUaSubmit(); }
   else if(action==='room-ua-next'){ doRoomUaNext(el.dataset.r); }
   else if(action==='room-ua-end'){ doRoomUaEnd(); }
+  else if(action==='room-dg-start'){ doRoomDgStart(); }
+  else if(action==='room-dg-pick'){ doRoomDgPick(el.dataset.i); }
+  else if(action==='room-dg-guess'){ doRoomDgGuess(); }
+  else if(action==='room-dg-tool'){ dgTool(el.dataset.t, el.dataset.v); }
+  else if(action==='room-dg-next'){ doRoomDgNext(el.dataset.r); }
+  else if(action==='room-bs-start'){ doRoomBsStart(); }
+  else if(action==='room-bs-reroll'){ doRoomBsReroll(); }
+  else if(action==='room-bs-ready'){ doRoomBsReady(); }
+  else if(action==='room-bs-fire'){ doRoomBsFire(el.dataset.i); }
+  else if(action==='room-bs-next'){ doRoomBsNext(); }
   else if(action==='room-fh-start'){ doRoomFhStart(); }
   else if(action==='room-fh-bet'){ doRoomFhBet(el.dataset.n); }
   else if(action==='room-fh-submit'){ doRoomFhSubmit(); }
@@ -44354,6 +44739,1054 @@ document.addEventListener('pointerup',function(){ endDrag(false); }); document.a
 var rsT=null; window.addEventListener('resize',function(){ clearTimeout(rsT); rsT=setTimeout(function(){ if(G&&G.phase==='play'&&ovEl()) draw(); },200); });
 window.openCrossMathGame=open;
 window.__cmGen=genPuzzle; window.__cmSolve=solveP; window.__cmLV=LV;
+})();
+</script>
+
+<style id="askfather-css">
+/* ===== اسأل أبونا ===== */
+.af-tabs{display:flex;gap:6px;margin:4px 0 14px}
+.af-tab{flex:1;appearance:none;font-family:inherit;font-weight:800;font-size:12.5px;padding:10px 6px;border-radius:14px;cursor:pointer;color:var(--text-muted);background:var(--surface);border:1.5px solid var(--border);position:relative}
+.af-tab.on{color:var(--gold);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 10%,var(--surface))}
+.af-dot{position:absolute;top:6px;inset-inline-start:8px;width:9px;height:9px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 3px color-mix(in srgb,var(--coral) 30%,transparent)}
+.af-form,.af-card{margin-bottom:12px}
+.af-lab{font-weight:800;font-size:13px;color:var(--text);margin:12px 0 6px;display:block}
+.af-lab:first-child{margin-top:0}
+.af-count{font-size:11px;color:var(--text-muted);text-align:left;margin-top:4px}
+.af-who{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.af-pill{appearance:none;font-family:inherit;text-align:center;font-weight:800;font-size:13.5px;padding:12px 8px;border-radius:16px;cursor:pointer;color:var(--text);background:var(--bg-2);border:1.5px solid var(--border);display:flex;flex-direction:column;gap:3px;align-items:center}
+.af-pill small{font-weight:600;font-size:11px;color:var(--text-muted)}
+.af-pill.on{border-color:var(--teal);background:color-mix(in srgb,var(--teal) 14%,var(--bg-2))}
+.af-hint{font-size:12px;color:var(--text-muted);line-height:1.7;margin-top:8px}
+.af-send{width:100%;margin-top:14px}
+.af-sim{margin-top:12px}
+.af-sim-t{font-size:12px;font-weight:800;color:var(--gold);margin-bottom:6px}
+.af-sim details{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:9px 12px;margin-bottom:6px}
+.af-sim summary{cursor:pointer;font-weight:700;font-size:12.5px;line-height:1.6}
+.af-sim details div{margin-top:8px;font-size:12.5px;line-height:1.8;color:var(--text-muted);white-space:pre-wrap}
+.af-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.af-head b{font-size:13.5px}
+.af-head small{color:var(--text-muted);font-size:11px}
+.af-chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.af-chip{font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;background:var(--bg-2);border:1px solid var(--border);color:var(--text-muted)}
+.af-chip.wait{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 50%,transparent)}
+.af-chip.ok{color:var(--good);border-color:color-mix(in srgb,var(--good) 50%,transparent)}
+.af-chip.hot{color:#fff;background:var(--coral);border-color:var(--coral)}
+.af-q{font-size:14px;line-height:1.9;white-space:pre-wrap;word-break:break-word;margin:6px 0}
+.af-a{margin-top:10px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--violet) 22%,var(--surface)),color-mix(in srgb,var(--gold) 14%,var(--surface)));border:1px solid color-mix(in srgb,var(--gold) 35%,transparent)}
+.af-a-l{font-size:11.5px;font-weight:900;color:var(--gold);margin-bottom:5px}
+.af-a-t{font-size:13.5px;line-height:1.9;white-space:pre-wrap;word-break:break-word}
+.af-card.urgent{border-color:var(--coral)}
+.af-starters{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 6px}
+.af-st{appearance:none;font-family:inherit;font-size:11.5px;font-weight:700;padding:6px 11px;border-radius:99px;cursor:pointer;color:var(--text);background:var(--bg-2);border:1px dashed var(--border)}
+.af-chk{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.7;margin:10px 0;cursor:pointer}
+.af-chk input{margin-top:4px}
+.af-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.af-acts .btn{flex:1;min-width:120px}
+.af-link{appearance:none;background:none;border:none;font-family:inherit;font-size:12px;color:var(--text-muted);cursor:pointer;text-decoration:underline;padding:4px 0;margin-top:6px}
+.af-modal{position:fixed;inset:0;z-index:10200;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(8,7,28,.72);animation:afFade .25s both}
+.af-mc{width:100%;max-width:380px;border-radius:26px;padding:24px 20px 18px;text-align:center;background:linear-gradient(160deg,var(--surface-2),var(--bg-2));border:1.5px solid color-mix(in srgb,var(--gold) 45%,transparent);box-shadow:0 24px 60px -20px rgba(0,0,0,.7);animation:afPop .45s cubic-bezier(.34,1.5,.5,1) both}
+.af-mi{font-size:56px;line-height:1;animation:afFloat 2.6s ease-in-out infinite}
+.af-mt{font-weight:900;font-size:18px;margin:10px 0 6px;color:var(--text)}
+.af-ms{font-size:13px;line-height:1.8;color:var(--text-muted);margin-bottom:10px;white-space:pre-wrap;word-break:break-word}
+.af-mq{font-size:12px;color:var(--text-muted);border-inline-start:3px solid var(--violet);padding:2px 10px;margin:8px 0;text-align:start}
+.af-mb{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+@keyframes afFade{from{opacity:0}to{opacity:1}}
+@keyframes afPop{from{opacity:0;transform:scale(.8) translateY(14px)}to{opacity:1;transform:none}}
+@keyframes afFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@media (prefers-reduced-motion:reduce){.af-modal,.af-mc,.af-mi{animation:none !important}}
+</style>
+<script id="askfather-module">
+/* ===== اسأل أبونا: المشارك يسأل (باسمه أو من غير اسم) → الأدمن يجاوب → المشارك ياخد رد فوري ===== */
+(function(){
+'use strict';
+if(window.__askFather) return; window.__askFather = 1;
+
+var KEY = 'glavera-ask-father-v1';
+var MAX_LEN = 700, MAX_OPEN = 5;
+var A = {list:[], t:0, p:null, sig:'', tab:'ask', anon:false, draft:'', busy:false};
+var shown = {}, nat = {}, simT = null;
+var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+var meP = function(){ return PARTICIPANTS.find(function(x){ return x.id===state.pid; }); };
+var toast = function(m, err){ try{ showToast(m, !!err); }catch(e){} };
+
+/* ---------- تخزين مشترك (Firebase) ---------- */
+async function jget(){
+  try{
+    var r = await window.storage.get(KEY, true);
+    if(!r || r.value==null) return null;
+    var o = typeof r.value==='string' ? JSON.parse(r.value) : r.value;
+    return (o && Array.isArray(o.list)) ? o : {list:[]};
+  }catch(e){ return null; }
+}
+function jupd(fn){
+  try{
+    return window.storage.update(KEY, function(cur){
+      var o = null;
+      try{ o = cur ? (typeof cur==='string' ? JSON.parse(cur) : cur) : null; }catch(e){}
+      if(!o || !Array.isArray(o.list)) o = {list:[]};
+      return JSON.stringify(fn(o) || o);
+    }, true);
+  }catch(e){ return Promise.resolve(null); }
+}
+function relevant(){
+  return state.view==='askfather' || (state.view==='admin' && state.adminUnlocked && state.adminTab==='askfather');
+}
+function softRender(){
+  var a = document.activeElement;
+  if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return;
+  if(document.querySelector('.af-modal')) return;
+  try{ render(); }catch(e){}
+}
+async function doLoad(){
+  try{
+    var o = await jget();
+    if(!o){ if(A.list.length) return; o = {list:[]}; }
+    var sig = JSON.stringify(o.list), ch = sig!==A.sig;
+    A.list = o.list; A.sig = sig; A.t = Date.now();
+    if(ch){ checkAnswered(); if(relevant()) softRender(); }
+  }catch(e){ console.error('askfather load', e); }
+}
+function load(force){
+  if(!force && Date.now()-A.t < 20000) return Promise.resolve();
+  if(A.p) return force ? A.p.then(function(){ return doLoad(); }) : A.p;
+  A.p = doLoad().then(function(){ A.p = null; }); return A.p;
+}
+function pendingCount(){ return A.list.filter(function(q){ return q.status!=='answered'; }).length; }
+window.askFatherPending = pendingCount;
+
+/* ---------- الذكاء: تصنيف السؤال + كشف الحالات اللي محتاجة متابعة شخصية ---------- */
+function norm(s){ return ' '+String(s||'').replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase()+' '; }
+var CATS = [
+  {id:'prayer',   ic:'🕯️', n:'صلاة وصوم',          w:['صلاه','صلي','صوم','صايم','صيام','انقطاع','تسبح','قداس','تناول','مزمور','اجبيه','طقس','بخور','ميطانيه']},
+  {id:'confess',  ic:'🤍', n:'اعتراف وتوبة',        w:['اعتراف','توبه','خطيه','خطايا','ذنب','تايب','سقطه','غفران','اب اعتراف']},
+  {id:'bible',    ic:'📖', n:'كتاب مقدس وعقيدة',    w:['انجيل','كتاب مقدس','اصحاح','لاهوت','عقيده','ثالوث','طبيعه','تجسد','سرائر','قديس','عذراء','بدعه','تفسير','معني ايه']},
+  {id:'rel',      ic:'👨‍👩‍👧', n:'علاقات وأسرة',       w:['خطوبه','جواز','ارتباط','حب ','بنت ','شاب ','اهلي','بابا','ماما','اخويا','اختي','صاحبي','صحابي','زعل','خناقه','مشكله مع','زميل','طلاق']},
+  {id:'life',     ic:'🎓', n:'دراسة وشغل ومستقبل',  w:['دراسه','امتحان','كليه','جامعه','مذاكره','شغل','وظيفه','مستقبل','سفر','قرار','اختيار','تخرج','مرتب']},
+  {id:'struggle', ic:'🌧️', n:'ضعف وصراع روحي',      w:['فتور','ملل','شك ','ضعف','مش قادر','محبط','احباط','حزين','حزن','قلق','خايف','خوف','وحيد','وحده','تعبان','ياس','ضايق','تشتت','ادمان','عاده']}
+];
+var OTHER = {id:'other', ic:'💬', n:'سؤال عام'};
+var URGENT = ['انتحر','اموت نفسي','اقتل نفسي','اذي نفسي','مش عايز اعيش','عايز اموت','نفسي اموت','اكتئاب','مكتئب','مش قادر اكمل','مفيش امل','تحرش','اعتداء','بيضربني','بتضربني','اغتصاب','ابتزاز','بيهددني','مخدرات','ادمان'];
+function catOf(id){ return CATS.find(function(c){ return c.id===id; }) || OTHER; }
+function analyze(text){
+  var t = norm(text), best = OTHER, bs = 0;
+  CATS.forEach(function(c){
+    var s = 0; c.w.forEach(function(w){ if(t.indexOf(w)>-1) s++; });
+    if(s>bs){ bs = s; best = c; }
+  });
+  var urgent = URGENT.some(function(w){ return t.indexOf(w)>-1; });
+  return {cat:best, urgent:urgent};
+}
+var STOP = ' في من على الى الي عن مع هل ايه ازاي ليه انا انت هو هي مش ده دي دا ان كان كل لو بس يا ممكن عايز عاوز اللي ';
+function tokens(text){
+  return norm(text).split(/[^\u0600-\u06FFa-z0-9]+/).filter(function(w){ return w.length>=3 && STOP.indexOf(' '+w+' ')<0; });
+}
+function similar(text){
+  var tk = tokens(text); if(tk.length<2) return [];
+  return pubList().map(function(q){
+    var set = tokens(q.text), n = 0;
+    tk.forEach(function(w){ if(set.indexOf(w)>-1) n++; });
+    return {q:q, n:n};
+  }).filter(function(x){ return x.n>=2; }).sort(function(a,b){ return b.n-a.n; }).slice(0,2).map(function(x){ return x.q; });
+}
+function snip(s, n){ s = String(s||'').replace(/\s+/g,' ').trim(); return s.length>n ? s.slice(0,n-1)+'…' : s; }
+
+/* ---------- قوائم ---------- */
+function mine(){ return A.list.filter(function(q){ return String(q.pid)===String(state.pid); }).sort(function(a,b){ return b.ts-a.ts; }); }
+function pubList(){ return A.list.filter(function(q){ return q.pub && q.status==='answered' && q.answer; }).sort(function(a,b){ return (b.answeredAt||0)-(a.answeredAt||0); }); }
+function whoLabel(q){ return q.anon ? '🕶️ مجهول' : ('👤 '+esc(q.name||'—')); }
+
+/* ---------- صفحة المشارك ---------- */
+function head(){
+  return '<div class="back-row"><button class="icon-btn" data-action="back">'+ICO.back+'</button><div class="back-title">اسأل أبونا</div></div>'
+    + '<div class="opinion-hero"><div class="opinion-hero-ico">🙏</div><div class="opinion-hero-title">اسأل أبونا</div>'
+    + '<div class="opinion-hero-sub">اكتب سؤالك براحتك — هيوصل لأبونا والخدام، وتقدر تخفي اسمك لو حابب</div></div>';
+}
+function tabsHtml(){
+  var my = mine(), unread = my.filter(function(q){ return q.status==='answered' && !q.seen; }).length;
+  var b = function(id, label, dot){ return '<button type="button" class="af-tab '+(A.tab===id?'on':'')+'" data-af="tab" data-v="'+id+'">'+label+(dot?'<span class="af-dot"></span>':'')+'</button>'; };
+  return '<div class="af-tabs">'+b('ask','✍️ اسأل')+b('mine','📬 أسئلتي'+(my.length?' ('+my.length+')':''), unread>0)+b('pub','📖 أجوبة للجميع')+'</div>';
+}
+function whoHint(){
+  var p = meP();
+  return A.anon ? 'اسمك هيتخفي — أبونا والخدام هيشوفوا «مجهول» بس، وهتوصلك الإجابة هنا في التطبيق.'
+                : 'هيظهر اسمك ('+esc(p?p.name:'')+') لأبونا والخدام.';
+}
+function askTab(){
+  var p = meP();
+  return '<div class="card af-form">'
+    + '<label class="af-lab" for="af-text">سؤالك</label>'
+    + '<textarea id="af-text" class="field" rows="5" maxlength="'+MAX_LEN+'" placeholder="اكتب سؤالك هنا…">'+esc(A.draft)+'</textarea>'
+    + '<div class="af-count"><span id="af-cnt">'+A.draft.length+'</span>/'+MAX_LEN+'</div>'
+    + '<span class="af-lab">تحب سؤالك يوصل إزاي؟</span>'
+    + '<div class="af-who">'
+    +   '<button type="button" class="af-pill '+(A.anon?'':'on')+'" data-af="who" data-v="name">👤 باسمي<small>'+esc(p?p.name.split(' ')[0]:'')+'</small></button>'
+    +   '<button type="button" class="af-pill '+(A.anon?'on':'')+'" data-af="who" data-v="anon">🕶️ من غير اسم<small>هيظهر «مجهول»</small></button>'
+    + '</div>'
+    + '<div class="af-hint" id="af-whohint">'+whoHint()+'</div>'
+    + '<div class="af-sim" id="af-sim"></div>'
+    + '<button type="button" class="btn btn-primary af-send" data-af="send">📨 ابعت السؤال</button>'
+    + '</div>';
+}
+function statusChip(q){ return q.status==='answered' ? '<span class="af-chip ok">✅ جاوب أبونا</span>' : '<span class="af-chip wait">⏳ مستني الرد</span>'; }
+function mineTab(){
+  var my = mine();
+  if(!my.length) return '<div class="empty-note">لسه ما بعتّش أسئلة — اكتب أول سؤال من تاب «اسأل» ✍️</div>';
+  return my.map(function(q){
+    var c = catOf(q.cat);
+    return '<div class="card af-card">'
+      + '<div class="af-head"><span>'+statusChip(q)+'</span><small>'+timeAgoAr(q.ts)+'</small></div>'
+      + '<div class="af-chips"><span class="af-chip">'+c.ic+' '+c.n+'</span><span class="af-chip">'+(q.anon?'🕶️ من غير اسم':'👤 باسمك')+'</span>'+(q.pub?'<span class="af-chip ok">📖 منشور للكل</span>':'')+'</div>'
+      + '<div class="af-q">'+esc(q.text)+'</div>'
+      + (q.status==='answered'
+          ? '<div class="af-a"><div class="af-a-l">🙏 رد أبونا · '+timeAgoAr(q.answeredAt||q.ts)+'</div><div class="af-a-t">'+esc(q.answer)+'</div></div>'
+          : '<button type="button" class="af-link" data-af="withdraw" data-id="'+esc(q.id)+'">سحب السؤال</button>')
+      + '</div>';
+  }).join('');
+}
+function pubTab(){
+  var L = pubList();
+  if(!L.length) return '<div class="empty-note">لسه مفيش أسئلة اتنشرت — لما أبونا ينشر إجابات هتلاقيها هنا 📖</div>';
+  return L.map(function(q){
+    var c = catOf(q.cat);
+    return '<div class="card af-card">'
+      + '<div class="af-head"><b>'+whoLabel(q)+'</b><small>'+timeAgoAr(q.answeredAt||q.ts)+'</small></div>'
+      + '<div class="af-chips"><span class="af-chip">'+c.ic+' '+c.n+'</span></div>'
+      + '<div class="af-q">'+esc(q.text)+'</div>'
+      + '<div class="af-a"><div class="af-a-l">🙏 رد أبونا</div><div class="af-a-t">'+esc(q.answer)+'</div></div>'
+      + '</div>';
+  }).join('');
+}
+window.FXVIEWS = window.FXVIEWS || {};
+window.FXVIEWS.askfather = function(){
+  load(false);
+  var body = A.tab==='mine' ? mineTab() : A.tab==='pub' ? pubTab() : askTab();
+  if(A.tab==='mine') setTimeout(markSeenMine, 400);
+  if(A.tab==='ask') setTimeout(updateSim, 50);
+  return head() + tabsHtml() + body;
+};
+
+/* ---------- صفحة الأدمن ---------- */
+var STARTERS = [
+  'ربنا يباركك على سؤالك الجميل 🙏\n\n',
+  'سؤال مهم، وأحب نتكلم فيه وجهًا لوجه — كلّمني بعد الاجتماع.\n\n',
+  'صلواتي معاك، وربنا يدبّر الأمور للأفضل 🤍',
+  'أنا حاسس بيك، وعايزك تعرف إنك مش لوحدك. تعالى نتكلم شخصيًا في أقرب وقت، وكلّمني أو كلّم خادمك.\n\n'
+];
+function adminCard(q){
+  var c = catOf(q.cat), done = q.status==='answered', hot = q.urgent && !done;
+  var h = '<div class="card af-card '+(hot?'urgent':'')+'">'
+    + '<div class="af-head"><b>'+whoLabel(q)+'</b><small>'+timeAgoAr(q.ts)+'</small></div>'
+    + '<div class="af-chips"><span class="af-chip">'+c.ic+' '+c.n+'</span>'+(q.urgent?'<span class="af-chip hot">🔴 يحتاج متابعة شخصية</span>':'')+(done?'<span class="af-chip ok">✅ اتجاوب</span>':'<span class="af-chip wait">⏳ جديد</span>')+(q.pub?'<span class="af-chip ok">📖 منشور</span>':'')+'</div>'
+    + '<div class="af-q">'+esc(q.text)+'</div>';
+  if(done){
+    h += '<div class="af-a"><div class="af-a-l">ردّك · '+timeAgoAr(q.answeredAt||q.ts)+(q.seen?' · السائل شافه 👀':'')+'</div><div class="af-a-t">'+esc(q.answer)+'</div></div>'
+      + '<div class="af-acts"><button type="button" class="btn btn-ghost" data-af="pubtoggle" data-id="'+esc(q.id)+'">'+(q.pub?'🙈 شيله من المنشور':'📖 انشره للكل')+'</button>'
+      + '<button type="button" class="btn btn-ghost" style="color:var(--danger)" data-af="del" data-id="'+esc(q.id)+'">🗑️ حذف</button></div>';
+  } else {
+    var picks = q.urgent ? [3,1,2] : [0,1,2];
+    h += '<div class="af-starters">'+picks.map(function(i){ return '<button type="button" class="af-st" data-af="starter" data-id="'+esc(q.id)+'" data-v="'+i+'">'+esc(snip(STARTERS[i],28))+'</button>'; }).join('')+'</div>'
+      + '<textarea id="af-ans-'+esc(q.id)+'" class="field" rows="4" maxlength="2000" placeholder="اكتب إجابتك…"></textarea>'
+      + '<label class="af-chk"><input type="checkbox" id="af-pub-'+esc(q.id)+'"><span>📖 انشر السؤال والإجابة للكل ('+(q.anon?'السائل اختار «مجهول»':'هيظهر باسم السائل')+')</span></label>'
+      + '<div class="af-acts"><button type="button" class="btn btn-primary" data-af="answer" data-id="'+esc(q.id)+'">📨 ابعت الإجابة</button>'
+      + '<button type="button" class="btn btn-ghost" style="color:var(--danger)" data-af="del" data-id="'+esc(q.id)+'">🗑️ حذف</button></div>';
+  }
+  return h + '</div>';
+}
+window.FXADMIN = window.FXADMIN || {};
+window.FXADMIN.askfather = function(){
+  load(false);
+  var L = A.list.slice();
+  var pend = L.filter(function(q){ return q.status!=='answered'; });
+  var done = L.filter(function(q){ return q.status==='answered'; });
+  var hot = pend.filter(function(q){ return q.urgent; });
+  var kp = adminKpis([{num:pend.length, lab:'مستنية رد', cls:pend.length?'is-alert':''},{num:hot.length, lab:'محتاجة متابعة', cls:hot.length?'is-alert':''},{num:done.length, lab:'اتجاوبت'},{num:L.length, lab:'الكل'}]);
+  var f = adminSubGet('askfather','new');
+  var tabs = adminSubTabs('askfather', [{id:'new', label:'🆕 جديدة ('+pend.length+')'},{id:'done', label:'✅ اتجاوبت ('+done.length+')'},{id:'all', label:'الكل'}], f);
+  var list = f==='done' ? done : f==='all' ? L : pend;
+  list = list.slice().sort(function(a,b){
+    if(f!=='done'){ var ua = (a.urgent&&a.status!=='answered')?1:0, ub = (b.urgent&&b.status!=='answered')?1:0; if(ua!==ub) return ub-ua; }
+    return f==='new' ? a.ts-b.ts : b.ts-a.ts;
+  });
+  if(!L.length) return kp + adminEmptyState('🙏','لسه محدش سأل','أسئلة المشاركين لأبونا هتظهر هنا — والأسئلة اللي من غير اسم هتظهر «مجهول»');
+  return kp + tabs + (list.map(adminCard).join('') || adminEmptyState('🎉','مفيش حاجة في القسم ده',''));
+};
+
+/* ---------- العمليات ---------- */
+async function send(){
+  if(A.busy) return;
+  var p = meP(); if(!p){ toast('سجّل دخولك الأول', true); return; }
+  var ta = document.getElementById('af-text');
+  var text = (ta ? ta.value : A.draft).trim();
+  if(text.length<5){ toast('اكتب سؤالك الأول (٥ حروف على الأقل)', true); return; }
+  await load(true);
+  var open = mine().filter(function(q){ return q.status!=='answered'; }).length;
+  if(open>=MAX_OPEN){ toast('عندك '+MAX_OPEN+' أسئلة لسه مستنية رد — استنى أبونا يجاوب عليهم الأول 🙏', true); return; }
+  var an = analyze(text);
+  var q = {id:'af'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), pid:p.id, name:A.anon?'':p.name, anon:!!A.anon, text:text.slice(0,MAX_LEN), cat:an.cat.id, urgent:an.urgent, ts:Date.now(), status:'pending'};
+  A.busy = true;
+  var res = await jupd(function(o){ if(!o.list.some(function(x){ return x.id===q.id; })) o.list.push(q); return o; });
+  A.busy = false;
+  if(!res){ toast('معرفناش نبعت السؤال — اتأكد من النت وجرّب تاني', true); return; }
+  A.draft = ''; A.tab = 'mine';
+  await load(true);
+  try{ SND.success(); }catch(e){}
+  ackModal(q, an);
+  try{ render(); }catch(e){}
+}
+async function answer(id){
+  var ta = document.getElementById('af-ans-'+id);
+  var txt = (ta ? ta.value : '').trim();
+  if(txt.length<2){ toast('اكتب الإجابة الأول', true); return; }
+  var pubEl = document.getElementById('af-pub-'+id), pub = !!(pubEl && pubEl.checked);
+  var claimed = false, target = null, qtext = '';
+  var res = await jupd(function(o){
+    claimed = false; target = null;
+    var q = o.list.find(function(x){ return x.id===id; });
+    if(q && q.status!=='answered'){ q.status='answered'; q.answer=txt; q.answeredAt=Date.now(); q.pub=pub; q.seen=false; claimed=true; target=q.pid; qtext=q.text; }
+    return o;
+  });
+  if(!res){ toast('معرفناش نحفظ الإجابة — اتأكد من النت وجرّب تاني', true); return; }
+  if(!claimed){ toast('السؤال ده اتجاوب قبل كده', true); await load(true); softRender(); return; }
+  try{ pushNotification(target, '🙏 أبونا جاوب على سؤالك: «'+snip(qtext,50)+'»', '🙏'); }catch(e){}
+  toast('اتبعتت الإجابة للسائل 🙏');
+  await load(true); try{ render(); }catch(e){}
+}
+function markSeen(ids){
+  if(!ids.length) return;
+  jupd(function(o){ o.list.forEach(function(q){ if(ids.indexOf(q.id)>-1) q.seen = true; }); return o; }).then(function(){ A.t = 0; });
+}
+function markSeenMine(){
+  if(state.view!=='askfather' || A.tab!=='mine') return;
+  var ids = mine().filter(function(q){ return q.status==='answered' && !q.seen; }).map(function(q){ return q.id; });
+  ids.forEach(function(i){ shown[i] = 1; });
+  markSeen(ids);
+}
+
+/* ---------- الرد الذكي: لما أبونا يجاوب، السائل ياخد نافذة فورية + إشعار ---------- */
+function openModal(html){
+  var o = document.createElement('div'); o.className = 'af-modal';
+  o.innerHTML = '<div class="af-mc">'+html+'</div>';
+  o.addEventListener('click', function(e){ if(e.target===o) o.remove(); });
+  document.body.appendChild(o);
+  setTimeout(function(){ if(o.parentNode) o.remove(); }, 60000);
+}
+function closeModal(){ var m = document.querySelector('.af-modal'); if(m) m.remove(); }
+function ackModal(q, an){
+  var c = an.cat;
+  var msg = 'وصل سؤالك لأبونا 🙏\nاتصنّف تحت «'+c.n+'» — وهتوصلك الإجابة هنا في التطبيق أول ما أبونا يرد.';
+  if(q.anon) msg += '\n\nاسمك مخفي: هيظهر «مجهول» لأبونا والخدام.';
+  if(an.urgent) msg += '\n\nلو محتاج تتكلم مع حد دلوقتي، كلّم أبونا أو أي خادم تثق فيه مباشرة، ومتفضلش لوحدك 🤍';
+  openModal('<div class="af-mi">'+(an.urgent?'🤍':'📨')+'</div><div class="af-mt">وصل سؤالك</div><div class="af-ms">'+esc(msg)+'</div>'
+    + '<div class="af-mb"><button type="button" class="btn btn-primary" data-af="modal-close">تمام</button></div>');
+}
+function answerModal(q, n){
+  openModal('<div class="af-mi">🙏</div><div class="af-mt">أبونا جاوب على سؤالك!</div>'
+    + '<div class="af-mq">'+esc(snip(q.text,110))+'</div>'
+    + '<div class="af-ms">'+esc(snip(q.answer,240))+'</div>'
+    + '<div class="af-mb"><button type="button" class="btn btn-primary" data-af="modal-open">📬 اقرأ الإجابة كاملة'+(n>1?' (+'+(n-1)+' كمان)':'')+'</button>'
+    + '<button type="button" class="btn btn-ghost" data-af="modal-close">بعدين</button></div>');
+  try{ if(navigator.vibrate) navigator.vibrate([30,40,30]); }catch(e){}
+  try{ SND.success(); }catch(e){}
+}
+function checkAnswered(){
+  if(!state.pid || state.adminUnlocked) return;
+  var fresh = A.list.filter(function(q){ return String(q.pid)===String(state.pid) && q.status==='answered' && !q.seen && !shown[q.id]; });
+  if(!fresh.length) return;
+  if(document.hidden){
+    var q0 = fresh[0];
+    if(!nat[q0.id] && typeof Notification!=='undefined' && Notification.permission==='granted'){
+      nat[q0.id] = 1;
+      try{ notifyNative('🙏 أبونا جاوب على سؤالك', snip(q0.answer,90), 'af-'+q0.id); }catch(e){}
+    }
+    return;
+  }
+  if(state.view==='askfather' && A.tab==='mine'){ fresh.forEach(function(q){ shown[q.id] = 1; }); markSeen(fresh.map(function(q){ return q.id; })); return; }
+  fresh.forEach(function(q){ shown[q.id] = 1; });
+  answerModal(fresh[0], fresh.length);
+  markSeen(fresh.map(function(q){ return q.id; }));
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden && state.pid){ load(true); } });
+
+/* ---------- أسئلة قريبة من اللي بيكتبه (من الأجوبة المنشورة) ---------- */
+function updateSim(){
+  var box = document.getElementById('af-sim'); if(!box) return;
+  var ta = document.getElementById('af-text');
+  var L = similar(ta ? ta.value : '');
+  box.innerHTML = L.length ? '<div class="af-sim-t">📖 أسئلة قريبة من سؤالك اتجاوب عليها قبل كده</div>'
+    + L.map(function(q){ return '<details><summary>'+esc(snip(q.text,90))+'</summary><div>'+esc(q.answer)+'</div></details>'; }).join('') : '';
+}
+
+/* ---------- الأحداث ---------- */
+document.addEventListener('input', function(e){
+  var t = e.target;
+  if(t && t.id==='af-text'){
+    A.draft = t.value;
+    var c = document.getElementById('af-cnt'); if(c) c.textContent = t.value.length;
+    clearTimeout(simT); simT = setTimeout(updateSim, 350);
+  }
+});
+document.addEventListener('click', function(e){
+  var el = e.target.closest && e.target.closest('[data-af]'); if(!el || el.disabled) return;
+  var a = el.dataset.af, id = el.dataset.id, v = el.dataset.v;
+  if(a==='tab'){ A.tab = v; try{ render(); }catch(x){} }
+  else if(a==='who'){
+    A.anon = (v==='anon');
+    document.querySelectorAll('.af-pill').forEach(function(b){ b.classList.toggle('on', (b.dataset.v==='anon')===A.anon); });
+    var h = document.getElementById('af-whohint'); if(h) h.innerHTML = whoHint();
+  }
+  else if(a==='send') send();
+  else if(a==='answer') answer(id);
+  else if(a==='starter'){
+    var ta = document.getElementById('af-ans-'+id); if(!ta) return;
+    ta.value = (ta.value ? ta.value+'\n' : '') + STARTERS[+v]; ta.focus();
+  }
+  else if(a==='pubtoggle') jupd(function(o){ var q = o.list.find(function(x){ return x.id===id; }); if(q) q.pub = !q.pub; return o; }).then(function(){ return load(true); }).then(function(){ try{ render(); }catch(x){} });
+  else if(a==='del'){
+    if(!confirm('تحذف السؤال ده نهائيًا؟')) return;
+    jupd(function(o){ o.list = o.list.filter(function(x){ return x.id!==id; }); return o; }).then(function(){ return load(true); }).then(function(){ try{ render(); }catch(x){} });
+  }
+  else if(a==='withdraw'){
+    if(!confirm('تسحب السؤال ده؟')) return;
+    var pid = state.pid;
+    jupd(function(o){ o.list = o.list.filter(function(x){ return !(x.id===id && String(x.pid)===String(pid) && x.status!=='answered'); }); return o; }).then(function(){ return load(true); }).then(function(){ try{ render(); }catch(x){} });
+  }
+  else if(a==='modal-close') closeModal();
+  else if(a==='modal-open'){ closeModal(); A.tab = 'mine'; if(state.view!=='askfather') go('askfather'); else render(); }
+});
+
+/* ---------- القوائم ---------- */
+if(typeof NAV_TILE_ITEMS!=='undefined'){
+  NAV_TILE_ITEMS.push({page:'askfather', icon:'🙏', labelKey:'اسأل أبونا', subKey:'اكتب سؤالك وأبونا هيجاوبك', color:'linear-gradient(145deg,#9B8CFF,#F4B740)'});
+}
+if(typeof BNAV_VIEW_TAB!=='undefined'){ BNAV_VIEW_TAB.askfather = 'capabilities'; }
+if(typeof ADMIN_HUB_ITEMS!=='undefined'){
+  ADMIN_HUB_ITEMS.push({group:'people', tab:'askfather', short:'أسئلة المشاركين لأبونا', desc:'أسئلة المشاركين لأبونا (باسمهم أو من غير اسم)، الرد عليها، ونشر الإجابات', icon:'🙏', label:'اسأل أبونا', color:'linear-gradient(145deg,#9B8CFF,#F4B740)'});
+}
+
+/* ---------- تحميل دوري ---------- */
+setInterval(function(){ if(navigator.onLine===false) return; if(state.pid || state.adminUnlocked) load(true); }, 20000);
+setTimeout(function(){ load(true); }, 4000);
+window.afLoad = load;
+})();
+</script>
+
+<style id="bdaygreet-css">
+/* ===== تهاني أعياد الميلاد ===== */
+.bg-tabs{display:flex;gap:6px;margin:4px 0 14px}
+.bg-tab{flex:1;appearance:none;font-family:inherit;font-weight:800;font-size:13px;padding:10px 6px;border-radius:14px;cursor:pointer;color:var(--text-muted);background:var(--surface);border:1.5px solid var(--border);position:relative}
+.bg-tab.on{color:var(--gold);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 10%,var(--surface))}
+.bg-dot{position:absolute;top:6px;inset-inline-start:8px;width:9px;height:9px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 3px color-mix(in srgb,var(--coral) 30%,transparent)}
+.bg-card{margin-bottom:10px}
+.bg-row{display:flex;align-items:center;gap:12px}
+.bg-av{width:46px;height:46px;border-radius:50%;flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg-2);font-weight:900;font-size:17px;color:var(--gold);border:2px solid color-mix(in srgb,var(--gold) 45%,transparent)}
+.bg-av img{width:100%;height:100%;object-fit:cover}
+.bg-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.bg-info b{font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bg-info small{font-size:11.5px;color:var(--text-muted)}
+.bg-chip{font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;background:var(--bg-2);border:1px solid var(--border);color:var(--text-muted);display:inline-block}
+.bg-chip.ok{color:var(--good);border-color:color-mix(in srgb,var(--good) 50%,transparent)}
+.bg-chip.gold{color:#1a1633;background:var(--gold);border-color:var(--gold)}
+.bg-btn{appearance:none;font-family:inherit;font-weight:800;font-size:12.5px;padding:9px 14px;border-radius:99px;cursor:pointer;color:#1a1633;background:var(--gold);border:none;flex:none}
+.bg-btn.ghost{color:var(--text);background:var(--bg-2);border:1.5px solid var(--border)}
+.bg-comp{margin-top:12px}
+.bg-sts{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.bg-st{appearance:none;font-family:inherit;font-size:11.5px;font-weight:700;padding:6px 11px;border-radius:99px;cursor:pointer;color:var(--text);background:var(--bg-2);border:1px dashed var(--border)}
+.bg-cnt{font-size:11px;color:var(--text-muted);text-align:left;margin-top:4px}
+.bg-acts{display:flex;gap:8px;margin-top:10px}
+.bg-acts .btn{flex:1}
+.bg-g{margin-top:8px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--coral) 18%,var(--surface)),color-mix(in srgb,var(--gold) 14%,var(--surface)));border:1px solid color-mix(in srgb,var(--gold) 35%,transparent)}
+.bg-g-f{font-size:11.5px;font-weight:900;color:var(--gold);margin-bottom:4px}
+.bg-g-t{font-size:13.5px;line-height:1.9;white-space:pre-wrap;word-break:break-word}
+.bg-lock{text-align:center;padding:26px 14px;font-size:14px;line-height:1.9;color:var(--text-muted)}
+.bg-lock b{display:block;font-size:34px;margin-bottom:6px}
+.bg-adm details{margin-top:8px}
+.bg-adm summary{cursor:pointer;font-weight:700;font-size:12.5px;color:var(--gold)}
+.bg-modal{position:fixed;inset:0;z-index:10200;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(8,7,28,.72);animation:bgFade .25s both}
+.bg-mc{width:100%;max-width:380px;border-radius:26px;padding:24px 20px 18px;text-align:center;background:linear-gradient(160deg,var(--surface-2),var(--bg-2));border:1.5px solid color-mix(in srgb,var(--gold) 45%,transparent);box-shadow:0 24px 60px -20px rgba(0,0,0,.7);animation:bgPop .45s cubic-bezier(.34,1.5,.5,1) both}
+.bg-mi{font-size:60px;line-height:1;animation:bgFloat 2.6s ease-in-out infinite}
+.bg-mt{font-weight:900;font-size:18px;margin:10px 0 6px;color:var(--text)}
+.bg-ms{font-size:13px;line-height:1.8;color:var(--text-muted)}
+.bg-mb{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+@keyframes bgFade{from{opacity:0}to{opacity:1}}
+@keyframes bgPop{from{opacity:0;transform:scale(.8) translateY(14px)}to{opacity:1;transform:none}}
+@keyframes bgFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-5px) rotate(3deg)}}
+@media (prefers-reduced-motion:reduce){.bg-modal,.bg-mc,.bg-mi{animation:none !important}}
+</style>
+<script id="bdaygreet-module">
+/* ===== تهاني أعياد ميلاد الشهر: المخدوم يكتب تهنئة لصاحب العيد، وبتوصله يوم عيده بس ===== */
+(function(){
+'use strict';
+if(window.__bdayGreet) return; window.__bdayGreet = 1;
+
+var KEY = 'glavera-bday-greets-v1', MAX_LEN = 300;
+var G = {list:[], t:0, p:null, sig:'', tab:'month', open:null, busy:false};
+var shown = {};
+var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+var meP = function(){ return PARTICIPANTS.find(function(x){ return x.id===state.pid; }); };
+var toast = function(m, err){ try{ showToast(m, !!err); }catch(e){} };
+var first = function(n){ return String(n||'').trim().split(/\s+/)[0] || ''; };
+var pad = function(n){ return (n<10?'0':'')+n; };
+
+/* ---------- تخزين مشترك (Firebase) ---------- */
+async function jget(){
+  try{
+    var r = await window.storage.get(KEY, true);
+    if(!r || r.value==null) return null;
+    var o = typeof r.value==='string' ? JSON.parse(r.value) : r.value;
+    return (o && Array.isArray(o.list)) ? o : {list:[]};
+  }catch(e){ return null; }
+}
+function jupd(fn){
+  try{
+    return window.storage.update(KEY, function(cur){
+      var o = null;
+      try{ o = cur ? (typeof cur==='string' ? JSON.parse(cur) : cur) : null; }catch(e){}
+      if(!o || !Array.isArray(o.list)) o = {list:[]};
+      return JSON.stringify(fn(o) || o);
+    }, true);
+  }catch(e){ return Promise.resolve(null); }
+}
+function relevant(){
+  return state.view==='bdaygreet' || (state.view==='admin' && state.adminUnlocked && state.adminTab==='bdaygreet');
+}
+function softRender(){
+  var a = document.activeElement;
+  if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return;
+  if(document.querySelector('.bg-modal')) return;
+  try{ render(); }catch(e){}
+}
+async function doLoad(){
+  try{
+    var o = await jget();
+    if(!o){ if(G.list.length) return; o = {list:[]}; }
+    var sig = JSON.stringify(o.list), ch = sig!==G.sig;
+    G.list = o.list; G.sig = sig; G.t = Date.now();
+    if(ch){ checkRevealed(); if(relevant()) softRender(); }
+  }catch(e){ console.error('bdaygreet load', e); }
+}
+function load(force){
+  if(!force && Date.now()-G.t < 20000) return Promise.resolve();
+  if(G.p) return force ? G.p.then(function(){ return doLoad(); }) : G.p;
+  G.p = doLoad().then(function(){ G.p = null; }); return G.p;
+}
+
+/* ---------- تواريخ الميلاد ---------- */
+function curYm(){ var n = new Date(); return n.getFullYear()+'-'+pad(n.getMonth()+1); }
+function monthName(){ try{ return new Date().toLocaleDateString('ar-EG', {month:'long'}); }catch(e){ return ''; } }
+function birthOf(p){
+  var e = (typeof myExtra==='function' ? myExtra(p.id) : null) || {};
+  var cp = (typeof cpOf==='function' ? cpOf(p.id) : null) || {};
+  return e.birth || cp.birth || '';
+}
+function parseB(b){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(b||''); return m ? {y:+m[1], m:+m[2], d:+m[3]} : null; }
+function monthPeople(){
+  var cm = new Date().getMonth()+1;
+  return PARTICIPANTS.map(function(p){ var b = parseB(birthOf(p)); return (b && b.m===cm) ? {p:p, d:b.d} : null; })
+    .filter(Boolean).sort(function(a,b){ return a.d-b.d; });
+}
+function myBday(){ var p = meP(); if(!p) return null; var b = parseB(birthOf(p)); return (b && b.m===new Date().getMonth()+1) ? b : null; }
+function revealedFor(d){ return new Date().getDate() >= d; }
+function greetsTo(pid){ var ym = curYm(); return G.list.filter(function(g){ return g.ym===ym && String(g.to)===String(pid); }); }
+function allTo(pid){ return G.list.filter(function(g){ return String(g.to)===String(pid); }); }
+function isRevealed(g){
+  var cy = curYm(); if(g.ym<cy) return true; if(g.ym>cy) return false;
+  var me = meP(), b = me ? parseB(birthOf(me)) : null;
+  return b ? revealedFor(b.d) : false;
+}
+function mySent(toPid){
+  var ym = curYm(), me = state.pid;
+  return G.list.find(function(g){ return g.ym===ym && String(g.from)===String(me) && String(g.to)===String(toPid); });
+}
+function avatar(p){
+  var ph = p && p.photo;
+  return '<span class="bg-av">'+(ph ? '<img src="'+esc(ph)+'" alt="">' : esc(first(p?p.name:'?').charAt(0)))+'</span>';
+}
+function dayLabel(d){ return 'يوم '+d+' '+monthName(); }
+
+/* ---------- صفحة المخدوم ---------- */
+function head(){
+  return '<div class="back-row"><button class="icon-btn" data-action="back">'+ICO.back+'</button><div class="back-title">أعياد ميلاد الشهر</div></div>'
+    + '<div class="opinion-hero"><div class="opinion-hero-ico">🎂</div><div class="opinion-hero-title">أعياد ميلاد شهر '+esc(monthName())+'</div>'
+    + '<div class="opinion-hero-sub">اكتب تهنئة لصاحب العيد — هتوصله يوم عيد ميلاده 🎁</div></div>';
+}
+function unseenMine(){
+  return allTo(state.pid).filter(function(g){ return isRevealed(g) && !g.seen; });
+}
+function tabsHtml(){
+  var dot = unseenMine().length>0;
+  var t = function(id, label, d){ return '<button type="button" class="bg-tab '+(G.tab===id?'on':'')+'" data-bg="tab" data-v="'+id+'">'+label+(d?'<span class="bg-dot"></span>':'')+'</button>'; };
+  return '<div class="bg-tabs">'+t('month','🎂 أعياد الشهر')+t('mine','🎁 تهانيّ', dot)+'</div>';
+}
+var STARTERS = [
+  'كل سنة وإنت طيب يا {n}! ربنا يفرّح قلبك ويبارك سنتك الجاية 🎂',
+  'عيد ميلاد سعيد يا {n} 🎉 ربنا يحفظك ويديك كل اللي بتتمناه',
+  'كل سنة وإنت قريب من ربنا ومن اللي بتحبهم يا {n} 💛'
+];
+function composer(p){
+  var old = mySent(p.id), val = old ? old.text : '';
+  return '<div class="bg-comp">'
+    + '<textarea id="bg-t-'+esc(p.id)+'" class="field" rows="3" maxlength="'+MAX_LEN+'" placeholder="اكتب تهنئتك…">'+esc(val)+'</textarea>'
+    + '<div class="bg-sts">'+STARTERS.map(function(s,i){ return '<button type="button" class="bg-st" data-bg="starter" data-id="'+esc(p.id)+'" data-v="'+i+'">'+esc(s.replace('{n}',first(p.name)).slice(0,26))+'…</button>'; }).join('')+'</div>'
+    + '<div class="bg-acts"><button type="button" class="btn btn-primary" data-bg="send" data-id="'+esc(p.id)+'">🎁 '+(old?'حدّث التهنئة':'ابعت التهنئة')+'</button>'
+    + '<button type="button" class="btn btn-ghost" data-bg="close">إلغاء</button></div></div>';
+}
+function monthTab(){
+  var L = monthPeople(), me = state.pid, today = new Date().getDate();
+  if(!L.length) return '<div class="empty-note">مفيش حد عيد ميلاده الشهر ده 🎈</div>';
+  return L.map(function(x){
+    var p = x.p, mine = String(p.id)===String(me), n = greetsTo(p.id).length, sent = mySent(p.id);
+    var status;
+    if(mine) status = '<span class="bg-chip gold">🎉 ده عيدك!</span>';
+    else if(x.d===today) status = '<span class="bg-chip gold">🎉 النهارده</span>';
+    else status = '<span class="bg-chip">'+(x.d<today?'عيده عدّى':'بعد '+(x.d-today)+(x.d-today===1?' يوم':' يوم'))+'</span>';
+    var action = '';
+    if(mine) action = '<span class="bg-chip ok">'+(n? (revealedFor(x.d)?'وصلك '+n+' تهنئة':'فيه '+n+' تهنئة مستنياك 🎁') : 'لسه ماحدش كتب')+'</span>';
+    else action = '<button type="button" class="bg-btn '+(sent?'ghost':'')+'" data-bg="open" data-id="'+esc(p.id)+'">'+(sent?'✅ عدّل تهنئتك':'✍️ اكتب تهنئة')+'</button>';
+    return '<div class="card bg-card"><div class="bg-row">'+avatar(p)
+      + '<div class="bg-info"><b>'+esc(p.name)+'</b><small>🎂 '+dayLabel(x.d)+'</small><span>'+status+'</span></div>'+action+'</div>'
+      + (G.open!==null && String(G.open)===String(p.id) && !mine ? composer(p) : '')
+      + '</div>';
+  }).join('');
+}
+function ymLabel(ym){
+  var m = /^(\d{4})-(\d{2})$/.exec(ym||''); if(!m) return ym||'';
+  try{ return new Date(+m[1], +m[2]-1, 1).toLocaleDateString('ar-EG', {month:'long', year:'numeric'}); }catch(e){ return ym; }
+}
+function mineTab(){
+  var L = allTo(state.pid).slice().sort(function(a,c){ return c.ts-a.ts; });
+  var rev = L.filter(isRevealed), pend = L.length-rev.length;
+  var b = myBday(), cy = curYm(), out = '';
+  if(!L.length){
+    if(!b) return '<div class="bg-lock"><b>🎂</b>تهانيك بتظهر هنا في شهر عيد ميلادك، وبتفضل محفوظة عندك.<br>وإنت دلوقتي تقدر تكتب تهاني لزمايلك اللي عيدهم الشهر ده.</div>';
+    return revealedFor(b.d)
+      ? '<div class="bg-lock"><b>🎈</b>كل سنة وإنت طيب!<br>لسه ماحدش كتبلك تهنئة — ممكن لسه توصل.</div>'
+      : '<div class="bg-lock"><b>🎁</b>التهاني بتتفتح يوم عيد ميلادك<br>'+dayLabel(b.d)+' — استنى المفاجأة!</div>';
+  }
+  if(pend>0 && b) out += '<div class="bg-lock" style="padding:14px"><b>🎁</b>فيه '+pend+(pend===1?' تهنئة':' تهاني')+' مستنياك يوم عيدك<br>'+dayLabel(b.d)+'</div>';
+  var groups = {}, order = [];
+  rev.forEach(function(g){ if(!groups[g.ym]){ groups[g.ym] = []; order.push(g.ym); } groups[g.ym].push(g); });
+  order.sort().reverse();
+  order.forEach(function(ym){
+    out += '<div class="bg-lock" style="padding:10px 0 6px"><b>'+(ym===cy?'🎉':'🎂')+'</b>'
+      + (ym===cy ? 'كل سنة وإنت طيب يا '+esc(first(meP()?meP().name:''))+'!<br>' : '')
+      + esc(ymLabel(ym))+' · '+groups[ym].length+(groups[ym].length===1?' تهنئة':' تهاني')+'</div>'
+      + groups[ym].map(function(g){
+          return '<div class="card bg-card"><div class="bg-g"><div class="bg-g-f">💌 من '+esc(g.fromName||'زميل')+' · '+timeAgoAr(g.ts)+'</div><div class="bg-g-t">'+esc(g.text)+'</div></div></div>';
+        }).join('');
+  });
+  return out + '<div class="bg-lock" style="padding:10px;font-size:12px">💾 تهانيك محفوظة هنا، ومتتمسحش لما الشهر يخلص.</div>';
+}
+window.FXVIEWS = window.FXVIEWS || {};
+window.FXVIEWS.bdaygreet = function(){
+  load(false);
+  if(G.tab==='mine') setTimeout(markSeenMine, 400);
+  return head() + tabsHtml() + (G.tab==='mine' ? mineTab() : monthTab());
+};
+
+/* ---------- الأدمن ---------- */
+window.FXADMIN = window.FXADMIN || {};
+window.FXADMIN.bdaygreet = function(){
+  load(false);
+  var L = monthPeople(), ym = curYm();
+  var all = G.list.filter(function(g){ return g.ym===ym; });
+  var noGreet = L.filter(function(x){ return !greetsTo(x.p.id).length; }).length;
+  var kp = adminKpis([{num:L.length, lab:'أعياد الشهر'},{num:all.length, lab:'تهاني اتكتبت'},{num:noGreet, lab:'من غير تهنئة', cls:noGreet?'is-alert':''}]);
+  var remind = L.length ? '<button type="button" class="btn btn-primary" style="width:100%;margin-bottom:12px" data-bg="remind">📣 ذكّر المخدومين يكتبوا تهاني</button>' : '';
+  if(!L.length) return kp + adminEmptyState('🎂','مفيش أعياد ميلاد الشهر ده','أعياد الميلاد بتتاخد من تاريخ الميلاد اللي المشاركين مسجلينه');
+  var rows = L.map(function(x){
+    var gs = greetsTo(x.p.id).slice().sort(function(a,b){ return a.ts-b.ts; });
+    var det = gs.length ? '<details><summary>اقرأ التهاني ('+gs.length+')</summary>'+gs.map(function(g){
+      return '<div class="bg-g"><div class="bg-g-f">من '+esc(g.fromName||'زميل')+'</div><div class="bg-g-t">'+esc(g.text)+'</div>'
+        + '<button type="button" class="bg-st" style="margin-top:6px;color:var(--danger)" data-bg="del" data-id="'+esc(g.id)+'">🗑️ حذف</button></div>';
+    }).join('')+'</details>' : '';
+    return '<div class="card bg-card bg-adm"><div class="bg-row">'+avatar(x.p)+'<div class="bg-info"><b>'+esc(x.p.name)+'</b><small>🎂 '+dayLabel(x.d)+'</small></div><span class="bg-chip '+(gs.length?'ok':'')+'">'+gs.length+' تهنئة</span></div>'+det+'</div>';
+  }).join('');
+  return kp + remind + rows;
+};
+
+/* ---------- العمليات ---------- */
+async function send(toPid){
+  if(G.busy) return;
+  var me = meP(); if(!me){ toast('سجّل دخولك الأول', true); return; }
+  var ta = document.getElementById('bg-t-'+toPid);
+  var text = (ta ? ta.value : '').trim();
+  if(text.length<2){ toast('اكتب التهنئة الأول', true); return; }
+  if(String(toPid)===String(me.id)){ return; }
+  var target = PARTICIPANTS.find(function(p){ return String(p.id)===String(toPid); });
+  var b = target ? parseB(birthOf(target)) : null;
+  if(!b || b.m!==new Date().getMonth()+1){ toast('الشخص ده مش عيد ميلاده الشهر ده', true); return; }
+  var ym = curYm();
+  var rec = {id:'bg'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), from:me.id, fromName:me.name, to:toPid, ym:ym, text:text.slice(0,MAX_LEN), ts:Date.now(), seen:false};
+  G.busy = true;
+  var res = await jupd(function(o){
+    o.list = o.list.filter(function(g){ return !(g.ym===ym && String(g.from)===String(me.id) && String(g.to)===String(toPid)); });
+    o.list.push(rec); return o;
+  });
+  G.busy = false;
+  if(!res){ toast('معرفناش نبعت التهنئة — اتأكد من النت وجرّب تاني', true); return; }
+  G.open = null;
+  toast('اتبعتت تهنئتك لـ '+first(target.name)+' 🎁');
+  try{ SND.success(); }catch(e){}
+  await load(true); try{ render(); }catch(e){}
+}
+function markSeen(ids){
+  if(!ids.length) return;
+  jupd(function(o){ o.list.forEach(function(g){ if(ids.indexOf(g.id)>-1) g.seen = true; }); return o; }).then(function(){ G.t = 0; });
+}
+function markSeenMine(){
+  if(state.view!=='bdaygreet' || G.tab!=='mine') return;
+  var ids = unseenMine().map(function(g){ return g.id; });
+  ids.forEach(function(i){ shown[i] = 1; });
+  markSeen(ids);
+}
+async function remindAll(){
+  var L = monthPeople(); if(!L.length) return;
+  if(!confirm('هتبعت إشعار لكل المخدومين يفتكروا يكتبوا تهاني. تكمّل؟')) return;
+  var ids = {}; L.forEach(function(x){ ids[x.p.id] = 1; });
+  var n = 0;
+  PARTICIPANTS.forEach(function(p){
+    if(ids[p.id]) return;
+    try{ pushNotification(p.id, '🎂 أعياد ميلاد شهر '+monthName()+' — ادخل اكتب تهنئة لزمايلك 💛', '🎂'); n++; }catch(e){}
+  });
+  toast('اتبعت التذكير لـ '+n+' مخدوم 🎂');
+}
+
+/* ---------- نافذة المفاجأة يوم العيد ---------- */
+function openModal(html){
+  var o = document.createElement('div'); o.className = 'bg-modal';
+  o.innerHTML = '<div class="bg-mc">'+html+'</div>';
+  o.addEventListener('click', function(e){ if(e.target===o) o.remove(); });
+  document.body.appendChild(o);
+  setTimeout(function(){ if(o.parentNode) o.remove(); }, 60000);
+}
+function checkRevealed(){
+  if(!state.pid || state.adminUnlocked) return;
+  var un = unseenMine(); if(!un.length) return;
+  var fresh = un.filter(function(g){ return !shown[g.id]; }); if(!fresh.length) return;
+  if(document.hidden) return;
+  if(state.view==='bdaygreet' && G.tab==='mine') return;
+  un.forEach(function(g){ shown[g.id] = 1; });
+  var me = meP();
+  openModal('<div class="bg-mi">🎂</div><div class="bg-mt">كل سنة وإنت طيب يا '+esc(first(me?me.name:''))+'!</div>'
+    + '<div class="bg-ms">وصلك '+un.length+(un.length===1?' تهنئة':' تهاني')+' من زمايلك 💛</div>'
+    + '<div class="bg-mb"><button type="button" class="btn btn-primary" data-bg="modal-open">🎁 افتح تهانيك</button>'
+    + '<button type="button" class="btn btn-ghost" data-bg="modal-close">بعدين</button></div>');
+  try{ if(navigator.vibrate) navigator.vibrate([30,40,30]); }catch(e){}
+  try{ SND.success(); }catch(e){}
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden && state.pid) load(true); });
+
+/* ---------- الأحداث ---------- */
+document.addEventListener('click', function(e){
+  var el = e.target.closest && e.target.closest('[data-bg]'); if(!el || el.disabled) return;
+  var a = el.dataset.bg, id = el.dataset.id, v = el.dataset.v;
+  if(a==='tab'){ G.tab = v; G.open = null; try{ render(); }catch(x){} }
+  else if(a==='open'){ G.open = (String(G.open)===String(id)) ? null : id; try{ render(); }catch(x){} }
+  else if(a==='close'){ G.open = null; try{ render(); }catch(x){} }
+  else if(a==='starter'){
+    var ta = document.getElementById('bg-t-'+id); if(!ta) return;
+    var p = PARTICIPANTS.find(function(q){ return String(q.id)===String(id); });
+    ta.value = STARTERS[+v].replace('{n}', first(p?p.name:'')); ta.focus();
+  }
+  else if(a==='send') send(id);
+  else if(a==='remind') remindAll();
+  else if(a==='del'){
+    if(!confirm('تحذف التهنئة دي؟')) return;
+    jupd(function(o){ o.list = o.list.filter(function(g){ return g.id!==id; }); return o; }).then(function(){ return load(true); }).then(function(){ try{ render(); }catch(x){} });
+  }
+  else if(a==='modal-close'){ var m = document.querySelector('.bg-modal'); if(m) m.remove(); }
+  else if(a==='modal-open'){
+    var m2 = document.querySelector('.bg-modal'); if(m2) m2.remove();
+    G.tab = 'mine'; if(state.view!=='bdaygreet') go('bdaygreet'); else render();
+  }
+});
+
+/* ---------- القوائم ---------- */
+if(typeof NAV_TILE_ITEMS!=='undefined'){
+  NAV_TILE_ITEMS.push({page:'bdaygreet', icon:'🎂', labelKey:'أعياد الميلاد', subKey:'اكتب تهنئة لصاحب العيد', color:'linear-gradient(145deg,#FF6B9D,#F4B740)'});
+}
+if(typeof BNAV_VIEW_TAB!=='undefined'){ BNAV_VIEW_TAB.bdaygreet = 'capabilities'; }
+if(typeof ADMIN_HUB_ITEMS!=='undefined'){
+  ADMIN_HUB_ITEMS.push({group:'people', tab:'bdaygreet', short:'تهاني أعياد ميلاد الشهر', desc:'أعياد ميلاد الشهر، التهاني اللي كتبها المخدومين لكل صاحب عيد، وتذكيرهم يكتبوا', icon:'🎂', label:'تهاني أعياد الميلاد', color:'linear-gradient(145deg,#FF6B9D,#F4B740)'});
+}
+
+/* ---------- تحميل دوري ---------- */
+setInterval(function(){ if(navigator.onLine===false) return; if(state.pid || state.adminUnlocked) load(true); }, 20000);
+setTimeout(function(){ load(true); }, 5000);
+})();
+</script>
+
+<style id="mymeeting-css">
+/* ===== اجتماعي أنا ===== */
+.mm-tabs{display:flex;gap:6px;margin:4px 0 14px}
+.mm-tab{flex:1;appearance:none;font-family:inherit;font-weight:800;font-size:13px;padding:10px 6px;border-radius:14px;cursor:pointer;color:var(--text-muted);background:var(--surface);border:1.5px solid var(--border);position:relative}
+.mm-tab.on{color:var(--gold);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 10%,var(--surface))}
+.mm-dot{position:absolute;top:6px;inset-inline-start:8px;width:9px;height:9px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 3px color-mix(in srgb,var(--coral) 30%,transparent)}
+.mm-card{margin-bottom:10px}
+.mm-lab{font-weight:800;font-size:13px;color:var(--text);margin:12px 0 6px;display:block}
+.mm-lab:first-child{margin-top:0}
+.mm-types{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mm-type{appearance:none;font-family:inherit;font-weight:800;font-size:12.5px;padding:11px 8px;border-radius:14px;cursor:pointer;color:var(--text);background:var(--bg-2);border:1.5px solid var(--border);text-align:center}
+.mm-type.on{border-color:var(--teal);background:color-mix(in srgb,var(--teal) 14%,var(--bg-2))}
+.mm-count{font-size:11px;color:var(--text-muted);text-align:left;margin-top:4px}
+.mm-send{width:100%;margin-top:14px}
+.mm-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.mm-head b{font-size:13.5px}
+.mm-head small{color:var(--text-muted);font-size:11px}
+.mm-chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.mm-chip{font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;background:var(--bg-2);border:1px solid var(--border);color:var(--text-muted)}
+.mm-chip.wait{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 50%,transparent)}
+.mm-chip.plan{color:var(--teal);border-color:color-mix(in srgb,var(--teal) 55%,transparent)}
+.mm-chip.ok{color:var(--good);border-color:color-mix(in srgb,var(--good) 50%,transparent)}
+.mm-chip.no{color:var(--text-muted);opacity:.85}
+.mm-t{font-size:14px;line-height:1.9;white-space:pre-wrap;word-break:break-word;margin:6px 0}
+.mm-r{margin-top:8px;padding:11px 14px;border-radius:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--violet) 22%,var(--surface)),color-mix(in srgb,var(--gold) 14%,var(--surface)));border:1px solid color-mix(in srgb,var(--gold) 35%,transparent)}
+.mm-r-l{font-size:11.5px;font-weight:900;color:var(--gold);margin-bottom:4px}
+.mm-r-t{font-size:13px;line-height:1.85;white-space:pre-wrap;word-break:break-word}
+.mm-link{appearance:none;background:none;border:none;font-family:inherit;font-size:12px;color:var(--text-muted);cursor:pointer;text-decoration:underline;padding:4px 0;margin-top:4px}
+.mm-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.mm-acts .btn{flex:1;min-width:104px;font-size:12.5px;padding:10px 8px}
+</style>
+<script id="mymeeting-module">
+/* ===== اجتماعي أنا: المخدوم يكتب هو عايز إيه في الاجتماع (مواضيع / فقرات / ألعاب / خروجات) والأدمن يرد ===== */
+(function(){
+'use strict';
+if(window.__myMeeting) return; window.__myMeeting = 1;
+
+var KEY = 'glavera-my-meeting-v1';
+var MAX_LEN = 500, MAX_OPEN = 5;
+var TYPES = [
+  {id:'topic',   ic:'🗣️', n:'موضوع نتكلم فيه'},
+  {id:'segment', ic:'🎤', n:'فقرة أو نشاط'},
+  {id:'game',    ic:'🎮', n:'لعبة أو مسابقة'},
+  {id:'trip',    ic:'🚌', n:'خروجة أو فعالية'},
+  {id:'other',   ic:'💬', n:'حاجة تانية'}
+];
+var STATUS = {
+  new:     {ic:'⏳', n:'مستني الرد', cls:'wait'},
+  planned: {ic:'⭐', n:'هننفذه',     cls:'plan'},
+  done:    {ic:'✅', n:'اتنفذ',      cls:'ok'},
+  no:      {ic:'🙏', n:'مش مناسب دلوقتي', cls:'no'}
+};
+var M = {list:[], t:0, p:null, sig:'', tab:'new', type:'topic', busy:false, draft:''};
+var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+var meP = function(){ return PARTICIPANTS.find(function(x){ return x.id===state.pid; }); };
+var toast = function(m, err){ try{ showToast(m, !!err); }catch(e){} };
+function tOf(id){ return TYPES.find(function(t){ return t.id===id; }) || TYPES[4]; }
+function sOf(id){ return STATUS[id] || STATUS.new; }
+function snip(s, n){ s = String(s||'').replace(/\s+/g,' ').trim(); return s.length>n ? s.slice(0,n-1)+'…' : s; }
+
+/* ---------- تخزين مشترك (Firebase) ---------- */
+async function jget(){
+  try{
+    var r = await window.storage.get(KEY, true);
+    if(!r || r.value==null) return null;
+    var o = typeof r.value==='string' ? JSON.parse(r.value) : r.value;
+    return (o && Array.isArray(o.list)) ? o : {list:[]};
+  }catch(e){ return null; }
+}
+function jupd(fn){
+  try{
+    return window.storage.update(KEY, function(cur){
+      var o = null;
+      try{ o = cur ? (typeof cur==='string' ? JSON.parse(cur) : cur) : null; }catch(e){}
+      if(!o || !Array.isArray(o.list)) o = {list:[]};
+      return JSON.stringify(fn(o) || o);
+    }, true);
+  }catch(e){ return Promise.resolve(null); }
+}
+function relevant(){
+  return state.view==='mymeeting' || (state.view==='admin' && state.adminUnlocked && state.adminTab==='mymeeting');
+}
+function softRender(){
+  var a = document.activeElement;
+  if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return;
+  try{ render(); }catch(e){}
+}
+async function doLoad(){
+  try{
+    var o = await jget();
+    if(!o){ if(M.list.length) return; o = {list:[]}; }
+    var sig = JSON.stringify(o.list), ch = sig!==M.sig;
+    M.list = o.list; M.sig = sig; M.t = Date.now();
+    if(ch && relevant()) softRender();
+  }catch(e){ console.error('mymeeting load', e); }
+}
+function load(force){
+  if(!force && Date.now()-M.t < 20000) return Promise.resolve();
+  if(M.p) return force ? M.p.then(function(){ return doLoad(); }) : M.p;
+  M.p = doLoad().then(function(){ M.p = null; }); return M.p;
+}
+function newCount(){ return M.list.filter(function(s){ return (s.status||'new')==='new'; }).length; }
+window.myMeetingPending = newCount;
+function mine(){ return M.list.filter(function(s){ return String(s.pid)===String(state.pid); }).sort(function(a,b){ return b.ts-a.ts; }); }
+function fmtDate(ts){ try{ return new Date(ts).toLocaleDateString('ar-EG', {day:'numeric', month:'long'}); }catch(e){ return ''; } }
+
+/* ---------- صفحة المخدوم ---------- */
+function head(){
+  return '<div class="back-row"><button class="icon-btn" data-action="back">'+ICO.back+'</button><div class="back-title">اجتماعي أنا</div></div>'
+    + '<div class="opinion-hero"><div class="opinion-hero-ico">🏛️</div><div class="opinion-hero-title">اجتماعي أنا</div>'
+    + '<div class="opinion-hero-sub">قولنا عايز نتكلم في إيه ونعمل إيه في الاجتماع — مواضيع، فقرات، ألعاب، خروجات</div></div>';
+}
+function tabsHtml(){
+  var my = mine(), upd = my.filter(function(s){ return (s.status||'new')!=='new' && !s.seen; }).length;
+  var b = function(id, label, dot){ return '<button type="button" class="mm-tab '+(M.tab===id?'on':'')+'" data-mm="tab" data-v="'+id+'">'+label+(dot?'<span class="mm-dot"></span>':'')+'</button>'; };
+  return '<div class="mm-tabs">'+b('new','✍️ اقترح')+b('mine','💡 اقتراحاتي'+(my.length?' ('+my.length+')':''), upd>0)+'</div>';
+}
+function formTab(){
+  return '<div class="card mm-card">'
+    + '<span class="mm-lab">اقتراحك عن إيه؟</span>'
+    + '<div class="mm-types">'+TYPES.map(function(t){ return '<button type="button" class="mm-type '+(M.type===t.id?'on':'')+'" data-mm="type" data-v="'+t.id+'">'+t.ic+' '+t.n+'</button>'; }).join('')+'</div>'
+    + '<label class="mm-lab" for="mm-text">اكتب اللي نفسك فيه</label>'
+    + '<textarea id="mm-text" class="field" rows="5" maxlength="'+MAX_LEN+'" placeholder="مثال: نتكلم عن إزاي نصلي بتركيز، أو فقرة مسابقة في الآخر…">'+esc(M.draft)+'</textarea>'
+    + '<div class="mm-count"><span id="mm-cnt">'+M.draft.length+'</span>/'+MAX_LEN+'</div>'
+    + '<button type="button" class="btn btn-primary mm-send" data-mm="send">📨 ابعت اقتراحك</button>'
+    + '</div>';
+}
+function mineTab(){
+  var my = mine();
+  if(!my.length) return '<div class="empty-note">لسه ما كتبتش اقتراحات — اكتب أول اقتراح من تاب «اقترح» ✍️</div>';
+  return my.map(function(s){
+    var t = tOf(s.type), st = sOf(s.status||'new');
+    return '<div class="card mm-card">'
+      + '<div class="mm-head"><span class="mm-chip '+st.cls+'">'+st.ic+' '+st.n+'</span><small>'+fmtDate(s.ts)+'</small></div>'
+      + '<div class="mm-chips"><span class="mm-chip">'+t.ic+' '+t.n+'</span></div>'
+      + '<div class="mm-t">'+esc(s.text)+'</div>'
+      + (s.reply ? '<div class="mm-r"><div class="mm-r-l">🙏 رد المنظمين</div><div class="mm-r-t">'+esc(s.reply)+'</div></div>' : '')
+      + ((s.status||'new')==='new' ? '<button type="button" class="mm-link" data-mm="withdraw" data-id="'+esc(s.id)+'">سحب الاقتراح</button>' : '')
+      + '</div>';
+  }).join('');
+}
+window.FXVIEWS = window.FXVIEWS || {};
+window.FXVIEWS.mymeeting = function(){
+  load(false);
+  if(M.tab==='mine') setTimeout(markSeenMine, 400);
+  return head() + tabsHtml() + (M.tab==='mine' ? mineTab() : formTab());
+};
+
+/* ---------- الأدمن ---------- */
+function adminCard(s){
+  var t = tOf(s.type), st = sOf(s.status||'new'), cur = s.status||'new';
+  var who = s.name ? esc(s.name) : '—';
+  var btn = function(id, label, extra){ return '<button type="button" class="btn '+(cur===id?'btn-primary':'btn-ghost')+'" data-mm="set" data-id="'+esc(s.id)+'" data-v="'+id+'" '+(extra||'')+'>'+label+'</button>'; };
+  return '<div class="card mm-card">'
+    + '<div class="mm-head"><b>👤 '+who+'</b><small>'+fmtDate(s.ts)+'</small></div>'
+    + '<div class="mm-chips"><span class="mm-chip">'+t.ic+' '+t.n+'</span><span class="mm-chip '+st.cls+'">'+st.ic+' '+st.n+'</span></div>'
+    + '<div class="mm-t">'+esc(s.text)+'</div>'
+    + (s.reply ? '<div class="mm-r"><div class="mm-r-l">ردّك</div><div class="mm-r-t">'+esc(s.reply)+'</div></div>' : '')
+    + '<textarea id="mm-rep-'+esc(s.id)+'" class="field" rows="2" maxlength="400" placeholder="رد للمخدوم (اختياري)…" style="margin-top:10px">'+esc(s.reply||'')+'</textarea>'
+    + '<div class="mm-acts">'+btn('planned','⭐ هننفذه')+btn('done','✅ اتنفذ')+btn('no','🙏 مش مناسب')+'</div>'
+    + '<div class="mm-acts"><button type="button" class="btn btn-ghost" style="color:var(--danger)" data-mm="del" data-id="'+esc(s.id)+'">🗑️ حذف</button></div>'
+    + '</div>';
+}
+window.FXADMIN = window.FXADMIN || {};
+window.FXADMIN.mymeeting = function(){
+  load(false);
+  var L = M.list.slice();
+  var cnt = function(id){ return L.filter(function(s){ return (s.status||'new')===id; }).length; };
+  var kp = adminKpis([{num:cnt('new'), lab:'جديدة', cls:cnt('new')?'is-alert':''},{num:cnt('planned'), lab:'هننفذها'},{num:cnt('done'), lab:'اتنفذت'},{num:L.length, lab:'الكل'}]);
+  if(!L.length) return kp + adminEmptyState('🏛️','لسه محدش كتب اقتراح','اقتراحات المخدومين عن المواضيع والفقرات هتظهر هنا');
+  var f = adminSubGet('mymeeting','new');
+  var tabs = adminSubTabs('mymeeting', [
+    {id:'new', label:'🆕 جديدة ('+cnt('new')+')'},
+    {id:'planned', label:'⭐ هننفذها ('+cnt('planned')+')'},
+    {id:'done', label:'✅ اتنفذت ('+cnt('done')+')'},
+    {id:'all', label:'الكل'}
+  ], f);
+  var list = f==='all' ? L : L.filter(function(s){ return (s.status||'new')===f; });
+  list = list.slice().sort(function(a,b){ return f==='new' ? a.ts-b.ts : b.ts-a.ts; });
+  /* تجميع حسب النوع عشان الأدمن يشوف مين طالب إيه */
+  var byType = TYPES.map(function(t){ var n = L.filter(function(s){ return s.type===t.id; }).length; return n ? '<span class="mm-chip">'+t.ic+' '+t.n+' · '+n+'</span>' : ''; }).join('');
+  return kp + '<div class="mm-chips" style="margin-bottom:10px">'+byType+'</div>' + tabs + (list.map(adminCard).join('') || adminEmptyState('🎉','مفيش حاجة في القسم ده',''));
+};
+
+/* ---------- العمليات ---------- */
+async function send(){
+  if(M.busy) return;
+  var p = meP(); if(!p){ toast('سجّل دخولك الأول', true); return; }
+  var ta = document.getElementById('mm-text');
+  var text = (ta ? ta.value : M.draft).trim();
+  if(text.length<3){ toast('اكتب اقتراحك الأول', true); return; }
+  await load(true);
+  var open = mine().filter(function(s){ return (s.status||'new')==='new'; }).length;
+  if(open>=MAX_OPEN){ toast('عندك '+MAX_OPEN+' اقتراحات لسه مستنية رد — استنى المنظمين يردوا عليهم الأول 🙏', true); return; }
+  var s = {id:'mm'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), pid:p.id, name:p.name, type:M.type, text:text.slice(0,MAX_LEN), ts:Date.now(), status:'new'};
+  M.busy = true;
+  var res = await jupd(function(o){ if(!o.list.some(function(x){ return x.id===s.id; })) o.list.push(s); return o; });
+  M.busy = false;
+  if(!res){ toast('معرفناش نبعت اقتراحك — اتأكد من النت وجرّب تاني', true); return; }
+  M.draft = ''; M.tab = 'mine';
+  try{ SND.success(); }catch(e){}
+  toast('وصل اقتراحك للمنظمين، شكرًا ليك 🙏');
+  await load(true); try{ render(); }catch(e){}
+}
+async function setStatus(id, status){
+  var ta = document.getElementById('mm-rep-'+id);
+  var reply = ta ? ta.value.trim() : '';
+  var target = null, text = '', changed = false;
+  var res = await jupd(function(o){
+    target = null; changed = false;
+    var s = o.list.find(function(x){ return x.id===id; });
+    if(s){
+      changed = (s.status||'new')!==status || (s.reply||'')!==reply;
+      s.status = status; s.reply = reply; s.seen = false; s.updatedAt = Date.now();
+      target = s.pid; text = s.text;
+    }
+    return o;
+  });
+  if(!res){ toast('معرفناش نحفظ التغيير — جرّب تاني', true); return; }
+  if(target!=null && changed){
+    var st = sOf(status);
+    try{ pushNotification(target, st.ic+' اقتراحك «'+snip(text,40)+'»: '+st.n+(reply?' — '+snip(reply,60):''), st.ic); }catch(e){}
+  }
+  toast('اتحفظ ✅');
+  await load(true); try{ render(); }catch(e){}
+}
+function markSeenMine(){
+  if(state.view!=='mymeeting' || M.tab!=='mine') return;
+  var ids = mine().filter(function(s){ return (s.status||'new')!=='new' && !s.seen; }).map(function(s){ return s.id; });
+  if(!ids.length) return;
+  jupd(function(o){ o.list.forEach(function(s){ if(ids.indexOf(s.id)>-1) s.seen = true; }); return o; }).then(function(){ M.t = 0; });
+}
+
+/* ---------- الأحداث ---------- */
+document.addEventListener('input', function(e){
+  var t = e.target;
+  if(t && t.id==='mm-text'){ M.draft = t.value; var c = document.getElementById('mm-cnt'); if(c) c.textContent = t.value.length; }
+});
+document.addEventListener('click', function(e){
+  var el = e.target.closest && e.target.closest('[data-mm]'); if(!el || el.disabled) return;
+  var a = el.dataset.mm, id = el.dataset.id, v = el.dataset.v;
+  if(a==='tab'){ M.tab = v; try{ render(); }catch(x){} }
+  else if(a==='type'){
+    M.type = v;
+    document.querySelectorAll('.mm-type').forEach(function(b){ b.classList.toggle('on', b.dataset.v===v); });
+  }
+  else if(a==='send') send();
+  else if(a==='set') setStatus(id, v);
+  else if(a==='withdraw'){
+    if(!confirm('تسحب الاقتراح ده؟')) return;
+    var pid = state.pid;
+    jupd(function(o){ o.list = o.list.filter(function(x){ return !(x.id===id && String(x.pid)===String(pid) && (x.status||'new')==='new'); }); return o; }).then(function(){ return load(true); }).then(function(){ try{ render(); }catch(x){} });
+  }
+  else if(a==='del'){
+    if(!confirm('تحذف الاقتراح ده نهائيًا؟')) return;
+    jupd(function(o){ o.list = o.list.filter(function(x){ return x.id!==id; }); return o; }).then(function(){ return load(true); }).then(function(){ try{ render(); }catch(x){} });
+  }
+});
+
+/* ---------- القوائم ---------- */
+if(typeof NAV_TILE_ITEMS!=='undefined'){
+  NAV_TILE_ITEMS.push({page:'mymeeting', icon:'🏛️', labelKey:'اجتماعي أنا', subKey:'قولنا عايز إيه في الاجتماع', color:'linear-gradient(145deg,#3FDCC9,#9B8CFF)'});
+}
+if(typeof BNAV_VIEW_TAB!=='undefined'){ BNAV_VIEW_TAB.mymeeting = 'capabilities'; }
+if(typeof ADMIN_HUB_ITEMS!=='undefined'){
+  ADMIN_HUB_ITEMS.push({group:'people', tab:'mymeeting', short:'اقتراحات المواضيع والفقرات', desc:'اللي المخدومين عايزينه في الاجتماع: مواضيع، فقرات، ألعاب، خروجات — والرد عليها', icon:'🏛️', label:'اجتماعي أنا', color:'linear-gradient(145deg,#3FDCC9,#9B8CFF)'});
+}
+
+/* ---------- تحميل دوري ---------- */
+setInterval(function(){ if(navigator.onLine===false) return; if(state.pid || state.adminUnlocked) load(true); }, 25000);
+setTimeout(function(){ load(true); }, 6000);
 })();
 </script>
 
