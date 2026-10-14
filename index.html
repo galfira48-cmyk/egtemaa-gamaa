@@ -22941,51 +22941,25 @@ async function joinGameRoom(code){
 function currentLeaveRoomPenalty(){ return (GAME_POINTS_SETTINGS && GAME_POINTS_SETTINGS.leavePenalty) || 0; }
 let leaveRoomTimer = null;
 function confirmLeaveGameRoom(){
-  if(state.roomSpectate){ leaveGameRoom(); return; }
   const room = GAME_ROOMS[state.roomCode];
-  if(!room || room.status!=='playing'){ leaveGameRoom(); return; }
-  showLeaveRoomWarning();
+  const game = (room && room.game) || String(state.view||'').replace(/^room-/,'');
+  if(state.roomSpectate){ gxExitConfirm({ game, spectate:true, onConfirm:leaveGameRoom }); return; }
+  if(room && (room.status==='playing' || room.status==='vs')){ showLeaveRoomWarning(game); return; }
+  if(room && room.status==='waiting'){ gxExitConfirm({ game, waiting:true, onConfirm:leaveGameRoom }); return; }
+  leaveGameRoom(); /* المعركة خلصت أو الغرفة اتقفلت: مفيش حاجة تتخسر */
 }
-function showLeaveRoomWarning(){
-  const old = document.getElementById('leave-room-overlay');
-  if(old) old.remove();
-  if(leaveRoomTimer){ clearInterval(leaveRoomTimer); leaveRoomTimer = null; }
-  let secs = 30;
+function showLeaveRoomWarning(game){
   const penalty = currentLeaveRoomPenalty();
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay confirm-overlay';
-  overlay.id = 'leave-room-overlay';
-  overlay.innerHTML = `
-    <div class="confirm-card">
-      <div class="confirm-icon">⚠️</div>
-      <div class="confirm-msg">هتخرج من الغرفة؟ هتخسر ${penalty} نقطة (هتتوزع على باقي اللاعبين) ودورك هيتلغي في الحال</div>
-      <div class="confirm-sub" id="leave-room-countdown">هيتلغي دورك تلقائيًا بعد <b>${secs}</b> ثانية لو محدش رد</div>
-      <div class="confirm-actions">
-        <button type="button" class="btn btn-ghost" id="leave-room-stay-btn">أكمل اللعب</button>
-        <button type="button" class="btn btn-primary" id="leave-room-yes-btn" style="background:linear-gradient(95deg,var(--danger),#e0644f); color:#fff;">نعم، اخرج</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-  const cleanup = ()=>{
-    if(leaveRoomTimer){ clearInterval(leaveRoomTimer); leaveRoomTimer = null; }
-    const el = document.getElementById('leave-room-overlay');
-    if(el) el.remove();
-  };
-  const doLeave = ()=>{
-    cleanup();
-    applyLeaveRoomPenalty(state.roomCode);
-    leaveGameRoom();
-  };
-  document.getElementById('leave-room-stay-btn').addEventListener('click', cleanup);
-  document.getElementById('leave-room-yes-btn').addEventListener('click', doLeave);
-  leaveRoomTimer = setInterval(()=>{
-    secs--;
-    const lbl = document.getElementById('leave-room-countdown');
-    if(!lbl){ clearInterval(leaveRoomTimer); leaveRoomTimer = null; return; }
-    if(secs<=0){ doLeave(); return; }
-    lbl.innerHTML = `هيتلغي دورك تلقائيًا بعد <b>${secs}</b> ثانية لو محدش رد`;
-  }, 1000);
+  gxExitConfirm({
+    game: game || '',
+    penalty,
+    countdown: 30,
+    onConfirm: ()=>{
+      const code = state.roomCode;
+      applyLeaveRoomPenalty(code);
+      leaveGameRoom();
+    }
+  });
 }
 async function applyLeaveRoomPenalty(code){
   if(!state.pid) return;
@@ -38456,9 +38430,12 @@ function popTopOverlay(){
   return false;
 }
 function handleHardwareBack(){
+  if(window.gxExitConfirm && gxExitConfirm.dismiss()) return true; /* نافذة تأكيد الخروج مفتوحة: الرجوع = أكمل اللعب */
   if(popTopOverlay()) return true;
-  if(document.getElementById('cube-overlay')){ closeCubeGame(); return true; }
+  if(document.getElementById('cube-overlay')){ gxAskExit('cube', ()=>closeCubeGame()); return true; }
   if(state.friendTile){ setFriendTile(null); return true; }
+  if(/^room-/.test(state.view||'') && state.view!=='room-lobby' && state.roomCode){ confirmLeaveGameRoom(); return true; }
+  if(/^game-/.test(state.view||'') && !/^game-(rooms|rooms-cat|achievements|leaderboard)$/.test(state.view)){ gxAskExit(null, ()=>goBack()); return true; }
   if(state.history && state.history.length>0){ goBack(); return true; }
   return false;
 }
@@ -45787,6 +45764,191 @@ if(typeof ADMIN_HUB_ITEMS!=='undefined'){
 /* ---------- تحميل دوري ---------- */
 setInterval(function(){ if(navigator.onLine===false) return; if(state.pid || state.adminUnlocked) load(true); }, 25000);
 setTimeout(function(){ load(true); }, 6000);
+})();
+</script>
+
+<style id="su-meter-pro">
+/* شريط اكتمال الملف: نسخة مدمجة واحترافية — سطر واحد (العنوان | الشريط | النسبة) + رسالة صغيرة تحته */
+html body .su-meter, html body .su-card .su-meter{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; column-gap:10px; row-gap:4px;
+  margin-top:10px; padding:8px 12px 7px; border-radius:12px; background:rgba(201,164,92,.10); border:1px solid rgba(201,164,92,.28); box-shadow:none; }
+html body .su-meter .top, html body .su-card .su-meter .top{ display:contents; }
+html body .su-meter .top span, html body .su-card .su-meter .top span{ grid-column:1; grid-row:1; font-size:11px; font-weight:800; letter-spacing:.2px; color:#7a5a14; white-space:nowrap; }
+html body .su-meter .top b, html body .su-card .su-meter .top b{ grid-column:3; grid-row:1; font-size:11px; font-weight:900; line-height:1.6; padding:1px 9px; border-radius:99px; color:#0f2147; background:rgba(201,164,92,.24); font-variant-numeric:tabular-nums; min-width:38px; text-align:center; }
+html body .su-meter .trk, html body .su-card .su-meter .trk{ grid-column:2; grid-row:1; height:5px; margin:0; border-radius:99px; background:rgba(122,90,20,.16); box-shadow:none; overflow:hidden; }
+html body .su-meter .trk i, html body .su-card .su-meter .trk i{ min-width:5px; border-radius:99px; background:linear-gradient(270deg,#F2CB63,#C98F1C); }
+html body .su-meter .trk i::after, html body .su-card .su-meter .trk i::after{ opacity:.5; animation-duration:3.6s; }
+html body .su-meter .msg, html body .su-card .su-meter .msg{ grid-column:1 / -1; grid-row:2; font-size:10.5px; font-weight:700; line-height:1.4; color:#8a7a4a; }
+html body .su-meter.full, html body .su-card .su-meter.full{ background:rgba(30,158,107,.08); border-color:rgba(30,158,107,.30); }
+html body .su-meter.full .top b, html body .su-card .su-meter.full .top b{ color:#14684a; background:rgba(30,158,107,.16); }
+html body .su-meter.full .trk, html body .su-card .su-meter.full .trk{ background:rgba(30,158,107,.16); }
+html body .su-meter.full .trk i, html body .su-card .su-meter.full .trk i{ background:linear-gradient(270deg,#5fd6a3,#1e9e6b); }
+html body .su-meter.full .msg, html body .su-card .su-meter.full .msg{ color:#1e7d57; }
+/* الوضع الداكن */
+html[data-theme="dark"] body .su-meter, html[data-theme="dark"] body .su-card .su-meter{ background:rgba(255,255,255,.05); border-color:rgba(232,198,117,.22); }
+html[data-theme="dark"] body .su-meter .top span, html[data-theme="dark"] body .su-card .su-meter .top span{ color:#CFC6A3; }
+html[data-theme="dark"] body .su-meter .top b, html[data-theme="dark"] body .su-card .su-meter .top b{ color:#F3EEDD; background:rgba(232,198,117,.16); }
+html[data-theme="dark"] body .su-meter .trk, html[data-theme="dark"] body .su-card .su-meter .trk{ background:rgba(255,255,255,.12); }
+html[data-theme="dark"] body .su-meter .msg, html[data-theme="dark"] body .su-card .su-meter .msg{ color:#A9A184; }
+html[data-theme="dark"] body .su-meter.full, html[data-theme="dark"] body .su-card .su-meter.full{ background:rgba(95,224,164,.08); border-color:rgba(95,224,164,.28); }
+html[data-theme="dark"] body .su-meter.full .top b, html[data-theme="dark"] body .su-card .su-meter.full .top b{ color:#CFF5E2; background:rgba(95,224,164,.16); }
+html[data-theme="dark"] body .su-meter.full .trk, html[data-theme="dark"] body .su-card .su-meter.full .trk{ background:rgba(95,224,164,.14); }
+html[data-theme="dark"] body .su-meter.full .msg, html[data-theme="dark"] body .su-card .su-meter.full .msg{ color:#7fdcb0; }
+@media (prefers-reduced-motion:reduce){ html body .su-meter .trk i::after, html body .su-card .su-meter .trk i::after{ animation:none; } }
+</style>
+<style id="gx-exit-confirm-css">
+/* ===== نافذة تأكيد الخروج من الألعاب ===== */
+.gx-ov{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px;direction:rtl;
+  background:rgba(6,5,20,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:gxFade .22s ease both;font-family:'Cairo','Tajawal',sans-serif;-webkit-tap-highlight-color:transparent}
+.gx-ov.out{animation:gxFadeOut .2s ease both}
+.gx-card{position:relative;width:100%;max-width:340px;margin-top:38px;padding:54px 20px 18px;border-radius:26px;text-align:center;color:var(--text,#F6F5FF);
+  background:linear-gradient(180deg,var(--surface-2,#262161),var(--bg-2,#171449));border:1px solid var(--border,rgba(255,255,255,.12));
+  box-shadow:0 26px 60px rgba(0,0,0,.5);animation:gxPop .45s cubic-bezier(.2,1.25,.3,1) both}
+.gx-ov.out .gx-card{animation:gxPopOut .2s ease both}
+.gx-badge{position:absolute;top:-40px;left:50%;margin-left:-40px;width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;line-height:1;
+  background:linear-gradient(145deg,var(--gold-2,#FFDE94),var(--gold,#F4B740));box-shadow:0 12px 28px rgba(244,183,64,.45);animation:gxBadge .65s .08s cubic-bezier(.2,1.5,.3,1) both}
+.gx-badge::before,.gx-badge::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--gold,#F4B740);opacity:0;animation:gxRing 2.4s ease-out infinite;pointer-events:none}
+.gx-badge::after{animation-delay:1.2s}
+.gx-ov.danger .gx-badge{background:linear-gradient(145deg,#ffb3a7,var(--danger,#FF6B6B));box-shadow:0 12px 28px rgba(255,107,107,.45)}
+.gx-ov.danger .gx-badge::before,.gx-ov.danger .gx-badge::after{border-color:var(--danger,#FF6B6B)}
+.gx-art{display:inline-block;animation:gxFloat 2.6s ease-in-out infinite}
+.gx-dice{display:inline-block;animation:gxDice 2.2s ease-in-out infinite}
+.gx-door{display:inline-block;transform-origin:100% 50%;animation:gxDoor 2s ease-in-out infinite}
+.gx-xo{display:block;overflow:visible}
+.gx-xo .d{stroke-dasharray:100;stroke-dashoffset:100;animation:gxDraw 2.6s ease-in-out infinite}
+.gx-xo .d2{animation-delay:.25s}.gx-xo .d3{animation-delay:.6s}
+.gx-ttl{margin:0 0 6px;font-size:19px;font-weight:900;letter-spacing:.1px}
+.gx-msg{margin:0;font-size:13.5px;font-weight:600;line-height:1.8;color:var(--text-muted,#9D9BC4)}
+.gx-chip{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 14px;border-radius:99px;font-size:12.5px;font-weight:800;
+  color:var(--danger,#FF6B6B);background:color-mix(in srgb,var(--danger,#FF6B6B) 14%,transparent);border:1px solid color-mix(in srgb,var(--danger,#FF6B6B) 38%,transparent);animation:gxShake .6s .5s ease both}
+.gx-cd{margin-top:14px}
+.gx-cd-txt{font-size:11.5px;font-weight:700;color:var(--text-muted,#9D9BC4);margin-bottom:6px}
+.gx-cd-txt b{color:var(--text,#F6F5FF);font-variant-numeric:tabular-nums}
+.gx-cd-bar{height:4px;border-radius:99px;background:rgba(127,127,160,.22);overflow:hidden}
+.gx-cd-bar i{display:block;height:100%;width:100%;border-radius:99px;transform-origin:100% 50%;background:linear-gradient(270deg,var(--gold-2,#FFDE94),var(--danger,#FF6B6B));animation:gxCd linear forwards}
+.gx-acts{display:flex;gap:10px;margin-top:18px}
+.gx-btn{flex:1;min-height:48px;padding:0 10px;border-radius:15px;border:0;cursor:pointer;font-family:inherit;font-size:14.5px;font-weight:900;transition:transform .12s ease,filter .15s ease;-webkit-user-select:none;user-select:none}
+.gx-btn:active{transform:scale(.95)}
+.gx-stay{color:#1a1633;background:linear-gradient(145deg,var(--gold-2,#FFDE94),var(--gold,#F4B740));box-shadow:0 8px 20px rgba(244,183,64,.35)}
+.gx-leave{color:var(--danger,#FF6B6B);background:transparent;border:1.5px solid color-mix(in srgb,var(--danger,#FF6B6B) 55%,transparent)}
+.gx-leave:active{background:color-mix(in srgb,var(--danger,#FF6B6B) 14%,transparent)}
+.gx-btn:focus-visible{outline:2px solid var(--gold,#F4B740);outline-offset:2px}
+@keyframes gxFade{from{opacity:0}to{opacity:1}}
+@keyframes gxFadeOut{to{opacity:0}}
+@keyframes gxPop{0%{opacity:0;transform:translateY(34px) scale(.86)}100%{opacity:1;transform:none}}
+@keyframes gxPopOut{to{opacity:0;transform:translateY(14px) scale(.94)}}
+@keyframes gxBadge{0%{transform:scale(0) rotate(-40deg)}100%{transform:none}}
+@keyframes gxRing{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.7)}}
+@keyframes gxFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes gxDice{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-18deg) scale(1.08)}50%{transform:rotate(14deg) scale(1)}75%{transform:rotate(180deg) scale(1.08)}}
+@keyframes gxDoor{0%,100%{transform:perspective(160px) rotateY(0)}50%{transform:perspective(160px) rotateY(-38deg)}}
+@keyframes gxDraw{0%{stroke-dashoffset:100}35%,75%{stroke-dashoffset:0}100%{stroke-dashoffset:-100}}
+@keyframes gxShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+@keyframes gxCd{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@media (prefers-reduced-motion:reduce){.gx-ov,.gx-card,.gx-badge,.gx-badge::before,.gx-badge::after,.gx-art,.gx-dice,.gx-door,.gx-chip{animation:none!important}.gx-xo .d{animation:none;stroke-dashoffset:0}}
+</style>
+
+<script id="gx-exit-confirm-js">
+/* ===== تأكيد الخروج الموحّد لكل الألعاب (إكس أو، لودو، يونو، شطرنج، بلياردو، ... وكل الغرف) ===== */
+(function(){
+  if(window.gxExitConfirm) return;
+  var EMO = {ludo:'🎲',connect4:'🔴',domino:'🎴',chess:'♟️',checkers:'⚫',uno:'🃏',memory:'🧠',rps:'✊',backgammon:'🎲',snakes:'🐍',reflex:'⚡',math:'➗',numguess:'🔢',placemem:'📍',bus:'🚌',tmm:'🎯',
+    billiards:'🎱',stack:'🧱',cube:'🧊',blocky:'🟦',darts:'🎯',bowling:'🎳',millionaire:'👑',revword:'🔤',crossmath:'➕',quiz:'❓',mystery:'🕵️',emojibible:'😀',proverb:'📜'};
+  var open = null;
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function art(g){
+    if(g==='xo') return '<svg class="gx-xo" viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="#1a1633" stroke-width="4.6" stroke-linecap="round"><path class="d" pathLength="100" d="M7 7L22 22"/><path class="d d2" pathLength="100" d="M22 7L7 22"/><circle class="d d3" pathLength="100" cx="34" cy="34" r="10"/></svg>';
+    if(g==='ludo'||g==='backgammon') return '<span class="gx-dice">🎲</span>';
+    if(EMO[g]) return '<span class="gx-art">'+EMO[g]+'</span>';
+    return '<span class="gx-door">🚪</span>';
+  }
+  function tick(){ try{ if(window.SND && SND.click) SND.click(); }catch(e){} }
+  function close(ok, ov, o, state){
+    if(state.done) return; state.done = true;
+    if(state.timer){ clearInterval(state.timer); state.timer = null; }
+    document.removeEventListener('keydown', state.onKey, true);
+    if(open===api) open = null;
+    ov.classList.add('out');
+    setTimeout(function(){ if(ov.parentNode) ov.parentNode.removeChild(ov); }, 200);
+    try{ if(ok){ if(o.onConfirm) o.onConfirm(); } else if(o.onCancel) o.onCancel(); }catch(e){ console.error(e); }
+  }
+  var api = null;
+  window.gxExitConfirm = function(o){
+    o = o || {};
+    if(open) open.dismiss();
+    var g = o.game || '';
+    var penalty = +o.penalty || 0, cd = +o.countdown || 0;
+    var title = o.title || (o.spectate ? 'تبطّل تتفرّج؟' : (o.waiting ? 'تخرج من الغرفة؟' : 'تغادر اللعبة؟'));
+    var msg = o.msg || (o.spectate ? 'هترجع للقائمة والمعركة هتكمّل من غيرك.'
+      : o.waiting ? 'هتخرج من الغرفة وترجع للألعاب.'
+      : penalty>0 ? 'خروجك أثناء المعركة هيلغي دورك، والنقط هتتوزع على باقي اللاعبين.'
+      : 'لو خرجت دلوقتي هتضيع اللعبة الحالية وكل تقدّمك فيها.');
+    var ov = document.createElement('div');
+    ov.className = 'gx-ov' + (penalty>0 ? ' danger' : '');
+    ov.setAttribute('role','alertdialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-labelledby','gx-t');
+    ov.innerHTML = '<div class="gx-card"><div class="gx-badge" aria-hidden="true">'+art(g)+'</div>'
+      + '<h3 class="gx-ttl" id="gx-t">'+esc(title)+'</h3><p class="gx-msg">'+esc(msg)+'</p>'
+      + (penalty>0 ? '<div class="gx-chip">⚠️ هتخسر '+penalty+' نقطة</div>' : '')
+      + (cd>0 ? '<div class="gx-cd"><div class="gx-cd-txt">هيتنفّذ الخروج تلقائيًا بعد <b id="gx-cd">'+cd+'</b> ثانية</div><div class="gx-cd-bar"><i style="animation-duration:'+cd+'s"></i></div></div>' : '')
+      + '<div class="gx-acts"><button type="button" class="gx-btn gx-stay">'+esc(o.stayLabel||'أكمل اللعب')+'</button><button type="button" class="gx-btn gx-leave">'+esc(o.leaveLabel||'نعم، اخرج')+'</button></div></div>';
+    document.body.appendChild(ov);
+    var st = { done:false, timer:null, onKey:null };
+    st.onKey = function(e){ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(false, ov, o, st); } };
+    document.addEventListener('keydown', st.onKey, true);
+    var stay = ov.querySelector('.gx-stay'), leave = ov.querySelector('.gx-leave');
+    stay.addEventListener('click', function(){ tick(); close(false, ov, o, st); });
+    leave.addEventListener('click', function(){ tick(); close(true, ov, o, st); });
+    ov.addEventListener('click', function(e){ if(e.target===ov) close(false, ov, o, st); });
+    if(cd>0){
+      var left = cd, lbl = ov.querySelector('#gx-cd');
+      st.timer = setInterval(function(){ left--; if(lbl) lbl.textContent = Math.max(left,0); if(left<=0) close(true, ov, o, st); }, 1000);
+    }
+    try{ if(navigator.vibrate) navigator.vibrate(12); }catch(e){}
+    try{ stay.focus({preventScroll:true}); }catch(e){}
+    api = { dismiss:function(){ close(false, ov, o, st); } };
+    open = api;
+    return api;
+  };
+  window.gxExitConfirm.dismiss = function(){ if(open){ open.dismiss(); return true; } return false; };
+
+  /* ---------- أي شاشة لعبة هي؟ ---------- */
+  var NO_CONFIRM = /^game-(rooms|rooms-cat|achievements|leaderboard)$/;
+  function viewGame(){
+    var v = (window.state && state.view) || '';
+    var m = /^game-(.+)$/.exec(v);
+    return (m && !NO_CONFIRM.test(v)) ? m[1] : null;
+  }
+  window.gxAskExit = function(game, fn){
+    window.gxExitConfirm({ game: game || viewGame() || '', onConfirm: fn });
+  };
+
+  /* ---------- اعتراض أزرار الخروج في كل الألعاب ---------- */
+  var EXIT_ACTIONS = {'billiards-close':'billiards','stack-close':'stack','cube-close':'cube','blk-close':'blocky','darts-close':'darts','bowling-close':'bowling','mil-close':'millionaire'};
+  var bypass = false;
+  document.addEventListener('click', function(e){
+    if(bypass) return;
+    var t = e.target; if(!t || !t.closest) return;
+    var el = t.closest('[data-action],[data-rw],[data-cm]'); if(!el) return;
+    var game = null, sel = null;
+    var act = el.getAttribute('data-action');
+    if(act){
+      if(EXIT_ACTIONS[act]){
+        if(el.classList.contains('blk-ghost-btn')) return;   /* زر "خروج" في شاشة النهاية */
+        game = EXIT_ACTIONS[act];
+      } else if(act==='back'){ game = viewGame(); }
+      if(!game) return;
+      sel = '[data-action="'+act+'"]';
+    } else if(el.getAttribute('data-rw')==='close' || el.getAttribute('data-cm')==='close'){
+      if(/(^|\s)alt(\s|$)/.test(el.className)) return;       /* أزرار الخروج في شاشة النتيجة */
+      game = el.hasAttribute('data-rw') ? 'revword' : 'crossmath';
+      sel = el.hasAttribute('data-rw') ? '[data-rw="close"]:not(.alt)' : '[data-cm="close"]:not(.alt)';
+    } else return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    window.gxExitConfirm({ game: game, onConfirm: function(){
+      var target = document.body.contains(el) ? el : document.querySelector(sel);
+      if(!target) return;
+      bypass = true; try{ target.click(); } finally { bypass = false; }
+    }});
+  }, true);
 })();
 </script>
 
