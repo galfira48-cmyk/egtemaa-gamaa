@@ -14557,7 +14557,7 @@ function askRoomPw(room){
   });
 }
 async function lobbyRefresh(){ try{ GAME_ROOMS = await loadGameRooms(); }catch(e){} ROOM_LOBBY.ready = true; if(state.view==='room-lobby') render(); }
-setInterval(()=>{ if(state.view==='room-lobby' && document.activeElement && document.activeElement.id!=='room-join-code' && !document.querySelector('.modal-overlay')) lobbyRefresh(); }, 4000);
+setInterval(()=>{ if(state.view==='room-lobby' && document.activeElement && document.activeElement.id!=='room-join-code' && document.activeElement.id!=='jr-search' && !document.querySelector('.modal-overlay')) lobbyRefresh(); }, 4000);
 function lobbyRooms(){
   return Object.values(GAME_ROOMS||{}).filter(r=>{
     if(!r || r.status!=='waiting' || r.hostId===state.pid || isGameDisabled(r.game)) return false;
@@ -14578,6 +14578,13 @@ function jrSyncCode(v){
   if(w){ w.innerHTML=jrBoxes(v, v.length>JR_PREV ? v.length-1 : -1); w.classList.toggle('full', v.length===4); }
   JR_PREV=v.length;
   const btn=document.getElementById('jr-join-btn'); if(btn) btn.classList.toggle('ready', v.length===4);
+  const pv=document.getElementById('jr-pv');
+  if(pv){
+    pv.innerHTML=jrPreviewHtml(v);
+    if(v.length===4 && !GAME_ROOMS[v]){
+      loadGameRooms().then(r=>{ GAME_ROOMS=r; const p2=document.getElementById('jr-pv'); if(p2 && String(state.roomJoinInput||'')===v) p2.innerHTML=jrPreviewHtml(v); }).catch(()=>{});
+    }
+  }
 }
 if(!window.__jrFx){
   window.__jrFx=1;
@@ -14594,53 +14601,247 @@ if(!window.__jrFx){
     }
   },true);
 }
+
+
+/* ---------- رسومات لوبي الانضمام (SVG) ---------- */
+const JR_SPARK = (x,y,s,c,d)=>`<g transform="translate(${x} ${y}) scale(${s})"><path class="a-tw" style="animation-delay:${d}s" d="M0-9l2.4 6.6L9 0l-6.6 2.4L0 9l-2.4-6.6L-9 0l6.6-2.4z" fill="${c}"/></g>`;
+const JR_HERO_ART = `<svg class="jr-hero-art" viewBox="0 0 170 130" aria-hidden="true">
+  <defs>
+    <linearGradient id="jrpad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9C8BFF"/><stop offset="1" stop-color="#5A3DE0"/></linearGradient>
+    <linearGradient id="jrdie" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#DDD4FF"/></linearGradient>
+    <radialGradient id="jrhalo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  </defs>
+  <circle cx="85" cy="68" r="62" fill="url(#jrhalo)"/>
+  <ellipse cx="86" cy="116" rx="46" ry="7" fill="#1B1050" opacity=".35"/>
+  <g class="a-f1">
+    <path d="M44 56c0-11 9-20 20-20h42c11 0 20 9 20 20 0 16 9 40-6 49-10 6-18-2-25-11H75c-7 9-15 17-25 11-15-9-6-33-6-49z" fill="url(#jrpad)" stroke="#1B1050" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M52 52c2-8 8-12 16-12h30" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="3.2" stroke-linecap="round"/>
+    <rect x="60" y="57" width="8" height="26" rx="3" fill="#fff" stroke="#1B1050" stroke-width="2.2"/><rect x="51" y="66" width="26" height="8" rx="3" fill="#fff" stroke="#1B1050" stroke-width="2.2"/>
+    <rect x="61.5" y="67.5" width="5" height="5" fill="#fff"/>
+    <circle cx="118" cy="58" r="5.8" fill="#FFD23F" stroke="#1B1050" stroke-width="2.2"/><circle cx="127" cy="67" r="5.8" fill="#FF5FA2" stroke="#1B1050" stroke-width="2.2"/>
+    <circle cx="118" cy="76" r="5.8" fill="#3DDCFF" stroke="#1B1050" stroke-width="2.2"/><circle cx="109" cy="67" r="5.8" fill="#3EE08F" stroke="#1B1050" stroke-width="2.2"/>
+    <rect x="79" y="62" width="7" height="4" rx="2" fill="#1B1050" opacity=".55"/><rect x="90" y="62" width="7" height="4" rx="2" fill="#1B1050" opacity=".55"/>
+  </g>
+  <g transform="translate(14 84) rotate(-14)"><g class="a-f2">
+    <rect width="32" height="32" rx="9" fill="url(#jrdie)" stroke="#1B1050" stroke-width="3"/>
+    <circle cx="9" cy="9" r="3.2" fill="#1B1050"/><circle cx="16" cy="16" r="3.2" fill="#FF5FA2"/><circle cx="23" cy="23" r="3.2" fill="#1B1050"/>
+  </g></g>
+  <g transform="translate(132 10) rotate(14)"><g class="a-f3">
+    <rect width="28" height="38" rx="7" fill="#fff" stroke="#1B1050" stroke-width="3"/>
+    <path d="M14 11l3 6.4 6.9.8-5.1 4.7 1.4 6.8L14 26.3l-6.2 3.4 1.4-6.8-5.1-4.7 6.9-.8z" fill="#FF5FA2" stroke="#1B1050" stroke-width="1.6" stroke-linejoin="round"/>
+  </g></g>
+  <g transform="translate(24 24)"><g class="a-f3"><circle r="13" fill="#fff" stroke="#1B1050" stroke-width="3"/><circle r="8" fill="#FF5FA2"/><circle r="3.6" fill="#fff"/></g></g>
+  ${JR_SPARK(150,70,.9,'#FFE066',0)}${JR_SPARK(8,58,.7,'#3DDCFF',.6)}${JR_SPARK(106,18,.6,'#fff',1.1)}${JR_SPARK(60,10,.8,'#FFE066',.3)}
+</svg>`;
+const JR_EMPTY_ART = `<div class="jr-orb"><i class="jr-ring"></i><span class="jr-core"><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#F6D27A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 10.5v4M6 12.5h4"/><circle cx="15.5" cy="11.5" r=".7" fill="#F6D27A"/><circle cx="17.5" cy="13.5" r=".7" fill="#F6D27A"/></svg></span><u class="o1">🃏</u><u class="o2">🎯</u><u class="o3">🎲</u></div>`;
+/* ---------- لوبي الغرف الذكي: لوجو اللعبة + بحث + فلاتر + انضمام سريع + معاينة الكود ---------- */
+function jrGame(id){ return GAMES_CATALOG.find(x=>x.id===id) || (typeof ROOM_ONLY_TILES!=='undefined' && ROOM_ONLY_TILES[id]) || {icon:'🎮', title:'لعبة'}; }
+function jrCap(r){
+  if(!r.players) return 2;
+  return r.game==='khatfa' ? 8 : r.game==='battleship' ? 2 : r.game==='drawguess' ? 6 : r.game==='snakes' ? Math.max(2, Math.min(6, r.maxPlayers||6)) : ((r.game==='fazzura' && r.fzJudge!==false) ? 5 : 4);
+}
+function jrAgo(ts){ const s=Math.max(0,Math.round((Date.now()-(ts||Date.now()))/1000)); if(s<45) return 'دلوقتي'; const m=Math.round(s/60); return 'من '+(m<=1?'دقيقة':m+' د'); }
+function jrFiltered(rooms){
+  const f=state.jrF||'all', q=String(state.jrQ||'').trim().toLowerCase();
+  return rooms.filter(r=>{
+    if(f==='free' && r.paid) return false;
+    if(f==='paid' && !r.paid) return false;
+    if(f==='open' && r.pw) return false;
+    if(q){ const g=jrGame(r.game); const hay=((g.title||'')+' '+(r.hostName||'')+' '+(r.code||'')).toLowerCase(); if(!hay.includes(q)) return false; }
+    return true;
+  });
+}
+function jrQuickPick(rooms){
+  const c = rooms.filter(r=>!r.pw && !r.paid && (r.players ? r.players.length : 1) < jrCap(r));
+  if(!c.length) return null;
+  c.sort((a,b)=>((b.players?b.players.length:1)-(a.players?a.players.length:1)) || ((b.updatedAt||0)-(a.updatedAt||0)));
+  return c[0];
+}
+function jrRoomCard(r, idx){
+  const g = jrGame(r.game);
+  const pl = r.players || [{id:r.hostId, name:r.hostName}];
+  const n = pl.length, max = jrCap(r);
+  let dots=''; for(let i=0;i<max;i++) dots+=`<b style="--d:${i}" class="${i<n?'f':''}"></b>`;
+  const isNew = !JR_SEEN[r.code]; JR_SEEN[r.code]=1;
+  const avs = pl.slice(0,4).map(p=>gameAvatar(p.id)).join('') + (n>4?`<i class="jr-more">+${n-4}</i>`:'');
+  return `<button type="button" class="jr-room${isNew?' jr-new':''}" style="--k:${Math.min(idx,7)};--gc:${g.color||'linear-gradient(145deg,#3a2a12,#0c0b16)'}" data-action="lobby-join" data-code="${escapeHtml(r.code)}">
+    <span class="jr-ico jr-logo">${gameIconHtml(g)}</span>
+    <span class="jr-info">
+      <span class="jr-name">${escapeHtml(g.title)}<em class="jr-codechip">#${escapeHtml(r.code)}</em></span>
+      <span class="jr-host"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>${escapeHtml(r.hostName||'لاعب')} · ${jrAgo(r.createdAt||r.updatedAt)}</span>
+      <span class="jr-avs">${avs}</span>
+      <span class="jr-tags"><span class="jr-tag${r.pw?' lock':''}">${r.pw?'🔒 محمية':'🔓 مفتوحة'}</span><span class="jr-tag${r.paid?' gold':''}">${r.paid?'🪙 بكوين':'🆓 مجاني'}</span></span>
+    </span>
+    <span class="jr-side"><span class="jr-dots" title="${n}/${max}">${dots}</span><span class="jr-cnt">${n}/${max}</span><span class="jr-go">انضم</span></span></button>`;
+}
+function jrCardsHtml(all){
+  if(!ROOM_LOBBY.ready) return [1,2,3].map(()=>`<div class="jr-room jr-skel jr-new"><i></i><div><b></b><em></em></div></div>`).join('');
+  if(!all.length) return `<div class="jr-empty">
+      <div class="jr-empty-art">${JR_EMPTY_ART}</div>
+      <div class="jr-empty-t">مفيش غرف مفتوحة دلوقتي</div>
+      <div class="jr-empty-s">أول ما صحابك يعملوا غرف هتظهر هنا لحظيًا</div>
+    </div>`;
+  const rooms = jrFiltered(all);
+  if(!rooms.length) return `<div class="jr-empty"><div class="jr-empty-t">🔍 مفيش نتائج</div><div class="jr-empty-s">جرّب تغيّر البحث أو الفلتر</div></div>`;
+  return rooms.map(jrRoomCard).join('');
+}
+function jrPreviewHtml(v){
+  v = String(v||''); if(v.length<4) return '';
+  const r = GAME_ROOMS[v];
+  if(!r) return `<div class="jr-pvc bad"><span class="jr-pv-t"><b>🔍 الكود ده مش موجود</b><em>اتأكد من الأرقام وجرّب تاني</em></span></div>`;
+  const g = jrGame(r.game), pl = r.players || [{id:r.hostId}], n = pl.length, max = jrCap(r);
+  const already = pl.some(p=>p.id===state.pid) || r.guestId===state.pid;
+  let st = 'جاهزة للانضمام', cls = 'ok';
+  if(!already){ if(r.status!=='waiting'){ st='اللعبة بدأت'; cls='bad'; } else if(n>=max){ st='الغرفة مكتملة'; cls='bad'; } }
+  return `<div class="jr-pvc ${cls}"><span class="jr-ico jr-pv-ico">${gameIconHtml(g)}</span><span class="jr-pv-t"><b>${escapeHtml(g.title)}</b><em>${escapeHtml(r.hostName||'لاعب')} · ${n}/${max}${r.pw?' · 🔒':''}${r.paid?' · 🪙':''}</em></span><span class="jr-pv-s">${st}</span></div>`;
+}
+function jrUpdateList(){
+  const el=document.getElementById('jr-list'); if(!el) return;
+  el.innerHTML = jrCardsHtml(lobbyRooms());
+  document.querySelectorAll('[data-jr-filter]').forEach(c=>c.classList.toggle('on', c.dataset.jrFilter===(state.jrF||'all')));
+}
+if(!window.__jrSmart){
+  window.__jrSmart = 1;
+  window.addEventListener('click', e=>{
+    const t = e.target.closest ? e.target.closest('[data-jr-filter],[data-jr-quick],[data-jr-paste]') : null;
+    if(!t) return;
+    if(t.dataset.jrFilter){ state.jrF = t.dataset.jrFilter; jrUpdateList(); return; }
+    if(t.hasAttribute('data-jr-quick')){ const r=jrQuickPick(lobbyRooms()); if(!r){ showToast('مفيش غرفة مناسبة دلوقتي', true); return; } attemptJoinRoom(r.code); return; }
+    if(t.hasAttribute('data-jr-paste')){
+      (async()=>{
+        try{
+          const txt = await navigator.clipboard.readText();
+          const v = ghNormalizeDigits(String(txt||'')).replace(/\D/g,'').slice(0,4);
+          if(v.length<4){ showToast('مفيش كود غرفة في اللي منسوخ', true); return; }
+          const inp=document.getElementById('room-join-code'); if(inp) inp.value=v;
+          state.roomJoinInput=v; jrSyncCode(v);
+        }catch(_){ showToast('اللصق مش متاح، اكتب الكود بإيدك', true); }
+      })();
+    }
+  }, true);
+  document.addEventListener('input', e=>{
+    if(e.target && e.target.id==='jr-search'){ state.jrQ = e.target.value; jrUpdateList(); }
+  });
+}
 function renderRoomLobby(){
   const rooms = lobbyRooms();
   const cur = String(state.roomJoinInput||'');
   const fresh = (Date.now()-JR_LAST) > 6000; JR_LAST = Date.now();
   if(fresh) JR_SEEN = {};
   JR_PREV = cur.length;
-  const cards = !ROOM_LOBBY.ready ? [1,2,3].map(()=>`<div class="jr-room jr-skel jr-new"><i></i><div><b></b><em></em></div></div>`).join('')
-  : rooms.length ? rooms.map((r,idx)=>{
-      const g = GAMES_CATALOG.find(x=>x.id===r.game) || {icon:'🎮', title:'لعبة'};
-      const n = r.players ? r.players.length : 1, max = r.players ? 4 : 2;
-      let dots=''; for(let i=0;i<max;i++) dots+=`<b style="--d:${i}" class="${i<n?'f':''}"></b>`;
-      const isNew = !JR_SEEN[r.code]; JR_SEEN[r.code]=1;
-      return `<button type="button" class="jr-room${isNew?' jr-new':''}" style="--k:${Math.min(idx,7)}" data-action="lobby-join" data-code="${escapeHtml(r.code)}">
-        <span class="jr-ico">${g.icon}</span>
-        <span class="jr-info">
-          <span class="jr-name">${escapeHtml(g.title)}</span>
-          <span class="jr-host"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>${escapeHtml(r.hostName||'لاعب')}</span>
-          <span class="jr-tags"><span class="jr-tag${r.pw?' lock':''}">${r.pw?'🔒 محمية':'🔓 مفتوحة'}</span><span class="jr-tag${r.paid?' gold':''}">${r.paid?'🪙 بكوين':'🆓 مجاني'}</span></span>
-        </span>
-        <span class="jr-side"><span class="jr-dots" title="${n}/${max}">${dots}</span><span class="jr-cnt">${n}/${max}</span><span class="jr-go">انضم</span></span></button>`;
-    }).join('')
-  : `<div class="jr-empty">
-      <div class="jr-empty-art"><span></span><span></span><u>🎲</u><u>🃏</u><u>🎯</u><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="11" rx="3"/><path d="M8 12.5v0M7 10.5v4M6 12.5h2M15.5 11.5h.01M17.5 13.5h.01"/></svg></div>
-      <div class="jr-empty-t">مفيش غرف مفتوحة دلوقتي</div>
-      <div class="jr-empty-s">أول ما صحابك يعملوا غرف هتظهر هنا لحظيًا</div>
-    </div>`;
+  const cards = jrCardsHtml(rooms);
+  const quick = jrQuickPick(rooms);
+  const fl = state.jrF||'all', q0 = state.jrQ||'';
   return `
     <div class="jr-page${fresh?' jr-enter':''}">
     <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">انضمام لغرفة</div></div>
     <div class="jr-hero">
+      ${JR_HERO_ART}
       <div class="jr-hero-ico"><em></em><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M16 7l3 3M14 9l2 2"/></svg></div>
-      <div class="jr-hero-txt"><b>ادخل اللعب مع صحابك</b><span>اكتب كود الغرفة أو اختار غرفة مفتوحة من القايمة</span></div>
+      <div class="jr-hero-txt"><b>ادخل اللعب مع صحابك</b><span>اكتب كود الغرفة أو اختار غرفة مفتوحة من القايمة</span>${ROOM_LOBBY.ready?`<span class="jr-live-chip${rooms.length?' on':''}"><i></i>${rooms.length?rooms.length+' غرفة متاحة الآن':'مفيش غرف دلوقتي'}</span>`:''}</div>
     </div>
-    <div class="jr-code"><div class="jr-glow"></div>
-      <div class="jr-code-k"><span>عندك كود غرفة؟</span><em>٤ أرقام</em></div>
+    <div class="jr-code"><div class="jr-glow"></div><svg class="jr-code-deco" viewBox="0 0 120 90" aria-hidden="true"><g transform="translate(8 40) rotate(-12)"><rect width="30" height="30" rx="8" fill="#fff" stroke="#1B1050" stroke-width="3"/><circle cx="9" cy="9" r="3" fill="#1B1050"/><circle cx="21" cy="9" r="3" fill="#1B1050"/><circle cx="15" cy="15" r="3" fill="#FF5FA2"/><circle cx="9" cy="21" r="3" fill="#1B1050"/><circle cx="21" cy="21" r="3" fill="#1B1050"/></g><g transform="translate(66 8) rotate(12)"><rect width="26" height="36" rx="6" fill="#fff" stroke="#1B1050" stroke-width="3"/><path d="M13 12c-5-6-11 0-6 6l6 6 6-6c5-6-1-12-6-6z" fill="#FF3D6E"/></g></svg>
+      <div class="jr-code-k"><span>عندك كود غرفة؟</span><span class="jr-ck-r"><button type="button" class="jr-paste" data-jr-paste>📋 لصق</button><em>٤ أرقام</em></span></div>
       <label class="jr-code-wrap" for="room-join-code">
         <span class="jr-boxes" id="jr-boxes" dir="ltr">${jrBoxes(cur)}</span>
         <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" class="jr-code-in" id="room-join-code" placeholder="0000" aria-label="كود الغرفة" value="${escapeHtml(cur)}">
       </label>
+      <div class="jr-pv" id="jr-pv">${jrPreviewHtml(cur)}</div>
       <button type="button" id="jr-join-btn" class="jr-join${cur.length===4?' ready':''}" data-action="join-room"><span>انضم بالكود</span><svg class="jr-arr" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
     </div>
     <div class="jr-sec">
       <div class="jr-sec-t"><span class="jr-live"></span>غرف متاحة للانضمام${ROOM_LOBBY.ready&&rooms.length?` <span class="jr-count">${rooms.length}</span>`:''}</div>
       <div class="jr-sec-s"><i></i>تحديث تلقائي</div>
     </div>
-    <div class="jr-list">${cards}</div>
+    ${ROOM_LOBBY.ready && rooms.length ? `<div class="jr-tools">
+      <label class="jr-search"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="jr-search" type="search" autocomplete="off" placeholder="دوّر باسم اللعبة أو صاحب الغرفة" value="${escapeHtml(q0)}"></label>
+      <div class="jr-chips">${[['all','الكل'],['open','🔓 مفتوحة'],['free','🆓 مجاني'],['paid','🪙 بكوين']].map(c=>`<button type="button" class="jr-chip${fl===c[0]?' on':''}" data-jr-filter="${c[0]}">${c[1]}</button>`).join('')}</div>
+      ${quick ? `<button type="button" class="jr-quick" data-jr-quick><span>⚡ انضمام سريع</span><small>${escapeHtml(jrGame(quick.game).title)} · ${escapeHtml(quick.hostName||'لاعب')}</small></button>` : ''}
+    </div>` : ''}
+    <div class="jr-list" id="jr-list">${cards}</div>
     </div>`;
+}
+
+/* ============================= نظام "جاهز" في غرف الانتظار ============================= */
+const RDY_START_RE = /^room-(?:ludo|uno|quiz|mystery|eb|pv|st|ua|dg|bs|fh|fs|fz|snr|kh)-start$/;
+function rdyIsReady(room, pid){ return !!room['rdy_'+pid]; }
+function rdyInfo(room){
+  const ps = room.players || [];
+  const ready = ps.filter(p=>rdyIsReady(room,p.id)).length;
+  return {n:ps.length, ready, all: ps.length>0 && ready===ps.length, me: rdyIsReady(room, state.pid)};
+}
+function rdyPanelHtml(room, info){
+  const g = jrGame(room.game), ps = room.players || [], isHost = room.hostId===state.pid;
+  const pct = info.n ? Math.round(info.ready/info.n*100) : 0;
+  const rows = ps.map(p=>{
+    const on = rdyIsReady(room,p.id), me = p.id===state.pid;
+    const right = me
+      ? `<button type="button" class="rdy-btn${on?' on':''}" data-rdy-toggle>${on?'✅ جاهز':'اضغط جاهز'}</button>`
+      : `<span class="rdy-pill${on?' on':''}">${on?'✅ جاهز':'⏳ مش جاهز'}</span>`;
+    return `<div class="rdy-row${on?' on':''}">${gameAvatar(p.id)}<div class="rdy-nm"><b>${escapeHtml(p.name)}${me?' (انت)':''}</b><em>${p.id===room.hostId?'👑 صاحب الغرفة':'لاعب'}</em></div>${right}</div>`;
+  }).join('');
+  const waitNames = ps.filter(p=>!rdyIsReady(room,p.id)).map(p=>p.id===state.pid?'انت':p.name);
+  const msg = info.all
+    ? (isHost ? '🔥 الكل جاهز — اضغط ابدأ اللعب' : '🔥 الكل جاهز — مستنيين صاحب الغرفة يبدأ')
+    : '⏳ مستنيين: ' + escapeHtml(waitNames.join('، '));
+  return `<div class="rdy-panel${info.all?' all':''}">
+    <div class="rdy-head"><span class="rdy-logo">${gameIconHtml(g)}</span><div class="rdy-ht"><b>${escapeHtml(g.title)}</b><span>غرفة <em>${escapeHtml(String(room.code))}</em> · ${room.paid?'🪙 بكوين':'🆓 مجاني'}${room.pw?' · 🔒 محمية':''}</span></div><span class="rdy-count">${info.ready}/${info.n}</span></div>
+    <div class="rdy-bar"><i style="width:${pct}%"></i></div>
+    <div class="rdy-list">${rows}</div>
+    <div class="rdy-msg">${msg}</div>
+  </div>`;
+}
+window.__rdyWrap = function(html, room){
+  try{
+    if(!room || room.status!=='waiting' || !Array.isArray(room.players) || typeof html!=='string') return html;
+    const info = rdyInfo(room);
+    const panel = `<div class="rdy-wrap">${rdyPanelHtml(room, info)}</div>`;
+    const startRe = /<button[^>]*data-action="room-(?:ludo|uno|quiz|mystery|eb|pv|st|ua|dg|bs|fh|fs|fz|snr|kh)-start"[^>]*>/;
+    let out = html.replace(startRe, m=>{
+      if(info.all) return m.replace('class="','class="rdy-go ');
+      return /\bdisabled\b/.test(m) ? m : m.replace(/>$/, ' disabled>');
+    });
+    out = out.replace(/✅ جاهز/g, '🟢 متصل'); /* قديم: كان بيظهر "جاهز" لأي لاعب منضم من غير ما يضغط */
+    if(out.indexOf('<div class="snp-foot">')>-1) return out.replace('<div class="snp-foot">', panel+'<div class="snp-foot">');
+    const bi = out.search(/<button[^>]*data-action="room-(?:ludo|uno|quiz|mystery|eb|pv|st|ua|dg|bs|fh|fs|fz|snr|kh)-start"/);
+    if(bi>-1) return out.slice(0,bi)+panel+out.slice(bi);
+    const hi = out.search(/<div class="hint"[^>]*>⏳ في انتظار صاحب الغرفة/);
+    if(hi>-1) return out.slice(0,hi)+panel+out.slice(hi);
+    const li = out.lastIndexOf('</div>');
+    return li>-1 ? out.slice(0,li)+panel+out.slice(li) : out+panel;
+  }catch(e){ return html; }
+};
+let _rdyBusy = false;
+async function rdyToggle(){
+  if(_rdyBusy) return; _rdyBusy = true;
+  try{
+    GAME_ROOMS = await loadGameRooms();
+    const room = GAME_ROOMS[state.roomCode];
+    if(!room || room.status!=='waiting') return;
+    const k = 'rdy_'+state.pid;
+    room[k] = room[k] ? 0 : Date.now();
+    room.updatedAt = Date.now();
+    await saveGameRooms(GAME_ROOMS);
+    try{ SND.click(); }catch(_){}
+    if(room[k] && navigator.vibrate){ try{ navigator.vibrate(18); }catch(_){} }
+    render();
+  }catch(e){}
+  finally{ _rdyBusy = false; }
+}
+if(!window.__rdyInit){
+  window.__rdyInit = 1;
+  window.addEventListener('click', e=>{
+    const tg = e.target.closest ? e.target.closest('[data-rdy-toggle]') : null;
+    if(tg){ e.preventDefault(); e.stopPropagation(); rdyToggle(); return; }
+    const st = e.target.closest ? e.target.closest('[data-action]') : null;
+    if(st && RDY_START_RE.test(st.getAttribute('data-action')||'')){
+      const room = GAME_ROOMS[state.roomCode];
+      if(room && room.status==='waiting' && Array.isArray(room.players) && !rdyInfo(room).all){
+        e.preventDefault(); e.stopImmediatePropagation();
+        showToast('لازم كل اللاعبين يضغطوا "جاهز" الأول', true);
+      }
+    }
+  }, true);
 }
 /* ============================= GAMES: HUB ============================= */
 const GAME_CATEGORIES = [
@@ -22119,7 +22320,8 @@ function ludoRoomCtx(room){
   return {mode:'room', solo:false, me, disp:L.pos, movable:mv,
     ready: myTurn && L.phase==='roll' && !state.ludoRoomBusy, canNew: me>=0};
 }
-function renderRoomLudoLobby(room){
+function renderRoomLudoLobby(room){ return window.__rdyWrap(__rdy_renderRoomLudoLobby(room), room); }
+function __rdy_renderRoomLudoLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   const cols = LUDO_SEAT_COLORS[Math.max(2, Math.min(4, ps.length))];
@@ -23145,7 +23347,7 @@ async function createGameRoom(gameType, paid){
     code, game:gameType, status:'waiting', paid: !!paid,
     hostId: state.pid, hostName: p ? p.name : 'مضيف',
     guestId:null, guestName:null,
-    updatedAt: Date.now()
+    updatedAt: Date.now(), createdAt: Date.now()
   };
   if(ROOM_PW){ room.pw = roomPwHash(ROOM_PW); } ROOM_PW = '';
   if(gameType==='xo'){
@@ -23817,7 +24019,8 @@ const ROOM_ONLY_TILES = {
 /* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
 /* بيتتبع مين من اللاعبين ظهر قبل كده في نفس الغرفة، عشان نعرض حركة "انضم الآن" مرة واحدة بس لكل لاعب */
 const _unoLobbySeen = {};
-function renderRoomUnoLobby(room){
+function renderRoomUnoLobby(room){ return window.__rdyWrap(__rdy_renderRoomUnoLobby(room), room); }
+function __rdy_renderRoomUnoLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   if(!_unoLobbySeen[room.code]) _unoLobbySeen[room.code] = new Set();
@@ -24081,7 +24284,8 @@ function quizNewState(players){
     answered:{}, correctOrder:[], finished:false
   };
 }
-function renderRoomQuizLobby(room){
+function renderRoomQuizLobby(room){ return window.__rdyWrap(__rdy_renderRoomQuizLobby(room), room); }
+function __rdy_renderRoomQuizLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
@@ -24249,7 +24453,8 @@ function mysteryFmtTime(sec){
   const m = Math.floor(sec/60), s = sec%60;
   return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
-function renderRoomMysteryLobby(room){
+function renderRoomMysteryLobby(room){ return window.__rdyWrap(__rdy_renderRoomMysteryLobby(room), room); }
+function __rdy_renderRoomMysteryLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
@@ -24441,7 +24646,8 @@ function ebNewState(players){
   const qs = ebPickQuestions(EB_TOTAL_QUESTIONS);
   return { questions: qs, qIndex:0, total: qs.length, scores: Object.fromEntries((players||[]).map(p=>[p.id,0])), answered:{}, correctOrder:[], finished:false };
 }
-function renderRoomEbLobby(room){
+function renderRoomEbLobby(room){ return window.__rdyWrap(__rdy_renderRoomEbLobby(room), room); }
+function __rdy_renderRoomEbLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
@@ -24585,7 +24791,8 @@ function pvNewState(players){
   const qs = pvPickQuestions(PV_TOTAL_QUESTIONS);
   return { questions: qs, qIndex:0, total: qs.length, scores: Object.fromEntries((players||[]).map(p=>[p.id,0])), answered:{}, correctOrder:[], finished:false };
 }
-function renderRoomPvLobby(room){
+function renderRoomPvLobby(room){ return window.__rdyWrap(__rdy_renderRoomPvLobby(room), room); }
+function __rdy_renderRoomPvLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
@@ -24766,7 +24973,8 @@ function stName(room, id){
   const p = (room.players||[]).find(x=>x.id===id) || (typeof PARTICIPANTS!=='undefined' ? PARTICIPANTS.find(x=>x.id===id) : null);
   return p ? p.name : 'لاعب';
 }
-function renderRoomStLobby(room){
+function renderRoomStLobby(room){ return window.__rdyWrap(__rdy_renderRoomStLobby(room), room); }
+function __rdy_renderRoomStLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   const cur = stLevel(room), lv = ST_LEVELS[cur];
@@ -25050,7 +25258,8 @@ function dgHint(D){
   const show = new Set(el>0.7 ? [idx[0], idx[idx.length-1]] : (el>0.4 ? [idx[0]] : []));
   return w.split('').map((c,i)=> c===' ' ? '  ' : (show.has(i) ? c : '_')).join(' ');
 }
-function renderRoomDgLobby(room){
+function renderRoomDgLobby(room){ return window.__rdyWrap(__rdy_renderRoomDgLobby(room), room); }
+function __rdy_renderRoomDgLobby(room){
   const ps = room.players||[], isHost = room.hostId===state.pid;
   const slots = [0,1,2,3,4,5].map(i=>{
     const p = ps[i];
@@ -25255,7 +25464,8 @@ function bsNew(){ return { gid:Date.now()+'-'+Math.floor(Math.random()*1e6), pha
 function bsKey(room, pid){ return room.players[0].id===pid ? 'bsA' : 'bsB'; }
 function bsFleet(room, pid){ return room[bsKey(room,pid)] || null; }
 function bsOpp(room){ return room.players.find(p=>p.id!==state.pid); }
-function renderRoomBsLobby(room){
+function renderRoomBsLobby(room){ return window.__rdyWrap(__rdy_renderRoomBsLobby(room), room); }
+function __rdy_renderRoomBsLobby(room){
   const ps = room.players||[], isHost = room.hostId===state.pid;
   const slots = [0,1].map(i=>{ const p = ps[i];
     return p ? `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`
@@ -25391,7 +25601,8 @@ function uaResolve(room){
   U.last = {groups:list, gains, silent};
   U.phase = 'reveal';
 }
-function renderRoomUaLobby(room){
+function renderRoomUaLobby(room){ return window.__rdyWrap(__rdy_renderRoomUaLobby(room), room); }
+function __rdy_renderRoomUaLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
@@ -25675,7 +25886,8 @@ function fhResolve(room){
   F.last = {groups:list, winners, gains};
   F.phase = 'reveal';
 }
-function renderRoomFhLobby(room){
+function renderRoomFhLobby(room){ return window.__rdyWrap(__rdy_renderRoomFhLobby(room), room); }
+function __rdy_renderRoomFhLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
@@ -25882,7 +26094,8 @@ async function awardFsPoints(room){
     vtxLogSafe(ids.map(id=>({ pid:id, type:'game_win', amount:prizes[id], balAfter:(WALLET[id]||0), note:'ذاكرة الأماكن' })));
   }catch(e){}
 }
-function renderRoomFsLobby(room){
+function renderRoomFsLobby(room){ return window.__rdyWrap(__rdy_renderRoomFsLobby(room), room); }
+function __rdy_renderRoomFsLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   const slots = [0,1,2,3].map(i=>{
@@ -26169,7 +26382,8 @@ function fzJudgeOf(room){
   const ps = room.players || [];
   return (room.fzJudgeId && ps.some(p=>p.id===room.fzJudgeId)) ? room.fzJudgeId : room.hostId;
 }
-function renderRoomFzLobby(room){
+function renderRoomFzLobby(room){ return window.__rdyWrap(__rdy_renderRoomFzLobby(room), room); }
+function __rdy_renderRoomFzLobby(room){
   const ps = room.players || [];
   const isHost = room.hostId===state.pid;
   const judgeOn = room.fzJudge!==false;
@@ -27854,7 +28068,8 @@ function snzSlotHtml(room, i, max){
     <div class="snz-plate"><b>${name}</b><em class="${isHostP?'host':''}">${sub}</em></div>
   </div>`;
 }
-function renderRoomSnakesLobby(room){
+function renderRoomSnakesLobby(room){ return window.__rdyWrap(__rdy_renderRoomSnakesLobby(room), room); }
+function __rdy_renderRoomSnakesLobby(room){
   const ps = room.players || [], isHost = room.hostId===state.pid;
   const max = Math.max(2, Math.min(6, room.maxPlayers||6));
   const code = escapeHtml(String(room.code)), game = room.game||'snakes';
@@ -39568,7 +39783,8 @@ function khHelpHtml(){
     <div class="kh-rules">١. فيه فئة (زي «حيوان») وتلات حروف. اضغط على حرف يبدأ بيه جوابك.<br>٢. قولها بصوت عالي، وبعدين اضغط «قلتها» للتأكيد.<br>٣. الباقيين عندهم ٣ ثواني يعترضوا. لو فيه اعتراض بنصوّت: صح ولا خطأ.<br>٤. لو اتقبلت الإجابة الحرف بيبقى معاك. لو اترفضت بتتجمّد ٨ ثواني.<br>٥. اجمع حروفك وكوّن كلمة من ٣ حروف أو أكتر (أي كلمة) واضغط «إعلان». أول واحد كلمته تتقبل بيكسب! 🏆</div>
     <button type="button" class="snp-roll" style="flex:none;width:100%">تمام</button></div></div>`;
 }
-function renderRoomKhLobby(room){
+function renderRoomKhLobby(room){ return window.__rdyWrap(__rdy_renderRoomKhLobby(room), room); }
+function __rdy_renderRoomKhLobby(room){
   const ps = room.players || [], isHost = room.hostId===state.pid, max = 8;
   const code = escapeHtml(String(room.code));
   const slots = [...Array(Math.max(ps.length+1, 4)).keys()].filter(i=>i<max).map(i=>{
@@ -47267,6 +47483,515 @@ html[data-theme="dark"] body .su-meter.full .msg, html[data-theme="dark"] body .
 .mth-grid small{font-size:12px;font-weight:700;color:#aeb6d4}
 .mth-grid span{display:block;font-size:10.5px;font-weight:700;color:#aeb6d4;margin-top:2px}
 @media (prefers-reduced-motion:reduce){.mth-card,.mth-card::after,.mth-opt,.mth-pop,.mth-res,.mth-res-ico,.mth-stars span,.mth-ring.mth-low b,.mth-seg i.c{animation:none!important}.mth-stars span{opacity:1;transform:none}}
+
+/* ---------- لوبي الانضمام الذكي + نظام جاهز ---------- */
+.jr-logo .game-logo-img{ width:42px; height:42px; filter:drop-shadow(0 3px 6px rgba(0,0,0,.45)); }
+.jr-name{ display:flex; align-items:center; gap:7px; }
+.jr-codechip{ font-style:normal; font-size:10px; font-weight:800; direction:ltr; padding:1px 7px; border-radius:9px; color:#F6DC93; background:rgba(232,200,116,.1); border:1px solid rgba(232,200,116,.28); }
+.jr-avs{ display:flex; align-items:center; gap:0; margin-top:2px; direction:rtl; }
+.jr-avs .pl-avatar{ width:22px!important; height:22px!important; min-width:0!important; font-size:9px!important; margin-inline-start:-5px; border:1.5px solid #1b1840; box-shadow:none!important; }
+.jr-avs .pl-avatar:first-child{ margin-inline-start:0; }
+.jr-more{ font-style:normal; font-size:9.5px; font-weight:800; margin-inline-start:4px; color:rgba(252,249,243,.6); }
+.jr-ck-r{ display:flex; align-items:center; gap:8px; }
+.jr-paste{ padding:3px 11px; border-radius:20px; font-family:inherit; font-size:11px; font-weight:800; color:#F6DC93; background:rgba(232,200,116,.1); border:1px solid rgba(232,200,116,.3); cursor:pointer; }
+.jr-paste:active{ transform:scale(.95); }
+.jr-pv{ margin:0 0 10px; }
+.jr-pv:empty{ display:none; }
+.jr-pvc{ display:flex; align-items:center; gap:11px; padding:9px 11px; border-radius:16px; background:rgba(95,224,164,.08); border:1px solid rgba(95,224,164,.3); animation:jrUp .35s ease both; }
+.jr-pvc.bad{ background:rgba(255,120,120,.08); border-color:rgba(255,120,120,.3); }
+.jr-pvc .jr-pv-ico{ width:42px; height:42px; border-radius:13px; }
+.jr-pvc .jr-pv-ico .game-logo-img{ width:30px; height:30px; }
+.jr-pv-t{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.jr-pv-t b{ font-family:'Cairo',sans-serif; font-size:13.5px; font-weight:900; color:#FCF9F3; }
+.jr-pv-t em{ font-style:normal; font-size:11px; color:rgba(252,249,243,.6); }
+.jr-pv-s{ font-size:11px; font-weight:900; color:#5FE0A4; }
+.jr-pvc.bad .jr-pv-s{ color:#FF9C9C; }
+.jr-tools{ display:flex; flex-direction:column; gap:10px; margin:0 0 12px; }
+.jr-search{ display:flex; align-items:center; gap:9px; padding:0 14px; height:44px; border-radius:15px; color:rgba(252,249,243,.55); background:rgba(255,255,255,.06); border:1px solid rgba(233,219,192,.16); }
+.jr-search input{ flex:1; min-width:0; height:100%; background:transparent; border:0; outline:0; color:#FCF9F3; font-family:inherit; font-size:13px; }
+.jr-search input::placeholder{ color:rgba(252,249,243,.4); }
+.jr-chips{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
+.jr-chips::-webkit-scrollbar{ display:none; }
+.jr-chip{ flex:none; padding:7px 14px; border-radius:20px; font-family:inherit; font-size:12px; font-weight:800; color:rgba(252,249,243,.75); background:rgba(255,255,255,.05); border:1px solid rgba(233,219,192,.16); cursor:pointer; transition:.15s; }
+.jr-chip.on{ color:#241704; background:linear-gradient(100deg,#F1B53F,#FFDD94); border-color:transparent; }
+.jr-quick{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; border-radius:16px; font-family:inherit; cursor:pointer; color:#CFF5E3; background:linear-gradient(120deg,rgba(95,224,164,.18),rgba(95,224,164,.06)); border:1px solid rgba(95,224,164,.4); }
+.jr-quick span{ font-family:'Cairo',sans-serif; font-weight:900; font-size:14px; }
+.jr-quick small{ font-size:11px; opacity:.75; }
+.jr-quick:active{ transform:scale(.98); }
+
+.rdy-wrap{ margin:14px 0 4px; }
+.rdy-panel{ padding:14px; border-radius:20px; color:#FCF9F3; background:linear-gradient(140deg,rgba(255,255,255,.09),rgba(255,255,255,.03)); border:1px solid rgba(233,219,192,.18); box-shadow:0 14px 28px -18px rgba(0,0,0,.7); transition:border-color .3s, box-shadow .3s; }
+.rdy-panel.all{ border-color:rgba(95,224,164,.55); box-shadow:0 0 0 1px rgba(95,224,164,.25), 0 14px 34px -14px rgba(95,224,164,.45); }
+.rdy-head{ display:flex; align-items:center; gap:11px; }
+.rdy-logo{ flex:none; width:48px; height:48px; display:grid; place-items:center; border-radius:15px; font-size:26px; background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.22),rgba(255,255,255,.05)); border:1px solid rgba(233,219,192,.22); }
+.rdy-logo .game-logo-img{ width:34px; height:34px; }
+.rdy-ht{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.rdy-ht b{ font-family:'Cairo',sans-serif; font-size:15px; font-weight:900; }
+.rdy-ht span{ font-size:11px; color:rgba(252,249,243,.6); }
+.rdy-ht em{ font-style:normal; font-weight:900; direction:ltr; display:inline-block; color:#F6DC93; }
+.rdy-count{ flex:none; min-width:44px; text-align:center; padding:5px 10px; border-radius:12px; font-size:13px; font-weight:900; direction:ltr; color:#241704; background:linear-gradient(145deg,#FFE29A,#F1B53F); }
+.rdy-panel.all .rdy-count{ background:linear-gradient(145deg,#B8F5D6,#5FE0A4); }
+.rdy-bar{ height:6px; margin:12px 0; border-radius:6px; background:rgba(255,255,255,.1); overflow:hidden; }
+.rdy-bar i{ display:block; height:100%; border-radius:6px; background:linear-gradient(90deg,#F1B53F,#5FE0A4); transition:width .5s cubic-bezier(.22,1,.36,1); }
+.rdy-list{ display:flex; flex-direction:column; gap:8px; }
+.rdy-row{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:15px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); transition:.25s; }
+.rdy-row.on{ background:rgba(95,224,164,.08); border-color:rgba(95,224,164,.32); }
+.rdy-row .pl-avatar{ flex:none; }
+.rdy-nm{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.rdy-nm b{ font-size:13px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rdy-nm em{ font-style:normal; font-size:10.5px; color:rgba(252,249,243,.5); }
+.rdy-pill{ flex:none; padding:6px 12px; border-radius:20px; font-size:11.5px; font-weight:800; color:rgba(252,249,243,.55); background:rgba(255,255,255,.06); }
+.rdy-pill.on{ color:#CFF5E3; background:rgba(95,224,164,.14); }
+.rdy-btn{ flex:none; padding:9px 16px; border-radius:14px; font-family:'Cairo',sans-serif; font-size:13px; font-weight:900; cursor:pointer; border:0; color:#241704; background:linear-gradient(100deg,#F1B53F,#FFDD94); box-shadow:0 8px 16px -8px rgba(241,181,63,.75); transition:transform .12s; }
+.rdy-btn:active{ transform:scale(.94); }
+.rdy-btn.on{ color:#0d2d1f; background:linear-gradient(100deg,#5FE0A4,#B8F5D6); box-shadow:0 8px 16px -8px rgba(95,224,164,.7); }
+.rdy-msg{ margin-top:12px; text-align:center; font-size:12.5px; font-weight:800; color:rgba(252,249,243,.7); }
+.rdy-panel.all .rdy-msg{ color:#5FE0A4; }
+.rdy-go{ animation:rdyPulse 1.6s ease-in-out infinite; }
+@keyframes rdyPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(95,224,164,.55);} 50%{ box-shadow:0 0 0 9px rgba(95,224,164,0);} }
+button[data-action$="-start"][disabled]{ opacity:.45; filter:grayscale(.4); }
+@media (prefers-reduced-motion:reduce){ .rdy-go,.jr-pvc{ animation:none; } }
+
+/* ---------- لوبي الانضمام: لمسة راقية (v2) ---------- */
+.jr-page{ position:relative; }
+.jr-page::before{ content:""; position:absolute; left:-30px; right:-30px; top:-40px; height:260px; pointer-events:none; z-index:0;
+  background:radial-gradient(60% 80% at 80% 0%,rgba(241,181,63,.16),transparent 70%),radial-gradient(50% 70% at 10% 10%,rgba(108,92,255,.14),transparent 70%); }
+.jr-page > *{ position:relative; z-index:1; }
+.jr-hero{ padding:14px 14px; margin:2px 0 16px; border-radius:22px; background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02)); border:1px solid rgba(233,219,192,.14); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
+.jr-hero-txt b{ font-size:17px; letter-spacing:.2px; }
+.jr-live-chip{ align-self:flex-start; display:inline-flex!important; align-items:center; gap:7px; margin-top:6px; padding:3px 11px; border-radius:20px; font-size:11px!important; font-weight:800; color:rgba(252,249,243,.6)!important; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); }
+.jr-live-chip i{ width:7px; height:7px; border-radius:50%; background:#8a8fa8; }
+.jr-live-chip.on{ color:#CFF5E3!important; background:rgba(95,224,164,.1); border-color:rgba(95,224,164,.32); }
+.jr-live-chip.on i{ background:#5FE0A4; animation:jrLive 1.8s infinite; }
+.jr-code{ padding:20px 16px 16px; border-radius:28px; border:0; background:linear-gradient(160deg,rgba(26,32,92,.96),rgba(26,26,66,.96) 55%,rgba(44,32,50,.96)); box-shadow:0 26px 46px -22px rgba(4,3,26,.9),inset 0 1px 0 rgba(255,255,255,.12); }
+.jr-code::after{ content:""; position:absolute; inset:0; border-radius:28px; padding:1px; pointer-events:none;
+  background:linear-gradient(150deg,rgba(255,226,154,.7),rgba(255,226,154,.06) 40%,rgba(255,226,154,.06) 60%,rgba(255,226,154,.45));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+.jr-code-k span:first-child{ font-size:13px; letter-spacing:.3px; color:rgba(243,234,216,.85); }
+.jr-box{ height:66px; border-radius:18px; font-size:30px; color:#FFE29A; background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025)); border:1px solid rgba(233,219,192,.16); box-shadow:inset 0 -10px 18px -12px rgba(0,0,0,.45); text-shadow:0 0 18px rgba(255,226,154,.45); }
+.jr-box.on{ background:linear-gradient(180deg,rgba(255,226,154,.2),rgba(255,226,154,.06)); border-color:rgba(255,226,154,.6); }
+.jr-join{ height:52px; border-radius:16px; letter-spacing:.2px; }
+.jr-paste{ background:rgba(255,255,255,.07); color:#F3EAD8; border-color:rgba(255,255,255,.14); }
+.jr-sec{ margin:6px 2px 12px; gap:12px; }
+.jr-sec-t{ font-size:15px; letter-spacing:.2px; }
+.jr-sec::after{ content:none; }
+.jr-sec-s{ display:flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); }
+.jr-search{ height:46px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(233,219,192,.14); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); transition:border-color .2s,box-shadow .2s; }
+.jr-search:focus-within{ border-color:rgba(255,226,154,.55); box-shadow:0 0 0 4px rgba(241,181,63,.12); }
+.jr-chip{ padding:7px 15px; font-weight:700; background:transparent; }
+.jr-chip.on{ font-weight:900; box-shadow:0 8px 16px -8px rgba(241,181,63,.7); }
+.jr-quick{ position:relative; overflow:hidden; border-radius:18px; padding:13px 16px; }
+.jr-quick::before{ content:""; position:absolute; top:0; bottom:0; width:35%; left:-50%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.18),transparent); transform:skewX(-20deg); animation:jrSweep 3.2s ease-in-out 1s infinite; }
+.jr-list{ gap:12px; }
+.jr-room{ padding:14px 14px 14px 12px; border-radius:22px; overflow:hidden; background:linear-gradient(140deg,rgba(255,255,255,.075),rgba(255,255,255,.02)); border:1px solid rgba(233,219,192,.13); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+.jr-room::before{ content:""; position:absolute; top:14px; bottom:14px; right:0; width:3px; border-radius:3px 0 0 3px; background:var(--gc,linear-gradient(#F1B53F,#FFDD94)); opacity:.95; }
+.jr-room::after{ content:""; position:absolute; inset:0; pointer-events:none; opacity:.55; background:radial-gradient(90% 120% at 100% 50%,rgba(255,255,255,.07),transparent 60%); }
+.jr-room:active{ transform:scale(.985); border-color:rgba(255,226,154,.45); }
+.jr-ico.jr-logo{ width:60px; height:60px; border-radius:19px; background:var(--gc,rgba(255,255,255,.1)); border:1px solid rgba(255,255,255,.25); box-shadow:0 12px 22px -10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.35); }
+.jr-logo .game-logo-img{ width:44px; height:44px; }
+.jr-name{ font-size:15.5px; }
+.jr-codechip{ background:rgba(255,255,255,.07); color:rgba(243,234,216,.8); border-color:rgba(255,255,255,.14); font-weight:700; }
+.jr-host{ font-size:11.5px; }
+.jr-tag{ font-weight:700; padding:2px 9px; }
+.jr-go{ padding:9px 22px; border-radius:14px; font-size:13px; box-shadow:0 10px 18px -8px rgba(241,181,63,.8); }
+.jr-empty{ border-radius:26px; padding:34px 18px 38px; border:1.5px dashed rgba(233,219,192,.18); background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,.01)); }
+.jr-pvc{ border-radius:18px; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+.rdy-panel{ border-radius:24px; background:linear-gradient(150deg,rgba(255,255,255,.08),rgba(255,255,255,.02)); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+.rdy-logo{ border-radius:17px; }
+.rdy-row{ border-radius:16px; }
+
+/* ---------- لوبي الانضمام: فخامة سوداء وذهبية (v3) ---------- */
+.jr-page{ --g1:#FFF1C2; --g2:#E9C46A; --g3:#B8862B; --gold:linear-gradient(135deg,#FFF1C2 0%,#E9C46A 38%,#B8862B 70%,#F6D98A 100%); --ink:#0B0A14; }
+.jr-page::before{ height:340px; background:radial-gradient(55% 70% at 50% 0%,rgba(233,196,106,.22),transparent 72%),radial-gradient(40% 50% at 0% 30%,rgba(184,134,43,.12),transparent 70%),radial-gradient(40% 50% at 100% 35%,rgba(184,134,43,.1),transparent 70%); }
+/* هيدر */
+.jr-hero{ flex-direction:row; padding:16px; border-radius:26px; border:0; position:relative;
+  background:linear-gradient(160deg,rgba(20,18,32,.92),rgba(10,9,18,.92)); box-shadow:0 24px 44px -24px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,241,194,.12); }
+.jr-hero::after{ content:""; position:absolute; inset:0; border-radius:26px; padding:1px; pointer-events:none; background:var(--gold); opacity:.55;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+.jr-hero-ico{ width:56px; height:56px; border-radius:50%; color:var(--ink); background:var(--gold); box-shadow:0 0 0 4px rgba(233,196,106,.14),0 0 0 5px rgba(233,196,106,.35),0 14px 28px -8px rgba(233,196,106,.6),inset 0 1px 0 rgba(255,255,255,.7); }
+.jr-hero-txt b{ font-size:18px; font-weight:900; background:var(--gold); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; letter-spacing:.3px; }
+.jr-hero-txt span{ color:rgba(255,241,194,.55); }
+.jr-live-chip{ background:rgba(233,196,106,.06); border-color:rgba(233,196,106,.25); color:rgba(255,241,194,.65)!important; }
+.jr-live-chip.on{ color:#FFF1C2!important; background:rgba(233,196,106,.1); border-color:rgba(233,196,106,.45); }
+.jr-live-chip.on i{ background:#E9C46A; box-shadow:0 0 8px #E9C46A; }
+/* كارت الكود */
+.jr-code{ border-radius:30px; padding:22px 16px 16px; background:linear-gradient(165deg,#15132a 0%,#0c0b18 60%,#14100f 100%); box-shadow:0 30px 50px -24px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,241,194,.14); }
+.jr-code::after{ border-radius:30px; background:var(--gold); opacity:.75; }
+.jr-glow{ opacity:.6; }
+.jr-code-k span:first-child{ font-size:13.5px; font-weight:800; color:#FFF1C2; letter-spacing:.4px; }
+.jr-code-k em{ color:#E9C46A; background:transparent; border-color:rgba(233,196,106,.4); }
+.jr-paste{ background:transparent; color:#E9C46A; border-color:rgba(233,196,106,.4); }
+.jr-boxes{ gap:11px; }
+.jr-box{ height:70px; border-radius:16px; font-size:32px; font-weight:900; color:#FFF1C2; background:linear-gradient(180deg,#1c1a30,#0f0e1d); border:1px solid rgba(233,196,106,.28);
+  box-shadow:inset 0 1px 0 rgba(255,241,194,.1),inset 0 -12px 18px -14px #000,0 8px 16px -10px #000; text-shadow:0 0 16px rgba(233,196,106,.6); }
+.jr-box i{ width:6px; height:6px; background:rgba(233,196,106,.4); }
+.jr-box.on{ background:linear-gradient(180deg,#2a2342,#15122a); border-color:#E9C46A; }
+.jr-code-wrap:focus-within .jr-box.cur{ border-color:#FFF1C2; box-shadow:0 0 0 4px rgba(233,196,106,.2),0 0 22px rgba(233,196,106,.25); }
+.jr-join{ height:54px; border-radius:16px; font-weight:900; color:rgba(255,241,194,.4); background:rgba(255,255,255,.04); border:1px solid rgba(233,196,106,.2); }
+.jr-join.ready{ color:var(--ink); background:var(--gold); box-shadow:0 16px 30px -12px rgba(233,196,106,.75),inset 0 1px 0 rgba(255,255,255,.7); }
+/* عنوان القايمة بزخرفة */
+.jr-sec{ margin:8px 2px 14px; }
+.jr-sec-t{ font-size:15.5px; font-weight:900; color:#FFF1C2; letter-spacing:.4px; }
+.jr-sec-t::after{ content:""; display:inline-block; width:34px; height:1px; margin-inline-start:6px; vertical-align:middle; background:linear-gradient(90deg,#E9C46A,transparent); }
+.jr-count{ color:var(--ink); background:var(--gold); }
+.jr-sec-s{ background:transparent; border-color:rgba(233,196,106,.22); color:rgba(255,241,194,.55); }
+/* أدوات */
+.jr-search{ background:#0f0e1d; border:1px solid rgba(233,196,106,.22); color:#E9C46A; }
+.jr-search:focus-within{ border-color:#E9C46A; box-shadow:0 0 0 4px rgba(233,196,106,.14); }
+.jr-chip{ color:rgba(255,241,194,.7); border-color:rgba(233,196,106,.22); }
+.jr-chip.on{ color:var(--ink); background:var(--gold); box-shadow:0 8px 16px -8px rgba(233,196,106,.8); }
+.jr-quick{ color:#FFF1C2; background:linear-gradient(120deg,rgba(233,196,106,.16),rgba(233,196,106,.04)); border:1px solid rgba(233,196,106,.5); }
+/* كروت الغرف */
+.jr-room{ border-radius:24px; border:0; background:linear-gradient(160deg,#17152b,#0d0c19); box-shadow:0 20px 34px -20px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,241,194,.1); -webkit-backdrop-filter:none; backdrop-filter:none; }
+.jr-room::before{ top:0; bottom:0; right:0; left:0; width:auto; border-radius:24px; padding:1px; opacity:.45; background:var(--gold);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+.jr-room::after{ opacity:.8; background:radial-gradient(70% 120% at 100% 0%,rgba(233,196,106,.1),transparent 60%); }
+.jr-room:active{ transform:scale(.985); }
+.jr-room:active::before{ opacity:1; }
+.jr-ico.jr-logo{ width:62px; height:62px; border-radius:20px; border:1px solid rgba(233,196,106,.55); box-shadow:0 0 0 3px rgba(233,196,106,.08),0 14px 24px -10px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.35); }
+.jr-name{ color:#FFF6DA; font-weight:900; }
+.jr-codechip{ color:#E9C46A; background:transparent; border-color:rgba(233,196,106,.4); }
+.jr-host{ color:rgba(255,241,194,.55); }
+.jr-tag{ color:rgba(255,241,194,.8); background:rgba(233,196,106,.06); border-color:rgba(233,196,106,.25); }
+.jr-tag.lock{ color:#F3C7A6; border-color:rgba(243,199,166,.35); }
+.jr-tag.gold{ color:var(--ink); background:var(--gold); border-color:transparent; }
+.jr-dots b.f{ background:#E9C46A; box-shadow:0 0 6px rgba(233,196,106,.7); }
+.jr-cnt{ color:rgba(255,241,194,.5); }
+.jr-go{ color:var(--ink); background:var(--gold); box-shadow:0 12px 20px -8px rgba(233,196,106,.8),inset 0 1px 0 rgba(255,255,255,.6); }
+.jr-avs .pl-avatar{ border-color:#0d0c19; }
+.jr-empty{ border:1px dashed rgba(233,196,106,.3); background:linear-gradient(160deg,#121024,#0a0914); }
+.jr-empty-t{ color:#FFF1C2; }
+.jr-empty-art{ color:#E9C46A; }
+.jr-pvc{ background:linear-gradient(160deg,#17152b,#0d0c19); border-color:rgba(233,196,106,.45); }
+.jr-pvc.bad{ border-color:rgba(255,120,120,.4); }
+.jr-pv-s{ color:#E9C46A; }
+/* لوحة جاهز */
+.rdy-panel{ background:linear-gradient(165deg,#17152b,#0c0b18); border:1px solid rgba(233,196,106,.3); box-shadow:0 20px 36px -22px #000,inset 0 1px 0 rgba(255,241,194,.1); }
+.rdy-ht b{ background:var(--gold); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+.rdy-count{ color:var(--ink); background:var(--gold); }
+.rdy-bar i{ background:var(--gold); }
+.rdy-btn{ color:var(--ink); background:var(--gold); }
+.rdy-btn.on{ color:#07261a; background:linear-gradient(100deg,#5FE0A4,#B8F5D6); }
+.rdy-logo{ border:1px solid rgba(233,196,106,.5); }
+
+/* ---------- لوبي الانضمام: أجواء ألعاب كرتونية (v4) ---------- */
+.jr-page{ --ink:#2A1458; --cream:#FFF8E7; --yel:#FFD23F; --pink:#FF5FA2; --cyn:#3DDCFF; --grn:#3EE08F; --org:#FF9A3D; --pur:#6B4BFF; }
+.jr-page::before{ height:100%; top:-20px; opacity:1;
+  background:radial-gradient(circle at 12% 8%,rgba(255,95,162,.55) 0 7px,transparent 8px),radial-gradient(circle at 88% 14%,rgba(61,220,255,.55) 0 9px,transparent 10px),
+  radial-gradient(circle at 70% 4%,rgba(255,210,63,.6) 0 6px,transparent 7px),radial-gradient(circle at 30% 20%,rgba(62,224,143,.5) 0 5px,transparent 6px),
+  radial-gradient(circle at 94% 40%,rgba(255,95,162,.4) 0 6px,transparent 7px),radial-gradient(circle at 5% 55%,rgba(61,220,255,.4) 0 7px,transparent 8px),
+  radial-gradient(60% 40% at 50% 0%,rgba(107,75,255,.45),transparent 75%); }
+/* هيدر */
+.jr-hero{ padding:15px; border-radius:26px; background:linear-gradient(135deg,#7B5CFF,#4B2FD8); border:3px solid var(--ink); box-shadow:0 6px 0 var(--ink); }
+.jr-hero::after,.jr-code::after,.jr-room::before,.jr-quick::before{ content:none!important; display:none; }
+.jr-hero-ico{ width:58px; height:58px; border-radius:20px; color:var(--ink); background:var(--yel); border:3px solid var(--ink); box-shadow:0 4px 0 var(--ink); animation:jrWig 3s ease-in-out infinite; }
+.jr-hero-ico em{ display:none; }
+@keyframes jrWig{ 0%,100%{ transform:rotate(-6deg) scale(1);} 50%{ transform:rotate(6deg) scale(1.06);} }
+.jr-hero-txt b{ font-size:19px; font-weight:900; color:#fff; background:none; -webkit-text-fill-color:#fff; text-shadow:-2px -2px 0 var(--ink),2px -2px 0 var(--ink),-2px 2px 0 var(--ink),2px 2px 0 var(--ink),0 3px 0 var(--ink); letter-spacing:.2px; }
+.jr-hero-txt span{ color:rgba(255,255,255,.88); font-weight:600; }
+.jr-live-chip{ color:#fff!important; background:rgba(42,20,88,.45); border:2px solid var(--ink); font-weight:800; }
+.jr-live-chip i{ background:#c9c2ee; }
+.jr-live-chip.on{ color:var(--ink)!important; background:var(--grn); border-color:var(--ink); }
+.jr-live-chip.on i{ background:var(--ink); box-shadow:none; }
+/* كارت الكود */
+.jr-code{ border-radius:28px; padding:20px 15px 15px; background:linear-gradient(160deg,#FF7AB8,#FF5FA2 55%,#E8458C); border:3px solid var(--ink); box-shadow:0 7px 0 var(--ink); -webkit-backdrop-filter:none; backdrop-filter:none; }
+.jr-glow{ display:none; }
+.jr-code-k span:first-child{ font-size:15px; font-weight:900; color:#fff; text-shadow:0 2px 0 var(--ink); letter-spacing:0; }
+.jr-code-k em{ color:var(--ink); background:var(--yel); border:2px solid var(--ink); font-weight:900; }
+.jr-paste{ color:var(--ink); background:#fff; border:2px solid var(--ink); font-weight:900; box-shadow:0 3px 0 var(--ink); }
+.jr-paste:active{ transform:translateY(3px); box-shadow:0 0 0 var(--ink); }
+.jr-boxes{ gap:10px; }
+.jr-box{ height:70px; border-radius:18px; font-size:34px; font-weight:900; color:var(--ink); background:#fff; border:3px solid var(--ink); box-shadow:0 5px 0 var(--ink); text-shadow:none; }
+.jr-box i{ width:9px; height:9px; background:#d9d2f3; }
+.jr-box.on{ background:var(--yel); border-color:var(--ink); }
+.jr-box.pop{ animation:jrBoing .35s cubic-bezier(.34,1.8,.64,1); }
+@keyframes jrBoing{ 0%{ transform:scale(.6) rotate(-8deg);} 100%{ transform:scale(1) rotate(0);} }
+.jr-code-wrap:focus-within .jr-box.cur{ border-color:var(--ink); background:#FFF3B8; box-shadow:0 5px 0 var(--ink),0 0 0 4px rgba(255,255,255,.7); transform:translateY(-2px); }
+.jr-join{ height:56px; border-radius:18px; font-size:17px; font-weight:900; color:#fff; background:#8B77D9; border:3px solid var(--ink); box-shadow:0 5px 0 var(--ink); text-shadow:0 2px 0 rgba(42,20,88,.5); }
+.jr-join.ready{ color:var(--ink); text-shadow:none; background:var(--grn); border-color:var(--ink); box-shadow:0 5px 0 var(--ink); animation:jrBounce 1.4s ease-in-out infinite; }
+.jr-join:active,.jr-join.ready:active{ transform:translateY(5px); box-shadow:0 0 0 var(--ink); animation:none; }
+@keyframes jrBounce{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-4px);} }
+.jr-join.ready::before{ display:none; }
+.jr-join.ready .jr-arr{ color:var(--ink); }
+/* معاينة الكود */
+.jr-pvc{ background:var(--cream); border:3px solid var(--ink); box-shadow:0 4px 0 var(--ink); border-radius:18px; -webkit-backdrop-filter:none; backdrop-filter:none; }
+.jr-pvc.bad{ background:#FFE1E1; border-color:var(--ink); }
+.jr-pv-t b{ color:var(--ink); } .jr-pv-t em{ color:#6a5a99; font-weight:700; }
+.jr-pv-s{ color:#12804a; font-weight:900; } .jr-pvc.bad .jr-pv-s{ color:#c0262d; }
+.jr-pvc .jr-pv-ico{ border:2.5px solid var(--ink); }
+/* عنوان القايمة */
+.jr-sec{ margin:10px 2px 14px; }
+.jr-sec-t{ font-size:17px; font-weight:900; color:#fff; letter-spacing:0; text-shadow:-1.5px -1.5px 0 var(--ink),1.5px -1.5px 0 var(--ink),-1.5px 1.5px 0 var(--ink),1.5px 1.5px 0 var(--ink),0 3px 0 var(--ink); }
+.jr-sec-t::after{ display:none; }
+.jr-live{ background:var(--grn); border:2px solid var(--ink); width:12px; height:12px; }
+.jr-count{ color:var(--ink); background:var(--yel); border:2px solid var(--ink); text-shadow:none; box-shadow:0 2px 0 var(--ink); }
+.jr-sec-s{ color:#fff; background:rgba(42,20,88,.4); border:2px solid var(--ink); font-weight:700; }
+/* أدوات */
+.jr-search{ background:#fff; border:3px solid var(--ink); border-radius:18px; box-shadow:0 4px 0 var(--ink); color:var(--ink); -webkit-backdrop-filter:none; backdrop-filter:none; }
+.jr-search input{ color:var(--ink); font-weight:700; } .jr-search input::placeholder{ color:#8f83bd; }
+.jr-search:focus-within{ border-color:var(--ink); box-shadow:0 4px 0 var(--ink),0 0 0 4px rgba(255,210,63,.6); }
+.jr-chip{ color:var(--ink); background:#fff; border:2.5px solid var(--ink); font-weight:900; box-shadow:0 3px 0 var(--ink); }
+.jr-chip.on{ background:var(--yel); box-shadow:0 3px 0 var(--ink); transform:translateY(-1px); }
+.jr-chip:active{ transform:translateY(3px); box-shadow:none; }
+.jr-quick{ color:var(--ink); background:linear-gradient(180deg,#FFB35C,var(--org)); border:3px solid var(--ink); border-radius:18px; box-shadow:0 5px 0 var(--ink); animation:jrBounce 2s ease-in-out infinite; }
+.jr-quick span{ font-weight:900; } .jr-quick small{ color:var(--ink); opacity:.75; font-weight:700; }
+.jr-quick:active{ transform:translateY(5px); box-shadow:none; animation:none; }
+/* كروت الغرف */
+.jr-list{ gap:15px; }
+.jr-room{ padding:13px; border-radius:24px; color:var(--ink); background:var(--cream); border:3px solid var(--ink); box-shadow:0 6px 0 var(--ink); -webkit-backdrop-filter:none; backdrop-filter:none; }
+.jr-room::after{ content:none; }
+.jr-room:nth-child(4n+1){ background:#FFF8E7; } .jr-room:nth-child(4n+2){ background:#E8FBFF; } .jr-room:nth-child(4n+3){ background:#FFEAF4; } .jr-room:nth-child(4n){ background:#EAFFF1; }
+.jr-room:active{ transform:translateY(5px); box-shadow:0 1px 0 var(--ink); border-color:var(--ink); }
+.jr-ico.jr-logo{ width:64px; height:64px; border-radius:20px; background:var(--gc,#fff); border:3px solid var(--ink); box-shadow:0 4px 0 var(--ink); animation:jrWig 3.4s ease-in-out infinite; animation-delay:calc(var(--k,0)*.3s); }
+.jr-logo .game-logo-img{ width:46px; height:46px; filter:drop-shadow(0 2px 0 rgba(42,20,88,.5)); }
+.jr-name{ color:var(--ink); font-size:16px; font-weight:900; }
+.jr-codechip{ color:var(--ink); background:var(--yel); border:2px solid var(--ink); font-weight:900; }
+.jr-host{ color:#6a5a99; font-weight:700; }
+.jr-tag{ color:#0e6b3f; background:#C8F7DB; border:2px solid var(--ink); font-weight:900; }
+.jr-tag.lock{ color:#8a3a00; background:#FFD9B8; }
+.jr-tag.gold{ color:var(--ink); background:var(--yel); }
+.jr-dots b{ background:#d9d2f3; border:1.5px solid var(--ink); width:10px; height:10px; }
+.jr-dots b.f{ background:var(--grn); box-shadow:none; }
+.jr-cnt{ color:var(--ink); font-weight:900; }
+.jr-go{ color:var(--ink); background:var(--yel); border:3px solid var(--ink); border-radius:15px; padding:8px 20px; font-weight:900; box-shadow:0 4px 0 var(--ink); }
+.jr-avs .pl-avatar{ border:2px solid var(--ink); }
+.jr-more{ color:var(--ink); font-weight:900; }
+.jr-skel i,.jr-skel b,.jr-skel em{ background:linear-gradient(90deg,#f0e9ff 25%,#fff 50%,#f0e9ff 75%); background-size:200% 100%; }
+.jr-empty{ border:3px dashed rgba(255,255,255,.7); background:rgba(42,20,88,.35); border-radius:28px; }
+.jr-empty-t{ color:#fff; font-weight:900; text-shadow:0 2px 0 var(--ink); } .jr-empty-s{ color:rgba(255,255,255,.85); }
+.jr-empty-art{ color:var(--yel); }
+.jr-empty-art span{ border-color:rgba(255,210,63,.7); }
+.jr-empty-art svg{ background:rgba(255,255,255,.15); }
+/* لوحة جاهز */
+.rdy-panel{ color:var(--ink); background:var(--cream); border:3px solid var(--ink); border-radius:26px; box-shadow:0 6px 0 var(--ink); -webkit-backdrop-filter:none; backdrop-filter:none; }
+.rdy-panel.all{ background:#EAFFF1; border-color:var(--ink); box-shadow:0 6px 0 var(--ink),0 0 0 4px rgba(62,224,143,.55); }
+.rdy-logo{ background:var(--yel); border:3px solid var(--ink); box-shadow:0 3px 0 var(--ink); animation:jrWig 3.2s ease-in-out infinite; }
+.rdy-ht b{ color:var(--ink); background:none; -webkit-text-fill-color:var(--ink); font-weight:900; }
+.rdy-ht span{ color:#6a5a99; font-weight:700; } .rdy-ht em{ color:var(--ink); }
+.rdy-count{ color:var(--ink); background:var(--yel); border:2px solid var(--ink); }
+.rdy-panel.all .rdy-count{ background:var(--grn); }
+.rdy-bar{ height:12px; border-radius:12px; background:#fff; border:2.5px solid var(--ink); }
+.rdy-bar i{ background:repeating-linear-gradient(45deg,var(--grn) 0 10px,#7CF0B3 10px 20px); border-radius:0; }
+.rdy-row{ background:#fff; border:2.5px solid var(--ink); border-radius:18px; box-shadow:0 3px 0 var(--ink); }
+.rdy-row.on{ background:#D9FBE7; border-color:var(--ink); }
+.rdy-nm b{ color:var(--ink); font-weight:900; } .rdy-nm em{ color:#6a5a99; font-weight:700; }
+.rdy-pill{ color:#6a5a99; background:#EFEAFB; border:2px solid var(--ink); font-weight:900; }
+.rdy-pill.on{ color:#0e6b3f; background:var(--grn); }
+.rdy-btn{ color:var(--ink); background:var(--yel); border:3px solid var(--ink); border-radius:15px; box-shadow:0 4px 0 var(--ink); font-weight:900; }
+.rdy-btn:active{ transform:translateY(4px); box-shadow:none; }
+.rdy-btn.on{ color:var(--ink); background:var(--grn); }
+.rdy-msg{ color:var(--ink); font-weight:900; } .rdy-panel.all .rdy-msg{ color:#0e6b3f; }
+.rdy-row .pl-avatar{ border:2px solid var(--ink); }
+@media (prefers-reduced-motion:reduce){ .jr-hero-ico,.jr-ico.jr-logo,.rdy-logo,.jr-quick,.jr-join.ready{ animation:none; } }
+
+/* ---------- لوبي الانضمام: كرتوني راقي + رسومات (v5) ---------- */
+.jr-page{ --ink:#1B1050; --edge:rgba(255,255,255,.2); }
+.jr-page::before{ background:radial-gradient(circle at 10% 6%,rgba(255,122,184,.35) 0 6px,transparent 7px),radial-gradient(circle at 90% 12%,rgba(95,227,255,.4) 0 8px,transparent 9px),radial-gradient(circle at 74% 3%,rgba(255,224,102,.45) 0 5px,transparent 6px),radial-gradient(circle at 4% 52%,rgba(95,227,255,.3) 0 6px,transparent 7px),radial-gradient(circle at 96% 46%,rgba(255,122,184,.3) 0 5px,transparent 6px),radial-gradient(70% 36% at 50% 0%,rgba(122,92,255,.5),transparent 76%); }
+/* حركات الرسومات */
+.a-f1{ animation:jrF1 4.2s ease-in-out infinite; } .a-f2{ animation:jrF2 3.4s ease-in-out infinite; } .a-f3{ animation:jrF3 3.8s ease-in-out infinite; }
+.jr-hero-art .a-f1,.jr-hero-art .a-f2,.jr-hero-art .a-f3,.jr-empty-svg .a-f1{ transform-box:fill-box; transform-origin:center; }
+@keyframes jrF1{ 0%,100%{ transform:translateY(0) rotate(0);} 50%{ transform:translateY(-5px) rotate(-2deg);} }
+@keyframes jrF2{ 0%,100%{ transform:translateY(0) rotate(0);} 50%{ transform:translateY(-7px) rotate(8deg);} }
+@keyframes jrF3{ 0%,100%{ transform:translateY(0) rotate(0);} 50%{ transform:translateY(-6px) rotate(-8deg);} }
+.a-tw{ transform-box:fill-box; transform-origin:center; animation:jrTw 2s ease-in-out infinite; }
+@keyframes jrTw{ 0%,100%{ transform:scale(.4); opacity:.4;} 50%{ transform:scale(1.15); opacity:1;} }
+.a-z{ animation:jrZ 2.6s ease-in-out infinite; }
+@keyframes jrZ{ 0%{ opacity:0; transform:translateY(8px);} 40%{ opacity:1;} 100%{ opacity:0; transform:translateY(-8px);} }
+/* هيدر برسمة */
+.jr-hero{ position:relative; overflow:hidden; min-height:128px; padding:16px 16px 16px 150px; align-items:center; border-radius:28px; background:linear-gradient(135deg,#7A5CFF 0%,#4B2FD8 60%,#3A22B0 100%); border:2px solid var(--edge); box-shadow:0 8px 0 -1px #1B1050,0 24px 34px -14px rgba(0,0,0,.65),inset 0 2px 0 rgba(255,255,255,.28); }
+.jr-hero::before{ content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(90px 70px at 22% 30%,rgba(255,255,255,.18),transparent 70%),repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 10px,transparent 10px 22px); }
+.jr-hero-ico{ display:none; }
+.jr-hero-art{ position:absolute; left:-6px; bottom:-4px; width:170px; height:130px; pointer-events:none; filter:drop-shadow(0 6px 10px rgba(14,6,60,.45)); }
+.jr-hero-txt{ position:relative; z-index:1; }
+.jr-hero-txt b{ font-size:19px; text-shadow:-2px -2px 0 #1B1050,2px -2px 0 #1B1050,-2px 2px 0 #1B1050,2px 2px 0 #1B1050,0 4px 0 #1B1050; }
+.jr-live-chip{ background:rgba(27,16,80,.5); border:1.5px solid rgba(255,255,255,.3); }
+.jr-live-chip.on{ background:linear-gradient(180deg,#7CF5B8,#2FD27E); border-color:#1B1050; color:#0A3A22!important; }
+/* كارت الكود */
+.jr-code{ position:relative; border-radius:30px; border:2px solid rgba(255,255,255,.28); background:linear-gradient(160deg,#FF86BE 0%,#F1559F 55%,#C93A86 100%); box-shadow:0 8px 0 -1px #7A1E57,0 26px 36px -16px rgba(0,0,0,.65),inset 0 2px 0 rgba(255,255,255,.4); overflow:hidden; }
+.jr-code::before{ content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(120px 80px at 15% 0%,rgba(255,255,255,.3),transparent 70%),repeating-linear-gradient(135deg,rgba(255,255,255,.07) 0 8px,transparent 8px 18px); }
+.jr-code > *{ position:relative; z-index:1; }
+.jr-code-deco{ position:absolute!important; z-index:0!important; left:-10px; top:-18px; width:112px; height:84px; opacity:.9; transform:scale(.8); transform-origin:top left; pointer-events:none; filter:drop-shadow(0 3px 0 rgba(27,16,80,.35)); }
+.jr-code-k{ padding-left:92px; }
+.jr-code-k span:first-child{ text-shadow:0 2px 0 #7A1E57; }
+.jr-box{ border:2.5px solid var(--ink); background:linear-gradient(180deg,#fff,#EDE7FF); box-shadow:0 5px 0 var(--ink),inset 0 -6px 8px -4px rgba(120,90,220,.25); }
+.jr-box.on{ background:linear-gradient(180deg,#FFF0A0,#FFD23F); }
+.jr-join{ border:2.5px solid var(--ink); background:linear-gradient(180deg,#A894F0,#7B64D8); }
+.jr-join.ready{ background:linear-gradient(180deg,#7CF5B8,#2FD27E); box-shadow:0 5px 0 #0E7A47,0 0 0 2.5px var(--ink); }
+.jr-paste,.jr-code-k em{ border-width:2px; }
+/* أزرار وبحث */
+.jr-search{ border:2px solid var(--edge); background:rgba(255,255,255,.1); box-shadow:inset 0 2px 0 rgba(255,255,255,.12),0 5px 0 -1px rgba(27,16,80,.8); color:rgba(255,255,255,.7); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+.jr-search input{ color:#fff; } .jr-search input::placeholder{ color:rgba(255,255,255,.5); }
+.jr-search:focus-within{ border-color:#FFE066; box-shadow:0 5px 0 -1px rgba(27,16,80,.8),0 0 0 4px rgba(255,224,102,.25); }
+.jr-chip{ color:#fff; background:rgba(255,255,255,.1); border:2px solid var(--edge); box-shadow:0 4px 0 -1px rgba(27,16,80,.85); }
+.jr-chip.on{ color:#3b2a00; background:linear-gradient(180deg,#FFE680,#FFB52E); border-color:#1B1050; box-shadow:0 4px 0 #A86400; }
+.jr-quick{ color:#3b1a00; border:2.5px solid var(--ink); background:linear-gradient(180deg,#FFC273,#FF8F2E); box-shadow:0 5px 0 #A04A00; }
+/* عنوان القايمة */
+.jr-sec-t{ text-shadow:-1.5px -1.5px 0 #1B1050,1.5px -1.5px 0 #1B1050,-1.5px 1.5px 0 #1B1050,1.5px 1.5px 0 #1B1050,0 3px 0 #1B1050; }
+.jr-count{ background:linear-gradient(180deg,#FFE680,#FFB52E); box-shadow:0 2px 0 #A86400; }
+/* كروت الغرف: داكنة لامعة + رسمة */
+.jr-room{ color:#fff; border:2px solid var(--edge); background:linear-gradient(160deg,#4A33C9 0%,#33229A 55%,#281A7C 100%)!important; box-shadow:0 7px 0 -1px #140B45,0 22px 30px -16px rgba(0,0,0,.7),inset 0 2px 0 rgba(255,255,255,.22); overflow:hidden; }
+.jr-room::before{ display:block!important; content:""!important; position:absolute; inset:0; border-radius:0; padding:0; opacity:.9; width:auto; pointer-events:none; -webkit-mask:none; mask:none;
+  background:radial-gradient(110px 80px at 100% 0%,rgba(255,255,255,.16),transparent 70%),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M10 12h8M14 8v8'/%3E%3Ccircle cx='46' cy='20' r='4'/%3E%3Cpath d='M20 46l5 5m0-5l-5 5'/%3E%3Cpath d='M48 48l6 0'/%3E%3C/g%3E%3C/svg%3E"); }
+.jr-room > *{ position:relative; z-index:1; }
+.jr-room:active{ transform:translateY(5px); box-shadow:0 2px 0 -1px #140B45,inset 0 2px 0 rgba(255,255,255,.22); }
+.jr-ico.jr-logo{ position:relative; border:2.5px solid var(--ink); box-shadow:0 4px 0 var(--ink),0 0 0 3px rgba(255,255,255,.18); overflow:hidden; }
+.jr-ico.jr-logo::after{ content:""; position:absolute; left:-20%; top:-30%; width:140%; height:60%; border-radius:50%; background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0)); transform:rotate(-12deg); pointer-events:none; }
+.jr-name{ color:#fff; text-shadow:0 2px 0 rgba(20,11,69,.6); }
+.jr-codechip{ color:#3b2a00; background:linear-gradient(180deg,#FFE680,#FFB52E); border:1.5px solid var(--ink); }
+.jr-host{ color:rgba(255,255,255,.72); }
+.jr-tag{ color:#B9FFD9; background:rgba(62,224,143,.16); border:1.5px solid rgba(62,224,143,.55); }
+.jr-tag.lock{ color:#FFD0A8; background:rgba(255,154,61,.16); border-color:rgba(255,154,61,.55); }
+.jr-tag.gold{ color:#3b2a00; background:linear-gradient(180deg,#FFE680,#FFB52E); border-color:var(--ink); }
+.jr-dots b{ background:rgba(255,255,255,.18); border:1.5px solid rgba(20,11,69,.9); }
+.jr-dots b.f{ background:#5BF0A8; }
+.jr-cnt{ color:#fff; }
+.jr-go{ color:#3b2a00; background:linear-gradient(180deg,#FFE680,#FFB52E); border:2.5px solid var(--ink); box-shadow:0 4px 0 #A86400; }
+.jr-avs .pl-avatar{ border:2px solid #281A7C; }
+.jr-more{ color:#fff; }
+/* معاينة الكود */
+.jr-pvc{ color:#fff; background:linear-gradient(160deg,#4A33C9,#281A7C); border:2px solid rgba(255,255,255,.3); box-shadow:0 5px 0 -1px #140B45; }
+.jr-pvc.bad{ background:linear-gradient(160deg,#9B2A4A,#5E1630); }
+.jr-pv-t b{ color:#fff; } .jr-pv-t em{ color:rgba(255,255,255,.75); }
+.jr-pv-s{ color:#7CF5B8; } .jr-pvc.bad .jr-pv-s{ color:#FFB3C0; }
+/* فاضي برسمة */
+.jr-empty{ padding:12px 16px 28px; border:2px dashed rgba(255,255,255,.4); background:radial-gradient(70% 60% at 50% 20%,rgba(255,255,255,.1),transparent 70%),rgba(27,16,80,.35); }
+.jr-empty-art{ width:auto; height:auto; margin:0 auto 4px; display:block; }
+.jr-empty-art span,.jr-empty-art u{ display:none; }
+.jr-empty-svg{ width:min(240px,80%); height:auto; display:block; margin:0 auto; filter:drop-shadow(0 8px 10px rgba(14,6,60,.45)); }
+/* لوحة جاهز */
+.rdy-panel{ color:#fff; background:linear-gradient(160deg,#4A33C9,#281A7C); border:2px solid var(--edge); box-shadow:0 8px 0 -1px #140B45,0 22px 30px -16px rgba(0,0,0,.7),inset 0 2px 0 rgba(255,255,255,.2); position:relative; overflow:hidden; }
+.rdy-panel.all{ background:linear-gradient(160deg,#27A86A,#126A45); box-shadow:0 8px 0 -1px #08381F,0 22px 30px -16px rgba(0,0,0,.7),inset 0 2px 0 rgba(255,255,255,.3); }
+.rdy-panel.all::before{ content:""; position:absolute; inset:0; pointer-events:none; animation:rdyConf 2.4s linear infinite;
+  background:radial-gradient(circle at 10% 20%,#FFE066 0 3px,transparent 4px),radial-gradient(circle at 30% 70%,#FF7AB8 0 3px,transparent 4px),radial-gradient(circle at 55% 15%,#5FE3FF 0 3px,transparent 4px),radial-gradient(circle at 75% 60%,#FFE066 0 3px,transparent 4px),radial-gradient(circle at 92% 25%,#FF7AB8 0 3px,transparent 4px),radial-gradient(circle at 45% 90%,#5FE3FF 0 3px,transparent 4px); }
+@keyframes rdyConf{ 0%{ transform:translateY(-10px); opacity:0;} 20%{ opacity:1;} 100%{ transform:translateY(14px); opacity:0;} }
+.rdy-panel > *{ position:relative; z-index:1; }
+.rdy-ht b{ color:#fff; -webkit-text-fill-color:#fff; text-shadow:0 2px 0 rgba(20,11,69,.6); } .rdy-ht span{ color:rgba(255,255,255,.75); } .rdy-ht em{ color:#FFE680; }
+.rdy-count{ background:linear-gradient(180deg,#FFE680,#FFB52E); border:2px solid var(--ink); color:#3b2a00; }
+.rdy-bar{ background:rgba(20,11,69,.55); border:2px solid var(--ink); }
+.rdy-bar i{ background:repeating-linear-gradient(45deg,#5BF0A8 0 10px,#8FF7C4 10px 20px); }
+.rdy-row{ background:rgba(255,255,255,.1); border:2px solid rgba(255,255,255,.18); box-shadow:0 3px 0 -1px rgba(20,11,69,.8); }
+.rdy-row.on{ background:rgba(91,240,168,.2); border-color:rgba(91,240,168,.7); }
+.rdy-nm b{ color:#fff; } .rdy-nm em{ color:rgba(255,255,255,.65); }
+.rdy-pill{ color:rgba(255,255,255,.75); background:rgba(20,11,69,.4); border:1.5px solid rgba(255,255,255,.25); }
+.rdy-pill.on{ color:#0A3A22; background:linear-gradient(180deg,#7CF5B8,#2FD27E); border-color:var(--ink); }
+.rdy-btn{ color:#3b2a00; background:linear-gradient(180deg,#FFE680,#FFB52E); border:2.5px solid var(--ink); box-shadow:0 4px 0 #A86400; }
+.rdy-btn.on{ color:#0A3A22; background:linear-gradient(180deg,#7CF5B8,#2FD27E); box-shadow:0 4px 0 #0E7A47; }
+.rdy-msg,.rdy-panel.all .rdy-msg{ color:#fff; text-shadow:0 2px 0 rgba(20,11,69,.5); }
+.rdy-logo{ border:2.5px solid var(--ink); }
+@media (prefers-reduced-motion:reduce){ .a-f1,.a-f2,.a-f3,.a-tw,.a-z,.rdy-panel.all::before{ animation:none; } }
+
+/* ---------- لوبي الانضمام: كحلي زجاجي بلمسات ذهبية (v6 - حسب الصورة المرجعية) ---------- */
+.jr-page{ min-height:calc(100vh - 100px); }
+.jr-page::before{ content:""; position:absolute; left:-30px; right:-30px; top:-60px; height:300px; pointer-events:none; z-index:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='260' viewBox='0 0 420 260'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='1' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%234F7CFF' stop-opacity='.0'/%3E%3Cstop offset='.5' stop-color='%234F7CFF' stop-opacity='.7'/%3E%3Cstop offset='1' stop-color='%234F7CFF' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M-10 190C60 90 170 20 330 -10' fill='none' stroke='url(%23g)' stroke-width='1.6'/%3E%3Cpath d='M-10 215C70 115 180 40 360 5' fill='none' stroke='url(%23g)' stroke-width='.8' opacity='.6'/%3E%3C/svg%3E") left top/auto 260px no-repeat,radial-gradient(60% 70% at 15% 0%,rgba(79,124,255,.28),transparent 70%),radial-gradient(45% 50% at 90% 20%,rgba(241,192,74,.07),transparent 70%); }
+.jr-page::after{ content:""; position:absolute; left:-30px; right:-30px; bottom:-30px; height:300px; pointer-events:none; z-index:0; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='300' viewBox='0 0 420 300' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='b' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%234F7CFF' stop-opacity='.0'/%3E%3Cstop offset='.45' stop-color='%234F7CFF' stop-opacity='.65'/%3E%3Cstop offset='.8' stop-color='%23F1C04A' stop-opacity='.85'/%3E%3Cstop offset='1' stop-color='%238A6CFF' stop-opacity='.2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M-10 230C90 190 170 270 290 250S400 180 440 170' fill='none' stroke='url(%23b)' stroke-width='1.6'/%3E%3Cpath d='M-10 255C100 215 190 290 300 272S410 210 440 200' fill='none' stroke='url(%23b)' stroke-width='.9' opacity='.6'/%3E%3Cpath d='M-10 205C80 165 160 245 280 222S400 150 440 140' fill='none' stroke='url(%23b)' stroke-width='.7' opacity='.45'/%3E%3Ccircle cx='60' cy='250' r='1.6' fill='%23F1C04A'/%3E%3Ccircle cx='330' cy='282' r='1.8' fill='%23F1C04A'/%3E%3Ccircle cx='215' cy='262' r='1.2' fill='%23FFE29A'/%3E%3C/svg%3E") center bottom/100% 100% no-repeat; }
+.a-f1,.a-f2,.a-f3,.a-tw,.a-z{ animation:none; }
+/* هيدر */
+.jr-hero{ min-height:0; overflow:visible; padding:0 2px; margin:2px 2px 18px; border:0; border-radius:0; background:none; box-shadow:none; }
+.jr-hero::before,.jr-hero::after{ content:none!important; display:none; }
+.jr-hero-art{ display:none; }
+.jr-hero-ico{ display:grid; width:56px; height:56px; border-radius:18px; color:#1a1633; background:linear-gradient(145deg,#FFE29A,#F1B53F); border:0; box-shadow:0 12px 26px -8px rgba(241,181,63,.7),inset 0 1px 0 rgba(255,255,255,.65); animation:none; }
+.jr-hero-ico em{ display:block; }
+.jr-hero-txt b{ font-size:18.5px; font-weight:900; background:linear-gradient(90deg,#FFE29A,#F1B53F); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; text-shadow:none; letter-spacing:0; }
+.jr-hero-txt span{ color:rgba(205,214,255,.7); font-weight:500; }
+.jr-live-chip{ color:rgba(205,214,255,.7)!important; background:rgba(79,124,255,.1); border:1px solid rgba(120,150,255,.3); font-weight:700; }
+.jr-live-chip i{ background:#8fa3e8; }
+.jr-live-chip.on{ color:#CFF5E3!important; background:rgba(95,224,164,.1); border-color:rgba(95,224,164,.4); }
+.jr-live-chip.on i{ background:#5FE0A4; box-shadow:0 0 8px rgba(95,224,164,.8); }
+/* كارت الكود */
+.jr-code{ padding:18px 16px 16px; border-radius:28px; border:1.5px solid rgba(120,150,255,.5); overflow:hidden;
+  background:linear-gradient(150deg,rgba(30,52,160,.72),rgba(22,30,96,.82) 55%,rgba(58,42,66,.78)); box-shadow:0 22px 40px -18px rgba(2,4,30,.9),0 0 30px -10px rgba(79,124,255,.45),inset 0 1px 0 rgba(255,255,255,.16); }
+.jr-code::before{ background:radial-gradient(140px 90px at 0% 100%,rgba(241,192,74,.3),transparent 70%),radial-gradient(140px 90px at 100% 100%,rgba(241,192,74,.22),transparent 70%),radial-gradient(60% 40% at 50% 0%,rgba(110,150,255,.3),transparent 80%); }
+.jr-code::after{ content:none!important; display:none; }
+.jr-code-deco{ display:none; }
+.jr-code-k{ padding-left:0; }
+.jr-code-k span:first-child{ color:#fff; text-shadow:none; font-size:15px; letter-spacing:0; }
+.jr-code-k em{ color:#F1C04A; background:rgba(241,192,74,.06); border:1px solid rgba(241,192,74,.5); font-weight:800; }
+.jr-paste{ color:#F1C04A; background:transparent; border:1px solid rgba(241,192,74,.45); box-shadow:none; }
+.jr-paste:active{ transform:scale(.95); box-shadow:none; }
+.jr-boxes{ gap:11px; }
+.jr-box{ height:72px; border-radius:20px; font-size:32px; color:#fff; background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.03)); border:1.5px solid rgba(120,160,255,.6); box-shadow:0 0 16px -4px rgba(79,124,255,.55),inset 0 1px 0 rgba(255,255,255,.2); text-shadow:none; }
+.jr-box i{ width:11px; height:11px; background:rgba(255,255,255,.4); }
+.jr-box.on{ color:#FFE29A; background:linear-gradient(180deg,rgba(241,192,74,.2),rgba(241,192,74,.05)); border-color:rgba(255,226,154,.85); box-shadow:0 0 16px -4px rgba(241,192,74,.5),inset 0 1px 0 rgba(255,255,255,.25); }
+.jr-box.pop{ animation:jrPop .25s ease; }
+.jr-code-wrap:focus-within .jr-box.cur{ background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.06)); border-color:#9DB8FF; box-shadow:0 0 0 4px rgba(79,124,255,.22),0 0 20px rgba(79,124,255,.5); transform:translateY(-1px); }
+.jr-join{ height:56px; border-radius:20px; font-size:16.5px; color:rgba(255,255,255,.78); text-shadow:none; background:linear-gradient(100deg,rgba(66,98,236,.8),rgba(110,100,206,.62) 60%,rgba(190,150,150,.5)); border:1px solid rgba(255,255,255,.3); box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 10px 20px -12px rgba(0,0,0,.7); }
+.jr-join.ready{ color:#241704; background:linear-gradient(100deg,#F1B53F,#FFDD94); border-color:transparent; box-shadow:0 14px 26px -10px rgba(241,181,63,.7),inset 0 1px 0 rgba(255,255,255,.55); animation:jrReady .6s var(--spring), jrBreath 2.4s ease-in-out .6s infinite; }
+.jr-join:active,.jr-join.ready:active{ transform:scale(.98); box-shadow:none; animation:none; }
+.jr-join.ready::before{ display:block; }
+/* معاينة الكود */
+.jr-pvc{ color:#fff; background:linear-gradient(150deg,rgba(32,52,150,.7),rgba(18,24,80,.8)); border:1px solid rgba(95,224,164,.5); box-shadow:0 8px 18px -12px #000; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+.jr-pvc.bad{ background:linear-gradient(150deg,rgba(120,36,70,.55),rgba(60,18,40,.7)); border-color:rgba(255,120,140,.5); }
+.jr-pvc .jr-pv-ico{ border:1px solid rgba(255,255,255,.25); }
+.jr-pv-t b{ color:#fff; } .jr-pv-t em{ color:rgba(205,214,255,.7); font-weight:500; }
+.jr-pv-s{ color:#7CF5B8; } .jr-pvc.bad .jr-pv-s{ color:#FFB3C0; }
+/* عنوان القايمة */
+.jr-sec{ margin:8px 4px 14px; }
+.jr-sec-t{ font-size:16px; font-weight:800; color:#fff; text-shadow:none; }
+.jr-sec-t::after{ display:none; }
+.jr-live{ width:10px; height:10px; background:#5FE0A4; border:0; box-shadow:0 0 0 5px rgba(95,224,164,.15); animation:jrLive 1.8s infinite; }
+.jr-count{ color:#1a1633; background:linear-gradient(145deg,#FFE29A,#F1B53F); border:0; box-shadow:none; text-shadow:none; }
+.jr-sec-s{ color:rgba(205,214,255,.55); background:none; border:0; font-weight:500; }
+/* أدوات */
+.jr-search{ color:rgba(205,214,255,.7); background:rgba(79,124,255,.1); border:1px solid rgba(120,150,255,.35); box-shadow:none; border-radius:18px; }
+.jr-search input{ color:#fff; font-weight:500; } .jr-search input::placeholder{ color:rgba(205,214,255,.45); }
+.jr-search:focus-within{ border-color:#9DB8FF; box-shadow:0 0 0 4px rgba(79,124,255,.2); }
+.jr-chip{ color:rgba(220,228,255,.8); background:rgba(79,124,255,.08); border:1px solid rgba(120,150,255,.3); box-shadow:none; font-weight:700; }
+.jr-chip.on{ color:#241704; background:linear-gradient(100deg,#F1B53F,#FFDD94); border-color:transparent; box-shadow:0 8px 16px -8px rgba(241,181,63,.7); transform:none; }
+.jr-chip:active{ transform:scale(.96); box-shadow:none; }
+.jr-quick{ color:#CFF5E3; background:linear-gradient(120deg,rgba(95,224,164,.2),rgba(79,124,255,.12)); border:1px solid rgba(95,224,164,.5); box-shadow:none; animation:none; border-radius:18px; position:relative; overflow:hidden; }
+.jr-quick small{ color:#CFF5E3; opacity:.75; font-weight:500; }
+.jr-quick:active{ transform:scale(.98); box-shadow:none; }
+/* كروت الغرف */
+.jr-list{ gap:12px; }
+.jr-room{ color:#fff; border-radius:24px; border:1.5px solid rgba(120,150,255,.32); background:linear-gradient(150deg,rgba(32,52,150,.55),rgba(18,24,80,.72))!important; box-shadow:0 16px 28px -18px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.14); }
+.jr-room::before{ background:radial-gradient(120px 90px at 100% 0%,rgba(241,192,74,.14),transparent 70%),radial-gradient(120px 90px at 0% 100%,rgba(79,124,255,.18),transparent 70%); }
+.jr-room:active{ transform:scale(.985); box-shadow:inset 0 1px 0 rgba(255,255,255,.14); border-color:rgba(255,226,154,.55); }
+.jr-ico.jr-logo{ border:1.5px solid rgba(255,255,255,.35); box-shadow:0 10px 20px -10px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.35); animation:jrIco 3.6s ease-in-out infinite; animation-delay:calc(var(--k,0)*.4s); }
+.jr-logo .game-logo-img{ filter:drop-shadow(0 3px 5px rgba(0,0,0,.45)); }
+.jr-name{ color:#fff; text-shadow:none; font-weight:900; }
+.jr-codechip{ color:#F1C04A; background:transparent; border:1px solid rgba(241,192,74,.45); font-weight:800; }
+.jr-host{ color:rgba(205,214,255,.7); font-weight:500; }
+.jr-tag{ color:#CFE8DA; background:rgba(95,224,164,.09); border:1px solid rgba(95,224,164,.3); font-weight:700; }
+.jr-tag.lock{ color:#F3C7A6; background:rgba(243,199,166,.09); border-color:rgba(243,199,166,.35); }
+.jr-tag.gold{ color:#F6DC93; background:rgba(241,192,74,.1); border-color:rgba(241,192,74,.4); }
+.jr-dots b{ background:rgba(255,255,255,.16); border:0; width:8px; height:8px; }
+.jr-dots b.f{ background:#5FE0A4; box-shadow:0 0 6px rgba(95,224,164,.7); }
+.jr-cnt{ color:rgba(205,214,255,.6); }
+.jr-go{ color:#241704; background:linear-gradient(100deg,#F1B53F,#FFDD94); border:0; border-radius:14px; padding:8px 20px; box-shadow:0 8px 16px -8px rgba(241,181,63,.75); }
+.jr-avs .pl-avatar{ border:1.5px solid #1a2470; }
+.jr-more{ color:rgba(205,214,255,.7); }
+.jr-skel i,.jr-skel b,.jr-skel em{ background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.06) 75%); background-size:200% 100%; }
+/* فاضي: كوكب بمدار */
+.jr-empty{ padding:22px 16px 34px; border-radius:28px; border:1.5px dashed rgba(100,140,255,.55); background:rgba(40,60,170,.06); }
+.jr-empty-t{ color:#fff; text-shadow:none; font-weight:800; } .jr-empty-s{ color:rgba(205,214,255,.6); }
+.jr-empty-art{ margin:0 auto 8px; }
+.jr-orb{ position:relative; width:170px; height:136px; margin:0 auto; }
+.jr-core{ position:absolute; left:50%; top:50%; width:88px; height:88px; margin:-44px 0 0 -44px; border-radius:50%; display:grid; place-items:center; background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.22),rgba(70,95,200,.18)); border:1px solid rgba(255,255,255,.25); box-shadow:0 0 34px rgba(241,192,74,.22),inset 0 0 20px rgba(120,150,255,.2); }
+.jr-ring{ position:absolute; left:-6px; right:-6px; top:30px; bottom:30px; border:1px solid rgba(110,150,255,.55); border-radius:50%; transform:rotate(-16deg); box-shadow:0 0 14px rgba(79,124,255,.25); }
+.jr-orb u{ position:absolute; text-decoration:none; font-size:26px; filter:drop-shadow(0 3px 6px rgba(0,0,0,.5)); animation:jrF3 3.8s ease-in-out infinite; }
+.jr-orb .o1{ left:36%; top:-6px; } .jr-orb .o2{ right:-4px; top:48px; animation-delay:.6s; } .jr-orb .o3{ left:22%; bottom:-8px; animation-delay:1.2s; }
+.jr-empty-art span,.jr-empty-art > u{ display:none; }
+/* لوحة جاهز */
+.rdy-panel{ color:#fff; border-radius:24px; border:1.5px solid rgba(120,150,255,.38); background:linear-gradient(150deg,rgba(32,52,150,.6),rgba(18,24,80,.78)); box-shadow:0 18px 32px -20px #000,0 0 24px -12px rgba(79,124,255,.5),inset 0 1px 0 rgba(255,255,255,.14); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+.rdy-panel.all{ background:linear-gradient(150deg,rgba(24,120,92,.65),rgba(14,56,68,.82)); border-color:rgba(95,224,164,.65); box-shadow:0 18px 32px -20px #000,0 0 28px -8px rgba(95,224,164,.5),inset 0 1px 0 rgba(255,255,255,.2); }
+.rdy-ht b{ color:#fff; -webkit-text-fill-color:#fff; text-shadow:none; } .rdy-ht span{ color:rgba(205,214,255,.7); } .rdy-ht em{ color:#F1C04A; }
+.rdy-logo{ border:1px solid rgba(241,192,74,.5); box-shadow:none; animation:none; background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.22),rgba(255,255,255,.05)); }
+.rdy-count{ color:#1a1633; background:linear-gradient(145deg,#FFE29A,#F1B53F); border:0; }
+.rdy-panel.all .rdy-count{ background:linear-gradient(145deg,#B8F5D6,#5FE0A4); }
+.rdy-bar{ height:7px; border:0; background:rgba(255,255,255,.12); border-radius:7px; }
+.rdy-bar i{ background:linear-gradient(90deg,#F1B53F,#5FE0A4); border-radius:7px; }
+.rdy-row{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); box-shadow:none; border-radius:16px; }
+.rdy-row.on{ background:rgba(95,224,164,.1); border-color:rgba(95,224,164,.4); }
+.rdy-nm b{ color:#fff; font-weight:800; } .rdy-nm em{ color:rgba(205,214,255,.55); font-weight:500; }
+.rdy-pill{ color:rgba(205,214,255,.65); background:rgba(255,255,255,.07); border:0; font-weight:700; }
+.rdy-pill.on{ color:#CFF5E3; background:rgba(95,224,164,.16); border:0; }
+.rdy-btn{ color:#241704; background:linear-gradient(100deg,#F1B53F,#FFDD94); border:0; box-shadow:0 8px 16px -8px rgba(241,181,63,.75); border-radius:14px; }
+.rdy-btn:active{ transform:scale(.95); box-shadow:none; }
+.rdy-btn.on{ color:#07261a; background:linear-gradient(100deg,#5FE0A4,#B8F5D6); box-shadow:0 8px 16px -8px rgba(95,224,164,.7); }
+.rdy-msg,.rdy-panel.all .rdy-msg{ color:rgba(220,228,255,.8); text-shadow:none; font-weight:800; } .rdy-panel.all .rdy-msg{ color:#7CF5B8; }
+.rdy-panel.all::before{ opacity:.6; }
 </style>
 </body>
 </html>
