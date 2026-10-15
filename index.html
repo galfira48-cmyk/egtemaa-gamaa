@@ -29155,6 +29155,7 @@ function renderSettingsPage(){
         <input type="range" id="music-volume-slider" min="0" max="1" step="0.01" value="${musicPrefs().volume}" style="width:100%;accent-color:var(--teal);">
       </div>
     </div>
+    ${upinSettingsCard(p.id)}
     <div class="section-title">${tr('settings_data')}</div>
     <div class="card">
       <button type="button" class="btn btn-ghost" data-action="export-pdf">${ICO.download} ${tr('settings_export_pdf')}</button>
@@ -34345,6 +34346,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='submit-login'){ doLogin(); }
   else if(action==='saved-login'){ savedAccountLogin(el.dataset.pid); }
   else if(action==='saved-remove'){ e.preventDefault(); e.stopPropagation(); confirmRemoveSavedAccount(el.dataset.pid); }
+  else if(action==='upin-setup'){ upinSetupFlow(); }
+  else if(action==='upin-remove'){ upinRemoveFlow(); }
   else if(action==='login-other'){ state._loginOther = true; render(); }
   else if(action==='login-back-cards'){ state._loginOther = false; render(); }
   else if(action==='go-signup'){ SU.step = 1; SU.dir = 1; SU._entered = false; SU._pct = null; SU._prev = null; state.view='signup'; render(); }
@@ -37986,7 +37989,7 @@ function savedAccountLogin(pid){
   if(!pid) return;
   const sid = String(pid);
   const p = PARTICIPANTS.find(x=>x.id===sid);
-  if(!p && navigator.onLine === false && savedAccountStub(sid)){ doLoginWithCode(sid); return; }
+  if(!p && navigator.onLine === false && savedAccountStub(sid)){ pinThenLogin(sid); return; }
   if(!p && !__loginDataReady){
     loginWaitAndRetry(()=>{
       /* لو السيرفر ما رجّعش أي حسابات (النت ضعيف/مقطوع) نكمّل بالحساب المحفوظ بدل ما نرفض */
@@ -37996,7 +37999,7 @@ function savedAccountLogin(pid){
     return;
   }
   if(!p){ showToast('مش لاقي الحساب ده — ادخل بالرقم والباسورد', true); state._loginOther = true; render(); return; }
-  doLoginWithCode(sid);
+  pinThenLogin(sid);
 }
 function loginFormOpen(){ return !savedAccountsGet().length || !!state._loginOther; }
 function savedAccountsHtml(){
@@ -38648,7 +38651,7 @@ if(window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermiss
 /* ============================= HARDWARE / BROWSER BACK BUTTON ============================= */
 /* بدل ما زرار الرجوع بتاع الموبايل يقفل الموقع خالص، بيرجع صفحة جوه التطبيق زي زرار الرجوع اللي في الشاشة */
 function popTopOverlay(){
-  const overlays = document.querySelectorAll('.modal-overlay');
+  const overlays = document.querySelectorAll('.modal-overlay, .upin-ov');
   if(overlays.length){
     overlays[overlays.length-1].remove();
     return true;
@@ -38673,6 +38676,190 @@ window.addEventListener('popstate', function(){
   /* لو معندناش حاجة نرجعها جوه التطبيق، سيبها تقفل عادي */
 });
 
+/* ============================= PIN خاص بالمخدوم (دخول سريع من الكارت) ============================= */
+let USER_PINS = {};
+const UPIN_LS = 'meeting-pins', UPIN_LOCK = 'meeting-pin-lock';
+function upLsGet(k){ try{ const o = JSON.parse(localStorage.getItem(k)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
+function upLsSet(k,o){ try{ localStorage.setItem(k, JSON.stringify(o)); }catch(e){} }
+async function loadUserPins(){
+  try{
+    const r = await window.storage.get('glavera-user-pins', true);
+    const o = r ? JSON.parse(r.value) : {};
+    USER_PINS = (o && typeof o==='object') ? o : {};
+    upLsSet(UPIN_LS, USER_PINS);
+  }catch(e){}
+}
+function userPinOf(pid){ return USER_PINS[pid] || upLsGet(UPIN_LS)[pid] || ''; }
+function userPinHash(pid, pin){ return sha256Hex('glavera-upin:'+pid+':'+pin); }
+async function saveUserPin(pid, hash){
+  const apply = (cur)=>{
+    let o = {}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o = {}; }
+    if(!o || typeof o!=='object') o = {};
+    if(hash) o[pid] = hash; else delete o[pid];
+    return JSON.stringify(o);
+  };
+  try{
+    if(window.storage.update){ await window.storage.update('glavera-user-pins', apply, true); }
+    else { const r = await window.storage.get('glavera-user-pins', true); await window.storage.set('glavera-user-pins', apply(r ? r.value : null), true); }
+    if(hash) USER_PINS[pid] = hash; else delete USER_PINS[pid];
+    upLsSet(UPIN_LS, USER_PINS);
+    return true;
+  }catch(e){ return false; }
+}
+function pinThenLogin(sid){
+  if(userPinOf(sid)) upinScreen({ pid:sid, mode:'verify', onDone:()=>doLoginWithCode(sid) });
+  else doLoginWithCode(sid);
+}
+function upinSettingsCard(pid){
+  const on = !!userPinOf(pid);
+  return `<div class="section-title">🔐 PIN الدخول</div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.7;">${on ? '✅ الـPIN مفعّل — هيتطلب منك لما تدخل حسابك من الكارت على الجهاز.' : 'اعمل PIN من ٤ أرقام يحمي حسابك، وهيظهرلك شاشة إدخاله لما تضغط على كارت حسابك في تسجيل الدخول.'}</div>
+      <button type="button" class="btn btn-primary" data-action="upin-setup">${on ? 'تغيير الـPIN' : 'تفعيل PIN'}</button>
+      ${on ? '<button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="upin-remove">إلغاء الـPIN</button>' : ''}
+    </div>`;
+}
+function upinSetupFlow(){
+  const pid = state.pid; if(!pid) return;
+  const next = ()=>upinScreen({ pid, mode:'set', onDone:()=>render() });
+  if(userPinOf(pid)) upinScreen({ pid, mode:'verify', title:'تغيير الـPIN', sub:'اكتب الـPIN الحالي الأول', noForgot:true, onDone:next });
+  else next();
+}
+function upinRemoveFlow(){
+  const pid = state.pid; if(!pid) return;
+  upinScreen({ pid, mode:'remove', onDone:async()=>{
+    const ok = await saveUserPin(pid, null);
+    showToast(ok ? 'اتلغى الـPIN' : 'حصلت مشكلة، جرّب تاني', !ok); render();
+  }});
+}
+function upinStyle(){
+  if(document.getElementById('upin-css')) return;
+  const s = document.createElement('style'); s.id = 'upin-css';
+  s.textContent = `
+  .upin-ov{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 50% 0%,#2a2570 0%,#171449 45%,#0a0926 100%);color:#fff;padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0);animation:upinIn .28s ease both;font-family:inherit;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+  @keyframes upinIn{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
+  .upin-glow{position:absolute;width:340px;height:340px;border-radius:50%;top:6%;left:50%;transform:translateX(-50%);background:radial-gradient(circle,rgba(244,183,64,.28),transparent 68%);filter:blur(10px);pointer-events:none;animation:upinGlow 4s ease-in-out infinite alternate;}
+  @keyframes upinGlow{to{opacity:.55;transform:translateX(-50%) scale(1.15)}}
+  .upin-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font-size:16px;cursor:pointer;}
+  .upin-box{position:relative;width:100%;max-width:330px;text-align:center;}
+  .upin-avwrap{position:relative;width:86px;height:86px;margin:0 auto 12px;}
+  .upin-av{width:86px;height:86px;border-radius:50%;background-size:cover;background-position:center;border:2.5px solid #f4b740;box-shadow:0 0 0 5px rgba(244,183,64,.15),0 10px 26px -8px rgba(0,0,0,.6);}
+  .upin-ini{display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;background:linear-gradient(145deg,#3b3490,#1d1858);}
+  .upin-lock{position:absolute;bottom:-4px;left:-4px;width:30px;height:30px;border-radius:50%;background:#171449;border:2px solid #f4b740;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .upin-title{font-size:21px;font-weight:800;margin-top:4px;}
+  .upin-sub{font-size:13px;color:rgba(255,255,255,.66);margin-top:4px;}
+  .upin-dots{display:flex;justify-content:center;gap:16px;margin:24px 0 8px;}
+  .upin-dots i{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.4);transition:.15s;}
+  .upin-dots i.on{background:#f4b740;border-color:#f4b740;transform:scale(1.18);box-shadow:0 0 14px rgba(244,183,64,.65);}
+  .upin-dots.shake{animation:upinShake .42s;}
+  .upin-dots.shake i{border-color:#ff6b6b;background:#ff6b6b;box-shadow:0 0 12px rgba(255,107,107,.6);}
+  .upin-dots.ok i{background:#3ddc97;border-color:#3ddc97;box-shadow:0 0 14px rgba(61,220,151,.7);transform:scale(1.2);}
+  @keyframes upinShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
+  .upin-msg{min-height:20px;font-size:12.5px;color:rgba(255,255,255,.7);margin-bottom:6px;}
+  .upin-msg.err{color:#ff8a8a}.upin-msg.ok{color:#3ddc97}
+  .upin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 18px;justify-items:center;margin:8px 6px 0;}
+  .upin-pad.locked{opacity:.35;pointer-events:none;}
+  .upin-k{width:70px;height:70px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:26px;font-weight:600;font-family:inherit;cursor:pointer;transition:transform .08s,background .12s;-webkit-tap-highlight-color:transparent;}
+  .upin-k:active{transform:scale(.9);background:rgba(244,183,64,.32);}
+  .upin-del{font-size:22px;background:transparent;border-color:transparent;}
+  .upin-forgot{margin-top:18px;background:none;border:0;color:#f4b740;font-size:13px;font-family:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:4px;}
+  @media (max-height:640px){.upin-k{width:58px;height:58px;font-size:22px}.upin-pad{gap:9px 14px}.upin-avwrap,.upin-av{width:68px;height:68px}.upin-dots{margin:14px 0 4px}}
+  `;
+  document.head.appendChild(s);
+}
+function upinScreen(o){
+  upinStyle();
+  const pid = o.pid, mode = o.mode || 'verify';
+  const old = document.querySelector('.upin-ov'); if(old) old.remove();
+  const p = PARTICIPANTS.find(x=>x.id===pid) || {}, sa = savedAccountsGet().find(x=>x.id===pid) || {};
+  const name = p.name || sa.name || 'حسابي', photo = p.photo || sa.thumb || '';
+  const first = String(name).trim().split(/\s+/)[0];
+  const av = photo ? `<div class="upin-av" style="background-image:url('${String(photo).replace(/'/g,'%27')}')"></div>` : `<div class="upin-av upin-ini">${escapeHtml(initials(name))}</div>`;
+  const ov = document.createElement('div'); ov.className = 'upin-ov';
+  ov.innerHTML = `<div class="upin-glow"></div><button type="button" class="upin-close" data-k="close" aria-label="إغلاق">✕</button>
+    <div class="upin-box">
+      <div class="upin-avwrap">${av}<span class="upin-lock">🔒</span></div>
+      <div class="upin-title"></div><div class="upin-sub"></div>
+      <div class="upin-dots" dir="ltr"><i></i><i></i><i></i><i></i></div>
+      <div class="upin-msg"></div>
+      <div class="upin-pad" dir="ltr">${[1,2,3,4,5,6,7,8,9].map(n=>`<button type="button" class="upin-k" data-k="${n}">${n}</button>`).join('')}<span></span><button type="button" class="upin-k" data-k="0">0</button><button type="button" class="upin-k upin-del" data-k="del" aria-label="مسح">⌫</button></div>
+      ${(mode==='verify' && !o.noForgot) ? '<button type="button" class="upin-forgot" data-k="forgot">نسيت الـPIN؟ ادخل بالرقم والباسورد</button>' : ''}
+    </div>`;
+  document.body.appendChild(ov);
+  const $ = s=>ov.querySelector(s);
+  const dots = $('.upin-dots'), msg = $('.upin-msg'), pad = $('.upin-pad'), lockIco = $('.upin-lock');
+  let buf = '', stage = mode==='set' ? 'new' : 'check', firstPin = '', busy = false, tmr = null;
+  const TXT = {
+    check: o.title ? [o.title, o.sub||''] : (mode==='remove' ? ['إلغاء الـPIN','اكتب الـPIN الحالي للتأكيد'] : ['أهلاً '+first+' 👋','اكتب الـPIN بتاعك عشان تدخل']),
+    new: ['اختار PIN جديد','٤ أرقام تحمي بيهم حسابك'],
+    confirm: ['أكّد الـPIN','اكتبه تاني للتأكيد']
+  };
+  const vib = x=>{ try{ navigator.vibrate && navigator.vibrate(x); }catch(e){} };
+  const paint = ()=>{ [...dots.children].forEach((d,i)=>d.classList.toggle('on', i<buf.length)); };
+  const setMsg = (t,c)=>{ msg.textContent = t||''; msg.className = 'upin-msg '+(c||''); };
+  const texts = ()=>{ $('.upin-title').textContent = TXT[stage][0]; $('.upin-sub').textContent = TXT[stage][1]; };
+  const alive = ()=>document.body.contains(ov);
+  const close = ()=>{ clearInterval(tmr); document.removeEventListener('keydown', onKey, true); ov.remove(); };
+  const bad = (t)=>{ vib([40,40,40]); try{ SND.error(); }catch(e){} dots.classList.add('shake'); setMsg(t,'err'); busy = true;
+    setTimeout(()=>{ dots.classList.remove('shake'); buf = ''; paint(); busy = false; }, 460); };
+  const weak = s=>{ if(/^(\d)\1{3}$/.test(s)) return true; const d = s.split('').map(Number);
+    return d.every((x,i)=>i===0||x===d[i-1]+1) || d.every((x,i)=>i===0||x===d[i-1]-1); };
+  const lockInfo = ()=>upLsGet(UPIN_LOCK)[pid] || {n:0, until:0};
+  const lockSet = v=>{ const a = upLsGet(UPIN_LOCK); if(v) a[pid] = v; else delete a[pid]; upLsSet(UPIN_LOCK, a); };
+  const checkLock = ()=>{
+    const L = lockInfo(), left = Math.ceil((L.until - Date.now())/1000);
+    if(left > 0){
+      pad.classList.add('locked'); setMsg('مقفول مؤقتاً — جرّب بعد '+left+' ثانية','err');
+      clearInterval(tmr); tmr = setInterval(()=>{ if(!alive()){ clearInterval(tmr); return; }
+        const r = Math.ceil((lockInfo().until - Date.now())/1000);
+        if(r <= 0){ clearInterval(tmr); pad.classList.remove('locked'); setMsg('تقدر تحاول تاني'); } else setMsg('مقفول مؤقتاً — جرّب بعد '+r+' ثانية','err'); }, 500);
+      return true;
+    }
+    return false;
+  };
+  const success = (t, cb)=>{ dots.classList.add('ok'); lockIco.textContent = '🔓'; setMsg(t,'ok'); vib([15,50,15]); try{ SND.success(); }catch(e){} busy = true;
+    setTimeout(()=>{ close(); cb && cb(); }, 480); };
+  const submit = async ()=>{
+    if(busy) return; busy = true;
+    const val = buf, h = await userPinHash(pid, val);
+    busy = false;
+    if(stage === 'check'){
+      if(checkLock()){ buf=''; paint(); return; }
+      if(h === userPinOf(pid)){ lockSet(null); success('تمام ✅', o.onDone); return; }
+      const L = lockInfo(); L.n = (L.n||0) + 1;
+      if(L.n >= 5){ L.until = Date.now() + (L.n>=10 ? 600000 : L.n>=8 ? 120000 : 30000); }
+      lockSet(L);
+      bad(L.n >= 5 ? 'محاولات كتير غلط' : 'PIN غلط — باقي '+(5-L.n)+' محاولات');
+      setTimeout(checkLock, 480);
+    } else if(stage === 'new'){
+      if(weak(val)){ bad('PIN سهل التخمين — اختار رقم أصعب'); return; }
+      firstPin = val; stage = 'confirm'; buf = ''; paint(); texts(); setMsg('');
+    } else {
+      if(val !== firstPin){ bad('مش متطابقين — ابدأ من الأول'); stage = 'new'; firstPin = ''; setTimeout(()=>{ texts(); }, 480); return; }
+      busy = true; const ok = await saveUserPin(pid, h); busy = false;
+      if(ok){ lockSet(null); success('تم تفعيل الـPIN ✅', ()=>{ showToast('الـPIN اتفعّل 🔐'); o.onDone && o.onDone(); }); }
+      else bad('حصلت مشكلة في الحفظ، جرّب تاني');
+    }
+  };
+  const press = k=>{
+    if(k==='close'){ close(); return; }
+    if(k==='forgot'){ close(); state._loginOther = true; if(!state.pid) state.view = 'login'; render(); showToast('ادخل برقم موبايلك والباسورد'); return; }
+    if(busy || pad.classList.contains('locked')) return;
+    if(k==='del'){ buf = buf.slice(0,-1); paint(); return; }
+    if(!/^\d$/.test(k) || buf.length >= 4) return;
+    vib(8); buf += k; setMsg(''); paint();
+    if(buf.length === 4) setTimeout(submit, 130);
+  };
+  function onKey(e){
+    if(!alive()){ document.removeEventListener('keydown', onKey, true); return; }
+    if(/^\d$/.test(e.key)) press(e.key); else if(e.key==='Backspace') press('del'); else if(e.key==='Escape') press('close'); else return;
+    e.preventDefault(); e.stopPropagation();
+  }
+  ov.addEventListener('click', e=>{ const b = e.target.closest('[data-k]'); if(b){ e.stopPropagation(); press(b.dataset.k); } });
+  document.addEventListener('keydown', onKey, true);
+  texts(); paint(); if(stage==='check') checkLock();
+}
+
 /* ============================= INIT ============================= */
 /* الأكواد بتاعة المشاركين المضافين من الأدمن كانت بتتعرف بس بعد ما يخلص تحميل كل بيانات التطبيق (ممكن ياخد لحد 10 ثواني)،
    فلو حد كتب كوده بدري كان يطلعله "كود الدخول غير صحيح". دلوقتي بنحمّلهم الأول لوحدهم وبسرعة، ولو لسه ما خلصوش بنستنى بدل ما نرفض الكود. */
@@ -38680,11 +38867,13 @@ let __loginDataReady = false, __loginDataResolve;
 const __loginDataPromise = new Promise(r=>{ __loginDataResolve = r; });
 function __markLoginDataReady(){ __loginDataReady = true; __loginDataResolve(); }
 async function preloadLoginData(){
+  const __pinP = loadUserPins();
   try{
     const cp = await loadCustomParticipants();
     if(!CUSTOM_PARTICIPANTS.length) CUSTOM_PARTICIPANTS = cp || [];
     (cp||[]).forEach(c=>{ if(!PARTICIPANTS.some(x=>x.id===c.id)) PARTICIPANTS.push({id:c.id, name:c.name}); });
   }catch(e){ console.error('preloadLoginData failed', e); }
+  try{ await __pinP; }catch(e){}
 }
 function loginWaitAndRetry(retry){
   if(window.__loginRetryPending) return;
@@ -38707,7 +38896,7 @@ function loginWaitAndRetry(retry){
   try{
     const sp = localStorage.getItem('meeting-pid');
     if(sp && !PARTICIPANTS.some(x=>x.id===sp) && !CUSTOM_PARTICIPANTS.length){ savedAccountStub(sp); }
-    if(sp && PARTICIPANTS.some(x=>x.id===sp) && (state.view==='splash' || state.view==='login')){ doLoginWithCode(sp); }
+    if(sp && PARTICIPANTS.some(x=>x.id===sp) && (state.view==='splash' || state.view==='login')){ pinThenLogin(sp); }
   }catch(e){}
   try{ savedAccountsRefresh(); }catch(e){}
   render();
