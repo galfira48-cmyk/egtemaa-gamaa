@@ -107,6 +107,13 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<style id="dmdrag-css">
+.domino-tile.playable{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.domino-tile.dm-dragging{opacity:.25}
+.domino-tile.dm-drag-clone{position:fixed;margin:0;pointer-events:none;z-index:99998;transform-origin:center;opacity:1;animation:none;box-shadow:0 18px 32px rgba(0,0,0,.55),0 0 0 2px #f4b740;will-change:transform}
+.dt-ghost.hot{opacity:1;animation:none;transform:scale(1.1);filter:brightness(1.45);box-shadow:0 0 0 3px #fff,0 0 22px rgba(255,255,255,.75)}
+.domino-board.dm-hot{outline:3px dashed #f4b740;outline-offset:-8px}
+</style>
 <style id="snp-css">
 .snp{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;direction:rtl;color:#fff;background:radial-gradient(120% 70% at 50% 0%,#2b2678 0%,#15123f 52%,#0a0925 100%);padding:max(env(safe-area-inset-top,0px),8px) 10px max(env(safe-area-inset-bottom,0px),10px);overflow:hidden;-webkit-tap-highlight-color:transparent;font-family:inherit;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 .snp *{box-sizing:border-box}
@@ -21132,7 +21139,7 @@ function renderDominoGame(){
   const inactivePlayer = activePlayer==='R' ? 'Y' : 'R';
   const humanTurn = !dominoIsAiTurn(g) && !g.winner;
   const isHumanInteractive = humanTurn && !g.busy && g.pendingIdx==null;
-  const activeLabel = activePlayer==='R' ? '🔴 دورك، اختار قطعة 👇' : (g.mode==='ai' ? '🤖 دور الجهاز' : '🟡 دور اللاعب 2');
+  const activeLabel = activePlayer==='R' ? '🔴 دورك — اسحب قطعة للطاولة أو اضغط عليها 👇' : (g.mode==='ai' ? '🤖 دور الجهاز' : '🟡 دور اللاعب 2');
   const inactiveLabel = inactivePlayer==='R' ? '🔴 انت' : (g.mode==='ai' ? '🤖 الجهاز' : '🟡 اللاعب 2');
   const inactiveCount = g.hands[inactivePlayer].length;
   const backTiles = Array.from({length:inactiveCount}).map(()=>`<span class="domino-back"></span>`).join('');
@@ -28495,7 +28502,7 @@ function renderRoomDomino(){
   else if(room.winner===myRole) statusText = room.blocked ? '🎉 اتقفلت اللعبة وفزت بأقل نقط!' : '🎉 فزت! خلصت قطعك الأول';
   else if(room.winner) statusText = room.blocked ? `😅 اتقفلت اللعبة وفاز صاحبك بأقل نقط` : '😅 فاز صاحبك';
   else if(isPendingMine) statusText = 'القطعة دي بتتحط في الطرفين، اختار فين 👇';
-  else if(isMyTurn) statusText = 'دورك! اختار قطعة 👇';
+  else if(isMyTurn) statusText = 'دورك! اسحب قطعة للطاولة أو اضغط عليها 👇';
   else statusText = '⏳ دور صاحبك...';
   if(room.matchOver){
     statusText = room.matchWinner===myRole ? `🏆 كسبت اللعبة! وصلت ${DOMINO_TARGET} نقطة` : `😅 صاحبك وصل ${DOMINO_TARGET} نقطة وكسب اللعبة`;
@@ -38785,9 +38792,9 @@ window.addEventListener('popstate', function(){
   /* لو معندناش حاجة نرجعها جوه التطبيق، سيبها تقفل عادي */
 });
 
-/* ============================= PIN خاص بالمخدوم (دخول سريع من الكارت) ============================= */
+/* ============================= قفل الحساب: PIN أو نمط أو بصمة/وجه — المخدوم هو اللي بيختار ============================= */
 let USER_PINS = {};
-const UPIN_LS = 'meeting-pins', UPIN_LOCK = 'meeting-pin-lock';
+const UPIN_LS = 'meeting-pins', UPIN_LOCK = 'meeting-pin-lock', UBIO_LS = 'meeting-bio';
 function upLsGet(k){ try{ const o = JSON.parse(localStorage.getItem(k)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
 function upLsSet(k,o){ try{ localStorage.setItem(k, JSON.stringify(o)); }catch(e){} }
 async function loadUserPins(){
@@ -38798,121 +38805,232 @@ async function loadUserPins(){
     upLsSet(UPIN_LS, USER_PINS);
   }catch(e){}
 }
-function userPinOf(pid){ return USER_PINS[pid] || upLsGet(UPIN_LS)[pid] || ''; }
+/* الشكل الجديد: {t:'pin'|'pattern'|'bio', h:hash} — والقديم (نص = PIN) لسه بيتقري */
+function userLockOf(pid){
+  const raw = USER_PINS[pid] || upLsGet(UPIN_LS)[pid];
+  if(!raw) return null;
+  if(typeof raw==='string') return { t:'pin', h:raw };
+  return (raw && raw.t) ? raw : null;
+}
 function userPinHash(pid, pin){ return sha256Hex('glavera-upin:'+pid+':'+pin); }
-async function saveUserPin(pid, hash){
+function userPatHash(pid, seq){ return sha256Hex('glavera-upat:'+pid+':'+seq); }
+async function saveUserLock(pid, val){
   const apply = (cur)=>{
     let o = {}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o = {}; }
     if(!o || typeof o!=='object') o = {};
-    if(hash) o[pid] = hash; else delete o[pid];
+    if(val) o[pid] = val; else delete o[pid];
     return JSON.stringify(o);
   };
   try{
     if(window.storage.update){ await window.storage.update('glavera-user-pins', apply, true); }
     else { const r = await window.storage.get('glavera-user-pins', true); await window.storage.set('glavera-user-pins', apply(r ? r.value : null), true); }
-    if(hash) USER_PINS[pid] = hash; else delete USER_PINS[pid];
+    if(val) USER_PINS[pid] = val; else delete USER_PINS[pid];
     upLsSet(UPIN_LS, USER_PINS);
     return true;
   }catch(e){ return false; }
 }
+/* ---------- البصمة / الوجه (WebAuthn): مربوطة بالجهاز نفسه ---------- */
+let UBIO_OK = null;
+(function(){
+  try{
+    if(!(window.PublicKeyCredential && window.isSecureContext && navigator.credentials)){ UBIO_OK = false; return; }
+    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+      .then(v=>{ UBIO_OK = !!v; try{ if(typeof state!=='undefined' && state.view==='settings') render(); }catch(e){} })
+      .catch(()=>{ UBIO_OK = false; });
+  }catch(e){ UBIO_OK = false; }
+})();
+const b64u = buf=>btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64u = s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), c=>c.charCodeAt(0));
+function ubioCred(pid){ return upLsGet(UBIO_LS)[pid] || ''; }
+function ubioSetCred(pid, id){ const a = upLsGet(UBIO_LS); if(id) a[pid] = id; else delete a[pid]; upLsSet(UBIO_LS, a); }
+async function ubioRegister(pid){
+  const cred = await navigator.credentials.create({ publicKey:{
+    challenge: crypto.getRandomValues(new Uint8Array(32)),
+    rp: { name:'اجتماع جامعة' },
+    user: { id:new TextEncoder().encode('u:'+pid).slice(0,64), name:String(pid), displayName:'مخدوم' },
+    pubKeyCredParams: [{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+    authenticatorSelection: { authenticatorAttachment:'platform', userVerification:'required', residentKey:'discouraged' },
+    attestation:'none', timeout:60000
+  }});
+  if(!cred) throw new Error('nocred');
+  ubioSetCred(pid, b64u(cred.rawId));
+}
+async function ubioVerify(pid){
+  const id = ubioCred(pid); if(!id) throw new Error('nolocal');
+  const a = await navigator.credentials.get({ publicKey:{
+    challenge: crypto.getRandomValues(new Uint8Array(32)),
+    allowCredentials: [{ type:'public-key', id:unb64u(id), transports:['internal'] }],
+    userVerification:'required', timeout:60000
+  }});
+  const ad = new Uint8Array(a.response.authenticatorData);
+  if(!(ad[32] & 0x04)) throw new Error('uv');   /* لازم الجهاز يكون اتحقق من صاحبه فعلًا */
+}
+/* ---------- الدخول والإعدادات ---------- */
 function pinThenLogin(sid){
-  if(userPinOf(sid)) upinScreen({ pid:sid, mode:'verify', onDone:()=>doLoginWithCode(sid) });
+  if(userLockOf(sid)) lockScreen({ pid:sid, mode:'verify', onDone:()=>doLoginWithCode(sid) });
   else doLoginWithCode(sid);
 }
+const UL_NAMES = { pin:'PIN (٤ أرقام)', pattern:'نمط (رسم بالإصبع)', bio:'بصمة / وجه' };
 function upinSettingsCard(pid){
-  const on = !!userPinOf(pid);
-  return `<div class="section-title">🔐 PIN الدخول</div>
+  const L = userLockOf(pid), on = !!L;
+  return `<div class="section-title">🔐 قفل الحساب</div>
     <div class="card">
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.7;">${on ? '✅ الـPIN مفعّل — هيتطلب منك لما تدخل حسابك من الكارت على الجهاز.' : 'اعمل PIN من ٤ أرقام يحمي حسابك، وهيظهرلك شاشة إدخاله لما تضغط على كارت حسابك في تسجيل الدخول.'}</div>
-      <button type="button" class="btn btn-primary" data-action="upin-setup">${on ? 'تغيير الـPIN' : 'تفعيل PIN'}</button>
-      ${on ? '<button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="upin-remove">إلغاء الـPIN</button>' : ''}
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.8;">${on ? '✅ القفل مفعّل — الطريقة: <b>'+UL_NAMES[L.t]+'</b>. هيتطلب منك لما تدخل حسابك من الكارت على الجهاز.' : 'إنت اللي بتختار طريقة قفل حسابك: PIN أو نمط أو بصمة إصبعك أو وجهك. هتظهرلك شاشة القفل لما تضغط على كارت حسابك في تسجيل الدخول.'}</div>
+      <button type="button" class="btn btn-primary" data-action="upin-setup">${on ? 'تغيير طريقة القفل' : 'تفعيل قفل للحساب'}</button>
+      ${on ? '<button type="button" class="btn btn-ghost" style="margin-top:8px;" data-action="upin-remove">إلغاء القفل</button>' : ''}
     </div>`;
 }
 function upinSetupFlow(){
   const pid = state.pid; if(!pid) return;
-  const next = ()=>upinScreen({ pid, mode:'set', onDone:()=>render() });
-  if(userPinOf(pid)) upinScreen({ pid, mode:'verify', title:'تغيير الـPIN', sub:'اكتب الـPIN الحالي الأول', noForgot:true, onDone:next });
-  else next();
+  const choose = ()=>ulockChooser(t=>lockScreen({ pid, mode:'set', type:t, onDone:()=>render() }));
+  if(userLockOf(pid)) lockScreen({ pid, mode:'verify', title:'تغيير القفل', sub:'أكّد هويتك الأول', noForgot:true, onDone:choose });
+  else choose();
 }
 function upinRemoveFlow(){
   const pid = state.pid; if(!pid) return;
-  upinScreen({ pid, mode:'remove', onDone:async()=>{
-    const ok = await saveUserPin(pid, null);
-    showToast(ok ? 'اتلغى الـPIN' : 'حصلت مشكلة، جرّب تاني', !ok); render();
+  lockScreen({ pid, mode:'remove', onDone:async()=>{
+    const ok = await saveUserLock(pid, null);
+    if(ok) ubioSetCred(pid, '');
+    showToast(ok ? 'اتلغى القفل' : 'حصلت مشكلة، جرّب تاني', !ok); render();
   }});
 }
+function lockScreen(o){
+  const mode = o.mode || 'verify';
+  const L = mode==='set' ? null : userLockOf(o.pid);
+  const type = mode==='set' ? o.type : (L && L.t);
+  if(type==='bio') return ubioScreen(o);
+  return upinScreen(Object.assign({}, o, { type: type==='pattern' ? 'pattern' : 'pin' }));
+}
+/* ---------- الستايل المشترك ---------- */
 function upinStyle(){
   if(document.getElementById('upin-css')) return;
   const s = document.createElement('style'); s.id = 'upin-css';
   s.textContent = `
-  .upin-ov{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 50% 0%,#2a2570 0%,#171449 45%,#0a0926 100%);color:#fff;padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0);animation:upinIn .28s ease both;font-family:inherit;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+  .upin-ov{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 50% 0%,#2a2570 0%,#171449 45%,#0a0926 100%);color:#fff;padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0);animation:upinIn .28s ease both;font-family:inherit;-webkit-user-select:none;user-select:none;touch-action:manipulation;direction:rtl;overflow-y:auto}
   @keyframes upinIn{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
-  .upin-glow{position:absolute;width:340px;height:340px;border-radius:50%;top:6%;left:50%;transform:translateX(-50%);background:radial-gradient(circle,rgba(244,183,64,.28),transparent 68%);filter:blur(10px);pointer-events:none;animation:upinGlow 4s ease-in-out infinite alternate;}
+  .upin-glow{position:absolute;width:340px;height:340px;border-radius:50%;top:6%;left:50%;transform:translateX(-50%);background:radial-gradient(circle,rgba(244,183,64,.28),transparent 68%);filter:blur(10px);pointer-events:none;animation:upinGlow 4s ease-in-out infinite alternate}
   @keyframes upinGlow{to{opacity:.55;transform:translateX(-50%) scale(1.15)}}
-  .upin-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font-size:16px;cursor:pointer;}
-  .upin-box{position:relative;width:100%;max-width:330px;text-align:center;}
-  .upin-avwrap{position:relative;width:86px;height:86px;margin:0 auto 12px;}
-  .upin-av{width:86px;height:86px;border-radius:50%;background-size:cover;background-position:center;border:2.5px solid #f4b740;box-shadow:0 0 0 5px rgba(244,183,64,.15),0 10px 26px -8px rgba(0,0,0,.6);}
-  .upin-ini{display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;background:linear-gradient(145deg,#3b3490,#1d1858);}
-  .upin-lock{position:absolute;bottom:-4px;left:-4px;width:30px;height:30px;border-radius:50%;background:#171449;border:2px solid #f4b740;display:flex;align-items:center;justify-content:center;font-size:14px;}
-  .upin-title{font-size:21px;font-weight:800;margin-top:4px;}
-  .upin-sub{font-size:13px;color:rgba(255,255,255,.66);margin-top:4px;}
-  .upin-dots{display:flex;justify-content:center;gap:16px;margin:24px 0 8px;}
-  .upin-dots i{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.4);transition:.15s;}
-  .upin-dots i.on{background:#f4b740;border-color:#f4b740;transform:scale(1.18);box-shadow:0 0 14px rgba(244,183,64,.65);}
-  .upin-dots.shake{animation:upinShake .42s;}
-  .upin-dots.shake i{border-color:#ff6b6b;background:#ff6b6b;box-shadow:0 0 12px rgba(255,107,107,.6);}
-  .upin-dots.ok i{background:#3ddc97;border-color:#3ddc97;box-shadow:0 0 14px rgba(61,220,151,.7);transform:scale(1.2);}
+  .upin-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font-size:16px;cursor:pointer;z-index:2}
+  .upin-box{position:relative;width:100%;max-width:330px;text-align:center;margin:auto}
+  .upin-avwrap{position:relative;width:86px;height:86px;margin:0 auto 12px}
+  .upin-av{width:86px;height:86px;border-radius:50%;background-size:cover;background-position:center;border:2.5px solid #f4b740;box-shadow:0 0 0 5px rgba(244,183,64,.15),0 10px 26px -8px rgba(0,0,0,.6)}
+  .upin-ini{display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;background:linear-gradient(145deg,#3b3490,#1d1858)}
+  .upin-lock{position:absolute;bottom:-4px;left:-4px;width:30px;height:30px;border-radius:50%;background:#171449;border:2px solid #f4b740;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .upin-title{font-size:21px;font-weight:800;margin-top:4px}
+  .upin-sub{font-size:13px;color:rgba(255,255,255,.66);margin-top:4px;line-height:1.6}
+  .upin-dots{display:flex;justify-content:center;gap:16px;margin:24px 0 8px}
+  .upin-dots i{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.4);transition:.15s}
+  .upin-dots i.on{background:#f4b740;border-color:#f4b740;transform:scale(1.18);box-shadow:0 0 14px rgba(244,183,64,.65)}
+  .upin-dots.shake{animation:upinShake .42s}
+  .upin-dots.shake i{border-color:#ff6b6b;background:#ff6b6b;box-shadow:0 0 12px rgba(255,107,107,.6)}
+  .upin-dots.ok i{background:#3ddc97;border-color:#3ddc97;box-shadow:0 0 14px rgba(61,220,151,.7);transform:scale(1.2)}
   @keyframes upinShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
-  .upin-msg{min-height:20px;font-size:12.5px;color:rgba(255,255,255,.7);margin-bottom:6px;}
+  .upin-msg{min-height:20px;font-size:12.5px;color:rgba(255,255,255,.7);margin-bottom:6px}
   .upin-msg.err{color:#ff8a8a}.upin-msg.ok{color:#3ddc97}
-  .upin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 18px;justify-items:center;margin:8px 6px 0;}
-  .upin-pad.locked{opacity:.35;pointer-events:none;}
-  .upin-k{width:70px;height:70px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:26px;font-weight:600;font-family:inherit;cursor:pointer;transition:transform .08s,background .12s;-webkit-tap-highlight-color:transparent;}
-  .upin-k:active{transform:scale(.9);background:rgba(244,183,64,.32);}
-  .upin-del{font-size:22px;background:transparent;border-color:transparent;}
-  .upin-forgot{margin-top:18px;background:none;border:0;color:#f4b740;font-size:13px;font-family:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:4px;}
-  @media (max-height:640px){.upin-k{width:58px;height:58px;font-size:22px}.upin-pad{gap:9px 14px}.upin-avwrap,.upin-av{width:68px;height:68px}.upin-dots{margin:14px 0 4px}}
+  .upin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 18px;justify-items:center;margin:8px 6px 0}
+  .upin-pad.locked,.upat-grid.locked{opacity:.35;pointer-events:none}
+  .upin-k{width:70px;height:70px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:26px;font-weight:600;font-family:inherit;cursor:pointer;transition:transform .08s,background .12s;-webkit-tap-highlight-color:transparent}
+  .upin-k:active{transform:scale(.9);background:rgba(244,183,64,.32)}
+  .upin-del{font-size:22px;background:transparent;border-color:transparent}
+  .upin-forgot{margin-top:18px;background:none;border:0;color:#f4b740;font-size:13px;font-family:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+  .upat-grid{position:relative;width:252px;height:252px;margin:18px auto 6px;touch-action:none;border-radius:24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);direction:ltr}
+  .upat-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .upat-svg polyline{fill:none;stroke:#f4b740;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+  .upat-dot{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:rgba(255,255,255,.5);transition:.15s;pointer-events:none}
+  .upat-dot::after{content:'';position:absolute;inset:-14px;border-radius:50%;border:2px solid transparent;transition:.15s}
+  .upat-dot.on{background:#f4b740;box-shadow:0 0 16px rgba(244,183,64,.8);transform:scale(1.15)}
+  .upat-dot.on::after{border-color:rgba(244,183,64,.45)}
+  .upat-grid.shake{animation:upinShake .42s}
+  .upat-grid.shake .upat-dot.on{background:#ff6b6b;box-shadow:0 0 14px rgba(255,107,107,.7)}
+  .upat-grid.shake polyline{stroke:#ff6b6b}
+  .upat-grid.ok .upat-dot.on{background:#3ddc97;box-shadow:0 0 16px rgba(61,220,151,.8)}
+  .upat-grid.ok polyline{stroke:#3ddc97}
+  .uc-list{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+  .uc-list button{display:flex;align-items:center;gap:14px;text-align:right;padding:14px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.07);color:#fff;font-family:inherit;cursor:pointer;transition:transform .1s,background .15s}
+  .uc-list button:active:not(:disabled){transform:scale(.97);background:rgba(244,183,64,.22)}
+  .uc-list button:disabled{opacity:.4;cursor:default}
+  .uc-list span{font-size:28px;flex:none}.uc-list b{display:block;font-size:16px}.uc-list small{display:block;font-size:12px;color:rgba(255,255,255,.6);margin-top:2px}
+  .ubio-btn{width:118px;height:118px;border-radius:50%;margin:24px auto 10px;display:flex;align-items:center;justify-content:center;font-size:54px;border:2px solid #f4b740;background:rgba(244,183,64,.12);color:#fff;cursor:pointer;animation:ubioPulse 2s ease-in-out infinite;font-family:inherit}
+  .ubio-btn:disabled{animation:none;opacity:.5}
+  @keyframes ubioPulse{0%,100%{box-shadow:0 0 0 0 rgba(244,183,64,.45)}50%{box-shadow:0 0 0 18px rgba(244,183,64,0)}}
+  .ubio-go{margin-top:14px;height:50px;padding:0 28px;border-radius:16px;border:0;background:linear-gradient(180deg,#ffd76a,#f0a21c);color:#2a1c00;font:inherit;font-weight:800;font-size:16px;cursor:pointer}
+  @media (max-height:700px){.upin-k{width:58px;height:58px;font-size:22px}.upin-pad{gap:9px 14px}.upin-avwrap,.upin-av{width:68px;height:68px}.upin-dots{margin:14px 0 4px}.upat-grid{margin:10px auto 4px}}
   `;
   document.head.appendChild(s);
 }
-function upinScreen(o){
-  upinStyle();
-  const pid = o.pid, mode = o.mode || 'verify';
-  const old = document.querySelector('.upin-ov'); if(old) old.remove();
+function upinHead(pid){
   const p = PARTICIPANTS.find(x=>x.id===pid) || {}, sa = savedAccountsGet().find(x=>x.id===pid) || {};
   const name = p.name || sa.name || 'حسابي', photo = p.photo || sa.thumb || '';
-  const first = String(name).trim().split(/\s+/)[0];
   const av = photo ? `<div class="upin-av" style="background-image:url('${String(photo).replace(/'/g,'%27')}')"></div>` : `<div class="upin-av upin-ini">${escapeHtml(initials(name))}</div>`;
+  return { first:String(name).trim().split(/\s+/)[0], html:`<div class="upin-avwrap">${av}<span class="upin-lock">🔒</span></div><div class="upin-title"></div><div class="upin-sub"></div>` };
+}
+function upinVib(x){ try{ navigator.vibrate && navigator.vibrate(x); }catch(e){} }
+function upinForgotGo(ov, close){
+  close(); state._loginOther = true; if(!state.pid) state.view = 'login'; render(); showToast('ادخل برقم موبايلك والباسورد');
+}
+/* ---------- اختيار الطريقة ---------- */
+function ulockChooser(onPick){
+  upinStyle();
+  const old = document.querySelector('.upin-ov'); if(old) old.remove();
   const ov = document.createElement('div'); ov.className = 'upin-ov';
+  ov.innerHTML = `<div class="upin-glow"></div><button type="button" class="upin-close" data-t="close" aria-label="إغلاق">✕</button>
+    <div class="upin-box"><div class="upin-title">اختار طريقة قفل حسابك</div><div class="upin-sub">إنت اللي بتحدد — وتقدر تغيّرها في أي وقت</div>
+    <div class="uc-list">
+      <button type="button" data-t="pin"><span>🔢</span><div><b>PIN</b><small>٤ أرقام تحفظها</small></div></button>
+      <button type="button" data-t="pattern"><span>✳️</span><div><b>نمط</b><small>ارسم شكل بإصبعك على ٩ نقط</small></div></button>
+      <button type="button" data-t="bio"${UBIO_OK?'':' disabled'}><span>🫆</span><div><b>بصمة إصبع / وجه</b><small>${UBIO_OK ? 'بتتفعّل على الجهاز ده بس' : 'مش مدعومة على الجهاز أو المتصفح ده'}</small></div></button>
+    </div></div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e=>{
+    const b = e.target.closest('[data-t]'); if(!b || b.disabled) return; e.stopPropagation();
+    ov.remove(); if(b.dataset.t!=='close') onPick(b.dataset.t);
+  });
+}
+/* ---------- شاشة PIN / النمط ---------- */
+function upinScreen(o){
+  upinStyle();
+  const pid = o.pid, mode = o.mode || 'verify', isPat = o.type==='pattern';
+  const old = document.querySelector('.upin-ov'); if(old) old.remove();
+  const H = upinHead(pid), first = H.first;
+  const ov = document.createElement('div'); ov.className = 'upin-ov';
+  const widget = isPat
+    ? `<div class="upat-grid">${[0,1,2,3,4,5,6,7,8].map(i=>`<i class="upat-dot" style="left:${42+(i%3)*84}px;top:${42+Math.floor(i/3)*84}px"></i>`).join('')}<svg class="upat-svg" viewBox="0 0 252 252"></svg></div>`
+    : `<div class="upin-dots" dir="ltr"><i></i><i></i><i></i><i></i></div>`;
+  const padHtml = isPat ? '' : `<div class="upin-pad" dir="ltr">${[1,2,3,4,5,6,7,8,9].map(n=>`<button type="button" class="upin-k" data-k="${n}">${n}</button>`).join('')}<span></span><button type="button" class="upin-k" data-k="0">0</button><button type="button" class="upin-k upin-del" data-k="del" aria-label="مسح">⌫</button></div>`;
   ov.innerHTML = `<div class="upin-glow"></div><button type="button" class="upin-close" data-k="close" aria-label="إغلاق">✕</button>
-    <div class="upin-box">
-      <div class="upin-avwrap">${av}<span class="upin-lock">🔒</span></div>
-      <div class="upin-title"></div><div class="upin-sub"></div>
-      <div class="upin-dots" dir="ltr"><i></i><i></i><i></i><i></i></div>
-      <div class="upin-msg"></div>
-      <div class="upin-pad" dir="ltr">${[1,2,3,4,5,6,7,8,9].map(n=>`<button type="button" class="upin-k" data-k="${n}">${n}</button>`).join('')}<span></span><button type="button" class="upin-k" data-k="0">0</button><button type="button" class="upin-k upin-del" data-k="del" aria-label="مسح">⌫</button></div>
-      ${(mode==='verify' && !o.noForgot) ? '<button type="button" class="upin-forgot" data-k="forgot">نسيت الـPIN؟ ادخل بالرقم والباسورد</button>' : ''}
-    </div>`;
+    <div class="upin-box">${H.html}${widget}<div class="upin-msg"></div>${padHtml}
+    ${(mode==='verify' && !o.noForgot) ? '<button type="button" class="upin-forgot" data-k="forgot">نسيت؟ ادخل بالرقم والباسورد</button>' : ''}</div>`;
   document.body.appendChild(ov);
   const $ = s=>ov.querySelector(s);
-  const dots = $('.upin-dots'), msg = $('.upin-msg'), pad = $('.upin-pad'), lockIco = $('.upin-lock');
-  let buf = '', stage = mode==='set' ? 'new' : 'check', firstPin = '', busy = false, tmr = null;
-  const TXT = {
-    check: o.title ? [o.title, o.sub||''] : (mode==='remove' ? ['إلغاء الـPIN','اكتب الـPIN الحالي للتأكيد'] : ['أهلاً '+first+' 👋','اكتب الـPIN بتاعك عشان تدخل']),
-    new: ['اختار PIN جديد','٤ أرقام تحمي بيهم حسابك'],
-    confirm: ['أكّد الـPIN','اكتبه تاني للتأكيد']
+  const msg = $('.upin-msg'), lockIco = $('.upin-lock');
+  const area = isPat ? $('.upat-grid') : $('.upin-dots'), pad = isPat ? $('.upat-grid') : $('.upin-pad');
+  let buf = '', stage = mode==='set' ? 'new' : 'check', firstVal = '', busy = false, tmr = null, seq = [], drawing = false, cur = null;
+  const dotEls = isPat ? [...ov.querySelectorAll('.upat-dot')] : [];
+  const TXT = isPat ? {
+    check: o.title ? [o.title, o.sub||''] : (mode==='remove' ? ['إلغاء القفل','ارسم النمط الحالي للتأكيد'] : ['أهلاً '+first+' 👋','ارسم النمط بتاعك عشان تدخل']),
+    new: ['ارسم نمط جديد','اربط ٤ نقط على الأقل'], confirm: ['أكّد النمط','ارسمه تاني للتأكيد']
+  } : {
+    check: o.title ? [o.title, o.sub||''] : (mode==='remove' ? ['إلغاء القفل','اكتب الـPIN الحالي للتأكيد'] : ['أهلاً '+first+' 👋','اكتب الـPIN بتاعك عشان تدخل']),
+    new: ['اختار PIN جديد','٤ أرقام تحمي بيهم حسابك'], confirm: ['أكّد الـPIN','اكتبه تاني للتأكيد']
   };
-  const vib = x=>{ try{ navigator.vibrate && navigator.vibrate(x); }catch(e){} };
-  const paint = ()=>{ [...dots.children].forEach((d,i)=>d.classList.toggle('on', i<buf.length)); };
   const setMsg = (t,c)=>{ msg.textContent = t||''; msg.className = 'upin-msg '+(c||''); };
   const texts = ()=>{ $('.upin-title').textContent = TXT[stage][0]; $('.upin-sub').textContent = TXT[stage][1]; };
   const alive = ()=>document.body.contains(ov);
   const close = ()=>{ clearInterval(tmr); document.removeEventListener('keydown', onKey, true); ov.remove(); };
-  const bad = (t)=>{ vib([40,40,40]); try{ SND.error(); }catch(e){} dots.classList.add('shake'); setMsg(t,'err'); busy = true;
-    setTimeout(()=>{ dots.classList.remove('shake'); buf = ''; paint(); busy = false; }, 460); };
-  const weak = s=>{ if(/^(\d)\1{3}$/.test(s)) return true; const d = s.split('').map(Number);
+  const paint = ()=>{
+    if(isPat){
+      dotEls.forEach((d,i)=>d.classList.toggle('on', seq.indexOf(i)>-1));
+      const pts = seq.map(i=>(42+(i%3)*84)+','+(42+Math.floor(i/3)*84));
+      if(drawing && cur && seq.length) pts.push(cur.x+','+cur.y);
+      $('.upat-svg').innerHTML = pts.length>1 ? `<polyline points="${pts.join(' ')}"/>` : '';
+    } else [...area.children].forEach((d,i)=>d.classList.toggle('on', i<buf.length));
+  };
+  const clear = ()=>{ buf = ''; seq = []; paint(); };
+  const bad = (t)=>{ upinVib([40,40,40]); try{ SND.error(); }catch(e){} area.classList.add('shake'); setMsg(t,'err'); busy = true;
+    setTimeout(()=>{ area.classList.remove('shake'); clear(); busy = false; }, 460); };
+  const weak = s=>{ if(isPat) return false; if(/^(\d)\1{3}$/.test(s)) return true; const d = s.split('').map(Number);
     return d.every((x,i)=>i===0||x===d[i-1]+1) || d.every((x,i)=>i===0||x===d[i-1]-1); };
+  const hashOf = v=>isPat ? userPatHash(pid, v) : userPinHash(pid, v);
   const lockInfo = ()=>upLsGet(UPIN_LOCK)[pid] || {n:0, until:0};
   const lockSet = v=>{ const a = upLsGet(UPIN_LOCK); if(v) a[pid] = v; else delete a[pid]; upLsSet(UPIN_LOCK, a); };
   const checkLock = ()=>{
@@ -38926,48 +39044,253 @@ function upinScreen(o){
     }
     return false;
   };
-  const success = (t, cb)=>{ dots.classList.add('ok'); lockIco.textContent = '🔓'; setMsg(t,'ok'); vib([15,50,15]); try{ SND.success(); }catch(e){} busy = true;
+  const success = (t, cb)=>{ area.classList.add('ok'); lockIco.textContent = '🔓'; setMsg(t,'ok'); upinVib([15,50,15]); try{ SND.success(); }catch(e){} busy = true;
     setTimeout(()=>{ close(); cb && cb(); }, 480); };
-  const submit = async ()=>{
+  const submit = async (val)=>{
     if(busy) return; busy = true;
-    const val = buf, h = await userPinHash(pid, val);
+    const h = await hashOf(val);
     busy = false;
     if(stage === 'check'){
-      if(checkLock()){ buf=''; paint(); return; }
-      if(h === userPinOf(pid)){ lockSet(null); success('تمام ✅', o.onDone); return; }
+      if(checkLock()){ clear(); return; }
+      const L0 = userLockOf(pid);
+      if(L0 && L0.h === h){ lockSet(null); success('تمام ✅', o.onDone); return; }
       const L = lockInfo(); L.n = (L.n||0) + 1;
       if(L.n >= 5){ L.until = Date.now() + (L.n>=10 ? 600000 : L.n>=8 ? 120000 : 30000); }
       lockSet(L);
-      bad(L.n >= 5 ? 'محاولات كتير غلط' : 'PIN غلط — باقي '+(5-L.n)+' محاولات');
+      bad(L.n >= 5 ? 'محاولات كتير غلط' : (isPat ? 'النمط غلط' : 'PIN غلط')+' — باقي '+(5-L.n)+' محاولات');
       setTimeout(checkLock, 480);
     } else if(stage === 'new'){
       if(weak(val)){ bad('PIN سهل التخمين — اختار رقم أصعب'); return; }
-      firstPin = val; stage = 'confirm'; buf = ''; paint(); texts(); setMsg('');
+      firstVal = val; stage = 'confirm'; clear(); texts(); setMsg('');
     } else {
-      if(val !== firstPin){ bad('مش متطابقين — ابدأ من الأول'); stage = 'new'; firstPin = ''; setTimeout(()=>{ texts(); }, 480); return; }
-      busy = true; const ok = await saveUserPin(pid, h); busy = false;
-      if(ok){ lockSet(null); success('تم تفعيل الـPIN ✅', ()=>{ showToast('الـPIN اتفعّل 🔐'); o.onDone && o.onDone(); }); }
+      if(val !== firstVal){ bad('مش متطابقين — ابدأ من الأول'); stage = 'new'; firstVal = ''; setTimeout(texts, 480); return; }
+      busy = true; const ok = await saveUserLock(pid, { t:o.type, h }); busy = false;
+      if(ok){ ubioSetCred(pid, ''); lockSet(null); success('تم تفعيل القفل ✅', ()=>{ showToast('القفل اتفعّل 🔐'); o.onDone && o.onDone(); }); }
       else bad('حصلت مشكلة في الحفظ، جرّب تاني');
     }
   };
   const press = k=>{
     if(k==='close'){ close(); return; }
-    if(k==='forgot'){ close(); state._loginOther = true; if(!state.pid) state.view = 'login'; render(); showToast('ادخل برقم موبايلك والباسورد'); return; }
-    if(busy || pad.classList.contains('locked')) return;
+    if(k==='forgot'){ upinForgotGo(ov, close); return; }
+    if(busy || pad.classList.contains('locked') || isPat) return;
     if(k==='del'){ buf = buf.slice(0,-1); paint(); return; }
     if(!/^\d$/.test(k) || buf.length >= 4) return;
-    vib(8); buf += k; setMsg(''); paint();
-    if(buf.length === 4) setTimeout(submit, 130);
+    upinVib(8); buf += k; setMsg(''); paint();
+    if(buf.length === 4) setTimeout(()=>submit(buf), 130);
   };
   function onKey(e){
     if(!alive()){ document.removeEventListener('keydown', onKey, true); return; }
+    if(isPat){ if(e.key==='Escape'){ press('close'); e.preventDefault(); } return; }
     if(/^\d$/.test(e.key)) press(e.key); else if(e.key==='Backspace') press('del'); else if(e.key==='Escape') press('close'); else return;
     e.preventDefault(); e.stopPropagation();
   }
   ov.addEventListener('click', e=>{ const b = e.target.closest('[data-k]'); if(b){ e.stopPropagation(); press(b.dataset.k); } });
   document.addEventListener('keydown', onKey, true);
+  if(isPat){
+    const MID = {'0-2':1,'2-0':1,'3-5':4,'5-3':4,'6-8':7,'8-6':7,'0-6':3,'6-0':3,'1-7':4,'7-1':4,'2-8':5,'8-2':5,'0-8':4,'8-0':4,'2-6':4,'6-2':4};
+    const pt = e=>{ const r = area.getBoundingClientRect(); return { x:(e.clientX-r.left)*252/r.width, y:(e.clientY-r.top)*252/r.height }; };
+    const hit = p=>{ for(let i=0;i<9;i++){ if(Math.hypot(p.x-(42+(i%3)*84), p.y-(42+Math.floor(i/3)*84)) < 30) return i; } return -1; };
+    const add = i=>{ if(seq.indexOf(i)>-1) return;
+      if(seq.length){ const m = MID[seq[seq.length-1]+'-'+i]; if(m!==undefined && seq.indexOf(m)<0) seq.push(m); }
+      seq.push(i); upinVib(8); };
+    area.addEventListener('pointerdown', e=>{
+      if(busy || area.classList.contains('locked')) return;
+      e.preventDefault(); try{ area.setPointerCapture(e.pointerId); }catch(x){}
+      clear(); setMsg(''); drawing = true; cur = pt(e); const h = hit(cur); if(h>-1) add(h); paint();
+    });
+    area.addEventListener('pointermove', e=>{
+      if(!drawing) return; e.preventDefault(); cur = pt(e); const h = hit(cur); if(h>-1) add(h); paint();
+    });
+    const end = ()=>{
+      if(!drawing) return; drawing = false; cur = null; paint();
+      if(seq.length >= 4) submit(seq.join('-')); else if(seq.length) bad('وصّل ٤ نقط على الأقل');
+    };
+    area.addEventListener('pointerup', end); area.addEventListener('pointercancel', end);
+  }
   texts(); paint(); if(stage==='check') checkLock();
 }
+/* ---------- شاشة البصمة / الوجه ---------- */
+function ubioScreen(o){
+  upinStyle();
+  const pid = o.pid, mode = o.mode || 'verify';
+  const old = document.querySelector('.upin-ov'); if(old) old.remove();
+  const H = upinHead(pid), hasCred = !!ubioCred(pid);
+  const noDev = mode!=='set' && !hasCred;
+  const ov = document.createElement('div'); ov.className = 'upin-ov';
+  ov.innerHTML = `<div class="upin-glow"></div><button type="button" class="upin-close" data-k="close" aria-label="إغلاق">✕</button>
+    <div class="upin-box">${H.html}
+      ${noDev ? '' : '<button type="button" class="ubio-btn" data-k="go" aria-label="بصمة">🫆</button>'}
+      <div class="upin-msg"></div>
+      ${(mode==='set') ? '<button type="button" class="ubio-go" data-k="go">ابدأ التفعيل</button>' : ''}
+      ${(mode==='verify' && !o.noForgot) ? '<button type="button" class="upin-forgot" data-k="forgot">'+(noDev ? 'ادخل بالرقم والباسورد' : 'مش راضية تشتغل؟ ادخل بالرقم والباسورد')+'</button>' : ''}
+    </div>`;
+  document.body.appendChild(ov);
+  const $ = s=>ov.querySelector(s), msg = $('.upin-msg');
+  const setMsg = (t,c)=>{ msg.textContent = t||''; msg.className = 'upin-msg '+(c||''); };
+  const close = ()=>{ ov.remove(); };
+  const alive = ()=>document.body.contains(ov);
+  let busy = false;
+  $('.upin-title').textContent = mode==='set' ? 'تفعيل البصمة / الوجه' : (o.title || (mode==='remove' ? 'إلغاء القفل' : 'أهلاً '+H.first+' 👋'));
+  $('.upin-sub').textContent = noDev ? 'البصمة اتفعّلت على جهاز تاني، مش على الجهاز ده' : (mode==='set' ? 'هتظهرلك رسالة من الجهاز — استخدم بصمة إصبعك أو وجهك' : (o.sub || 'استخدم بصمتك أو وجهك عشان تدخل'));
+  const finish = (t, cb)=>{ $('.upin-lock').textContent = '🔓'; setMsg(t,'ok'); upinVib([15,50,15]); try{ SND.success(); }catch(e){}
+    setTimeout(()=>{ close(); cb && cb(); }, 480); };
+  const run = async ()=>{
+    if(busy || noDev) return; busy = true;
+    const b = $('.ubio-btn'); if(b) b.disabled = true;
+    setMsg('استنى رسالة الجهاز...');
+    try{
+      if(mode==='set'){
+        await ubioRegister(pid);
+        const ok = await saveUserLock(pid, { t:'bio' });
+        if(!ok){ ubioSetCred(pid,''); throw new Error('save'); }
+        finish('تم تفعيل البصمة ✅', ()=>{ showToast('القفل اتفعّل 🔐'); o.onDone && o.onDone(); });
+      } else {
+        await ubioVerify(pid);
+        finish('تمام ✅', o.onDone);
+      }
+    }catch(e){
+      busy = false; if(b) b.disabled = false; if(!alive()) return;
+      setMsg(e && e.message==='save' ? 'حصلت مشكلة في الحفظ، جرّب تاني' : (e && e.name==='NotAllowedError' ? 'اتلغت أو ماتأكدش — جرّب تاني' : 'ماتأكدش — جرّب تاني'), 'err');
+      upinVib([40,40,40]);
+    }
+  };
+  ov.addEventListener('click', e=>{
+    const b = e.target.closest('[data-k]'); if(!b) return; e.stopPropagation();
+    if(b.dataset.k==='close') close(); else if(b.dataset.k==='forgot') upinForgotGo(ov, close); else if(b.dataset.k==='go') run();
+  });
+  if(mode!=='set' && !noDev) setTimeout(()=>{ if(alive()) run(); }, 350);
+}
+
+/* ============================= الدومينو: سحب وإفلات القطع على الطاولة (والضغط العادي لسه شغال) ============================= */
+function dmDragInfo(btn){
+  const idx = parseInt(btn.dataset.idx,10), act = btn.dataset.action;
+  if(act==='domino-tile'){
+    const g = state.domino;
+    if(!g || g.busy || g.winner || g.pendingIdx!=null) return null;
+    if(g.mode==='ai' && g.turn==='Y') return null;
+    const tile = g.hands[g.turn][idx]; if(!tile) return null;
+    return { idx, room:false, sides:dominoPlayableSides(tile, g.ends) };
+  }
+  if(act==='room-domino-tile'){
+    const room = GAME_ROOMS[state.roomCode];
+    if(!room || room.status!=='playing' || room.winner) return null;
+    const role = room.hostId===state.pid ? 'host' : 'guest';
+    if(room.turn!==role || room.pendingIdx!=null) return null;
+    const tile = room.hands[role][idx]; if(!tile) return null;
+    return { idx, room:true, sides:dominoPlayableSides(tile, room.ends) };
+  }
+  return null;
+}
+function dmPickSide(tile, sides, side){
+  if(sides.length===1) return sides[0]==='any' ? 'left' : sides[0];
+  return sides.indexOf(side)>-1 ? side : null;
+}
+function doDominoDrop(idx, side){
+  const g = state.domino;
+  if(!g || g.busy || g.winner || g.pendingIdx!=null) return;
+  if(g.mode==='ai' && g.turn==='Y') return;
+  const tile = g.hands[g.turn][idx]; if(!tile) return;
+  const sides = dominoPlayableSides(tile, g.ends); if(!sides.length) return;
+  const use = dmPickSide(tile, sides, side); if(!use) return;
+  dominoPlaceTile(use, idx, g.turn);
+  SND.click();
+  dominoAfterMove();
+}
+async function doRoomDominoDrop(idx, side){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.status!=='playing' || room.winner) return;
+  const myRole = room.hostId===state.pid ? 'host' : 'guest';
+  if(room.turn!==myRole || room.pendingIdx!=null) return;
+  const tile = room.hands[myRole][idx]; if(!tile) return;
+  const sides = dominoPlayableSides(tile, room.ends); if(!sides.length) return;
+  const use = dmPickSide(tile, sides, side); if(!use) return;
+  SND.click();
+  dominoPlaceTile(use, idx, myRole, room);
+  roomDominoAdvance(room);
+  room.updatedAt = Date.now();
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(room.winner){
+    vibrate([20,20,30]); SND.coinChime();
+    if(room.winner===myRole) launchConfetti();
+  }
+}
+(function(){
+  let D = null, suppressUntil = 0;
+  const vib = x=>{ try{ navigator.vibrate && navigator.vibrate(x); }catch(e){} };
+  const ghostEl = s=>document.querySelector('.dt-ghost.'+(s==='left'?'gl':'gr'));
+  const center = el=>{ const r = el.getBoundingClientRect(); return { x:r.left+r.width/2, y:r.top+r.height/2 }; };
+  function pick(x, y){
+    const board = document.querySelector('.domino-board'); if(!board) return null;
+    const r = board.getBoundingClientRect(), m = 28;
+    if(x<r.left-m || x>r.right+m || y<r.top-m || y>r.bottom+m) return null;
+    let best = null, bd = 1e9;
+    D.info.sides.map(s=>s==='any'?'left':s).forEach(s=>{
+      const g = ghostEl(s), c = g ? center(g) : { x:r.left+r.width/2, y:r.top+r.height/2 };
+      const d = Math.hypot(c.x-x, c.y-y);
+      if(d<bd){ bd = d; best = { side:s, ghost:g }; }
+    });
+    return best;
+  }
+  function mark(t){
+    document.querySelectorAll('.dt-ghost.hot').forEach(e=>e.classList.remove('hot'));
+    const b = document.querySelector('.domino-board'); if(b) b.classList.toggle('dm-hot', !!t && !t.ghost);
+    if(t && t.ghost) t.ghost.classList.add('hot');
+  }
+  function begin(){
+    const r = D.btn.getBoundingClientRect();
+    D.r = r; D.ox = D.sx - r.left; D.oy = D.sy - r.top; D.lift = D.touch ? 46 : 0;
+    const c = D.btn.cloneNode(true);
+    c.removeAttribute('data-action'); c.removeAttribute('data-idx'); c.removeAttribute('disabled');
+    c.className = 'domino-tile playable dm-drag-clone';
+    c.style.cssText = 'width:'+r.width+'px;height:'+r.height+'px;left:0;top:0;';
+    document.body.appendChild(c); D.clone = c; D.btn.classList.add('dm-dragging'); vib(10);
+  }
+  function onMove(e){
+    if(!D || e.pointerId!==D.pid) return;
+    if(!D.on){ if(Math.hypot(e.clientX-D.sx, e.clientY-D.sy) < 7) return; D.on = true; begin(); }
+    e.preventDefault();
+    const x = e.clientX - D.ox, y = e.clientY - D.oy - D.lift;
+    D.clone.style.transform = 'translate('+x+'px,'+y+'px) scale(1.18) rotate(-4deg)';
+    const t = pick(x + D.r.width/2, y + D.r.height/2), key = t ? t.side : '';
+    if(key!==D.hot){ D.hot = key; if(t) vib(8); }
+    mark(t); D.t = t;
+  }
+  function onUp(e){
+    if(!D || e.pointerId!==D.pid) return;
+    const d = D; D = null;
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    window.removeEventListener('pointercancel', onUp);
+    mark(null);
+    if(!d.on) return;                       /* مجرد ضغطة: الضغط العادي هيشتغل */
+    suppressUntil = Date.now() + 450;
+    if(e.type==='pointerup' && d.t){
+      d.clone.remove(); d.btn.classList.remove('dm-dragging');
+      (d.info.room ? doRoomDominoDrop : doDominoDrop)(d.info.idx, d.t.side);
+    } else {                                /* سيبها بره الطاولة: القطعة ترجع لمكانها */
+      d.clone.style.transition = 'transform .2s ease';
+      d.clone.style.transform = 'translate('+d.r.left+'px,'+d.r.top+'px) scale(1)';
+      setTimeout(()=>{ d.clone.remove(); d.btn.classList.remove('dm-dragging'); }, 210);
+    }
+  }
+  window.addEventListener('pointerdown', function(e){
+    if(D || !e.isPrimary) return;
+    if(e.pointerType==='mouse' && e.button!==0) return;
+    const btn = e.target.closest && e.target.closest('.domino-tile.playable');
+    if(!btn || btn.disabled) return;
+    const info = dmDragInfo(btn); if(!info || !info.sides.length) return;
+    if(e.pointerType==='mouse') e.preventDefault();
+    D = { pid:e.pointerId, btn, info, sx:e.clientX, sy:e.clientY, on:false, hot:'', t:null, touch:e.pointerType!=='mouse' };
+    window.addEventListener('pointermove', onMove, { passive:false });
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+  }, true);
+  window.addEventListener('click', function(e){
+    if(Date.now()<suppressUntil && e.target.closest && e.target.closest('.domino-tile')){ e.stopPropagation(); e.preventDefault(); }
+  }, true);
+})();
 
 /* ============================= INIT ============================= */
 /* الأكواد بتاعة المشاركين المضافين من الأدمن كانت بتتعرف بس بعد ما يخلص تحميل كل بيانات التطبيق (ممكن ياخد لحد 10 ثواني)،
