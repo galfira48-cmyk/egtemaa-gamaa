@@ -114,6 +114,50 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 .dt-ghost.hot{opacity:1;animation:none;transform:scale(1.1);filter:brightness(1.45);box-shadow:0 0 0 3px #fff,0 0 22px rgba(255,255,255,.75)}
 .domino-board.dm-hot{outline:3px dashed #f4b740;outline-offset:-8px}
 </style>
+<style id="kh-css">
+.kh-body{flex:1;min-height:0;overflow-y:auto;padding:8px 2px 14px;display:flex;flex-direction:column;align-items:center}
+.kh-cat{padding:8px 28px;border-radius:16px;background:linear-gradient(180deg,#a8f0ff,#18c4d4);color:#06323a;font-weight:900;font-size:21px;box-shadow:0 5px 0 #0b8a99;margin-top:6px}
+.kh-lets{display:flex;justify-content:center;gap:12px;margin:18px 0 26px}
+.kh-let{width:78px;height:96px;border-radius:16px;background:#fff;color:#5b21b6;font-size:48px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 0 #2a0f6b;border:0;font-family:inherit;position:relative;transition:.15s;padding:0}
+.kh-let small{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:11px;white-space:nowrap;color:#fff;font-weight:700;max-width:100px;overflow:hidden;text-overflow:ellipsis}
+.kh-let.free{cursor:pointer}.kh-let.free:active{transform:translateY(4px);box-shadow:0 2px 0 #2a0f6b}
+.kh-let.dim{opacity:.35;filter:grayscale(1)}.kh-let.mine{outline:3px dashed var(--pc);outline-offset:4px}
+.kh-let.win{background:linear-gradient(180deg,#e2fff0,#86f2bb);margin-bottom:12px}
+.kh-info{text-align:center;font-weight:700;font-size:15px;margin:2px 8px 6px;color:#ffe9a8;line-height:1.5}
+.kh-info.bad{color:#ff8a8a}.kh-info.ok{color:#3ddc97}
+.kh-sub{font-size:12px;color:rgba(255,255,255,.62);text-align:center;margin:3px 6px}
+.kh-bar{width:200px;height:6px;border-radius:6px;background:rgba(255,255,255,.14);overflow:hidden;margin:4px auto}
+.kh-bar i{display:block;height:100%;width:0;background:#3ddc97;border-radius:6px}
+@keyframes khbar{from{width:0}to{width:100%}}
+.kh-pills{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:4px 0}
+.kh-pill{padding:4px 12px;border-radius:20px;background:#7a0b0b;font-size:12px;font-weight:700}
+.kh-obj{margin:10px 0 4px;height:52px;padding:0 38px;border-radius:16px;border:0;background:linear-gradient(180deg,#ff5a5a,#b01212);color:#fff;font:inherit;font-weight:800;font-size:18px;box-shadow:0 5px 0 #6a0909;cursor:pointer}
+.kh-obj:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 #6a0909}.kh-obj:disabled{opacity:.5;box-shadow:none}
+.kh-sheet{width:100%;max-width:360px;margin-top:8px;padding:16px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);text-align:center}
+.kh-q{font-size:18px;font-weight:800}.kh-dots{display:flex;gap:8px;justify-content:center;margin:10px 0}
+.kh-dots i{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.35)}.kh-dots i.yes{background:#3ddc97;border-color:#3ddc97}.kh-dots i.no{background:#ff7b9c;border-color:#ff7b9c}
+.kh-vb{display:flex;gap:10px}.kh-v{flex:1;height:50px;border-radius:14px;border:2px solid transparent;font:inherit;font-weight:800;font-size:17px;color:#fff;cursor:pointer}
+.kh-v.yes{background:#1f9d6b}.kh-v.no{background:#a51919}.kh-v.sel{border-color:#fff;box-shadow:0 0 14px rgba(255,255,255,.4)}
+.kh-ps{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 14px;margin:14px 0 10px;width:100%}
+.kh-p{width:74px;text-align:center;position:relative;opacity:.88}.kh-p.hot{opacity:1}
+.kh-pav{width:54px;height:54px;border-radius:50%;margin:0 auto;border:3px solid var(--pc);overflow:hidden;background:rgba(0,0,0,.3);transition:.2s}
+.kh-p.hot .kh-pav{box-shadow:0 0 16px var(--pc);transform:scale(1.08)}.kh-p.frz .kh-pav{filter:grayscale(1) brightness(.7)}
+.kh-pav .pl-avatar{width:100%;height:100%;font-size:15px}
+.kh-fz{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-weight:900;font-size:13px;text-shadow:0 1px 4px #000}
+.kh-pn{font-size:11.5px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kh-rk{display:flex;justify-content:center;gap:2px;flex-wrap:wrap;min-height:16px}.kh-rk b{font-size:12px;color:var(--pc);background:rgba(255,255,255,.1);border-radius:5px;padding:0 4px}
+.kh-mine{width:100%;max-width:380px;padding:12px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);text-align:center}
+.kh-mt{font-weight:800;font-size:13px;color:rgba(255,255,255,.7);margin-bottom:6px}
+.kh-rack{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:4px 0}
+.kh-t{min-width:42px;height:50px;padding:0 6px;border-radius:11px;background:#fff;color:#5b21b6;font-size:26px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #2a0f6b;border:0;font-family:inherit}
+button.kh-t{cursor:pointer}.kh-t.on{background:linear-gradient(180deg,#a8f0ff,#4fd1e8);color:#06323a}.kh-t.used{opacity:.3}
+.kh-decl-btn{margin-top:10px;height:46px;padding:0 30px;border-radius:14px;border:0;background:linear-gradient(180deg,#a78bfa,#6d28d9);color:#fff;font:inherit;font-weight:800;font-size:16px;cursor:pointer}
+.kh-decl-btn:disabled{opacity:.4}
+.kh-decl{width:100%;max-width:380px;padding:14px;border-radius:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);text-align:center}
+.kh-dt{font-weight:900;font-size:18px}.kh-word{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:56px;align-items:center;margin:10px 0;padding:8px;border-radius:14px;border:2px dashed rgba(255,255,255,.25)}
+.kh-dbtns{display:flex;gap:10px;margin-top:8px;align-items:center}.kh-dbtns .snp-roll{height:50px;font-size:16px}
+.kh-rules{font-size:14px;line-height:1.9;margin:6px 0 14px;color:rgba(255,255,255,.9)}
+</style>
 <style id="snp-css">
 .snp{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;direction:rtl;color:#fff;background:radial-gradient(120% 70% at 50% 0%,#2b2678 0%,#15123f 52%,#0a0925 100%);padding:max(env(safe-area-inset-top,0px),8px) 10px max(env(safe-area-inset-bottom,0px),10px);overflow:hidden;-webkit-tap-highlight-color:transparent;font-family:inherit;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 .snp *{box-sizing:border-box}
@@ -10646,6 +10690,7 @@ async function loadGamePointsSettings(){
     soloNumGuessReward:100, soloNumGuessMaxTries:6, soloPlaceMemReward:40,
     soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5, soloCubeReward:50,
     soloSnlReward:30, soloSnlWinsNeeded:3, soloCrossMathReward:40,
+    soloReflexReward:30, soloReflexWinsNeeded:5, soloDartsReward:35, soloBowlingReward:40, soloBilliardsReward:40, soloTmmReward:25, soloTmmWinsNeeded:2,
     visaMinWithdraw:600, visaRenewFee:100, visaValidDays:14};
   try{
     const r = await window.storage.get('glavera-game-points-settings', true);
@@ -11125,7 +11170,7 @@ let GAME_POINTS_SETTINGS = {first:100, second:50, third:30, leavePenalty:50, xoE
   soloNumGuessReward:100, soloNumGuessMaxTries:6, soloPlaceMemReward:40,
   soloStackPerBlock:3, soloStackPerfectBonus:2, soloStackMilestoneStep:10, soloStackMilestoneUnit:5, soloCubeReward:50,
   soloSnlReward:30, soloSnlWinsNeeded:3, soloCrossMathReward:40,
-  soloReflexReward:30, soloReflexWinsNeeded:5, soloDartsReward:35, soloBowlingReward:40};
+  soloReflexReward:30, soloReflexWinsNeeded:5, soloDartsReward:35, soloBowlingReward:40, soloBilliardsReward:40};
 function confLogoHtml(){
   return CONF_SETTINGS && CONF_SETTINGS.logo
     ? `<img src="${CONF_SETTINGS.logo}" alt="لوجو الاجتماع" class="conf-logo-img" />`
@@ -14611,7 +14656,7 @@ const GAME_CATEGORY_OF = {
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
   memory:'mind', revword:'mind', blocky:'mind', cube:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
   uno:'cards', rps:'cards',
-  quiz:'party', mystery:'party', emojibible:'party', proverb:'party', stoptimer:'skill', uniqans:'party', fahmeen:'party', placemem:'mind', fazzura:'party', drawguess:'party', battleship:'board',
+  quiz:'party', mystery:'party', emojibible:'party', proverb:'party', stoptimer:'skill', uniqans:'party', fahmeen:'party', placemem:'mind', fazzura:'party', drawguess:'party', battleship:'board', khatfa:'party',
 };
 /* rectangular category cards — tap one to open the games inside it */
 /* تحديث لحظي: لو الأدمن قفل/فتح لعبة، الشاشة بتتحدّث عند اللاعبين من غير ريفرش */
@@ -15117,6 +15162,7 @@ function liveRoomsList(){
       // استبعاد الغرف اللي المعركة خلصت فيها فعليًا (فيه فايز/انتهت) حتى لو لسه موجودة قبل ما اللاعبين يخرجوا
       if(r.game==='ludo') return !(r.ludo && r.ludo.phase==='over');
       if(r.game==='snakes') return !(r.snl && r.snl.winner!==null && r.snl.winner!==undefined);
+      if(r.game==='khatfa') return !(r.kh && r.kh.phase==='over');
       if(r.finished) return false;
       if(r.winner) return false;
       return true;
@@ -15124,7 +15170,7 @@ function liveRoomsList(){
     .sort((a,b)=> (b.updatedAt||0)-(a.updatedAt||0));
 }
 function watchRoomNames(room){
-  if(room.game==='ludo' || room.game==='snakes'){
+  if(room.game==='ludo' || room.game==='snakes' || room.game==='khatfa'){
     return (room.players||[]).map(p=>p.name).filter(Boolean).join(' • ') || 'لاعبين';
   }
   return [room.hostName, room.guestName].filter(Boolean).join('  🆚  ');
@@ -15250,7 +15296,7 @@ const AI_LEVELS = [
 ];
 const AI_GAME_NAMES = {xo:'إكس أو', c4:'كونكت فور', chess:'الشطرنج', ck:'الداما', tmm:'الطاحونة الصغيرة', bg:'طاولة الزهر', domino:'دومينو', ludo:'لودو', uno:'أونو', bil:'بلياردو', darts:'النشان', bowling:'البولينج', reflex:'أسرع واحد'};
 function aiLevelOf(key){ const id=(state.aiLvl||{})[key]; return AI_LEVELS.find(l=>l.id===id)||null; }
-function aiBaseReward(key){ const s=GAME_POINTS_SETTINGS||{}; return ({xo:s.soloXoReward, c4:s.soloC4Reward, reflex:s.soloReflexReward, bil:s.soloBilliardsReward, darts:(s.soloDartsReward==null?35:s.soloDartsReward), bowling:(s.soloBowlingReward==null?40:s.soloBowlingReward), tmm:(s.soloTmmReward==null?25:s.soloTmmReward)})[key]||0; }
+function aiBaseReward(key){ const s=GAME_POINTS_SETTINGS||{}; return ({xo:s.soloXoReward, c4:s.soloC4Reward, reflex:(s.soloReflexReward==null?30:s.soloReflexReward), bil:(s.soloBilliardsReward==null?40:s.soloBilliardsReward), darts:(s.soloDartsReward==null?35:s.soloDartsReward), bowling:(s.soloBowlingReward==null?40:s.soloBowlingReward), tmm:(s.soloTmmReward==null?25:s.soloTmmReward)})[key]||0; }
 function aiLv(key){ return (aiLevelOf(key)||{id:'hard'}).id; }
 function aiShuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 const REFLEX_LVL = {easy:{cpuMin:480,cpuMax:950}, medium:{cpuMin:340,cpuMax:720}, hard:{cpuMin:220,cpuMax:570}, expert:{cpuMin:150,cpuMax:340}};
@@ -23157,6 +23203,8 @@ async function createGameRoom(gameType, paid){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], dg:null, dgS:null});
   } else if(gameType==='snakes'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], snl:null, maxPlayers:6});
+  } else if(gameType==='khatfa'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], kh:null, maxPlayers:8});
   } else {
     Object.assign(room, {hostPick:null, guestPick:null, resultText:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
   }
@@ -23186,11 +23234,11 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='stoptimer' || room.game==='uniqans' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura' || room.game==='drawguess' || room.game==='battleship' || room.game==='snakes'){
+  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='stoptimer' || room.game==='uniqans' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura' || room.game==='drawguess' || room.game==='battleship' || room.game==='snakes' || room.game==='khatfa'){
     room.players = room.players || [{id:room.hostId, name:room.hostName}];
     if(!room.players.some(x=>x.id===state.pid)){
       if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
-      const _cap = room.game==='battleship' ? 2 : room.game==='drawguess' ? 6 : room.game==='snakes' ? Math.max(2, Math.min(6, room.maxPlayers||6)) : ((room.game==='fazzura' && room.fzJudge!==false) ? 5 : 4); if(room.players.length>=_cap){ showToast('الغرفة دي مكتملة ('+_cap+' لاعبين)', true); return; }
+      const _cap = room.game==='khatfa' ? 8 : room.game==='battleship' ? 2 : room.game==='drawguess' ? 6 : room.game==='snakes' ? Math.max(2, Math.min(6, room.maxPlayers||6)) : ((room.game==='fazzura' && room.fzJudge!==false) ? 5 : 4); if(room.players.length>=_cap){ showToast('الغرفة دي مكتملة ('+_cap+' لاعبين)', true); return; }
       room.players.push({id:state.pid, name:p ? p.name : 'لاعب'});
     }
     room.updatedAt = Date.now();
@@ -23277,7 +23325,7 @@ async function applyLeaveRoomPenalty(code){
       if(room.game==='ludo'){
         const seats = (room.ludo && room.ludo.seats) || (room.players||[]).map(p=>({pid:p.id, left:false}));
         recipients = seats.filter(s=> s.pid && s.pid!==state.pid && !s.left).map(s=>s.pid);
-      } else if(room.game==='snakes'){
+      } else if(room.game==='snakes' || room.game==='khatfa'){
         recipients = (room.players||[]).filter(p=> p.id && p.id!==state.pid).map(p=>p.id);
       } else if(room.game==='uno'){
         // غرفة يونو ممكن يكون فيها لغاية 4 لاعبين مش مجرد host/guest، فلازم نوزع على كل الباقيين النشطين
@@ -23362,6 +23410,20 @@ async function leaveGameRoom(){
             roomTouch(room);
           }
         }
+      } else if(room.players.length===0){
+        delete GAME_ROOMS[code];
+      } else {
+        if(room.hostId===state.pid){ room.hostId = room.players[0].id; room.hostName = room.players[0].name; }
+        roomTouch(room);
+        room.players.forEach(pl=>pushNotification(pl.id, `🚪 ${myName} خرج من الغرفة`, '🚪'));
+      }
+    } else if(room.game==='khatfa'){
+      const myName = (room.players||[]).find(p=>p.id===state.pid)?.name
+        || (PARTICIPANTS.find(x=>x.id===state.pid)||{}).name || 'لاعب';
+      room.players = (room.players||[]).filter(p=>p.id!==state.pid);
+      if(room.kh && room.status==='playing'){
+        if(room.players.length<2){ delete GAME_ROOMS[code]; }
+        else { if(room.hostId===state.pid){ room.hostId = room.players[0].id; room.hostName = room.players[0].name; } roomTouch(room); room.players.forEach(pl=>pushNotification(pl.id, `🚪 ${myName} خرج من اللعبة`, '🚪')); }
       } else if(room.players.length===0){
         delete GAME_ROOMS[code];
       } else {
@@ -23735,6 +23797,7 @@ const ROOM_GAMES = [
   {id:'fazzura', sub:'فريقين أحمر وأزرق — اختاروا سؤال من اللوحة وجازفوا، ولو غلطتوا الفريق التاني يخطفها!'},
   {id:'drawguess', sub:'ارسم بالدور والباقي يخمّنوا لايف — لحد 6 أصحاب'},
   {id:'battleship', sub:'1 ضد 1 — رتّب أسطولك وغرّق أسطول صاحبك'},
+  {id:'khatfa', sub:'اخطف الحروف وكوّن كلمتك — من 2 لـ8 لاعبين، كل واحد بموبايله'},
 ];
 /* الألعاب دي متاحة بس في وضع الغرف (مع الأصحاب)، مش موجودة في هب الألعاب الفردي، فبناخدلها بيانات التايل من هنا */
 const ROOM_ONLY_TILES = {
@@ -23749,6 +23812,7 @@ const ROOM_ONLY_TILES = {
   fazzura: {id:'fazzura', icon:'🎯', title:'فزورة — لوحة النقاط', sub:'فريقين أحمر وأزرق — اختاروا سؤال من اللوحة وجازفوا، ولو غلطتوا الفريق التاني يخطفها!', color:'linear-gradient(145deg,#E8342A,#FFC21A)'},
   drawguess: {id:'drawguess', icon:'🎨', title:'ارسم وخمّن', sub:'ارسم بالدور والباقي يخمّنوا لايف — لحد 6 أصحاب', color:'linear-gradient(145deg,#FF5E62,#FF9966)'},
   battleship: {id:'battleship', icon:'⚓', title:'المعركة البحرية', sub:'1 ضد 1 — رتّب أسطولك وغرّق أسطول صاحبك، والإصابة بتدّيك دور تاني', color:'linear-gradient(145deg,#0b3a63,#4FACFE)'},
+  khatfa: {id:'khatfa', icon:'⚡', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjIgMTYgOTYgODQiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2U0ZGVmYSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxnIHN0cm9rZT0icmdiYSgwLDAsMCwuMjIpIiBzdHJva2Utd2lkdGg9IjEiPjxyZWN0IHg9IjYiIHk9IjI4IiB3aWR0aD0iMjYiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSJ1cmwoI2cpIiB0cmFuc2Zvcm09InJvdGF0ZSgtMTIgMTkgNDgpIi8+PHJlY3QgeD0iMzciIHk9IjIyIiB3aWR0aD0iMjYiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSJ1cmwoI2cpIi8+PHJlY3QgeD0iNjgiIHk9IjI4IiB3aWR0aD0iMjYiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSJ1cmwoI2cpIiB0cmFuc2Zvcm09InJvdGF0ZSgxMiA4MSA0OCkiLz48L2c+PGcgZm9udC1mYW1pbHk9IlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmb250LXNpemU9IjMwIiBmaWxsPSIjNWIyMWI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj48dGV4dCB4PSIxOSIgeT0iNTgiIHRyYW5zZm9ybT0icm90YXRlKC0xMiAxOSA0OCkiPtiuPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI1MiI+2Lc8L3RleHQ+PHRleHQgeD0iODEiIHk9IjU4IiB0cmFuc2Zvcm09InJvdGF0ZSgxMiA4MSA0OCkiPtmBPC90ZXh0PjwvZz48cG9seWdvbiBwb2ludHM9IjU2LDYwIDQ0LDgwIDUyLDgwIDQ4LDk2IDY2LDcyIDU3LDcyIDYyLDYwIiBmaWxsPSIjZmZkMjNmIiBzdHJva2U9IiNiODg2MGIiIHN0cm9rZS13aWR0aD0iMS4yIi8+PC9zdmc+', title:'خطفة', sub:'اخطف الحروف وكوّن كلمتك — من 2 لـ8 لاعبين، كل واحد بموبايله', color:'linear-gradient(145deg,#6d28d9,#18c4d4)'},
 };
 /* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
 /* بيتتبع مين من اللاعبين ظهر قبل كده في نفس الغرفة، عشان نعرض حركة "انضم الآن" مرة واحدة بس لكل لاعب */
@@ -31799,6 +31863,7 @@ function render(){
   else if(state.view==='room-domino') html = renderRoomDomino();
   else if(state.view==='room-ludo') html = renderRoomLudo();
   else if(state.view==='room-snakes') html = renderRoomSnakes();
+  else if(state.view==='room-khatfa') html = renderRoomKh();
   else if(state.view==='room-rps') html = renderRoomRps();
   else if(state.view==='room-connect4') html = renderRoomC4();
   else if(state.view==='room-memory') html = renderRoomMemory();
@@ -34864,6 +34929,19 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-snr-roll'){ doRoomSnrRoll(); }
   else if(action==='room-snr-next'){ doRoomSnrNext(); }
   else if(action==='room-snr-max'){ doRoomSnrMax(el.dataset.d); }
+  else if(action==='room-kh-start'){ doRoomKhStart(); }
+  else if(action==='room-kh-again'){ doRoomKhAgain(); }
+  else if(action==='room-kh-grab'){ khGrab(+el.dataset.li); }
+  else if(action==='room-kh-conf'){ khConf(); }
+  else if(action==='room-kh-cancel'){ khCancel(); }
+  else if(action==='room-kh-obj'){ khSend({t:'obj'}); }
+  else if(action==='room-kh-vote'){ khSend({t:'vote', v:el.dataset.v==='1'}); }
+  else if(action==='room-kh-decl-open'){ state.khDecl = []; render(); }
+  else if(action==='room-kh-decl-close'){ state.khDecl = null; render(); }
+  else if(action==='room-kh-decl-tap'){ khDeclTap(+el.dataset.i); }
+  else if(action==='room-kh-decl-undo'){ khDeclUndo(+el.dataset.i); }
+  else if(action==='room-kh-decl-send'){ khDeclSend(); }
+  else if(action==='room-kh-help'){ state.khHelp = !state.khHelp; render(); }
   else if(action==='numguess-key'){ numberKeyTap(el.dataset.key); }
   else if(action==='numguess-reset'){ initNumberGame(); render(); }
   else if(action==='ng-level-open'){ showNumLevelDialog(); }
@@ -39291,6 +39369,290 @@ async function doRoomDominoDrop(idx, side){
     if(Date.now()<suppressUntil && e.target.closest && e.target.closest('.domino-tile')){ e.stopPropagation(); e.preventDefault(); }
   }, true);
 })();
+
+/* ============================= خطفة: لعبة كلمات جماعية (2–8 لاعبين، كل واحد على جواله) ============================= */
+const KH_CATS = ['شيء بالشارع','حيوان','مهنة','أكلة','فاكهة','خضار','بلد','مدينة','اسم ولد','اسم بنت','جهاز كهربائي','شيء في المطبخ','شيء في المدرسة','شيء في البيت','وسيلة مواصلات','لون','رياضة','طائر','ملابس','مشروب','حلويات','شيء في المطار','شيء في البحر','شيء في السوبرماركت','شيء في الحقيبة','شيء في الغرفة','شخصية كتابية','شيء في الكنيسة','شيء بيتاكل','شيء بيتشرب','شيء بيتلبس','شيء في الجنينة','شيء بيطير','شيء بارد','شيء حلو','شيء كبير','شيء صغير','حاجة بتلاقيها في الفرح'];
+const KH_COLORS = ['#4fd1e8','#ff4f8b','#f6c445','#3ddc97','#a78bfa','#ff8a3d','#60a5fa','#f472b6'];
+const KH_W = {'أ':12,ل:8,م:7,ن:7,ي:7,و:6,ر:6,ب:5,ت:5,ع:4,ه:5,ك:4,د:4,س:4,ف:4,ق:3,ح:3,ج:2,ش:2,ص:2,ط:2,ز:1,خ:2,غ:1,ض:1,ذ:1,ث:1,ظ:1};
+const KH_DICT = new Set(('باب بيت ولد بنت ملك نور ورد نهر بحر جبل ريح مطر نار ماء خبز لبن شاي سكر ملح لحم سمك دجاج رز عسل زيت جبن بيض تمر موز تين عنب تفاح خوخ مشمش ليمون برتقال رمان بطيخ شمام كرز فراوله جزر خيار بصل ثوم فجل ذره فول عدس حمص قمح شعير ارض سماء شمس قمر نجم غيم ثلج برد حر صيف شتاء ربيع خريف ليل نهار صباح مساء يوم شهر سنه عام وقت ساعه دقيقه قلب عين اذن انف فم يد رجل راس شعر سن لسان وجه ظهر بطن كتف صدر اصبع ظفر دم عظم جلد اب ام اخ اخت جد جده عم خال عمه خاله ابن زوج زوجه صديق جار طفل امراه شاب شيخ دار غرفه مطبخ حمام سقف جدار نافذه شباك سرير كرسي طاوله مكتب دولاب مفتاح قفل سلم لمبه مروحه ثلاجه فرن غساله تلفاز راديو هاتف جوال حاسوب شاشه كتاب قلم ورقه دفتر مسطره ممحاه حقيبه مدرسه فصل معلم طالب درس امتحان نجاح علم ادب قصه مقال جريده مجله صوره لوحه رسم لون احمر ازرق اخضر اصفر ابيض اسود رمادي بني وردي ذهب فضه حديد نحاس خشب زجاج حجر رمل طين تراب عشب شجره زهره غصن ثمره بذره جذر غابه صحراء واحه وادي تل سهل جزيره شاطي موجه سفينه قارب طائره سياره قطار حافله دراجه شاحنه مطار ميناء محطه طريق شارع جسر نفق ميدان حديقه ملعب مسجد كنيسه دير سوق محل مخبز صيدليه مستشفي طبيب ممرض مهندس محامي سائق طيار بائع فلاح نجار حداد خباز طباخ شرطي جندي قاضي وزير رئيس امير اسد نمر فهد ذيب ثعلب دب فيل زرافه حمار حصان جمل بقره ثور خروف ماعز كلب قطه فار ارنب غزال قرد تمساح ثعبان سلحفاه ضفدع سمكه حوت قرش دلفين عصفور حمامه نسر صقر بومه ببغاء بطه ديك دجاجه نحله فراشه نمله ذبابه بعوضه عقرب سعيد حزين فرح غضب حب كره امل خوف صبر صدق امانه عدل خير شر سلام حرب نصر فوز لعب لعبه سباق جري سباحه قفز تنس فريق هدف حكم جمهور مباراه بطل كاس اكل شرب نوم جلس وقف مشي ركض كتب قرا سمع نظر قال ضحك بكي فتح غلق حمل وضع اخذ كبير صغير طويل قصير جميل سريع بطيء قوي ضعيف غني فقير جديد قديم حار بارد حلو مر حامض مالح نظيف ثقيل خفيف عالي واسع ضيق مفتوح مغلق موسي عيسي ابراهيم داود سليمان يوسف يعقوب اسحق نوح ادم حواء مريم يوحنا بطرس بولس مرقس لوقا متي جبريل صلاه صوم ايمان رجاء محبه فرح سلام شكر تسبيح ترنيم انجيل صليب مذبح كاهن شماس قديس ملاك سيف درع قوس سهم رمح تاج عرش قصر قلعه برج سور خيمه جيش ملعقه شوكه سكين صحن كوب كاسه طبق قدر مقلاه ابريق فنجان زجاجه سلطه شوربه كباب كفته فطيره بسبوسه كنافه حلوي كعك بسكويت شوكولاته مثلجات عصير قهوه كاكاو سيارات حذاء جزمه شراب قميص بنطلون فستان جاكيت قبعه نظاره ساعه خاتم سلسله حلق عقد').split(/\s+/).filter(Boolean));
+function khNorm(s){ return String(s||'').replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/\s+/g,''); }
+function khFits(w, rack){ const pool = rack.map(khNorm); for(const ch of w){ const i = pool.indexOf(ch); if(i<0) return false; pool.splice(i,1); } return true; }
+function khRound(kh){
+  const bag = []; Object.keys(KH_W).forEach(k=>{ for(let i=0;i<KH_W[k];i++) bag.push(k); });
+  const ls = []; while(ls.length<3){ const c = bag[Math.floor(Math.random()*bag.length)]; if(!ls.some(x=>x.c===c)) ls.push({c, by:null}); }
+  let cat; do{ cat = KH_CATS[Math.floor(Math.random()*KH_CATS.length)]; }while(cat===kh.cat);
+  Object.assign(kh, { cat, ls, g:null, cl:null, vt:null, phase:'pick', at:Date.now(), r:(kh.r||0)+1 });
+}
+function khNew(room){
+  const kh = { pids:(room.players||[]).map(p=>p.id), racks:{}, frozen:{}, ack:{}, res:null, win:null, r:0, cat:'' };
+  kh.pids.forEach(id=>{ kh.racks[id] = []; }); khRound(kh); return kh;
+}
+function khIsFrozen(kh, pid, now){ const f = kh.frozen[pid]; return !!(f && now < f.at + f.ms); }
+function khAccept(kh, pid, li, now){
+  kh.ls[li].by = pid; (kh.racks[pid] = kh.racks[pid]||[]).push(kh.ls[li].c);
+  Object.assign(kh, { res:{k:'ok', pid, c:kh.ls[li].c, at:now}, cl:null, vt:null, phase:'gap', at:now });
+}
+function khVerdict(kh, v, ok, now){
+  if(ok){
+    if(v.kind==='ans'){ khAccept(kh, v.pid, v.li, now); }
+    else { kh.win = { pid:v.pid, word:v.text }; kh.vt = null; kh.phase = 'over'; kh.at = now; }
+  } else {
+    kh.frozen[v.pid] = { at:now, ms:8000 };
+    Object.assign(kh, { res:{k:'bad', pid:v.pid, text:v.text, at:now}, vt:null, cl:null, phase:'pick', at:now });
+  }
+}
+function khAct(room, pid, a, now){
+  const kh = room.kh; if(!kh || kh.phase==='over' || (room.players||[]).every(p=>p.id!==pid)) return;
+  const fz = khIsFrozen(kh, pid, now);
+  if(a.t==='grab'){ if(kh.phase==='pick' && !fz && kh.ls[a.li] && !kh.ls[a.li].by){ kh.g = {pid, li:a.li, at:now}; kh.phase = 'say'; kh.at = now; } }
+  else if(a.t==='cancel'){ if(kh.phase==='say' && kh.g && kh.g.pid===pid){ kh.g = null; kh.phase = 'pick'; kh.at = now; } }
+  else if(a.t==='conf'){ if(kh.phase==='say' && kh.g && kh.g.pid===pid){ kh.cl = { pid, li:kh.g.li, at:now, word:String(a.w||'').slice(0,30), objs:[] }; kh.g = null; kh.phase = 'claim'; kh.at = now; } }
+  else if(a.t==='word'){ const w = String(a.w||'').slice(0,30); if(kh.cl && kh.cl.pid===pid) kh.cl.word = w; else if(kh.vt && kh.vt.kind==='ans' && kh.vt.pid===pid) kh.vt.text = w; }
+  else if(a.t==='obj'){ if(kh.phase==='claim' && kh.cl && kh.cl.pid!==pid && kh.cl.objs.indexOf(pid)<0) kh.cl.objs.push(pid); }
+  else if(a.t==='vote'){ const v = kh.vt; if(kh.phase==='vote' && v && v.pid!==pid && v.objs.indexOf(pid)<0) v.votes[pid] = !!a.v; }
+  else if(a.t==='decl'){
+    if(kh.phase!=='pick' || fz) return;
+    const w = khNorm(a.w);
+    if(w.length<3 || !khFits(w, kh.racks[pid]||[])) return;
+    if(KH_DICT.has(w)){ kh.win = { pid, word:String(a.w) }; kh.phase = 'over'; kh.at = now; }
+    else { kh.vt = { kind:'word', pid, text:String(a.w).slice(0,30), at:now, votes:{}, objs:[] }; kh.phase = 'vote'; kh.at = now; }
+  }
+}
+function khStep(room, now){
+  const kh = room.kh; if(!kh) return false; const p = kh.phase;
+  if(p==='pick' && now-kh.at>30000){ kh.res = { k:'none', at:now }; kh.phase = 'gap'; kh.at = now; return true; }
+  if(p==='say' && (!kh.g || now-kh.at>12000)){ kh.g = null; kh.phase = 'pick'; kh.at = now; return true; }
+  if(p==='claim' && kh.cl && now-kh.cl.at>=3000){
+    if(!kh.cl.objs.length) khAccept(kh, kh.cl.pid, kh.cl.li, now);
+    else { kh.vt = { kind:'ans', pid:kh.cl.pid, li:kh.cl.li, text:kh.cl.word, at:now, votes:{}, objs:kh.cl.objs.slice() }; kh.cl = null; kh.phase = 'vote'; kh.at = now; }
+    return true;
+  }
+  if(p==='vote' && kh.vt){
+    const v = kh.vt, el = (room.players||[]).map(x=>x.id).filter(id=>id!==v.pid && v.objs.indexOf(id)<0);
+    if(el.every(id=>id in v.votes) || now-v.at>10000){
+      const yes = el.filter(id=>v.votes[id]===true).length, no = el.filter(id=>v.votes[id]===false).length + v.objs.length;
+      khVerdict(kh, v, no<=yes, now); return true;
+    }
+    return false;
+  }
+  if(p==='gap' && now-kh.at>=1800){ khRound(kh); return true; }
+  return false;
+}
+/* مفيش حكم ثابت: أول لاعب متصل في الترتيب بيدير اللعبة تلقائي، ولو اتقطع التاني ياخد مكانه */
+function khArbiter(room){
+  const ps = (room.players||[]).map(p=>p.id), P = state._khPres || (state._khPres = {}), now = Date.now();
+  for(const id of ps){
+    if(id===state.pid) return id;
+    const n = room['kp_'+id], o = P[id];
+    if(!o || o.n!==n){ P[id] = { n, seenAt:now }; return id; }
+    if(now - o.seenAt < 8000) return id;
+  }
+  return ps[0];
+}
+function khCleanup(room){
+  const kh = room.kh, ids = (room.players||[]).map(p=>p.id), gone = id=>ids.indexOf(id)<0, now = Date.now(); let ch = false;
+  if(kh.g && gone(kh.g.pid)){ kh.g = null; kh.phase = 'pick'; kh.at = now; ch = true; }
+  if(kh.cl && gone(kh.cl.pid)){ kh.cl = null; kh.phase = 'pick'; kh.at = now; ch = true; }
+  if(kh.vt && gone(kh.vt.pid)){ kh.vt = null; kh.phase = 'pick'; kh.at = now; ch = true; }
+  return ch;
+}
+function khHostProcess(room){
+  const kh = room.kh; if(!kh || kh.phase==='over') return false;
+  const cln = khCleanup(room), now = Date.now(), pend = [];
+  (room.players||[]).forEach(pl=>{ const f = room['kc_'+pl.id]; if(!f || !f.q) return; const ack = kh.ack[pl.id]||0; f.q.forEach(x=>{ if(x.n>ack) pend.push({pid:pl.id, n:x.n, a:x.a, t:x.t||0}); }); });
+  pend.sort((x,y)=>x.t-y.t);
+  pend.forEach(x=>{ khAct(room, x.pid, x.a, now); kh.ack[x.pid] = Math.max(kh.ack[x.pid]||0, x.n); });
+  const st = khStep(room, now);
+  return pend.length>0 || st || cln;
+}
+async function khSend(a){
+  const room = GAME_ROOMS[state.roomCode]; if(!room || room.game!=='khatfa') return;
+  try{ SND.click(); }catch(e){}
+  GAME_ROOMS = await loadGameRooms();
+  const r = GAME_ROOMS[state.roomCode]; if(!r || !r.kh) return;
+  if(khArbiter(r)===state.pid){
+    khAct(r, state.pid, a, Date.now()); khHostProcess(r);
+  } else {
+    const old = (r['kc_'+state.pid] && r['kc_'+state.pid].q) || [];
+    const n = (old.length ? old[old.length-1].n : (r.kh.ack[state.pid]||0)) + 1;
+    r['kc_'+state.pid] = { q: old.slice(-5).concat([{ n, a, t:Date.now() }]) };
+  }
+  r.updatedAt = Date.now();
+  await saveGameRooms(GAME_ROOMS);
+  state._khSig = ''; render();
+}
+let _khBusy = false;
+async function khPollTick(){
+  if(state.view!=='room-khatfa' || !state.roomCode){ khPollStop(); return; }
+  if(_khBusy) return; _khBusy = true;
+  try{
+    const fresh = await loadGameRooms(), room = fresh[state.roomCode];
+    GAME_ROOMS = fresh;
+    let dirty = false;
+    if(room && room.status==='playing' && room.kh && (room.players||[]).some(p=>p.id===state.pid)){
+      if(Date.now() - (state._khPresAt||0) > 3000){ state._khPresAt = Date.now(); room['kp_'+state.pid] = (room['kp_'+state.pid]||0) + 1; dirty = true; }
+      if(khArbiter(room)===state.pid && khHostProcess(room)) dirty = true;
+    }
+    if(dirty){ room.updatedAt = Date.now(); await saveGameRooms(fresh); }
+    const sig = room ? JSON.stringify([room.status, room.players, room.kh]) : '';
+    if(sig!==state._khSig){ state._khSig = sig; render(); }
+  }catch(e){} finally{ _khBusy = false; }
+}
+function khPollStart(){ if(state._khPoll) return; state._khPoll = setInterval(khPollTick, 800); state._khTick = setInterval(khTick, 250); }
+function khPollStop(){ clearInterval(state._khPoll); clearInterval(state._khTick); state._khPoll = state._khTick = 0; khSpeechStop(); }
+function khSeen(key){ const m = state._khSeen || (state._khSeen = {}); if(!m[key]) m[key] = Date.now(); return m[key]; }
+function khFrozenLeft(kh, pid){ const f = kh.frozen[pid]; if(!f) return 0; return Math.max(0, f.ms - (Date.now() - khSeen('fz:'+pid+':'+f.at))); }
+function khTick(){
+  if(state.view!=='room-khatfa'){ khPollStop(); return; }
+  const room = GAME_ROOMS[state.roomCode], kh = room && room.kh; if(!kh) return;
+  if(kh.cl){ const left = Math.max(0, 3000 - (Date.now() - khSeen('cl:'+kh.cl.at))), e = document.getElementById('kh-cd'); if(e) e.textContent = 'تمام... '+Math.ceil(left/1000)+' ثواني للاعتراض'; }
+  if(kh.vt){ const left = Math.max(0, 10000 - (Date.now() - khSeen('vt:'+kh.vt.at))), e = document.getElementById('kh-vcd'); if(e) e.textContent = 'صوّتوا الآن • '+Math.ceil(left/1000)+' ث'; }
+  document.querySelectorAll('[data-kfz]').forEach(el=>{
+    const left = khFrozenLeft(kh, el.dataset.kfz);
+    if(left>0) el.textContent = '❄️ '+Math.ceil(left/1000); else { el.remove(); if(el.dataset.kfz===state.pid) render(); }
+  });
+  const rs = document.getElementById('kh-res'); if(rs && rs.dataset.at && Date.now() - khSeen('rs:'+rs.dataset.at) > 2600) rs.remove();
+}
+/* ---- الصوت (نص الكلمة اللي بتتقال، لو المتصفح بيدعم) ---- */
+function khSpeechStart(){
+  try{
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if(!SR) return;
+    khSpeechStop(); state._khWord = ''; state._khLate = false;
+    const r = new SR(); r.lang = 'ar-EG'; r.interimResults = true; r.continuous = true;
+    r.onresult = e=>{
+      let s = ''; for(let i=e.resultIndex;i<e.results.length;i++) s = e.results[i][0].transcript;
+      state._khWord = String(s||'').trim().split(/\s+/).slice(-3).join(' ');
+      if(state._khLate && state._khWord){ state._khLate = false; khSend({t:'word', w:state._khWord}); }
+    };
+    r.onerror = ()=>{}; r.start(); state._khRec = r;
+  }catch(e){}
+}
+function khSpeechStop(){ try{ state._khRec && state._khRec.stop(); }catch(e){} state._khRec = null; }
+function khGrab(li){
+  const room = GAME_ROOMS[state.roomCode], kh = room && room.kh; if(!kh || khFrozenLeft(kh, state.pid)>0) return;
+  khSpeechStart(); khSend({t:'grab', li});
+}
+function khConf(){ khSpeechStop(); const w = state._khWord || ''; state._khLate = !w; khSend({t:'conf', w}); }
+function khCancel(){ khSpeechStop(); khSend({t:'cancel'}); }
+function khDeclTap(i){ const d = state.khDecl; if(!d || d.indexOf(i)>-1) return; d.push(i); render(); }
+function khDeclUndo(i){ const d = state.khDecl; if(!d) return; const k = d.indexOf(i); if(k>-1) d.splice(k,1); render(); }
+function khDeclSend(){
+  const room = GAME_ROOMS[state.roomCode], kh = room && room.kh; if(!kh || !state.khDecl) return;
+  const rack = kh.racks[state.pid] || [], w = state.khDecl.map(i=>rack[i]).join('');
+  if(w.length<3){ showToast('الكلمة لازم تكون ٣ حروف على الأقل', true); return; }
+  state.khDecl = null; khSend({t:'decl', w});
+}
+async function doRoomKhStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='khatfa' || room.hostId!==state.pid || room.status!=='waiting') return;
+  if((room.players||[]).length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
+  room.kh = khNew(room); room.status = 'playing'; room.updatedAt = Date.now();
+  await saveGameRooms(GAME_ROOMS); state._khSig = ''; render();
+}
+async function doRoomKhAgain(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='khatfa' || !(room.players||[]).some(p=>p.id===state.pid) || !room.kh || room.kh.phase!=='over') return;
+  (room.players||[]).forEach(p=>{ room['kc_'+p.id] = { q:[] }; });
+  room.kh = khNew(room); room.updatedAt = Date.now(); state.khDecl = null;
+  await saveGameRooms(GAME_ROOMS); state._khSig = ''; render();
+}
+/* ---- الواجهات ---- */
+function khTopBar(room, sub){
+  const back = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+  return `<div class="snp-top"><button type="button" class="snp-ib" data-action="leave-room" aria-label="خروج">${back}</button><div class="snp-ttl">⚡ خطفة<small>${sub}</small></div><button type="button" class="snp-ib" data-action="room-kh-help" aria-label="شرح اللعبة">؟</button></div>`;
+}
+function khHelpHtml(){
+  return `<div class="snp-win" data-action="room-kh-help"><div class="snp-wc" style="text-align:right"><div class="snp-wt" style="text-align:center">⚡ إزاي تلعب خطفة؟</div>
+    <div class="kh-rules">١. فيه فئة (زي «حيوان») وتلات حروف. اضغط على حرف يبدأ بيه جوابك.<br>٢. قولها بصوت عالي، وبعدين اضغط «قلتها» للتأكيد.<br>٣. الباقيين عندهم ٣ ثواني يعترضوا. لو فيه اعتراض بنصوّت: صح ولا خطأ.<br>٤. لو اتقبلت الإجابة الحرف بيبقى معاك. لو اترفضت بتتجمّد ٨ ثواني.<br>٥. اجمع حروفك وكوّن كلمة من ٣ حروف أو أكتر (أي كلمة) واضغط «إعلان». أول واحد كلمته تتقبل بيكسب! 🏆</div>
+    <button type="button" class="snp-roll" style="flex:none;width:100%">تمام</button></div></div>`;
+}
+function renderRoomKhLobby(room){
+  const ps = room.players || [], isHost = room.hostId===state.pid, max = 8;
+  const code = escapeHtml(String(room.code));
+  const slots = [...Array(Math.max(ps.length+1, 4)).keys()].filter(i=>i<max).map(i=>{
+    const p = ps[i], c = KH_COLORS[i%KH_COLORS.length], host = p && p.id===room.hostId;
+    return `<div class="snp-slot${p?' on':''}${p&&p.id===state.pid?' me':''}" style="--c:${c}"><div class="snp-sav">${p ? gameAvatar(p.id) : SNR_SIL.replace('snr-sil','snp-sil')}</div><div class="snp-sn"><b>${p ? escapeHtml(p.name)+(p.id===state.pid?' (انت)':'') : 'Player '+(i+1)}</b><em class="${host?'host':''}">${p ? (host?'👑 صاحب الغرفة':'✅ جاهز') : 'بانتظار الانضمام...'}</em></div><i class="snp-dot"></i></div>`;
+  }).join('');
+  const foot = isHost
+    ? `<button type="button" class="snp-roll" data-action="room-kh-start" style="flex:none;width:100%"${ps.length<2?' disabled':''}>🚀 ابدأ اللعبة</button>${ps.length<2?'<div class="snp-hint">محتاج لاعبين اتنين على الأقل عشان تبدأ</div>':''}`
+    : `<div class="snp-wait">⏳ في انتظار صاحب الغرفة يبدأ اللعب</div>`;
+  return `<div class="snp snp-lobby">${khTopBar(room,'غرفة أونلاين • ٢–٨ لاعبين')}
+    <div class="snp-scroll"><div class="snp-code"><button type="button" class="snp-ib" data-action="copy-room-code" data-code="${code}" aria-label="نسخ الكود">📋</button><div><small>كود الغرفة</small><b>${code}</b></div><button type="button" class="snp-ib" data-action="invite-room-friend" data-code="${code}" data-game="khatfa" aria-label="دعوة صديق">👥</button></div>
+    <div class="snp-ct"><span>اللاعبين ${ps.length}/${max}</span></div>${slots}</div>
+    <div class="snp-foot">${foot}</div>${state.khHelp ? khHelpHtml() : ''}</div>`;
+}
+function renderRoomKh(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate('خطفة', room);
+  khPollStart();
+  if(room.status==='waiting' || !room.kh) return renderRoomKhLobby(room);
+  const kh = room.kh, me = state.pid, pl = room.players || [], ph = kh.phase;
+  const colorOf = id=>KH_COLORS[Math.max(0, kh.pids.indexOf(id)) % KH_COLORS.length];
+  const nameOf = id=>escapeHtml((pl.find(x=>x.id===id)||{}).name || 'لاعب');
+  const frozenMe = khFrozenLeft(kh, me) > 0, rack = kh.racks[me] || [];
+  /* الحروف */
+  let lets = '', info = '', extra = '';
+  if(ph==='claim' && kh.cl){
+    const c = kh.ls[kh.cl.li].c, el = Date.now() - khSeen('cl:'+kh.cl.at);
+    lets = `<div class="kh-lets"><div class="kh-let win" style="outline:3px solid ${colorOf(kh.cl.pid)};outline-offset:4px">${c}${kh.cl.word?`<small>«${escapeHtml(kh.cl.word)}»</small>`:''}</div></div>`;
+    const objers = kh.cl.objs.map(id=>`<span class="kh-pill">${nameOf(id)} ✕</span>`).join('');
+    info = `<div class="kh-info" id="kh-cd">تمام... 3 ثواني للاعتراض</div><div class="kh-bar"><i style="animation:khbar 3s linear forwards;animation-delay:-${(el/1000).toFixed(2)}s"></i></div><div class="kh-pills">${objers}</div>`;
+    if(kh.cl.pid!==me){
+      const done = kh.cl.objs.indexOf(me)>-1;
+      extra = `<button type="button" class="kh-obj"${done?' disabled':' data-action="room-kh-obj"'}>${done ? 'اعترضت ✓' : 'اعتراض ✋'}</button>`;
+    } else info += `<div class="kh-sub">${nameOf(me)}: استنى الاعتراضات</div>`;
+  } else {
+    lets = `<div class="kh-lets">${kh.ls.map((l,i)=>{
+      const grabbed = kh.g && kh.g.li===i, taken = !!l.by, free = ph==='pick' && !taken && !frozenMe;
+      const cls = 'kh-let'+(free?' free':'')+(taken?' dim':'')+(grabbed?' mine':'');
+      const st = grabbed ? ` style="--pc:${colorOf(kh.g.pid)}"` : '';
+      return `<button type="button" class="${cls}"${st}${free?` data-action="room-kh-grab" data-li="${i}"`:' disabled'}>${l.c}${grabbed?`<small>${nameOf(kh.g.pid)}</small>`:''}${taken?`<small>${nameOf(l.by)}</small>`:''}</button>`;
+    }).join('')}</div>`;
+    if(ph==='pick') info = `<div class="kh-info">${frozenMe ? '❄️ إنت مجمّد... استنى' : 'اخطف حرف يبدأ به جوابك'}</div>`;
+    else if(ph==='say'){
+      if(kh.g.pid===me) info = `<div class="kh-info">قولها بصوت عالي! ثم اضغط بطاقتك تأكيداً</div>`, extra = `<button type="button" class="snp-roll" data-action="room-kh-conf" style="flex:none;width:100%;max-width:300px">✅ قلتها — تأكيد</button><button type="button" class="snp-ghost" data-action="room-kh-cancel" style="margin-top:8px">إلغاء</button>`;
+      else info = `<div class="kh-info">${nameOf(kh.g.pid)} خطف حرف وبيجاوب...</div>`;
+    } else if(ph==='vote' && kh.vt){
+      const v = kh.vt, el = pl.map(x=>x.id).filter(id=>id!==v.pid && v.objs.indexOf(id)<0), can = el.indexOf(me)>-1, mine = v.votes[me];
+      const dots = v.objs.map(()=>'<i class="no"></i>').concat(el.map(id=>`<i class="${id in v.votes ? (v.votes[id]?'yes':'no') : ''}"></i>`)).join('');
+      const q = v.kind==='word' ? `«${escapeHtml(v.text)}» كلمة صحيحة؟` : (v.text ? `«${escapeHtml(v.text)}» ${escapeHtml(kh.cat)}؟` : `الإجابة بحرف «${kh.ls[v.li].c}» — ${escapeHtml(kh.cat)}؟`);
+      extra = `<div class="kh-sheet"><div class="kh-q">${q}</div><div class="kh-sub" id="kh-vcd">صوّتوا الآن</div><div class="kh-dots">${dots}</div>
+        ${can ? `<div class="kh-vb"><button type="button" class="kh-v yes${mine===true?' sel':''}" data-action="room-kh-vote" data-v="1">صح ✓</button><button type="button" class="kh-v no${mine===false?' sel':''}" data-action="room-kh-vote" data-v="0">خطأ ✕</button></div>` : `<div class="kh-sub">${v.pid===me ? 'الباقيين بيصوّتوا على إجابتك...' : 'إنت اعترضت — استنى التصويت'}</div>`}</div>`;
+      info = `<div class="kh-info">${v.kind==='word' ? nameOf(v.pid)+' أعلن كلمة جديدة' : 'تم الاعتراض'}</div>`;
+    } else if(ph==='gap' && kh.res){
+      const r = kh.res; info = `<div class="kh-info ${r.k}">${r.k==='ok' ? '✅ '+nameOf(r.pid)+' خطف «'+r.c+'»' : '⏱️ ما أحد خطفها'}</div>`;
+    }
+    if(kh.res && kh.res.k==='bad' && ph==='pick' && Date.now() - khSeen('rs:'+kh.res.at) < 2600)
+      info = `<div class="kh-info bad" id="kh-res" data-at="${kh.res.at}">❌ ${kh.res.text?'«'+escapeHtml(kh.res.text)+'» ':''}الإجابة مرفوضة — ${nameOf(kh.res.pid)} مجمّد 8 ث</div>` + info;
+  }
+  /* اللاعبين */
+  const players = pl.map(p=>{
+    const c = colorOf(p.id), fl = khFrozenLeft(kh, p.id), rk = (kh.racks[p.id]||[]).map(x=>`<b>${x}</b>`).join('');
+    const turnHot = (kh.g && kh.g.pid===p.id) || (kh.cl && kh.cl.pid===p.id);
+    return `<div class="kh-p${fl>0?' frz':''}${turnHot?' hot':''}" style="--pc:${c}"${(ph==='say' && kh.g.pid===me && p.id===me) ? ' data-action="room-kh-conf"' : ''}><div class="kh-pav">${gameAvatar(p.id)}</div>${fl>0?`<div class="kh-fz" data-kfz="${p.id}">❄️ ${Math.ceil(fl/1000)}</div>`:''}<div class="kh-pn">${escapeHtml(p.name)}${p.id===me?' (انت)':''}</div><div class="kh-rk">${rk||'&nbsp;'}</div></div>`;
+  }).join('');
+  /* حروفي + الإعلان */
+  const canDecl = ph==='pick' && !frozenMe && rack.length>=3;
+  let bottom;
+  if(state.khDecl){
+    const d = state.khDecl;
+    bottom = `<div class="kh-decl"><div class="kh-dt">كوّن كلمتك</div><div class="kh-sub">أي كلمة من حروفك — ما لها علاقة بالفئة</div>
+      <div class="kh-word">${d.map(i=>`<button type="button" class="kh-t on" data-action="room-kh-decl-undo" data-i="${i}">${rack[i]}</button>`).join('') || '<span class="kh-sub">اضغط على حروفك بالترتيب</span>'}</div>
+      <div class="kh-rack">${rack.map((c,i)=>`<button type="button" class="kh-t${d.indexOf(i)>-1?' used':''}" data-action="room-kh-decl-tap" data-i="${i}">${c}</button>`).join('')}</div>
+      <div class="kh-dbtns"><button type="button" class="snp-roll" data-action="room-kh-decl-send"${(d.length>=3 && ph==='pick' && !frozenMe)?'':' disabled'}>${ph==='pick' ? '🚀 أعلن الكلمة' : 'استنى الجولة تخلص'}</button><button type="button" class="snp-ghost" data-action="room-kh-decl-close">رجوع</button></div></div>`;
+  } else {
+    bottom = `<div class="kh-mine"><div class="kh-mt">حروفي</div><div class="kh-rack">${rack.map(c=>`<span class="kh-t">${c}</span>`).join('') || '<span class="kh-sub">لسه مفيش حروف — اخطف حرف!</span>'}</div><button type="button" class="kh-decl-btn"${canDecl?' data-action="room-kh-decl-open"':' disabled'}>إعلان 📣</button>${rack.length<3?'<div class="kh-sub">محتاج ٣ حروف على الأقل عشان تعلن</div>':''}</div>`;
+  }
+  let win = '';
+  if(ph==='over' && kh.win){
+    const isHost = true;
+    win = `<div class="snp-win"><div class="snp-wc"><div class="snp-trophy">🏆</div><div class="snp-wt">${nameOf(kh.win.pid)} فاز!</div><div class="kh-word" style="justify-content:center">${[...khNorm(kh.win.word)].map(c=>`<span class="kh-t on">${c}</span>`).join('')}</div><div class="kh-sub">${escapeHtml(kh.win.word)}</div>${isHost ? '<button type="button" class="snp-roll" data-action="room-kh-again" style="flex:none">🔄 جولة جديدة</button>' : '<div class="kh-sub">في انتظار صاحب الغرفة للجولة الجديدة</div>'}<button type="button" class="snp-ghost" data-action="leave-room">خروج</button></div></div>`;
+  }
+  return `<div class="snp kh">${khTopBar(room, 'جولة '+kh.r)}<div class="kh-body">
+    <div class="kh-cat">${escapeHtml(kh.cat)}</div>${lets}${info}${extra}<div class="kh-ps">${players}</div>${bottom}</div>${win}${state.khHelp ? khHelpHtml() : ''}</div>`;
+}
 
 /* ============================= INIT ============================= */
 /* الأكواد بتاعة المشاركين المضافين من الأدمن كانت بتتعرف بس بعد ما يخلص تحميل كل بيانات التطبيق (ممكن ياخد لحد 10 ثواني)،
