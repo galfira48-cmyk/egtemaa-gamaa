@@ -6486,6 +6486,63 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 
   .domino-result{border-color:var(--gold); background:linear-gradient(160deg, rgba(244,183,64,.16), rgba(155,140,255,.16)); box-shadow:0 10px 28px rgba(0,0,0,.35);}
   .dr-title{font-size:18px;} .dr-sub{margin-bottom:8px;} .dr-sub b{color:var(--gold); font-size:15px;}
+  /* ===================== DOMINO IVORY (عاج + نقط سودة لامعة + فاصل أسود - زي الصورة) ===================== */
+  :root{ --dm-ivory-1:#FBF5DE; --dm-ivory-2:#F2E8C6; --dm-ivory-3:#E7DAAE; --dm-gold:#C9A24A; --dm-ink:#0B0B0D; }
+  /* ورق اليد */
+  .domino-tile{border-radius:11px; border:1.5px solid var(--dm-gold);
+    background:linear-gradient(135deg, rgba(255,255,255,.65) 0%, rgba(255,255,255,0) 38%), linear-gradient(170deg, var(--dm-ivory-1) 0%, var(--dm-ivory-2) 55%, var(--dm-ivory-3) 100%);
+    box-shadow:0 4px 0 var(--dm-ink), 0 8px 10px rgba(0,0,0,.42), inset 0 1.5px 0 rgba(255,255,255,.95), inset 0 -2px 3px rgba(140,110,40,.18);}
+  .domino-tile .domino-half:first-child{border-bottom:0;}
+  .domino-tile::before{left:11%; right:11%; width:auto; height:5px; margin:-2.5px 0 0 0; border-radius:5px; border:0;
+    background:linear-gradient(180deg,#3a3a3f 0%, #0B0B0D 45%, #000 100%);
+    box-shadow:0 0 0 1px rgba(201,162,74,.8), 0 1px 1px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35);}
+  .domino-tile.playable{box-shadow:0 4px 0 var(--dm-ink), 0 0 0 2.5px var(--gold), 0 0 18px rgba(244,183,64,.65);}
+  @keyframes dmPlayable{0%,100%{box-shadow:0 4px 0 var(--dm-ink), 0 0 0 2.5px var(--gold), 0 0 10px rgba(244,183,64,.4);} 50%{box-shadow:0 4px 0 var(--dm-ink), 0 0 0 2.5px #ffe08a, 0 0 22px rgba(244,183,64,.85);}}
+  /* النقط: كلها سودة لامعة بحلقة دهب (بدل الألوان) */
+  .domino-tile .domino-half[class] .dpip:not(.empty), .domino-tile-h .domino-half[class] .dpip:not(.empty){
+    background:radial-gradient(circle at 68% 28%, rgba(255,255,255,.95) 0 10%, rgba(255,255,255,0) 26%), radial-gradient(circle at 38% 42%, #3a3a40 0%, #0B0B0D 62%, #000 100%);
+    box-shadow:0 0 0 1px var(--dm-gold), 0 1px 1px rgba(0,0,0,.3);}
+  /* الصف الأفقي (لو الطاولة مش متاحة) */
+  .domino-tile-h{border:1.5px solid var(--dm-gold); background:linear-gradient(170deg, var(--dm-ivory-1) 0%, var(--dm-ivory-2) 55%, var(--dm-ivory-3) 100%); box-shadow:0 3px 0 var(--dm-ink), 0 5px 6px rgba(0,0,0,.35);}
+  .domino-tile-h .domino-half:first-child{border-left:0; border-right:2.5px solid var(--dm-ink);}
+  /* ورق الطاولة (SVG) */
+  .dt-in{border-radius:9px; border:1.5px solid var(--dm-gold);
+    background:linear-gradient(135deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,0) 36%), linear-gradient(170deg, var(--dm-ivory-1) 0%, var(--dm-ivory-2) 55%, var(--dm-ivory-3) 100%);
+    box-shadow:0 3px 0 var(--dm-ink), 0 6px 8px rgba(0,0,0,.5), inset 0 1.5px 0 rgba(255,255,255,.95), inset 0 -2px 3px rgba(140,110,40,.18);}
+  .dt.new .dt-in{box-shadow:0 3px 0 var(--dm-ink), 0 0 0 3px rgba(244,183,64,.9), 0 0 18px rgba(244,183,64,.75), 0 6px 8px rgba(0,0,0,.5), inset 0 1.5px 0 #fff;}
+  .dt-pip{fill:var(--dm-ink); filter:none;}
+  .dt-pip-ring{fill:none; stroke:var(--dm-gold); stroke-width:1.3;}
+  .dt-pip-shade{fill:rgba(255,255,255,.09);}
+  .dt-pip-shine{fill:rgba(255,255,255,.93);}
+  .dt-div-edge{stroke:var(--dm-gold); stroke-width:7.6; stroke-linecap:round;}
+  .dt-div{stroke:var(--dm-ink); stroke-width:6; stroke-linecap:round;}
+  .dt-div-hi{stroke:rgba(255,255,255,.38); stroke-width:1.4; stroke-linecap:round;}
+  /* ===================== DOMINO BOARD LUXE (طاولة راقية + ورق متراص) ===================== */
+  .domino-board{
+    background:
+      radial-gradient(65% 50% at 50% 36%, rgba(150,225,185,.22), transparent 72%),
+      radial-gradient(135% 135% at 50% 42%, #1c6e5a 0%, #124b40 55%, #072925 100%);
+    box-shadow:inset 0 0 0 2px rgba(232,198,117,.8), inset 0 0 0 6px #3b2412, inset 0 0 0 7.5px rgba(232,198,117,.4), inset 0 0 0 11px #1f1209, inset 0 26px 54px rgba(0,0,0,.5), 0 16px 36px rgba(0,0,0,.5);}
+  .domino-board::before{opacity:.7; background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.028) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px); background-size:auto;}
+  .db-in{inset:6%;}
+  .dt{filter:drop-shadow(0 5px 4px rgba(0,0,0,.45));}
+  .dt-in{border-radius:8px; box-shadow:0 2px 0 var(--dm-ink), inset 0 0 0 1.5px rgba(255,255,255,.45), inset 0 1.5px 0 rgba(255,255,255,.95), inset 0 -3px 5px rgba(140,110,40,.2);}
+  .dt.new .dt-in{box-shadow:0 2px 0 var(--dm-ink), 0 0 0 2.5px rgba(232,198,117,.95), 0 0 16px rgba(244,183,64,.7), inset 0 1.5px 0 #fff;}
+  .dt-ghost{border-width:1.5px; border-radius:9px; box-shadow:0 0 12px currentColor, inset 0 0 16px rgba(255,255,255,.06);}
+  .dt-ghost.pick{border-width:2px;}
+  .dg-num{font-size:56px; font-weight:800;}
+  /* ===================== DOMINO BIGGER + HQ ===================== */
+  .db-in{inset:4.5%;}
+  .domino-tile{width:54px; height:104px; min-width:54px; padding:0; border-radius:12px;}
+  .domino-tile::before{display:none;}
+  .dh-svg{display:block; width:100%; height:100%;}
+  .dh-svg svg{display:block; width:100%; height:100%;}
+  .domino-tile:disabled:not(.playable){opacity:1; filter:brightness(.72) saturate(.6);}
+  .dt-pip-recess{fill:#000;}
+  .dt-pip-shade{fill:rgba(255,255,255,.10);}
+  .dt-pip-shade2{fill:rgba(255,255,255,.07);}
+  .dt-pip-glint{fill:rgba(255,255,255,.35);}
+  .dt-in{border-radius:10px;}
   /* ===================== UNO (landscape table view) ===================== */
   .uno-stage{position:fixed; inset:0; z-index:70; background:#08150d; overflow:hidden;}
   .uno-rotor{position:fixed; top:50%; left:50%; width:100vh; height:100vw; transform:translate(-50%,-50%) rotate(90deg); transform-origin:center center; overflow:hidden;}
@@ -15160,7 +15217,8 @@ const LVL_THEMES = {
   ludo:    {crest:'🎲', g:['#3a2a12','#0c0b16','#F4B740'], ic:['🌱','🎲','🔥','👑'], ds:['بيحرّك قطعه عشوائي','بيلعب كويس وبيضيّع فرص','بياكل قطعك ويحمي قطعه','بيخطط لكل رمية — بلا رحمة']},
   numguess:{crest:'🔢', g:['#0e3a4a','#051118','#4FACFE'], ic:['🌱','🎯','🔥'], ds:[]},
   placemem:{crest:'🧠', g:['#2a1a5c','#0a0716','#B07CFF'], ic:['🌱','🧠','🔥'], ds:[]},
-  crossmath:{crest:'🧮', g:['#4a3418','#150d05','#E8C99A'], ic:[], ds:[]}
+  crossmath:{crest:'🧮', g:['#4a3418','#150d05','#E8C99A'], ic:[], ds:[]},
+  math:    {crest:'➗', g:['#0e3a4a','#051118','#4FACFE'], ic:['🌱','🧮','🔥','👑'], ds:[]}
 };
 const LVL_STARS = {easy:[2,3], medium:[3,4], hard:[3,4], expert:[5,5]};
 /* شاشة اختيار المستوى الموحّدة: بتتبني من قايمة مستويات + ثيم اللعبة، وبتستخدمها كل الألعاب اللي فيها مستويات */
@@ -15186,7 +15244,7 @@ function lvlScreen(cfg){
     setTimeout(()=>close(()=>cfg.onPick(b.dataset.id)),260);
   }));
   ov.querySelector('#lvl-back').addEventListener('click',()=>{
-    if(cfg.cur){ close(); return; }
+    if(cfg.cur){ close(cfg.onCancel); return; }
     ov.remove(); if(cfg.onBack) cfg.onBack();
   });
 }
@@ -16045,64 +16103,166 @@ function genMathProblem(level){
   const optsArr = shuffleArray(Array.from(options));
   return { a, b, op, answer, options: optsArr };
 }
-function initMathGame(){
-  const total = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloMathQuestions)||20;
-  const timerSec = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloMathTimerSec)||5;
-  state.mathgame = { qIndex:1, total, problem: genMathProblem(1), score:0, finished:false, won:false, timeLeft:timerSec, timerSec };
+/* ---- رياضيات سريعة بمستويات: الوقت بيتحدد من المستوى + صعوبة السؤال نفسه ---- */
+const MATH_LEVELS = {
+  easy:   {label:'سهل',  icon:'🟢', q:10, mult:0.5, ops:['+','-'],                add:20,  mul:0,  base:8, desc:'جمع وطرح بسيط'},
+  normal: {label:'عادي', icon:'🟡', q:15, mult:1,   ops:['+','-','×'],            add:50,  mul:9,  base:7, desc:'جمع وطرح وضرب'},
+  hard:   {label:'صعب',  icon:'🔴', q:20, mult:2,   ops:['+','-','×','÷'],        add:150, mul:12, base:7, desc:'أرقام أكبر مع القسمة'},
+  expert: {label:'خبير', icon:'🔥', q:25, mult:3,   ops:['+','-','×','÷','mix'],  add:300, mul:15, base:6, desc:'عمليات مركّبة وأرقام كبيرة'}
+};
+function mathLevel(){ return MATH_LEVELS[state.mathLevel] ? state.mathLevel : 'normal'; }
+function mathReward(lv){
+  const base = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloMathReward)||0;
+  return Math.round(base * MATH_LEVELS[lv].mult);
 }
-async function saveMathBestIfNeeded(score){
+/* الوقت: أساس المستوى + زيادة لو السؤال أصعب (ضرب/قسمة/مركّب/أرقام فوق المية) */
+function mathSecsFor(op, big, cfg){
+  let t = cfg.base;
+  if(op==='×' || op==='÷') t += 2;
+  if(op==='mix') t += 5;
+  if(big) t += 2;
+  return t;
+}
+function mathTimeRange(cfg){
+  let mx = cfg.base;
+  cfg.ops.forEach(o=>{
+    const big = o==='mix' ? false : (o==='×'||o==='÷') ? cfg.mul>=10 : cfg.add>=100;
+    mx = Math.max(mx, mathSecsFor(o, big, cfg));
+  });
+  return [cfg.base, mx];
+}
+function mathTimeText(cfg){
+  const r = mathTimeRange(cfg);
+  return r[0]===r[1] ? `${r[0]} ثواني للسؤال` : `من ${r[0]} لـ ${r[1]} ثانية للسؤال`;
+}
+function genMathProblemLv(lv, idx, total){
+  const cfg = MATH_LEVELS[lv];
+  const prog = total>1 ? (idx-1)/(total-1) : 1;
+  const k = 0.5 + 0.5*prog;            /* الأسئلة بتصعب تدريجيًا جوه نفس المستوى */
+  const R = (x,y)=> x + Math.floor(Math.random()*(y-x+1));
+  const op = cfg.ops[R(0, cfg.ops.length-1)];
+  const addMax = Math.max(9, Math.round(cfg.add*k));
+  const mulMax = Math.max(4, Math.round(cfg.mul*k));
+  let a,b,c,answer,text,big=false;
+  if(op==='+'){ a=R(2,addMax); b=R(2,addMax); answer=a+b; text=a+' + '+b; big=Math.max(a,b)>=100; }
+  else if(op==='-'){ a=R(Math.min(10,addMax),addMax); b=R(1,a-1); answer=a-b; text=a+' - '+b; big=a>=100; }
+  else if(op==='×'){ a=R(2,mulMax); b=R(2,mulMax); answer=a*b; text=a+' × '+b; big=answer>=100; }
+  else if(op==='÷'){ b=R(2,Math.min(mulMax,12)); answer=R(2,mulMax); a=b*answer; text=a+' ÷ '+b; big=a>=100; }
+  else {
+    a=R(5, Math.round(60*k)+5); b=R(2,9); c=R(2,9);
+    if(Math.random()<0.5){ answer=a+b*c; text=a+' + '+b+' × '+c; }
+    else { const x=b*c; a=Math.max(a,x+1); answer=a-x; text=a+' - '+b+' × '+c; }
+  }
+  const opts = new Set([answer]);
+  const spread = Math.max(3, Math.round(answer*0.12));
+  let guard = 0;
+  while(opts.size<3 && guard++<80){
+    let d = R(1,spread) * (Math.random()<0.5 ? -1 : 1);
+    if((op==='+'||op==='-') && Math.random()<0.3) d = Math.random()<0.5 ? -10 : 10;
+    const f = answer + d;
+    if(f>=0 && f!==answer) opts.add(f);
+  }
+  let n = 1; while(opts.size<3){ opts.add(answer+(n++)); }
+  return { op, text, answer, options: shuffleArray(Array.from(opts)), secs: mathSecsFor(op, big, cfg) };
+}
+function mathMarkStart(g){ g.qStart = Date.now() - (g.timerSec - g.timeLeft)*1000; }
+function initMathGame(level, hold){
+  if(level && MATH_LEVELS[level]) state.mathLevel = level;
+  const lv = mathLevel(), cfg = MATH_LEVELS[lv];
+  const pr = genMathProblemLv(lv, 1, cfg.q);
+  state.mathgame = { level:lv, qIndex:1, total:cfg.q, problem:pr, score:0, finished:false, won:false,
+    timeLeft:pr.secs, timerSec:pr.secs, ready:!hold, fb:null, anim:true, qStart:Date.now(),
+    times:[], ratios:[], fast:0, lastWrong:null };
+}
+function showMathLevelDialog(){
+  stopMathTimer();
+  const g = state.mathgame; if(g) g.ready = false;        /* الوقت واقف لحد ما يختار */
+  const cols = {easy:'#5FE0A4', normal:'#4FACFE', hard:'#FF9F43', expert:'#FF6B6B'}, th = LVL_THEMES.math;
+  const keys = Object.keys(MATH_LEVELS);
+  lvlScreen({ key:'math', cur:mathLevel(), game:'رياضيات سريعة',
+    sub: mathReward('normal')>0 ? 'كل ما زاد المستوى زادت المكافأة والوقت بيتظبط على صعوبة السؤال' : 'الوقت بيتظبط على صعوبة السؤال',
+    levels: keys.map((k,i)=>{ const c=MATH_LEVELS[k]; return {id:k, name:c.label, color:cols[k], icon:th.ic[i], stars:[i+1,4],
+      desc:`${c.q} سؤال • ${c.desc} • ${mathTimeText(c)}`, pts:mathReward(k)}; }),
+    onPick: id=>{ initMathGame(id); render(); },
+    onCancel: ()=>{ const g2=state.mathgame; if(g2){ g2.ready = true; g2.anim = false; mathMarkStart(g2); } render(); } });
+}
+async function saveMathBestIfNeeded(score, level){
   if(!state.pid) return;
   const st = myGameStats(state.pid);
-  if(!st.mathBest || score > st.mathBest){
-    st.mathBest = score;
+  const key = 'mathBest_'+(level||'normal');
+  if(!st[key] || score > st[key]){
+    st[key] = score;
     await saveGameStats(GAME_STATS);
   }
 }
 function endMathRound(won){
   const g = state.mathgame;
   if(!g || g.finished) return;
-  g.finished = true; g.won = won;
+  g.finished = true; g.won = won; g.fb = null;
   stopMathTimer();
-  saveMathBestIfNeeded(g.score);
+  saveMathBestIfNeeded(g.score, g.level);
   if(won){
-    const reward = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloMathReward)||0;
-    awardSoloGamePoints(reward, 'مبروك! جاوبت صح في كل أسئلة الرياضيات');
+    const reward = mathReward(g.level);
+    awardSoloGamePoints(reward, 'مبروك! جاوبت صح في كل أسئلة الرياضيات ('+MATH_LEVELS[g.level].label+')');
+    try{ launchConfetti(); SND.coinChime(); }catch(e){}
   } else {
     SND.click();
   }
   render();
 }
+/* بنعرض النتيجة (صح/غلط) لحظة قبل ما نكمّل، عشان اللاعب يشوف إجابته */
 function doMathPick(val){
   const g = state.mathgame;
-  if(!g || g.finished) return;
+  if(!g || g.finished || g.fb || g.ready===false) return;
   stopMathTimer();
-  const correct = parseInt(val,10)===g.problem.answer;
-  if(!correct){ vibrate(30); endMathRound(false); return; }
-  g.score++;
-  SND.cheer();
-  if(g.qIndex>=g.total){ endMathRound(true); return; }
-  g.qIndex++;
-  g.problem = genMathProblem(g.qIndex);
-  g.timeLeft = g.timerSec;
+  const v = parseInt(val,10), pr = g.problem, correct = v===pr.answer;
+  const used = Math.max(0,(Date.now()-g.qStart)/1000);
+  if(correct){
+    const fast = used <= g.timerSec*0.4;
+    g.score++; g.times.push(used); g.ratios.push(Math.min(1,used/g.timerSec)); if(fast) g.fast++;
+    g.fb = { picked:v, ok:true, fast };
+    SND.cheer();
+  } else {
+    g.fb = { picked:v, ok:false };
+    g.lastWrong = { text:pr.text, answer:pr.answer };
+    vibrate(30);
+  }
   render();
+  setTimeout(()=>{
+    if(state.mathgame!==g || g.finished) return;
+    g.fb = null;
+    if(!correct){ endMathRound(false); return; }
+    if(g.qIndex>=g.total){ endMathRound(true); return; }
+    g.qIndex++;
+    g.problem = genMathProblemLv(g.level, g.qIndex, g.total);
+    g.timerSec = g.problem.secs; g.timeLeft = g.timerSec; g.anim = true; mathMarkStart(g);
+    render();
+  }, correct ? 480 : 1000);
 }
 function doMathTimeout(){
   const g = state.mathgame;
-  if(!g || g.finished) return;
+  if(!g || g.finished || g.fb) return;
   vibrate(30);
-  endMathRound(false);
+  g.fb = { picked:null, ok:false, timeout:true };
+  g.lastWrong = { text:g.problem.text, answer:g.problem.answer };
+  render();
+  setTimeout(()=>{ if(state.mathgame!==g || g.finished) return; g.fb = null; endMathRound(false); }, 1100);
 }
 let mathTickInterval = null;
 function startMathTimer(){
   stopMathTimer();
   const g = state.mathgame;
-  if(!g || g.finished) return;
+  if(!g || g.finished || g.ready===false || g.fb) return;
   mathTickInterval = setInterval(()=>{
     const g2 = state.mathgame;
-    if(!g2 || g2.finished){ stopMathTimer(); return; }
+    if(!g2 || g2.finished || g2.ready===false || g2.fb){ stopMathTimer(); return; }
     g2.timeLeft--;
     const el = document.getElementById('math-timer');
-    if(el) el.textContent = Math.max(0,g2.timeLeft)+' ث';
+    if(el){
+      el.textContent = Math.max(0,g2.timeLeft);
+      const ring = el.parentNode;
+      if(ring && ring.classList){ ring.classList.toggle('mth-low', g2.timeLeft<=3); ring.classList.toggle('mid', g2.timeLeft>3 && g2.timeLeft<=g2.timerSec/2); }
+    }
     if(g2.timeLeft<=0){ stopMathTimer(); doMathTimeout(); }
   }, 1000);
 }
@@ -16111,35 +16271,73 @@ function renderMathGame(){
   if(!state.mathgame) initMathGame();
   const g = state.mathgame;
   const total = g.total || 20;
-  const reward = (GAME_POINTS_SETTINGS&&GAME_POINTS_SETTINGS.soloMathReward)||0;
+  const cfg = MATH_LEVELS[g.level] || MATH_LEVELS.normal;
+  const reward = mathReward(g.level);
   const stats = state.pid ? myGameStats(state.pid) : {};
-  const bestLine = stats.mathBest ? `أفضل نتيجة لك: ${stats.mathBest} سؤال صح` : `جاوب صح في كل الـ${total} سؤال قبل ما ينتهي وقتك واكسب ${reward} نقطة 🏅`;
-  return `
+  const best = stats['mathBest_'+g.level];
+  const bestLine = best ? `أفضل نتيجة لك في مستوى ${cfg.label}: ${best} من ${total}` : `جاوب صح في كل الـ${total} سؤال قبل ما ينتهي وقتك${reward>0?' واكسب '+reward+' نقطة':''} 🏅`;
+  const pr = g.problem, fb = g.fb;
+  const head = `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">رياضيات سريعة</div>
     </div>
-    <div class="xo-score-row">
-      <div class="xo-score-pill"><span>سؤال</span><b>${Math.min(g.qIndex,total)}/${total}</b></div>
-      <div class="xo-score-pill draw"><span>صح</span><b>${g.score}</b></div>
-      <div class="xo-score-pill o"><span>⏱️ الوقت</span><b id="math-timer">${g.timeLeft} ث</b></div>
+    <div class="mth-chip">${cfg.icon} ${cfg.label} • ${mathTimeText(cfg)}</div>`;
+  const foot = `
+    <div class="hint" style="text-align:center;margin-top:12px;">${bestLine}</div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button type="button" class="btn btn-outline" style="flex:1;" data-action="math-reset">🔄 لعبة جديدة</button>
+      <button type="button" class="btn btn-outline" style="flex:1;" data-action="math-level">🎚️ غيّر المستوى</button>
+    </div>`;
+  if(g.finished){
+    const n = g.times.length, avg = n ? g.times.reduce((x,y)=>x+y,0)/n : 0;
+    const ar = g.ratios.length ? g.ratios.reduce((x,y)=>x+y,0)/g.ratios.length : 1;
+    const stars = g.won ? (ar<=0.45 ? 3 : ar<=0.7 ? 2 : 1) : 0;
+    const wrong = g.lastWrong ? `<div class="mth-ans">الإجابة الصح: <span dir="ltr" style="unicode-bidi:isolate">${g.lastWrong.text} = <b>${g.lastWrong.answer}</b></span></div>` : '';
+    return `<div class="mth" data-lv="${g.level}">${head}
+      <div class="mth-res ${g.won?'win':'lose'}">
+        <div class="mth-res-ico">${g.won?'🏆':'😅'}</div>
+        <div class="mth-res-title">${g.won?'مبروك! جاوبت صح في كل الأسئلة':'خلصت الجولة'}</div>
+        ${g.won ? `<div class="mth-stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}" style="--i:${i}">★</span>`).join('')}</div>` : wrong}
+        <div class="mth-grid">
+          <div><b>${g.score}<small>/${total}</small></b><span>إجابات صح</span></div>
+          <div><b>${g.fast}</b><span>⚡ إجابات سريعة</span></div>
+          <div><b>${n?avg.toFixed(1):'—'}<small>${n?' ث':''}</small></b><span>⏱️ متوسط وقتك</span></div>
+        </div>
+        ${g.won ? (reward>0 ? `<div class="match-result-points win">+${reward} نقطة 🎉</div>` : '') : `<div class="match-result-points lose">😢 حاول تاني وجاوب صح في كل الأسئلة</div>`}
+      </div>${foot}</div>`;
+  }
+  const C = 163.36, frac = Math.max(0, Math.min(1, g.timeLeft/g.timerSec));
+  const paused = (g.ready===false || !!fb);
+  const ringCls = g.timeLeft<=3 ? 'mth-low' : (frac<=0.5 ? 'mid' : '');
+  const ringStyle = paused ? `animation:none;stroke-dashoffset:${(C*(1-frac)).toFixed(2)}`
+                           : `--o0:${(C*(1-frac)).toFixed(2)};animation-duration:${Math.max(g.timeLeft,0)}s`;
+  const doneCount = g.qIndex-1 + ((fb && fb.ok) ? 1 : 0);
+  const seg = Array.from({length:total},(_,i)=>`<i class="${i<doneCount?'d':(i===g.qIndex-1?'c':'')}"></i>`).join('');
+  const an = g.anim; g.anim = false;
+  const pop = fb ? (fb.timeout ? `<div class="mth-pop badp">⏰ انتهى الوقت!</div>` : fb.ok ? (fb.fast ? `<div class="mth-pop fast">⚡ سريع! +1</div>` : `<div class="mth-pop good">✓ صح</div>`) : `<div class="mth-pop badp">✕ غلط</div>`) : '';
+  const opts = pr.options.map(o=>{
+    let cls = '';
+    if(fb){ cls = o===pr.answer ? 'ok' : (o===fb.picked ? 'bad' : 'dim'); }
+    return `<button type="button" class="mth-opt ${cls}" data-action="math-pick" data-val="${o}" ${fb?'disabled':''}>${o}</button>`;
+  }).join('');
+  return `<div class="mth" data-lv="${g.level}">${head}
+    <div class="mth-hud">
+      <div class="mth-stat"><span>سؤال</span><b>${Math.min(g.qIndex,total)}<small>/${total}</small></b></div>
+      <div class="mth-ring ${ringCls}">
+        <svg viewBox="0 0 60 60" aria-hidden="true"><circle class="tr" cx="30" cy="30" r="26"/><circle class="pg" cx="30" cy="30" r="26" style="${ringStyle}"/></svg>
+        <b id="math-timer">${Math.max(0,g.timeLeft)}</b>
+      </div>
+      <div class="mth-stat"><span>صح</span><b>${g.score}</b></div>
     </div>
-    ${g.finished ? `
-      <div class="match-result-card ${g.won?'win':'lose'}">
-        <div class="match-result-ico">${g.won?'🏆':'😅'}</div>
-        <div class="match-result-title">${g.won?'مبروك! جاوبت صح في كل الأسئلة':'خلصت الجولة'}</div>
-        <div class="match-result-sub">جاوبت صح في ${g.score} من ${total} سؤال</div>
-        ${g.won
-          ? `<div class="match-result-points win">+${reward} نقطة 🎉</div>`
-          : `<div class="match-result-points lose">😢 حاول تاني وجاوب صح في كل الأسئلة</div>`}
-      </div>` : `
-    <div class="numguess-display">${g.problem.a} ${g.problem.op} ${g.problem.b} = ؟</div>
-    <div class="rps-choices">
-      ${g.problem.options.map(o=>`<button type="button" class="rps-btn" data-action="math-pick" data-val="${o}">${o}</button>`).join('')}
-    </div>`}
-    <div class="hint" style="text-align:center;margin-top:10px;">${bestLine}</div>
-    <button type="button" class="btn btn-outline" style="width:100%;margin-top:12px;" data-action="math-reset">🔄 لعبة جديدة</button>
-  `;
+    <div class="mth-seg">${seg}</div>
+    <div class="mth-card ${an?'in':''} ${fb&&!fb.ok?'wrong':''} ${fb&&fb.ok?'right':''}">
+      ${pop}
+      <div class="mth-q">السؤال ${Math.min(g.qIndex,total)}</div>
+      <div class="mth-ex ${pr.text.length>9?'long':''}">${pr.text} <em>= ?</em></div>
+    </div>
+    <div class="mth-opts">${opts}</div>
+    ${foot}</div>`;
 }
 
 /* ============================= GAMES: CONNECT FOUR ============================= */
@@ -20697,7 +20895,7 @@ function doDominoChooseSide(side){
 
 /* ---------- طاولة الدومينو: مربعة كبيرة، والقطع بتلف زي الثعبان وبتصغّر لوحدها لو كترت ---------- */
 /* الوحدة = نص سمك القطعة: القطعة الأفقية 4×2 والرأسية 2×4، والصف ارتفاعه 2 */
-const DOMINO_GRIDS = [18,20,22,24,26,28,30,32,36,40,48];
+const DOMINO_GRIDS = [12,14,16,18,20,22,24,26,28,30,32,36,40,48];
 const DPIP_XY = {
   0:[], 1:[[50,50]], 2:[[28,28],[72,72]], 3:[[26,26],[50,50],[74,74]],
   4:[[28,28],[72,28],[28,72],[72,72]], 5:[[28,28],[72,28],[50,50],[28,72],[72,72]],
@@ -20722,6 +20920,14 @@ function dominoLayoutArm(n, dir, vdir, G, x0, yc){
   }
   return slots;
 }
+/* مسافة إضافية بين صفوف الطاولة (بالوحدات) - الورق نفسه وفاصل الجنب زي ما هم */
+const DOMINO_ROW_EXTRA = 0.5;
+function dominoStretchSlot(sl, yc, P){
+  const rt = Math.round((sl.y - yc)/2);
+  if(!sl.vert) return Object.assign({}, sl, {y: yc + rt*P});
+  const top = yc + rt*P, bottom = yc + (rt+1)*P + 2;   /* القطعة الرأسية بتربط صفين */
+  return Object.assign({}, sl, {y: (top+bottom)/2 - 2});
+}
 function dominoLayout(chain, origin){
   const n = chain.length;
   if(!n) return null;
@@ -20730,9 +20936,12 @@ function dominoLayout(chain, origin){
   for(let gi=0; gi<DOMINO_GRIDS.length; gi++){
     const G = DOMINO_GRIDS[gi];
     const x0 = (G-4)/2, yc = (G-2)/2;
-    const R = dominoLayoutArm(nr+1, 1, 1, G, x0, yc);
-    const L = dominoLayoutArm(nl+1, -1, -1, G, x0, yc);
+    const P = 2 + DOMINO_ROW_EXTRA;   /* ارتفاع الصف + المسافة الإضافية بين الصفوف */
+    const R = dominoLayoutArm(nr+1, 1, 1, G, x0, yc).map(sl=>dominoStretchSlot(sl,yc,P));
+    const L = dominoLayoutArm(nl+1, -1, -1, G, x0, yc).map(sl=>dominoStretchSlot(sl,yc,P));
     if(R.length<nr || L.length<nl) continue;
+    const inb = sl => sl.y>=0 && sl.y+sl.h<=G;
+    if(!R.slice(0,nr).every(inb) || !L.slice(0,nl).every(inb)) continue;
     const c0 = chain[o];
     const tiles = [{slot:{x:x0,y:yc,w:4,h:2,vert:false,nearFirst:true}, a:c0.left, b:c0.right, id:c0.id}];
     for(let k=0;k<nr;k++){
@@ -20743,18 +20952,34 @@ function dominoLayout(chain, origin){
       const c = chain[o-1-k], s = L[k];   // القطعة على الشمال: القريب = right
       tiles.push({slot:s, a: s.nearFirst?c.right:c.left, b: s.nearFirst?c.left:c.right, id:c.id});
     }
-    return {G, tiles, ghostR:R[nr]||null, ghostL:L[nl]||null};
+    return {G, tiles, ghostR:(R[nr]&&inb(R[nr]))?R[nr]:null, ghostL:(L[nl]&&inb(L[nl]))?L[nl]:null};
   }
   return null;
 }
 function dominoTileSvg(a,b,vert){
   const W = vert?100:200, H = vert?200:100;
   let s = `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">`;
-  s += vert ? `<line x1="12" y1="100" x2="88" y2="100" class="dt-div"/>` : `<line x1="100" y1="12" x2="100" y2="88" class="dt-div"/>`;
-  const put = (v,ox,oy)=>{ (DPIP_XY[v]||[]).forEach(p=>{ s += `<circle cx="${ox+p[0]}" cy="${oy+p[1]}" r="9.5" class="dt-pip p${v}"/>`; }); };
+  /* الفاصل الأسود (زي الصورة): حافة دهبية + بار أسود + لمعة */
+  const dv = (cls,o)=> vert
+    ? `<line x1="${10+o}" y1="${100}" x2="${90-o}" y2="${100}" class="${cls}"/>`
+    : `<line x1="${100}" y1="${10+o}" x2="${100}" y2="${90-o}" class="${cls}"/>`;
+  s += dv('dt-div-edge',0) + dv('dt-div',0);
+  s += vert
+    ? `<line x1="14" y1="98.3" x2="86" y2="98.3" class="dt-div-hi"/>`
+    : `<line x1="98.3" y1="14" x2="98.3" y2="86" class="dt-div-hi"/>`;
+  /* نقطة سودة لامعة بحلقة دهب */
+  const put = (v,ox,oy)=>{ (DPIP_XY[v]||[]).forEach(p=>{
+    const cx = ox+p[0], cy = oy+p[1];
+    s += `<circle cx="${cx}" cy="${cy}" r="11.4" class="dt-pip-ring"/>`
+       + `<circle cx="${cx}" cy="${cy}" r="10.4" class="dt-pip-recess"/>`
+       + `<circle cx="${cx}" cy="${cy}" r="9.8" class="dt-pip"/>`
+       + `<circle cx="${cx-1.2}" cy="${cy-1.6}" r="7.6" class="dt-pip-shade"/>`
+       + `<circle cx="${cx-1.8}" cy="${cy-2.4}" r="4.6" class="dt-pip-shade2"/>`
+       + `<ellipse cx="${cx+3.7}" cy="${cy-4}" rx="3.2" ry="1.7" transform="rotate(-45 ${cx+3.7} ${cy-4})" class="dt-pip-shine"/>`
+       + `<ellipse cx="${cx-4.3}" cy="${cy+4.3}" rx="2" ry="0.9" transform="rotate(-45 ${cx-4.3} ${cy+4.3})" class="dt-pip-glint"/>`;
+  }); };
   put(a,0,0);
   put(b, vert?0:100, vert?100:0);
-  s += `<circle cx="${vert?50:100}" cy="${vert?100:50}" r="${a===b?6:4.5}" class="dt-spin"/>`;
   return s + '</svg>';
 }
 function dominoGhostSvg(slot, val){
@@ -20776,13 +21001,13 @@ function dominoBoardHtml(chain, origin, o){
   const G = lay.G;
   const p = v => (v/G*100).toFixed(3)+'%';
   const pos = s => `left:${p(s.x)};top:${p(s.y)};width:${p(s.w)};height:${p(s.h)};`;
-  const pad = (20/G).toFixed(3)+'%';   /* مسافة بين القطع = خُمس سمك القطعة */
+  const padY = (20/G).toFixed(3)+'%', padX = (11/G).toFixed(3)+'%';   /* رأسي زي الأول، وأفقي (جنب بعض) أضيق */
   let html = lay.tiles.map(t=>{
     const isNew = o.newId && t.id===o.newId;
-    return `<div class="dt ${t.slot.vert?'v':'h'}${isNew?' new':''}" style="${pos(t.slot)}padding:${pad};"><div class="dt-in">${dominoTileSvg(t.a,t.b,t.slot.vert)}</div></div>`;
+    return `<div class="dt ${t.slot.vert?'v':'h'}${isNew?' new':''}" style="${pos(t.slot)}padding:${padY} ${padX};"><div class="dt-in">${dominoTileSvg(t.a,t.b,t.slot.vert)}</div></div>`;
   }).join('');
   if(o.ghosts && o.ends){
-    const ghost = (slot, side, val)=> slot ? `<div class="dtg-wrap" style="${pos(slot)}padding:${pad};"><div class="dt-ghost ${side==='left'?'gl':'gr'}${o.pick?' pick':''}" ${o.pick?`data-action="${o.sideAction}" data-side="${side}"`:''}>${dominoGhostSvg(slot,val)}</div></div>` : '';
+    const ghost = (slot, side, val)=> slot ? `<div class="dtg-wrap" style="${pos(slot)}padding:${padY} ${padX};"><div class="dt-ghost ${side==='left'?'gl':'gr'}${o.pick?' pick':''}" ${o.pick?`data-action="${o.sideAction}" data-side="${side}"`:''}>${dominoGhostSvg(slot,val)}</div></div>` : '';
     html += ghost(lay.ghostL, 'left', o.ends.left) + ghost(lay.ghostR, 'right', o.ends.right);
   }
   return `<div class="domino-board"><div class="db-in">${html}</div></div>`;
@@ -20856,7 +21081,7 @@ function renderDominoGame(){
     const dis = (isHumanInteractive && playable) ? '' : 'disabled';
     const fresh = (g.lastDrawn && t===g.lastDrawn) ? ' fresh' : '';
     const pop = (drawnT && t===drawnT) ? ' drawn' : '';
-    return `<button type="button" class="domino-tile ${playable?'playable':''}${fresh}${pop}" data-action="domino-tile" data-idx="${i}" ${dis}>${dominoHalfHtml(t.a)}${dominoHalfHtml(t.b)}</button>`;
+    return `<button type="button" class="domino-tile ${playable?'playable':''}${fresh}${pop}" data-action="domino-tile" data-idx="${i}" ${dis}><span class="dh-svg">${dominoTileSvg(t.a,t.b,true)}</span></button>`;
   }).join('');
   let statusText;
   if(g.winner==='draw') statusText = g.blocked ? '🤝 اتقفلت اللعبة وتعادلتوا في النقط!' : '🤝 تعادل!';
@@ -28154,7 +28379,7 @@ function renderRoomDomino(){
     const sides = (isMyTurn && room.pendingIdx==null) ? dominoPlayableSides(t, room.ends) : [];
     const playable = sides.length>0;
     const dis = (isMyTurn && room.pendingIdx==null && playable) ? '' : 'disabled';
-    return `<button type="button" class="domino-tile ${playable?'playable':''}" data-action="room-domino-tile" data-idx="${i}" ${dis}>${dominoHalfHtml(t.a)}${dominoHalfHtml(t.b)}</button>`;
+    return `<button type="button" class="domino-tile ${playable?'playable':''}" data-action="room-domino-tile" data-idx="${i}" ${dis}><span class="dh-svg">${dominoTileSvg(t.a,t.b,true)}</span></button>`;
   }).join('');
   let statusText;
   if(room.winner==='draw') statusText = room.blocked ? '🤝 اتقفلت اللعبة وتعادلتوا في النقط!' : '🤝 تعادل!';
@@ -31503,7 +31728,7 @@ function render(){
   if(state.view==='splash'){ attachLampDrag(); }
   if(state.view==='gallery'){ attachGalleryEvents(); }
   if(state.view==='game-memory'){ startMemoryTicker(); } else { stopMemoryTicker(); }
-  if(state.view==='game-math' && state.mathgame && !state.mathgame.finished){ startMathTimer(); } else { stopMathTimer(); }
+  if(state.view==='game-math' && state.mathgame && !state.mathgame.finished && state.mathgame.ready!==false){ startMathTimer(); } else { stopMathTimer(); }
   if(typeof busAfterRender==='function'){ busAfterRender(); }
   if(state.view==='room-mystery' && GAME_ROOMS[state.roomCode] && GAME_ROOMS[state.roomCode].mystery && !GAME_ROOMS[state.roomCode].mystery.finished){ startMysteryTimer(); } else { stopMysteryTimer(); }
   if(String(state.view).indexOf('room-')===0 && state.roomCode){ if(!roomPollInterval) startRoomPolling(); roomMaybeIntro(); } else { stopRoomPolling(); }
@@ -34315,7 +34540,7 @@ document.addEventListener('click', (e)=>{
     else if(gid==='reflex') initReflexGame();
     else if(gid==='numguess'){ initNumberGame(); setTimeout(showNumLevelDialog,350); }
     else if(gid==='placemem'){ initPlaceMemGame(); setTimeout(showPmLevelDialog,350); }
-    else if(gid==='math') initMathGame();
+    else if(gid==='math'){ initMathGame(null,true); setTimeout(showMathLevelDialog,350); }
     else if(gid==='uno'){ initUnoGame(); unoRunBots(state.uno, true); }
     else if(gid==='chess'){ initChessGame(); }
     else if(gid==='checkers'){ initCheckersGame(); }
@@ -34532,6 +34757,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='numguess-level'){ initNumberGame(el.dataset.level); render(); }
   else if(action==='math-pick'){ doMathPick(el.dataset.val); }
   else if(action==='math-reset'){ initMathGame(); render(); }
+  else if(action==='math-level'){ showMathLevelDialog(); }
   else if(action==='uno-play'){ doUnoPlay(el.dataset.cid); }
   else if(action==='uno-draw'){ doUnoDraw(); }
   else if(action==='uno-endturn'){ doUnoEndTurn(); }
@@ -45925,7 +46151,7 @@ html[data-theme="dark"] body .su-meter.full .msg, html[data-theme="dark"] body .
   var EXIT_ACTIONS = {'billiards-close':'billiards','stack-close':'stack','cube-close':'cube','blk-close':'blocky','darts-close':'darts','bowling-close':'bowling','mil-close':'millionaire'};
   var bypass = false;
   document.addEventListener('click', function(e){
-    if(bypass) return;
+    if(bypass || e.isTrusted===false) return;
     var t = e.target; if(!t || !t.closest) return;
     var el = t.closest('[data-action],[data-rw],[data-cm]'); if(!el) return;
     var game = null, sel = null;
@@ -45952,5 +46178,112 @@ html[data-theme="dark"] body .su-meter.full .msg, html[data-theme="dark"] body .
 })();
 </script>
 
+<style id="mem-card-style">
+/* ===== كروت لعبة الذاكرة: ظهر أزرق بالمخ + وش كريمي ===== */
+.memory-card .mc-inner{border-radius:17px}
+.memory-card .mc-back,.memory-card .mc-front{border-radius:17px;box-sizing:border-box;border:5px solid #1b2347;overflow:hidden}
+.memory-card .mc-back{
+  background:
+    repeating-linear-gradient(45deg,rgba(255,255,255,.075) 0 1px,transparent 1px 13px),
+    repeating-linear-gradient(-45deg,rgba(255,255,255,.075) 0 1px,transparent 1px 13px),
+    linear-gradient(160deg,#3f74f2,#2149c2 58%,#183593);
+  box-shadow:inset 0 0 0 2px #6d9bff, inset 0 0 0 4px rgba(14,30,100,.55), inset 0 -12px 18px rgba(8,20,80,.35), 0 0 0 1px rgba(255,255,255,.1)}
+.memory-card .mc-back::before{content:none}
+.memory-card .mc-back::after{content:'';position:absolute;left:50%;top:50%;width:84%;aspect-ratio:1;height:auto;transform:translate(-50%,-50%);border:0;border-radius:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='42%25' r='60%25'%3E%3Cstop offset='0' stop-color='%231b3a9c'/%3E%3Cstop offset='1' stop-color='%230b1d63'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cg stroke='%237fb0ff' stroke-linecap='round' opacity='.75' stroke-width='2.2'%3E%3Cpath d='M50 6v6M50 88v6M6 50h6M88 50h6M19 19l4 4M77 77l4 4M81 19l-4 4M23 77l-4 4'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='33' fill='url%28%23g%29' stroke='%23123a8f' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='33' fill='none' stroke='%232f5fd0' stroke-width='1'/%3E%3Cg fill='none' stroke='%239cc4ff' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M49 36C49 31 44 29 40 31C35 29 30 33 31 38C27 40 27 46 30 48C27 51 29 57 33 58C34 63 41 64 44 61C47 64 49 62 49 59Z'/%3E%3Cpath d='M51 36C51 31 56 29 60 31C65 29 70 33 69 38C73 40 73 46 70 48C73 51 71 57 67 58C66 63 59 64 56 61C53 64 51 62 51 59Z'/%3E%3Cpath d='M36 40C38 42 41 41 42 39M33 50C36 49 38 51 40 50M39 55C41 54 44 55 45 53M64 40C62 42 59 41 58 39M67 50C64 49 62 51 60 50M61 55C59 54 56 55 55 53' stroke-width='1.8'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;box-shadow:none}
+.memory-card .mc-front{font-size:36px;color:#2a2a2a;text-shadow:0 3px 4px rgba(90,55,10,.35);
+  border-color:#24242c;
+  background:radial-gradient(circle at 50% 38%,#fff6dc 0,#f6e5b8 62%,#eed59b 100%);
+  box-shadow:inset 0 0 0 2px #e2c88c, inset 0 -10px 16px rgba(160,115,40,.2), 0 0 0 1px rgba(255,255,255,.1)}
+.memory-card .mc-front::before{content:'';position:absolute;z-index:-1;left:50%;bottom:13%;width:54%;height:9%;transform:translateX(-50%);border-radius:50%;
+  background:radial-gradient(ellipse,rgba(140,95,35,.38),transparent 70%)}
+.memory-card .mc-front::after,.memory-card.matched .mc-front::after{content:'';position:absolute;z-index:-1;inset:0;width:auto;top:0;bottom:0;left:0;transform:none;animation:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%23f08a2c' stroke-width='2.8' stroke-linecap='round' opacity='.85'%3E%3Cpath d='M8 27l5 3M13 17l5 5M23 10l2 6M92 27l-5 3M87 17l-5 5M77 10l-2 6'/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat}
+.memory-card.flipped:not(.matched) .mc-front{border-color:#24242c;box-shadow:inset 0 0 0 2px #f4b740,0 0 0 3px rgba(244,183,64,.35),0 10px 22px rgba(0,0,0,.4)}
+.memory-card.mc-hint:not(.matched) .mc-front{box-shadow:inset 0 0 0 2px #7C9CFF,0 0 0 3px rgba(124,156,255,.4),0 0 22px rgba(124,156,255,.85)}
+.memory-card.matched .mc-front{opacity:1;border:5px solid #1f3d33;
+  background:radial-gradient(circle at 50% 38%,#f4ffe9 0,#dff1c9 62%,#c9e6ad 100%);
+  box-shadow:inset 0 0 0 2px #2fbf86,0 0 14px rgba(47,191,134,.45);text-shadow:0 3px 4px rgba(20,70,40,.3)}
+</style>
+<style id="math-lv-style">
+.mth{--ac:#4FACFE;--ac2:rgba(79,172,254,.2)}
+.mth[data-lv="easy"]{--ac:#5FE0A4;--ac2:rgba(95,224,164,.2)}
+.mth[data-lv="hard"]{--ac:#FF9F43;--ac2:rgba(255,159,67,.2)}
+.mth[data-lv="expert"]{--ac:#FF6B6B;--ac2:rgba(255,107,107,.22)}
+.mth-chip{display:table;margin:-2px auto 10px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;color:var(--ac);border:1px solid color-mix(in srgb,var(--ac) 45%,transparent);background:var(--ac2)}
+.mth-hud{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 10px}
+.mth-stat{flex:1;text-align:center;padding:8px 6px;border-radius:16px;background:var(--surface);border:1px solid var(--border)}
+.mth-stat span{display:block;font-size:11px;font-weight:700;color:var(--text-muted)}
+.mth-stat b{font-family:'Cairo',sans-serif;font-size:21px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.3}
+.mth-stat small{font-size:12px;font-weight:700;color:var(--text-muted)}
+.mth-ring{position:relative;width:72px;height:72px;flex:none}
+.mth-ring svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.mth-ring .tr{fill:none;stroke:rgba(127,127,160,.25);stroke-width:5}
+.mth-ring .pg{fill:none;stroke:var(--ac);stroke-width:5;stroke-linecap:round;stroke-dasharray:163.36;filter:drop-shadow(0 0 4px var(--ac));animation:mthRing linear forwards}
+.mth-ring.mid .pg{stroke:#F4B740}
+.mth-ring.mth-low .pg{stroke:#FF6B6B}
+.mth-ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;font-weight:900;font-size:24px;color:var(--text);font-variant-numeric:tabular-nums}
+.mth-ring.mth-low b{color:#FF6B6B;animation:mthPulse .5s ease-in-out infinite alternate}
+@keyframes mthRing{from{stroke-dashoffset:var(--o0,0)}to{stroke-dashoffset:163.36}}
+@keyframes mthPulse{to{transform:scale(1.16)}}
+.mth-seg{display:flex;gap:3px;margin:0 4px 12px}
+.mth-seg i{flex:1;height:6px;border-radius:99px;background:rgba(127,127,160,.25);transition:background .3s}
+.mth-seg i.d{background:var(--ac);box-shadow:0 0 6px var(--ac2)}
+.mth-seg i.c{background:color-mix(in srgb,var(--ac) 55%,transparent);animation:mthBlink .9s ease-in-out infinite alternate}
+@keyframes mthBlink{to{opacity:.4}}
+.mth-card{position:relative;overflow:hidden;border-radius:26px;padding:26px 12px 28px;text-align:center;color:#fff;
+  background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--ac) 26%,#161a46) 0,#12153a 55%,#0b0e27 100%);
+  border:1.5px solid color-mix(in srgb,var(--ac) 55%,transparent);
+  box-shadow:0 18px 40px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.06),0 0 28px var(--ac2);transition:box-shadow .2s,border-color .2s}
+.mth-card::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 1px,transparent 1px 22px);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 45%,#000 0,transparent 78%);mask-image:radial-gradient(ellipse at 50% 45%,#000 0,transparent 78%)}
+.mth-card::after{content:'';position:absolute;left:-30%;top:-70%;width:160%;height:110%;pointer-events:none;background:radial-gradient(circle,var(--ac2),transparent 60%);animation:mthDrift 6s ease-in-out infinite alternate}
+@keyframes mthDrift{to{transform:translateX(14%)}}
+.mth-card.in{animation:mthIn .4s cubic-bezier(.2,1.2,.3,1) both}
+@keyframes mthIn{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}
+.mth-card.right{border-color:#34d399;box-shadow:0 18px 40px rgba(0,0,0,.35),0 0 34px rgba(52,211,153,.55)}
+.mth-card.wrong{border-color:#ff6b6b;box-shadow:0 18px 40px rgba(0,0,0,.35),0 0 34px rgba(255,107,107,.55);animation:mthShake .5s}
+.mth-q{position:relative;z-index:1;font-size:12px;font-weight:800;letter-spacing:.3px;color:var(--ac);margin-bottom:4px}
+.mth-ex{position:relative;z-index:1;direction:ltr;font-family:'Cairo',sans-serif;font-weight:900;font-size:50px;line-height:1.25;text-shadow:0 4px 18px rgba(0,0,0,.5);font-variant-numeric:tabular-nums}
+.mth-ex.long{font-size:38px}
+.mth-ex em{font-style:normal;color:var(--ac)}
+.mth-pop{position:absolute;z-index:2;left:50%;top:10px;transform:translateX(-50%);padding:4px 13px;border-radius:99px;font-size:12.5px;font-weight:900;white-space:nowrap;animation:mthPop 1s ease both}
+.mth-pop.good{background:#12b886;color:#fff}
+.mth-pop.fast{background:linear-gradient(90deg,#F4B740,#FF9F43);color:#2a1a00}
+.mth-pop.badp{background:#e03e3e;color:#fff}
+@keyframes mthPop{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}22%{opacity:1;transform:translate(-50%,0) scale(1.08)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+.mth-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.mth-opt{position:relative;min-height:76px;border:0;border-radius:20px;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:900;font-size:28px;color:var(--text);font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,var(--surface-2),var(--surface));
+  box-shadow:0 5px 0 color-mix(in srgb,var(--ac) 42%,#000),0 12px 18px rgba(0,0,0,.25),inset 0 0 0 1.5px color-mix(in srgb,var(--ac) 50%,transparent);
+  transition:transform .1s,box-shadow .1s,opacity .2s;-webkit-tap-highlight-color:transparent}
+.mth-opt:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 color-mix(in srgb,var(--ac) 42%,#000),0 4px 8px rgba(0,0,0,.25),inset 0 0 0 1.5px color-mix(in srgb,var(--ac) 50%,transparent)}
+.mth-opt:disabled{cursor:default}
+.mth-opt.ok{color:#fff;background:linear-gradient(180deg,#34d399,#0f9d6a);box-shadow:0 5px 0 #0a6b49,0 0 26px rgba(52,211,153,.6);animation:mthOk .45s ease}
+.mth-opt.bad{color:#fff;background:linear-gradient(180deg,#ff8a8a,#e03e3e);box-shadow:0 5px 0 #9c2323,0 0 22px rgba(255,107,107,.5);animation:mthShake .5s}
+.mth-opt.dim{opacity:.35}
+.mth-opt.ok::after,.mth-opt.bad::after{position:absolute;top:6px;inset-inline-end:10px;font-size:15px;font-weight:900}
+.mth-opt.ok::after{content:'✓'}.mth-opt.bad::after{content:'✕'}
+@keyframes mthOk{0%{transform:scale(1)}40%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes mthShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.mth-res{position:relative;border-radius:26px;padding:22px 14px 18px;text-align:center;color:#fff;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--ac) 26%,#161a46) 0,#12153a 60%,#0b0e27 100%);border:1.5px solid color-mix(in srgb,var(--ac) 55%,transparent);box-shadow:0 18px 40px rgba(0,0,0,.35),0 0 28px var(--ac2);animation:mthIn .45s cubic-bezier(.2,1.2,.3,1) both}
+.mth-res.lose{border-color:rgba(255,107,107,.5)}
+.mth-res-ico{font-size:54px;line-height:1;animation:mthOk .7s .15s ease both}
+.mth-res-title{font-family:'Cairo',sans-serif;font-weight:900;font-size:19px;margin:8px 0 6px}
+.mth-stars{display:flex;justify-content:center;gap:6px;margin:4px 0 10px}
+.mth-stars span{font-size:34px;line-height:1;color:rgba(255,255,255,.2);transform:scale(.6);opacity:0;animation:mthStar .5s calc(.25s + var(--i)*.2s) cubic-bezier(.2,1.6,.3,1) both}
+.mth-stars span.on{color:#F4B740;text-shadow:0 0 14px rgba(244,183,64,.7)}
+@keyframes mthStar{to{transform:none;opacity:1}}
+.mth-ans{font-size:13px;font-weight:700;color:#cfd3f5;margin:2px 0 12px}
+.mth-ans b{color:#5FE0A4;font-size:16px}
+.mth-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 10px}
+.mth-grid>div{padding:10px 4px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
+.mth-grid b{display:block;font-family:'Cairo',sans-serif;font-size:21px;font-weight:900;font-variant-numeric:tabular-nums}
+.mth-grid small{font-size:12px;font-weight:700;color:#aeb6d4}
+.mth-grid span{display:block;font-size:10.5px;font-weight:700;color:#aeb6d4;margin-top:2px}
+@media (prefers-reduced-motion:reduce){.mth-card,.mth-card::after,.mth-opt,.mth-pop,.mth-res,.mth-res-ico,.mth-stars span,.mth-ring.mth-low b,.mth-seg i.c{animation:none!important}.mth-stars span{opacity:1;transform:none}}
+</style>
 </body>
 </html>
