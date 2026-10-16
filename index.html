@@ -4712,12 +4712,31 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   @keyframes wlcGlow{ 0%,100%{ filter:drop-shadow(0 0 6px rgba(227,201,143,.18)); } 50%{ filter:drop-shadow(0 0 22px rgba(227,201,143,.55)); } }
   .wlc-on .splash-title,.wlc-on .splash-sub{ display:none; }
   .wlc-txt{ margin-top:18px; padding:0 18px; text-align:center; color:#FCF9F3; font-family:'Cairo','Tajawal',sans-serif; }
-  .wlc-l{ display:block; width:max-content; max-width:100%; margin:0 auto; white-space:nowrap; font-weight:800; font-size:clamp(14px,4.4vw,19px); line-height:1.9;
-    clip-path:inset(0 0 0 100%); animation:wlcType calc(var(--n)*70ms) steps(var(--n),end) forwards; }
-  .wlc-l2{ font-size:clamp(12px,3.8vw,16px); font-weight:700; color:#E3D8C6; }
+  .wlc-l{ display:block; width:max-content; max-width:100%; margin:0 auto; white-space:nowrap; font-weight:800; font-size:clamp(17px,5.5vw,24px); line-height:1.9;
+    clip-path:inset(0 0 0 100%); animation:wlcType calc(var(--n)*38ms) steps(var(--n),end) forwards; }
+  .wlc-l2{ font-size:clamp(14.5px,4.8vw,20px); font-weight:700; color:#E3D8C6; }
   @keyframes wlcType{ to{ clip-path:inset(0 0 0 0); } }
   .wlc-line{ display:block; width:0; height:2px; margin:10px auto 0; border-radius:2px; background:linear-gradient(90deg,transparent,#E3C98F,transparent); animation:wlcLine 1s ease forwards; }
   @keyframes wlcLine{ to{ width:140px; } }
+
+  /* الدخول: البصمة أنزل شوية + ظهور احترافي بعد انتهاء الكتابة */
+  .wlc-on .fp-wrap{ margin-top:76px; }
+  .fp-reveal .fp-btn{ animation:fpPop 1s cubic-bezier(.2,.9,.25,1.15) var(--fpd,0s) backwards; }
+  .fp-reveal .fp-hint{ animation:fpHintIn .7s ease calc(var(--fpd,0s) + .55s) backwards; }
+  .fp-reveal .fp-btn::before{ content:''; position:absolute; inset:-7px; border-radius:50%; pointer-events:none;
+    border:2px solid rgba(54,224,255,.7); box-shadow:0 0 18px rgba(54,224,255,.45);
+    animation:fpShock 1.3s cubic-bezier(.2,.7,.3,1) calc(var(--fpd,0s) + .15s) 2 both; }
+  .fp-reveal .fp-face::after{ content:''; position:absolute; left:0; right:0; height:34%; top:-40%; pointer-events:none;
+    background:linear-gradient(180deg,rgba(54,224,255,0),rgba(54,224,255,.38),rgba(54,224,255,0));
+    animation:fpScan 1.5s ease-in-out calc(var(--fpd,0s) + .5s) 2 both; }
+  .fp-reveal .fp-ring-bg{ animation:fpBreath 2.8s ease-in-out calc(var(--fpd,0s) + 1.6s) infinite; }
+  @keyframes fpPop{ 0%{ opacity:0; transform:translateY(34px) scale(.45); filter:blur(12px); pointer-events:none; }
+    55%{ opacity:1; filter:blur(0); } 78%{ transform:translateY(-4px) scale(1.07); } 100%{ opacity:1; transform:none; filter:none; pointer-events:auto; } }
+  @keyframes fpShock{ 0%{ transform:scale(.9); opacity:.9; } 100%{ transform:scale(1.9); opacity:0; } }
+  @keyframes fpScan{ 0%{ top:-40%; opacity:0; } 15%{ opacity:1; } 85%{ opacity:1; } 100%{ top:105%; opacity:0; } }
+  @keyframes fpHintIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:.85; transform:none; } }
+  @keyframes fpBreath{ 0%,100%{ stroke:rgba(255,255,255,.12); } 50%{ stroke:rgba(54,224,255,.45); } }
+  @media (prefers-reduced-motion:reduce){ .fp-reveal .fp-btn,.fp-reveal .fp-hint,.fp-reveal .fp-btn::before,.fp-reveal .fp-face::after,.fp-reveal .fp-ring-bg{ animation:none; } }
   @media (prefers-reduced-motion:reduce){ .wlc-pop,.wlc-l,.wlc-line{ animation:none; } .wlc-l{ clip-path:none; } .wlc-line{ width:140px; } }
   .gx-label{ margin:4px 4px 10px; font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:#E3D8C6; display:flex; align-items:center; gap:10px; }
   .gx-label::after{ content:""; flex:1; height:1px; background:linear-gradient(90deg,rgba(233,219,192,.3),transparent); }
@@ -11674,7 +11693,7 @@ function showDeviceKickedOverlay(){
   });
   document.getElementById('device-kicked-logout').addEventListener('click', ()=>{
     backdrop.remove();
-    forgetLogin(); stopAmbient(); state = FRESH_STATE(); render();
+    forgetLogin(); stopAmbient(); state = FRESH_STATE(); state.view='login'; render();
   });
 }
 
@@ -11867,12 +11886,14 @@ function renderSplash(){
   let wl=false; try{ wl = matchMedia('(display-mode: standalone)').matches || navigator.standalone===true || /[?&]welcome=1/.test(location.search); }catch(e){}
   if(wl && !window.__wlcT0) window.__wlcT0 = Date.now();
   const el = wl ? (Date.now()-window.__wlcT0)/1000 : 0, dl = d => (d-el).toFixed(2)+'s';
+  const WLC_CPS = 0.038; /* سرعة الكتابة: ثواني للحرف */
   const L1='أهلاً ومرحبًا بكم في اجتماع جامعة', L2='وخريجين بكنيسة الأنبا كاراس السائح بتلة';
+  const _t1=1.0, _t2=_t1+L1.length*WLC_CPS+0.2, _tl=_t2+L2.length*WLC_CPS+0.15, _tfp=_tl+0.55;
   const welcome = wl ? `
       <div class="wlc-txt">
-        <div class="wlc-l" style="--n:${L1.length}; animation-delay:${dl(1.3)}">${L1}</div>
-        <div class="wlc-l wlc-l2" style="--n:${L2.length}; animation-delay:${dl(3.6)}">${L2}</div>
-        <i class="wlc-line" style="animation-delay:${dl(6.4)}"></i>
+        <div class="wlc-l" style="--n:${L1.length}; animation-delay:${dl(_t1)}">${L1}</div>
+        <div class="wlc-l wlc-l2" style="--n:${L2.length}; animation-delay:${dl(_t2)}">${L2}</div>
+        <i class="wlc-line" style="animation-delay:${dl(_tl)}"></i>
       </div>` : '';
   return `
     <div class="splash-scene ${wl?'wlc-on':''} ${state.splashLeaving?'leave':''}">
@@ -11886,7 +11907,7 @@ function renderSplash(){
       ${welcome}
       <div class="splash-title">اجتماع جامعة</div>
       <div class="splash-sub">بوابة المشاركين</div>
-      <div class="fp-wrap">
+      <div class="fp-wrap ${wl?'fp-reveal':''}" ${wl?`style="--fpd:${dl(_tfp)}"`:''}>
         <button type="button" class="fp-btn" id="fp-btn" aria-label="اضغط مطوّلًا للدخول">
           <svg class="fp-ring" viewBox="0 0 100 100" aria-hidden="true"><circle class="fp-ring-bg" cx="50" cy="50" r="46"/><circle class="fp-ring-fg" id="fp-ring-fg" cx="50" cy="50" r="46"/></svg>
           <span class="fp-face" id="fp-face"><span class="fp-print fp-base"></span><span class="fp-print fp-lit" id="fp-lit"></span><span class="fp-rips" id="fp-rips"></span></span>
@@ -12475,7 +12496,7 @@ function radialItemTap(el, page, isLogout){
   SND.nav();
   setTimeout(()=>{
     state.radialMenuOpen = false;
-    if(isLogout){ forgetLogin(); stopAmbient(); state = FRESH_STATE(); render(); }
+    if(isLogout){ forgetLogin(); stopAmbient(); state = FRESH_STATE(); state.view='login'; render(); }
     else { go(page); }
   }, 550);
 }
@@ -34896,7 +34917,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='del-address-sug'){ doDelAddressSug(+el.dataset.i); }
   else if(action==='admin-reset-pass'){ doAdminResetPass(el.dataset.pid); }
   else if(action==='back'){ goBack(); }
-  else if(action==='logout'){ const outPid = state.pid; forgetLogin(); stopAmbient(); state = FRESH_STATE(); render(); if(outPid) clearDeviceSession(outPid); }
+  else if(action==='logout'){ const outPid = state.pid; forgetLogin(); stopAmbient(); state = FRESH_STATE(); state.view='login'; render(); if(outPid) clearDeviceSession(outPid); }
   else if(action==='open-scan'){ openScanModal(el.dataset.mode || 'checkin', el.dataset.session); }
   else if(action.indexOf('att-')===0){ attHandleAction(action, el); }
   else if(action==='close-scan'){ closeScanModal(); }
