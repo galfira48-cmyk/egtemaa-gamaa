@@ -12366,7 +12366,7 @@ function renderNavTiles(){
 }
 /* ============================= RENDER: CAPABILITIES (ALL FEATURES) PAGE ============================= */
 function renderCapabilitiesPage(){
-  const all = [...NAV_TILE_ITEMS.filter(it=>it.page!=='settings'), ...NAV_DOCK_ITEMS];
+  const all = (window.capOrdered||(x=>x))([...NAV_TILE_ITEMS.filter(it=>it.page!=='settings'), ...NAV_DOCK_ITEMS]);
   const tiles = all.map(it=>{
     const bg = (!it.color || it.color==='transparent') ? 'linear-gradient(145deg,#FFB86B,#FF6B9D)' : it.color;
     const sub = it.subKey ? tr(it.subKey) : '';
@@ -12387,7 +12387,7 @@ function renderCapabilitiesPage(){
   `;
 }
 function renderProNavList(){
-  const mainItems = [...NAV_TILE_ITEMS.filter(it=>it.page!=='settings'), ...NAV_DOCK_ITEMS];
+  const mainItems = (window.capOrdered||(x=>x))([...NAV_TILE_ITEMS.filter(it=>it.page!=='settings'), ...NAV_DOCK_ITEMS]);
   const rows = mainItems.map((it,i)=>`
     <button type="button" class="pro-row ${i===0?'active-row':''}" data-action="tile-nav" data-page="${it.page}">
       <span class="pro-row-lab">${tr(it.labelKey)}</span>
@@ -12408,7 +12408,7 @@ function renderProNavList(){
   </div>`;
 }
 function radialMenuItemsList(){
-  const mainItems = [...NAV_TILE_ITEMS.filter(it=>it.page!=='settings'), ...NAV_DOCK_ITEMS];
+  const mainItems = (window.capOrdered||(x=>x))([...NAV_TILE_ITEMS.filter(it=>it.page!=='settings'), ...NAV_DOCK_ITEMS]);
   return [...mainItems, {page:null, icon:'🚪', labelKey:'logout', color:'linear-gradient(145deg,#FF6B6B,#E85F3E)', logout:true}];
 }
 function renderRadialMenu(){
@@ -44157,7 +44157,7 @@ load(true);
 (function(){
 'use strict';
 if(window.__booking) return; window.__booking = 1;
-var KEY = 'glavera-booking-v1', KEY2 = 'glavera-about-v1', WKEY = 'glavera-visa-wallet';
+var KEY = 'glavera-booking-v1', KEY2 = 'glavera-about-v1', WKEY = 'glavera-visa-wallet', KEY3 = 'glavera-glrank-v1', KEY4 = 'glavera-cap-order-v1';
 var DEF_CATS = [
   {id:'c_eve',  title:'أمسية', icon:'🌙', color:'linear-gradient(145deg,#7A5CFF,#3A24B8)'},
   {id:'c_trip', title:'رحلة',  icon:'🚌', color:'linear-gradient(145deg,#2FD0C0,#1479C9)'},
@@ -44165,7 +44165,7 @@ var DEF_CATS = [
   {id:'c_conf', title:'مؤتمر', icon:'🎤', color:'linear-gradient(145deg,#F1B53F,#D9622B)'}
 ];
 var PALETTE = ['linear-gradient(145deg,#7A5CFF,#3A24B8)','linear-gradient(145deg,#2FD0C0,#1479C9)','linear-gradient(145deg,#FF9A5C,#E8458C)','linear-gradient(145deg,#F1B53F,#D9622B)','linear-gradient(145deg,#5FE0A4,#1C8F6B)','linear-gradient(145deg,#FF7AB8,#8A4DFF)'];
-var B = {cats:JSON.parse(JSON.stringify(DEF_CATS)), events:[], about:{tagline:'', about:'', sections:[]}, imgs:{}, imgReq:{}, t:0, sig:'', p:null};
+var B = {cats:JSON.parse(JSON.stringify(DEF_CATS)), events:[], about:{tagline:'', about:'', sections:[]}, imgs:{}, imgReq:{}, rank:{}, t:0, sig:'', p:null};
 var PI = {cover:null, photos:[]};   /* صور فورم إضافة فعالية (لسه ما اتحفظتش) */
 var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
 if(typeof VISA_TX_META!=='undefined'){
@@ -44180,16 +44180,16 @@ function ju(k, fn){
   catch(e){ return Promise.resolve(null); }
 }
 function base(o){ o = o || {}; if(!Array.isArray(o.cats)) o.cats = JSON.parse(JSON.stringify(DEF_CATS)); o.events = o.events || []; return o; }
-function baseAbout(o){ o = o || {}; o.tagline = o.tagline || ''; o.about = o.about || ''; o.sections = o.sections || []; return o; }
-function relevant(){ return state.view==='book' || state.view==='glavera' || (state.view==='admin' && state.adminUnlocked && (state.adminTab==='book' || state.adminTab==='glavera')); }
+function baseAbout(o){ o = o || {}; o.tagline = o.tagline || ''; o.about = o.about || ''; o.sections = o.sections || []; o.eds = o.eds || {}; return o; }
+function relevant(){ return state.view==='capabilities' || (state.view==='admin' && state.adminUnlocked && state.adminTab==='caporder') || state.view==='book' || state.view==='glavera' || (state.view==='admin' && state.adminUnlocked && (state.adminTab==='book' || state.adminTab==='glavera')); }
 function safeRender(){ var el = document.activeElement; if(!(el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) render(); }
 async function doLoad(){
   try{
-    var o = await jg(KEY, null), a = await jg(KEY2, null);
+    var o = await jg(KEY, null), a = await jg(KEY2, null), rk = await jg(KEY3, null); B.rank = (rk && typeof rk==='object') ? rk : {}; var co = await jg(KEY4, null); B.capOrder = Array.isArray(co) ? co : []; window.__capOrder = B.capOrder;
     B.cats = (o && Array.isArray(o.cats)) ? o.cats : JSON.parse(JSON.stringify(DEF_CATS));
     B.events = (o && o.events) || [];
     B.about = baseAbout(a);
-    var sig = JSON.stringify([B.cats, B.events, B.about]), ch = sig!==B.sig; B.sig = sig; B.t = Date.now();
+    var sig = JSON.stringify([B.cats, B.events, B.about, B.rank, B.capOrder]), ch = sig!==B.sig; B.sig = sig; B.t = Date.now();
     if(ch && relevant()) safeRender();
     runReminders();
   }catch(e){ console.error('booking load', e); }
@@ -44348,17 +44348,64 @@ window.FXVIEWS.book = function(){
 };
 
 /* ============================ جلافيرا ============================ */
+/* ---- جلافيرا 1-4: خانات الإصدارات، وجلافيرا 4 فيها حجز المؤتمر ---- */
+var GL_EDS = [
+  {n:1, num:'١', ico:'🌱', color:'linear-gradient(145deg,#7A5CFF,#3A24B8)'},
+  {n:2, num:'٢', ico:'🌿', color:'linear-gradient(145deg,#2FD0C0,#1479C9)'},
+  {n:3, num:'٣', ico:'🌳', color:'linear-gradient(145deg,#FF9A5C,#E8458C)'},
+  {n:4, num:'٤', ico:'🎤', color:'linear-gradient(145deg,#F1B53F,#D9622B)'}
+];
+function confCat(){ return B.cats.find(function(c){ return c.id==='c_conf'; }) || B.cats.find(function(c){ return /مؤتمر/.test(c.title||''); }); }
+function confEvents(){ var c = confCat(); if(!c) return []; return B.events.filter(function(e){ return e.cat===c.id && upcoming(e); }).sort(byDate); }
+function glEdText(n){ var t = (B.about.eds||{})[n]; return t ? '<div class="card gl-about">'+esc(t).replace(/\n/g,'<br>')+'</div>' : ''; }
+function rankList(n){ return ((B.rank||{})[n]||[]).slice().sort(function(a,b){ return (+b.pts||0)-(+a.pts||0); }); }
+function rankHtml(n){
+  var l = rankList(n), me = state.pid;
+  var h = '<div class="bk-sec gl-sechead">🏆 الترتيب</div>';
+  if(!l.length) return h + '<div class="empty-note">الترتيب هيتضاف قريبًا 💛</div>';
+  var medals = ['🥇','🥈','🥉'], top = l.slice(0,3), order = top.length===3 ? [1,0,2] : top.map(function(_,i){ return i; });
+  h += '<div class="gl-podium">'+order.map(function(i){ var r = top[i]; return '<div class="gl-pod p'+(i+1)+(String(r.pid)===String(me)?' me':'')+'"><span class="gl-pod-m">'+medals[i]+'</span>'+av(person(r.pid))+'<b>'+esc(pname(r.pid))+'</b><small>'+(+r.pts||0)+' نقطة</small></div>'; }).join('')+'</div>';
+  if(l.length>3) h += '<div class="gl-rks">'+l.slice(3).map(function(r,i){ return '<div class="gl-rk'+(String(r.pid)===String(me)?' me':'')+'"><em>'+(i+4)+'</em>'+av(person(r.pid))+'<b>'+esc(pname(r.pid))+'</b><small>'+(+r.pts||0)+' نقطة</small></div>'; }).join('')+'</div>';
+  return h;
+}
+function memHtml(n){
+  var id = 'gled'+n, ph = imgs(id).photos || [];
+  var h = '<div class="bk-sec gl-sechead">📸 الذكريات</div>';
+  if(!ph.length) return h + '<div class="empty-note">الذكريات هتتضاف قريبًا 💛</div>';
+  return h + '<div class="gl-mem">'+ph.map(function(src,i){ return '<span class="gl-mem-i" data-bk="memview" data-n="'+n+'" data-i="'+i+'" style="background-image:url('+src+')"></span>'; }).join('')+'</div>';
+}
 window.FXVIEWS.glavera = function(){
   ensure();
-  var a = B.about, secs = (a.sections||[]).map(function(s){
+  var a = B.about, sub = +state.glSub || 0, ed = GL_EDS.find(function(x){ return x.n===sub; });
+  if(ed){
+    var out = '<div class="back-row"><button class="icon-btn" data-bk="glback">'+ICO.back+'</button><div class="back-title">جلافيرا '+ed.num+'</div></div>'
+      + '<div class="bk-banner gl-ban" style="--bk-c:'+ed.color+'"><span class="bk-banner-ico">'+ed.ico+'</span><div><b>جلافيرا '+ed.num+'</b><small>'+(ed.n===4 ? 'حجز المؤتمر متاح من هنا' : 'تفاصيل الإصدار')+'</small></div></div>'
+      + glEdText(ed.n);
+    if(ed.n===4){
+      var evs = confEvents();
+      out += '<div class="bk-sec gl-sechead">🎤 حجز المؤتمر</div>'
+        + (evs.length ? evs.map(evCard).join('') : '<div class="empty-note">لسه مفيش مؤتمر متاح للحجز — ترقّب الجاي 💛</div>');
+    } else { out += rankHtml(ed.n) + memHtml(ed.n); }
+    return out;
+  }
+  var secs = (a.sections||[]).map(function(s){
     return '<div class="gl-sec"><span class="gl-sec-ico">'+esc(s.icon||'✨')+'</span><div><b>'+esc(s.title)+'</b>'+(s.text?'<p>'+esc(s.text)+'</p>':'')+'</div></div>';
+  }).join('');
+  var nConf = confEvents().filter(function(e){ return e.status!=='closed'; }).length;
+  var tiles = GL_EDS.map(function(x){
+    var badge = x.n===4 ? (nConf ? '🎟️ حجز المؤتمر · '+nConf+' متاح' : '🎟️ حجز المؤتمر') : 'اعرف أكتر';
+    return '<button type="button" class="bk-tile gl-tile" style="--bk-c:'+x.color+'" data-bk="glsub" data-n="'+x.n+'">'
+      + '<span class="bk-tile-shine"></span><span class="bk-tile-ico">'+x.ico+'</span>'
+      + '<span class="gl-tile-num">'+x.num+'</span>'
+      + '<span class="bk-tile-name">جلافيرا '+x.num+'</span>'
+      + '<span class="bk-tile-badge'+(x.n===4?'':' soft')+'">'+badge+'</span>'
+      + '<span class="bk-tile-go">›</span></button>';
   }).join('');
   return '<div class="back-row"><button class="icon-btn" data-action="back">'+ICO.back+'</button><div class="back-title">جلافيرا</div></div>'
     + '<div class="gl-hero"><div class="gl-logo">✨</div><div class="gl-name">جلافيرا</div>'+(a.tagline?'<div class="gl-tag">'+esc(a.tagline)+'</div>':'')+'</div>'
     + (a.about ? '<div class="card gl-about">'+esc(a.about).replace(/\n/g,'<br>')+'</div>' : '')
-    + (secs ? '<div class="gl-secs">'+secs+'</div>' : '')
-    + (!a.about && !secs ? '<div class="empty-note">الأدمن لسه هيضيف التفاصيل — ترقّب 💛</div>' : '')
-    + '<button type="button" class="bk-btn" style="width:100%;margin-top:12px" data-bk="gobook">🎟️ احجز الآن</button>';
+    + '<div class="bk-sec">اختار الإصدار</div><div class="bk-grid">'+tiles+'</div>'
+    + (secs ? '<div class="gl-secs" style="margin-top:16px">'+secs+'</div>' : '');
 };
 
 /* ============================ الأدمن ============================ */
@@ -44418,6 +44465,43 @@ window.FXADMIN.book = function(){
   var evs = B.events.slice().sort(function(a,b){ return (isPast(a)-isPast(b)) || byDate(a,b); }).map(evAdmin).join('');
   return kp + catForm + form + adminSectionTitle('🎟️','الفعاليات والحجوزات') + (evs || adminEmptyState('🎟️','مفيش فعاليات لسه','أضف أول فعالية من الفورم اللي فوق وهتظهر للمشاركين في «احجز الآن»'));
 };
+function capAll(){ return window.capOrdered([].concat(NAV_TILE_ITEMS.filter(function(it){ return it.page!=='settings'; }), NAV_DOCK_ITEMS)); }
+window.capOrdered = function(list){
+  var ord = window.__capOrder || []; if(!ord.length) return list;
+  var idx = function(it){ var i = ord.indexOf(it.page); return i<0 ? 1e6 : i; };
+  return list.map(function(it,i){ return {it:it, i:i}; }).sort(function(a,b){ return (idx(a.it)-idx(b.it)) || (a.i-b.i); }).map(function(x){ return x.it; });
+};
+window.FXADMIN.caporder = function(){
+  ensure();
+  var l = capAll(), n = l.length;
+  var rows = l.map(function(it,i){
+    var bg = (!it.color || it.color==='transparent') ? 'linear-gradient(145deg,#FFB86B,#FF6B9D)' : it.color;
+    return '<div class="bk-row cap-or-row"><div class="bk-who"><em class="cap-or-n">'+(i+1)+'</em><span class="cap-or-ico" style="background:'+bg+'">'+it.icon+'</span><b>'+esc(tr(it.labelKey))+'</b></div><div class="bk-ra">'
+      + '<button type="button" class="bk-mini" '+(i===0?'disabled style="opacity:.3"':'')+' data-bk="capup" data-page="'+esc(it.page)+'" title="فوق">▲</button>'
+      + '<button type="button" class="bk-mini" '+(i===n-1?'disabled style="opacity:.3"':'')+' data-bk="capdn" data-page="'+esc(it.page)+'" title="تحت">▼</button></div></div>';
+  }).join('');
+  return '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">ترتيب خانات «الإمكانيات»</div>'
+    + '<div class="fx-hint">استخدم ▲ ▼ لتحريك الخانة. الترتيب بيظهر لكل المشاركين.</div>'+rows
+    + '<div class="sar-actions" style="margin-top:12px"><button type="button" class="bk-btn sm ghost" data-bk="capreset">↺ رجوع للترتيب الافتراضي</button></div></div>';
+};
+function capMove(page, d){
+  var pages = capAll().map(function(it){ return it.page; }), i = pages.indexOf(page), j = i+d;
+  if(i<0 || j<0 || j>=pages.length) return;
+  var t = pages[i]; pages[i] = pages[j]; pages[j] = t;
+  window.__capOrder = B.capOrder = pages; render();
+  ju(KEY4, function(){ return pages; }).then(function(){ return load(true); }).then(render);
+}
+function glEdAdmin(n){
+  var l = rankList(n), id = 'gled'+n, ph = imgs(id).photos || [];
+  var rows = l.map(function(r){ return '<div class="bk-row"><div class="bk-who">'+av(person(r.pid))+'<b>'+esc(pname(r.pid))+' — '+(+r.pts||0)+' نقطة</b></div><button type="button" class="bk-x" data-bk="rkdel" data-n="'+n+'" data-pid="'+esc(r.pid)+'">✕</button></div>'; }).join('');
+  var opts = PARTICIPANTS.map(function(p){ return '<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>'; }).join('');
+  var th = ph.map(function(src,i){ return '<span class="bk-th" style="background-image:url('+src+')"><button type="button" data-bk="memrm" data-n="'+n+'" data-i="'+i+'">✕</button></span>'; }).join('');
+  return '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">جلافيرا '+n+' — الترتيب والذكريات</div>'
+    + (rows || '<div class="fx-hint">مفيش ترتيب لسه.</div>')
+    + '<div style="display:flex;gap:8px;margin-top:10px"><select id="rk-p-'+n+'" class="field" style="flex:3"><option value="">اختار مشارك…</option>'+opts+'</select><input id="rk-pts-'+n+'" class="field" style="flex:1" type="number" placeholder="نقاط"><button type="button" class="bk-btn sm" data-bk="rkadd" data-n="'+n+'">➕</button></div>'
+    + '<div class="fx-sep">الذكريات ('+ph.length+' صورة)</div><div class="bk-pi">'+(th||'<small class="fx-hint">مفيش صور.</small>')+'</div>'
+    + '<div class="sar-actions" style="margin-top:10px"><button type="button" class="bk-btn sm" data-bk="memadd" data-n="'+n+'">📷 إضافة صور</button></div></div>';
+}
 window.FXADMIN.glavera = function(){
   ensure();
   var a = B.about;
@@ -44425,7 +44509,10 @@ window.FXADMIN.glavera = function(){
   return '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">صفحة جلافيرا</div>'
     + '<label class="emp-lab" for="gl-tag">جملة تعريفية قصيرة</label><input id="gl-tag" class="field" maxlength="120" value="'+esc(a.tagline)+'">'
     + '<label class="emp-lab" for="gl-about">عن جلافيرا</label><textarea id="gl-about" class="field" rows="5" maxlength="1500">'+esc(a.about)+'</textarea>'
+    + '<div class="fx-sep">نص كل إصدار (جلافيرا 1-4)</div>'
+    + [1,2,3,4].map(function(n){ return '<label class="emp-lab" for="gl-ed-'+n+'">جلافيرا '+n+(n===4?' (فيها حجز المؤتمر تلقائيًا)':'')+'</label><textarea id="gl-ed-'+n+'" class="field" rows="3" maxlength="1200">'+esc((a.eds||{})[n]||'')+'</textarea>'; }).join('')
     + '<div class="sar-actions" style="margin-top:12px"><button type="button" class="btn btn-primary" data-bk="saveabout">💾 حفظ</button></div></div>'
+    + [1,2,3].map(glEdAdmin).join('')
     + '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">كروت إضافية</div>'
     + (secs || '<div class="fx-hint">مفيش كروت.</div>')
     + '<div style="display:flex;gap:8px;margin-top:10px"><input id="gls-ico" class="field" style="flex:1" value="✨" maxlength="4"><input id="gls-title" class="field" style="flex:3" placeholder="عنوان الكارت" maxlength="60"></div>'
@@ -44558,7 +44645,7 @@ async function addCat(){
   showToast('اتضاف النوع ✅'); await refresh();
 }
 async function saveAbout(){
-  await ju(KEY2, function(o){ o = baseAbout(o); o.tagline = gv('gl-tag'); o.about = gv('gl-about'); return o; });
+  await ju(KEY2, function(o){ o = baseAbout(o); o.tagline = gv('gl-tag'); o.about = gv('gl-about'); o.eds = {}; [1,2,3,4].forEach(function(n){ var t = gv('gl-ed-'+n); if(t) o.eds[n] = t; }); return o; });
   showToast('اتحفظت صفحة جلافيرا ✅'); await refresh();
 }
 async function addSec(){
@@ -44669,6 +44756,17 @@ document.addEventListener('click', function(ev){
   else if(a==='open'){ state.bkCat = el.dataset.cat; render(); window.scrollTo(0,0); }
   else if(a==='back'){ state.bkCat = null; render(); }
   else if(a==='gobook'){ state.bkCat = null; go('book'); }
+  else if(a==='glsub'){ state.glSub = +el.dataset.n || null; try{ SND.nav(); }catch(_){} render(); window.scrollTo(0,0); }
+  else if(a==='capup') capMove(el.dataset.page, -1);
+  else if(a==='capdn') capMove(el.dataset.page, 1);
+  else if(a==='capreset'){ if(confirm('ترجّع الترتيب الافتراضي؟')){ window.__capOrder = B.capOrder = []; ju(KEY4, function(){ return []; }).then(function(){ return load(true); }).then(render); } }
+  else if(a==='memview') openViewer('gled'+el.dataset.n, +el.dataset.i||0);
+  else if(a==='memadd'){ var gn = el.dataset.n; pickImages(true, 560, function(l){ saveImgs('gled'+gn, function(o){ o.photos = (o.photos||[]).concat(l).slice(0,30); }).then(function(ok){ if(ok){ showToast('اتضافت الذكريات ✅'); render(); } }); }); }
+  else if(a==='memrm'){ var mn = el.dataset.n, mi = +el.dataset.i; saveImgs('gled'+mn, function(o){ (o.photos||[]).splice(mi,1); }).then(function(){ render(); }); }
+  else if(a==='rkadd'){ var rn = el.dataset.n, rp = gv('rk-p-'+rn), rpts = parseInt(gv('rk-pts-'+rn),10)||0; if(!rp){ showToast('اختار مشارك الأول', true); return; }
+    ju(KEY3, function(o){ o = (o && typeof o==='object') ? o : {}; var l = (o[rn]||[]).filter(function(r){ return String(r.pid)!==String(rp); }); l.push({pid:rp, pts:rpts}); o[rn] = l; return o; }).then(function(){ showToast('اتضاف للترتيب ✅'); return refresh(); }); }
+  else if(a==='rkdel'){ var dn = el.dataset.n, dp = pid; ju(KEY3, function(o){ o = (o && typeof o==='object') ? o : {}; o[dn] = (o[dn]||[]).filter(function(r){ return String(r.pid)!==String(dp); }); return o; }).then(refresh); }
+  else if(a==='glback'){ state.glSub = null; render(); window.scrollTo(0,0); }
   else if(a==='ovclose'){ var o = el.closest('.bk-ov'); if(o) o.remove(); }
   else if(a==='view') openViewer(id, +el.dataset.i||0);
   else if(a==='ticket') openTicket(id);
@@ -44730,6 +44828,7 @@ if(typeof BNAV_TABS!=='undefined'){
 if(typeof ADMIN_HUB_ITEMS!=='undefined'){
   ADMIN_HUB_ITEMS.push(
     {group:'people',  tab:'book',    short:'فعاليات، صور، عربون، تذاكر وحضور', desc:'إضافة أنواع الحجز والفعاليات بصورها ولوكيشنها وعربونها، ومتابعة المحجوزين وقايمة الانتظار ومسح تذاكر QR', icon:'🎟️', label:'احجز الآن', color:'linear-gradient(145deg,#7A5CFF,#2FD0C0)'},
+    {group:'content', tab:'caporder', short:'رتّب خانات صفحة الإمكانيات', desc:'تحديد ترتيب ظهور كل الخانات في صفحة الإمكانيات للمشاركين', icon:'🧩', label:'ترتيب الإمكانيات', color:'linear-gradient(145deg,#5FE0A4,#2F8FD0)'},
     {group:'content', tab:'glavera', short:'صفحة التعريف والكروت',               desc:'نص صفحة جلافيرا والكروت اللي بتظهر للمشاركين', icon:'✨', label:'جلافيرا', color:'linear-gradient(145deg,#F1B53F,#B8862B)'}
   );
 }
@@ -44804,11 +44903,19 @@ st.textContent = [
 '.gl-logo{width:78px;height:78px;display:grid;place-items:center;font-size:40px;border-radius:50%;background:linear-gradient(145deg,#FFE29A,#B8862B);box-shadow:0 0 0 6px rgba(241,192,74,.15),0 16px 28px -10px rgba(241,181,63,.7)}',
 '.gl-name{margin-top:12px;font-size:26px;font-weight:900;background:linear-gradient(90deg,#FFE29A,#F1B53F);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}',
 '.gl-tag{margin-top:6px;font-size:13px;opacity:.8}.gl-about{line-height:1.9;font-size:13.5px;margin-bottom:12px}',
+'.gl-tile-num{position:absolute;top:8px;left:12px;font-size:64px;line-height:1;font-weight:900;color:rgba(255,255,255,.22);text-shadow:0 4px 10px rgba(0,0,0,.25);pointer-events:none}',
+'.bk-tile-badge.soft{background:rgba(255,255,255,.22);color:#fff;border:1px solid rgba(255,255,255,.35)}',
+'.gl-podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-bottom:10px}.gl-pod{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;border-radius:20px;text-align:center;color:#fff;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15)}.gl-pod.p1{padding-bottom:26px;background:linear-gradient(160deg,rgba(241,181,63,.35),rgba(241,181,63,.08));border-color:rgba(241,192,74,.6)}.gl-pod b{font-size:12.5px}.gl-pod small{font-size:11px;font-weight:800;opacity:.8}.gl-pod-m{font-size:28px}.gl-pod.me,.gl-rk.me{box-shadow:0 0 0 2px #5FE0A4}',
+'.gl-rks{display:flex;flex-direction:column;gap:6px}.gl-rk{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:15px;color:#fff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}.gl-rk em{font-style:normal;width:22px;font-weight:900;color:#F6DC93}.gl-rk b{flex:1;font-size:13px}.gl-rk small{font-size:11.5px;font-weight:800;opacity:.8}',
+'.gl-mem{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.gl-mem-i{aspect-ratio:1/1;border-radius:14px;background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.2);cursor:pointer}',
+'.cap-or-row .bk-who{flex:1}.cap-or-n{font-style:normal;width:22px;font-weight:900;opacity:.6;font-size:12px}.cap-or-ico{flex:none;width:34px;height:34px;display:grid;place-items:center;font-size:18px;border-radius:11px;color:#fff}.cap-or-row .bk-mini{background:rgba(120,150,255,.18)}',
+'.gl-ban .bk-banner-ico{width:56px;height:56px;font-size:30px}',
+'.gl-sechead{display:flex;align-items:center;gap:8px;font-size:16px;margin-top:18px}.gl-sechead::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(241,192,74,.5),transparent)}',
 '.gl-secs{display:flex;flex-direction:column;gap:10px}.gl-sec{display:flex;gap:12px;padding:13px;border-radius:18px;color:#fff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}.gl-sec-ico{flex:none;width:44px;height:44px;display:grid;place-items:center;font-size:22px;border-radius:14px;background:linear-gradient(145deg,rgba(241,181,63,.3),rgba(241,181,63,.1))}.gl-sec b{display:block;font-size:14px}.gl-sec p{margin:4px 0 0;font-size:12.5px;line-height:1.7;opacity:.78}'
 ].join('');
 document.head.appendChild(st);
 window.bkLoad = load;
-(function(){ var _go = window.go; if(typeof _go==='function'){ window.go = function(v){ if(v==='book') state.bkCat = null; return _go.apply(this, arguments); }; } })();
+(function(){ var _go = window.go; if(typeof _go==='function'){ window.go = function(v){ if(v==='book') state.bkCat = null; if(v==='glavera') state.glSub = null; return _go.apply(this, arguments); }; } })();
 load(true);
 })();
 </script>
