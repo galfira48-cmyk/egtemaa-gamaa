@@ -1565,6 +1565,24 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .ms-fp .ms-item{ cursor:pointer; }
   /* admin extra members */
   .ms-adm-role{ width:100%; margin-bottom:6px; font-weight:800; }
+  .ms-adm-add{ display:flex; flex-direction:column; gap:8px; margin-top:12px; padding:16px 14px 14px; border-radius:20px; background:rgba(127,127,127,.10); border:1.5px dashed var(--border); }
+  .ms-adm-addtitle{ font-weight:900; font-size:15px; margin-bottom:2px; }
+  .ms-adm-lbl{ font-size:12px; font-weight:800; color:var(--text-muted); margin-top:4px; }
+  .ms-adm-add .field{ width:100%; min-height:50px; padding:12px 14px; font-size:16px; font-weight:700; border-radius:14px; border:2px solid var(--border); background:var(--bg-2); color:var(--text,inherit); box-sizing:border-box; font-family:inherit; }
+  .ms-adm-add .field:focus{ outline:none; border-color:#F4B740; box-shadow:0 0 0 4px rgba(244,183,64,.22); }
+  .ms-adm-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .ms-adm-chip{ padding:7px 14px; border-radius:999px; border:1.5px solid var(--border); background:transparent; color:inherit; font-family:inherit; font-size:13px; font-weight:800; cursor:pointer; }
+  .ms-adm-chip:active{ background:rgba(244,183,64,.25); border-color:#F4B740; }
+  .ms-adm-add input.field, .ms-adm-card input.ms-adm-name, .ms-adm-card input.ms-adm-role{
+    display:block !important; width:100% !important; min-width:0 !important; height:auto !important; min-height:54px !important; box-sizing:border-box !important;
+    padding:13px 16px !important; border-radius:16px !important; border:2px solid #C9D2EA !important; background:#FFFFFF !important; color:#14214F !important; -webkit-text-fill-color:#14214F !important;
+    font-family:'Cairo','Tajawal',sans-serif !important; font-size:17px !important; font-weight:800 !important; line-height:1.4 !important; text-align:right; direction:rtl; caret-color:#E8A317;
+    box-shadow:0 2px 0 rgba(20,33,79,.12) inset, 0 6px 14px -8px rgba(0,0,0,.45) !important; -webkit-appearance:none; appearance:none; }
+  .ms-adm-add input.field::placeholder, .ms-adm-card input.ms-adm-name::placeholder, .ms-adm-card input.ms-adm-role::placeholder{ color:#7C88AE !important; -webkit-text-fill-color:#7C88AE !important; font-weight:700; opacity:1; }
+  .ms-adm-add input.field:focus, .ms-adm-card input.ms-adm-name:focus, .ms-adm-card input.ms-adm-role:focus{ outline:none !important; border-color:#F4B740 !important; box-shadow:0 0 0 4px rgba(244,183,64,.35), 0 6px 14px -8px rgba(0,0,0,.45) !important; }
+  .ms-adm-card input:disabled{ background:#E6EAF5 !important; -webkit-text-fill-color:#5B6688 !important; }
+  .ms-adm-lbl{ font-size:13.5px !important; color:var(--text) !important; opacity:.9; }
+  .ms-adm-addbtn{ width:100%; margin-top:6px; padding:14px; font-size:15.5px; }
   .ms-adm-addrow{ display:flex; gap:8px; align-items:center; padding:12px 0 6px; border-top:1px dashed var(--border); }
   .ms-adm-addrow input{ flex:1; min-width:0; }
   .ms-adm-addrow .btn{ flex:0 0 auto; white-space:nowrap; }
@@ -13012,7 +13030,15 @@ function renderAdminFamilyPage(gi, row){
     <div class="card ms-adm-card">${row('FP'+gi, {role:'شفيع الأسرة', g:'m'}, MS_PATRON_TONE)}</div>
     <div class="admin-section-title"><span>${MS_FAM_EMOJI[f.icon]||'👥'}</span><span>أمناء وأعضاء الأسرة</span></div>
     <div class="card ms-adm-card">${f.members.map((m,pi)=>row(`F${gi}-${pi}`, m, MS_MEMBER_TONES[pi%2])).join('')}${msExtras(gi).map((e,i)=>row(`X${gi}-${e.id}`, {role:e.role||'عضو', g:'m'}, MS_MEMBER_TONES[i%2], {gi, id:e.id})).join('')}
-      <div class="ms-adm-addrow"><input type="text" class="ms-adm-newrole" data-fam="${gi}" placeholder="المسمى (مثال: خادم، عضو)" maxlength="30" /><button type="button" class="btn btn-primary" data-ms-adm="addmember" data-fam="${gi}">➕ إضافة عضو</button></div></div>
+      <div class="ms-adm-add" data-fam="${gi}">
+        <div class="ms-adm-addtitle">➕ إضافة عضو جديد</div>
+        <label class="ms-adm-lbl" for="ms-nn-${gi}">اسم العضو</label>
+        <input type="text" id="ms-nn-${gi}" class="field ms-adm-newname" data-fam="${gi}" placeholder="اكتب اسم العضو هنا" maxlength="60" autocomplete="off" enterkeyhint="next" />
+        <label class="ms-adm-lbl" for="ms-nr-${gi}">المسمى</label>
+        <input type="text" id="ms-nr-${gi}" class="field ms-adm-newrole" data-fam="${gi}" placeholder="مثال: خادم، عضو" maxlength="30" value="عضو" autocomplete="off" enterkeyhint="done" />
+        <div class="ms-adm-chips">${['عضو','خادم','خادمة','أمين مساعد','مسؤول','مسؤولة'].map(r=>`<button type="button" class="ms-adm-chip" data-ms-adm="rolechip" data-fam="${gi}" data-role="${r}">${r}</button>`).join('')}</div>
+        <button type="button" class="btn btn-primary ms-adm-addbtn" data-ms-adm="addmember" data-fam="${gi}">➕ إضافة العضو</button>
+      </div></div>
     <div class="admin-edit-actions" style="margin:6px 0 18px;"><button type="button" class="btn btn-primary" data-ms-adm="save" style="flex:1;">💾 حفظ</button></div>`;
 }
 function msReadLogo(file){
@@ -13047,6 +13073,7 @@ document.addEventListener('click', e=>{
   if(!el) return;
   const act = el.dataset.msAdm;
   if(act==='famopen'){ msAdmCollectNames(); state.msFam = +el.dataset.fam; render(); window.scrollTo && window.scrollTo(0,0); }
+  else if(act==='rolechip'){ const i = document.querySelector(`.ms-adm-newrole[data-fam="${el.dataset.fam}"]`); if(i){ i.value = el.dataset.role; i.focus(); } }
   else if(act==='famback'){ msAdmCollectNames(); saveMeetingStructureData(); state.msFam = null; render(); }
   else if(act==='picklogo'){
     const gi = +el.dataset.fam, inp = document.createElement('input');
@@ -13055,6 +13082,11 @@ document.addEventListener('click', e=>{
     inp.click();
   }
 }, true);
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Enter' || !e.target || !e.target.matches) return;
+  if(e.target.matches('.ms-adm-newname')){ e.preventDefault(); const r = document.querySelector(`.ms-adm-newrole[data-fam="${e.target.dataset.fam}"]`); if(r){ r.focus(); r.select(); } }
+  else if(e.target.matches('.ms-adm-newrole')){ e.preventDefault(); msAdmAddMember(e.target.dataset.fam); }
+});
 function msAdmCollectNames(){
   if(!MS_DATA.slots) MS_DATA.slots = {};
   document.querySelectorAll('.ms-adm-role').forEach(i=>{
@@ -13103,13 +13135,17 @@ function msCropPhoto(file){
 async function msAdmAddMember(gi){
   msAdmCollectNames();
   const inp = document.querySelector(`.ms-adm-newrole[data-fam="${gi}"]`);
+  const ninp = document.querySelector(`.ms-adm-newname[data-fam="${gi}"]`);
   const role = (inp && inp.value.trim()) || 'عضو';
+  const nm = (ninp && ninp.value.trim()) || '';
   if(!MS_DATA.extra) MS_DATA.extra = {};
   const arr = (MS_DATA.extra[gi] = MS_DATA.extra[gi] || []);
   if(arr.length >= 30){ showToast('وصلت للحد الأقصى للأعضاء', true); return; }
-  arr.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5), role});
+  const nid = Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  arr.push({id:nid, role});
+  if(nm){ if(!MS_DATA.slots) MS_DATA.slots = {}; MS_DATA.slots[`X${gi}-${nid}`] = {name:nm}; }
   const ok = await saveMeetingStructureData();
-  if(!ok) arr.pop();
+  if(!ok){ arr.pop(); delete MS_DATA.slots[`X${gi}-${nid}`]; }
   showToast(ok ? 'اتضاف العضو ✅' : 'حصلت مشكلة في الحفظ، جرّب تاني', !ok);
   render();
 }
