@@ -12754,7 +12754,8 @@ const MEETING_STRUCTURE = {
     {title:'أسرة التقديم',  icon:'mic',   tone:'purple', members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]},
     {title:'أسرة الافتقاد', icon:'heart', tone:'coral',  members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]},
     {title:'أسرة الميديا',  icon:'video', tone:'indigo', members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]},
-    {title:'أسرة المؤتمرات', icon:'conf', tone:'teal',   members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]}
+    {title:'أسرة المؤتمرات', icon:'conf', tone:'teal',   members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]},
+    {title:'أسرة الكورال',  icon:'music', tone:'amber',  members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]}
   ]
 };
 /* ---- التخزين المشترك: الأسماء في مفتاح واحد صغير، وكل صورة في مفتاح لوحدها (بتتحمّل بس لما تتغيّر) ---- */
@@ -12811,7 +12812,8 @@ const MS_FAM_TONES = {
   purple:{r:'#6F42C1', rd:'#5A32A8', bg:'rgba(111,66,193,.07)', l:'rgba(111,66,193,.28)'},
   coral: {r:'#F0575F', rd:'#D8434C', bg:'rgba(240,87,95,.07)',  l:'rgba(240,87,95,.28)'},
   indigo:{r:'#4B3FC4', rd:'#392FA8', bg:'rgba(75,63,196,.07)',  l:'rgba(75,63,196,.28)'},
-  teal:  {r:'#1596A0', rd:'#0F7A83', bg:'rgba(21,150,160,.07)', l:'rgba(21,150,160,.28)'}
+  teal:  {r:'#1596A0', rd:'#0F7A83', bg:'rgba(21,150,160,.07)', l:'rgba(21,150,160,.28)'},
+  amber: {r:'#D9822B', rd:'#B8691A', bg:'rgba(217,130,43,.07)', l:'rgba(217,130,43,.28)'}
 };
 const MS_ICONS = {
   conf:'<svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3zM5 9v10h14V9zm3 2h8v2H8zm0 4h5v2H8z"/></svg>',
@@ -12819,7 +12821,8 @@ const MS_ICONS = {
   group:'<svg viewBox="0 0 24 24"><circle cx="8" cy="8.5" r="3"/><circle cx="16.5" cy="8.5" r="3"/><path d="M2 19c0-3 2.7-5 6-5s6 2 6 5zM14.6 14.2c.6-.1 1.3-.2 1.9-.2 3 0 5.500 1.800 5.500 5h-6.600c-.1-2-.5-3.700-.8-4.800z"/></svg>',
   mic:'<svg viewBox="0 0 24 24"><path d="M12 14.500a3.500 3.500 0 0 0 3.500-3.500V6a3.500 3.500 0 0 0-7 0v5a3.500 3.500 0 0 0 3.500 3.500zM18 11a6 6 0 0 1-12 0H4a8 8 0 0 0 7 7.900V22h2v-3.100A8 8 0 0 0 20 11z"/></svg>',
   heart:'<svg viewBox="0 0 24 24"><path d="M12 21.500s-8.500-5.200-10.800-10.500C-.4 6.800 2 3 6 3c2.300 0 4 1.100 6 3.300C14 4.100 15.700 3 18 3c4 0 6.400 3.800 4.800 8C20.500 16.300 12 21.500 12 21.500z"/></svg>',
-  video:'<svg viewBox="0 0 24 24"><rect x="2" y="6" width="13.500" height="12" rx="3"/><path d="M16.500 10.300L22 7v10l-5.500-3.300z"/></svg>'
+  video:'<svg viewBox="0 0 24 24"><rect x="2" y="6" width="13.500" height="12" rx="3"/><path d="M16.500 10.300L22 7v10l-5.500-3.300z"/></svg>',
+  music:'<svg viewBox="0 0 24 24"><path d="M9 3v12.600A3.800 3.800 0 1 0 11 19V8.200l8-1.800v7.200A3.800 3.800 0 1 0 21 17V3z"/></svg>'
 };
 const MS_HEART_LINE = '<svg viewBox="0 0 24 24" fill="none" stroke="#1B2A5C" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7.500-4.600-9.400-9C1.200 7.600 3.200 4.500 6.400 4.500c2 0 3.600 1 5.600 3 2-2 3.600-3 5.600-3 3.200 0 5.200 3.100 3.800 6.500C19.500 15.400 12 20 12 20z"/></svg>';
 const MS_SPARK = '<svg class="ms-spark" viewBox="0 0 22 30" fill="none" stroke="#1B2A5C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M17 3 9 8"/><path d="M20 14 8 15"/><path d="M17 26 8 22"/></svg>';
@@ -12995,7 +12998,7 @@ document.addEventListener('keydown', e=>{
 });
 
 /* ============================= أدمن: تعديل هيكلة الاجتماع ============================= */
-const MS_FAM_EMOJI = {mic:'🎤', heart:'❤️', video:'🎥'};
+const MS_FAM_EMOJI = {mic:'🎤', heart:'❤️', video:'🎥', music:'🎶'};
 function msIsLocked(key){ const sl = MS_DATA.slots && MS_DATA.slots[key]; return !!(sl && sl.locked); }
 function renderAdminStructureTab(){
   const S = MEETING_STRUCTURE;
