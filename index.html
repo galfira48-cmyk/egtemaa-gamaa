@@ -48308,7 +48308,18 @@ setTimeout(function(){ load(true); }, 6000);
 @keyframes whShake{10%,50%,90%{transform:translateX(-6px)}30%,70%{transform:translateX(6px)}}
 @media (prefers-reduced-motion:reduce){.wh-ov *,.wh-ov,.wh-ov *::after,.wh-ov *::before{animation:none!important;transition:none!important}}
 
-.wh-x{display:none!important}
+.wh-slot:not(.bad) .wh-x{display:none!important}
+
+/* أداء: بدون أنيميشن مستمر وبدون إعادة توزيع الكروت */
+.wh-board.nd .wh-c{animation:none}
+.wh-bg i{display:none}
+.wh-c .wh-av,.wh-me,.wh-st .ic,.wh-prog i::after{animation:none!important}
+.wh-board.hint .wh-slot:not(.off) .wh-c{animation:none!important}
+.wh-ib,.wh-pill{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.wh-c{will-change:auto}
+
+.wh-pass{letter-spacing:.5px}
+.wh-pass.go{animation:none!important;background:linear-gradient(180deg,#FFF3C2,#FFC93C);color:#5a3a00;box-shadow:inset 0 1px 0 #fff,0 5px 0 rgba(150,100,0,.55),0 0 22px rgba(255,205,60,.85)}
 </style>
 <script id="who-module">
 /* =====================================================================
@@ -48580,14 +48591,14 @@ function drawTop(){
 }
 var XSVG='<div class="wh-x"><svg viewBox="0 0 24 24"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"/></svg></div>';
 function drawBoard(which){
-  G.board=which; var b=G.ov.querySelector('.wh-board'); b.className='wh-board'+(G.guessing?' guess':''); b.setAttribute('data-w',which);
+  G.board=which; var b=G.ov.querySelector('.wh-board'); b.className='wh-board'+(G.guessing?' guess':'')+(G.dealt?' nd':''); b.setAttribute('data-w',which);
   var h='';
   CH.forEach(function(c,i){
     var off=which==='me'?!!G.elim[i]:G.botC.indexOf(i)<0;
     var sh=SHIRT[i%SHIRT.length];
     h+='<div class="wh-slot'+(off?' off':'')+((which==='me'&&G.phase==='pick'&&G.picked===i)?' sel':'')+'" data-wh="card" data-i="'+i+'" style="--d:'+(i*28)+'ms;--sd:'+((i*370)%6000)+'ms;--t1:'+tint(sh,.9)+';--t2:'+tint(sh,.72)+';--t3:'+sh+'"><div class="wh-c"><span class="wh-num">'+(i+1)+'</span>'+avatar(c,i)+'<span class="wh-nm">'+esc(c.n)+'</span><i class="wh-gl"></i></div>'+XSVG+'</div>';
   });
-  b.innerHTML=h; fit(); if(which==='me') markBad();
+  b.innerHTML=h; G.dealt=true; fit(); if(which==='me') markBad();
 }
 function cardEl(i){ return G.ov.querySelector('.wh-slot[data-i="'+i+'"]'); }
 /* علامة X حمراء: كارت استبعدته وهو لسه بيطابق إجاباتك (يعني غلط) */
@@ -48606,7 +48617,7 @@ function panelHtml(){
   } else if(G.guessing){
     st='<div class="wh-st"><div class="ic">🎯</div><div class="tx">اضغط على الشخصية اللي بتتوقعها<small>لو غلطت هتخسر على طول!</small></div></div>';
   } else if(G.last&&G.qThisTurn){
-    st='<div class="wh-st"><div class="ic">'+catIcon(G.last.k)+'</div><div class="tx">'+esc(opt(G.last.k,G.last.v)[2])+'<small>اضغط على الكروت لاستبعاد غير المطابقة، أو استخدم ✨</small></div>'+ansHtml(G.last.ans)+'</div>';
+    st='<div class="wh-st"><div class="ic">'+catIcon(G.last.k)+'</div><div class="tx">'+esc(opt(G.last.k,G.last.v)[2])+'<small>اضغط على الكروت اللي مش مطابقة عشان تستبعدها</small></div>'+ansHtml(G.last.ans)+'</div>';
   } else st='<div class="wh-st"><div class="ic">❓</div><div class="tx">دورك! اختار سؤال عن شخصية الجهاز<small>أو خمّن لو عارفها 🎯</small></div></div>';
   if(ph!=='pick'){
     CATS.forEach(function(c){
@@ -48614,9 +48625,9 @@ function panelHtml(){
       cats+='<button type="button" class="wh-cat'+hl+'" data-wh="cat" data-k="'+c.k+'"'+(canAsk?'':' disabled')+'>'+catIcon(c.k)+'<span>'+c.n+'</span></button>';
     });
     cats='<div class="wh-cats">'+cats+'</div>';
-    var inTurn=(ph==='ask');
+    var inTurn=(ph==='ask'); var ready=inTurn&&passReady();
     ctl='<div class="wh-ctl"><button type="button" class="wh-rb" data-wh="undo" aria-label="تراجع"'+((inTurn&&G.undo.length)?'':' disabled')+'>↶</button>'
-      +'<button type="button" class="wh-pass'+((inTurn&&G.qThisTurn&&!G.guessing)?' go':'')+'" data-wh="pass"'+((inTurn&&G.qThisTurn&&!G.guessing)?'':' disabled')+'>تمرير الدور</button>'
+      +'<button type="button" class="wh-pass'+(ready?' go':'')+'" data-wh="pass"'+(ready?'':' disabled')+'>Pass</button>'
       +'<button type="button" class="wh-pill2'+(G.guessing?' on':'')+'" data-wh="guess"'+(inTurn?'':' disabled')+'>🎯 '+(G.guessing?'إلغاء':'خمّن')+'</button></div>';
   } else if(G.picked!=null){
     ctl='<div class="wh-conf"><button type="button" class="wh-btn alt" data-wh="repick">غيّر</button><button type="button" class="wh-btn" data-wh="confirm">تأكيد ✓</button></div>';
@@ -48726,7 +48737,12 @@ function startPlayerTurn(){
   G.phase='ask'; G.qThisTurn=false; G.guessing=false; G.undo=[]; G.last=null; G.botQ=null; G.botGuess=null; G.busy=false;
   setTheme('me'); drawBoard('me'); drawPanel();
 }
-function pass(){ if(G.phase!=='ask'||!G.qThisTurn||G.guessing) return; snd('click'); botTurn(); }
+function passReady(){
+  if(!G||G.phase!=='ask'||!G.qThisTurn||G.guessing) return false;
+  for(var i=0;i<CH.length;i++){ var ok=consistent(i,G.known); if(G.elim[i]?ok:!ok) return false; }
+  return true;
+}
+function pass(){ if(!passReady()) return; snd('click'); botTurn(); }
 function botTurn(){
   G.phase='bot'; G.busy=true; G.guessing=false; G.botQ=null; G.botGuess=null; G.botC=candsOf(G.botK);
   setTheme('bot'); drawBoard('bot'); drawPanel();
@@ -48782,7 +48798,7 @@ function end(win,why){
 /* ---------- النوافذ المساعدة ---------- */
 function showHelp(){
   var s=document.createElement('div'); s.className='wh-sheet'; s.setAttribute('data-wh','dlgbg');
-  s.innerHTML='<div class="wh-rc"><h2>إزاي تلعب؟</h2><div class="wh-help">① كل واحد فيكم عنده شخصية سرية.<br>② في دورك اسأل سؤال واحد عن شخصية الجهاز، هتاخد إجابة «أيوه» أو «لأ».<br>③ اضغط على الكروت اللي مش مطابقة عشان تستبعدها، أو اضغط ✨ تلقائي.<br>④ اضغط «تمرير الدور» ويجي دور الجهاز.<br>⑤ لما تبقى متأكد اضغط 🎯 خمّن واختار الشخصية. التخمين الغلط بيخسّرك الجولة!<br>⑥ علامة ✓ و ✗ في قايمة الأسئلة بتفكّرك باللي عرفته قبل كده.<br>⑦ اضغط مطوّلاً على أي كارت لتكبيره وتشوف مواصفاته بالتفصيل، وحرّك صباعك عليه يميل 3D 🔍</div><button type="button" class="wh-btn" data-wh="sheetx">تمام 👌</button></div>';
+  s.innerHTML='<div class="wh-rc"><h2>إزاي تلعب؟</h2><div class="wh-help">① كل واحد فيكم عنده شخصية سرية.<br>② في دورك اسأل سؤال واحد عن شخصية الجهاز، هتاخد إجابة «أيوه» أو «لأ».<br>③ اضغط على الكروت اللي مش مطابقة عشان تستبعدها.<br>④ اضغط «Pass» (بينوّر لما تستبعد كل الكروت المطابقة للإجابة) ويجي دور الجهاز.<br>⑤ لما تبقى متأكد اضغط 🎯 خمّن واختار الشخصية. التخمين الغلط بيخسّرك الجولة!<br>⑥ علامة ✓ و ✗ في قايمة الأسئلة بتفكّرك باللي عرفته قبل كده.<br>⑦ اضغط مطوّلاً على أي كارت لتكبيره وتشوف مواصفاته بالتفصيل، وحرّك صباعك عليه يميل 3D 🔍</div><button type="button" class="wh-btn" data-wh="sheetx">تمام 👌</button></div>';
   G.ov.appendChild(s); snd('click');
 }
 function showLog(){
