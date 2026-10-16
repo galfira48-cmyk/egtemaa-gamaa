@@ -1569,6 +1569,21 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .ms-adm-addrow{ display:flex; gap:8px; align-items:center; padding:12px 0 6px; border-top:1px dashed var(--border); }
   .ms-adm-addrow input{ flex:1; min-width:0; }
   .ms-adm-addrow .btn{ flex:0 0 auto; white-space:nowrap; }
+  .ms-lead3 > .ms-item:first-child{ grid-column:1/-1; width:calc(50% - 7px); justify-self:center; }
+  .ms-flogo{ width:100%; height:100%; object-fit:contain; border-radius:50%; background:#fff; padding:3px; box-sizing:border-box; display:block; }
+  .ms-ficon:has(.ms-flogo), .ms-fp-ico:has(.ms-flogo){ background:#fff; }
+  .ms-fp-ico .ms-flogo{ padding:6px; }
+  .ms-fp-patron{ width:calc(50% - 7px); margin:0 auto 26px; }
+  .ms-adm-famcard{ display:flex; align-items:center; gap:14px; width:100%; margin-bottom:12px; padding:12px 14px; text-align:start; font-family:inherit; color:inherit; cursor:pointer; }
+  .ms-adm-famlogo{ flex:0 0 auto; width:52px; height:52px; border-radius:50%; display:grid; place-items:center; background:rgba(127,127,127,.18); overflow:hidden; }
+  .ms-adm-famlogo svg{ width:26px; height:26px; fill:currentColor; }
+  .ms-adm-famtx{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .ms-adm-famtx b{ font-size:15px; font-weight:900; } .ms-adm-famtx small{ font-size:12px; color:var(--text-muted); }
+  .ms-adm-famgo{ flex:0 0 auto; width:18px; height:18px; } .ms-adm-famgo svg{ width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; display:block; }
+  .ms-adm-logocard{ display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+  .ms-adm-logobtn{ position:relative; flex:0 0 auto; width:92px; height:92px; padding:0; border:2px dashed var(--border); border-radius:50%; background:rgba(127,127,127,.12); display:grid; place-items:center; cursor:pointer; color:inherit; }
+  .ms-adm-logobtn svg{ width:38px; height:38px; fill:currentColor; }
+  .ms-adm-logobtn .cam{ position:absolute; inset-inline-end:2px; bottom:2px; width:26px; height:26px; border-radius:50%; display:grid; place-items:center; font-size:13px; background:var(--card,#fff); box-shadow:0 2px 6px rgba(0,0,0,.3); }
   @media (prefers-reduced-motion: reduce){
     .ms-fp, .ms-fp *, .ms-fchev{ animation:none !important; }
     .ms-reveal{ opacity:1; transform:none; animation:none !important; }
@@ -12694,12 +12709,14 @@ const BIBLE_SVG = `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org
 const MEETING_STRUCTURE = {
   leaders: [
     {role:'أمين الاجتماع',  g:'m'},
+    {role:'الأمين المساعد', g:'f'},
     {role:'الأمين المساعد', g:'f'}
   ],
   families: [
     {title:'أسرة التقديم',  icon:'mic',   tone:'purple', members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]},
     {title:'أسرة الافتقاد', icon:'heart', tone:'coral',  members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]},
-    {title:'أسرة الميديا',  icon:'video', tone:'indigo', members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]}
+    {title:'أسرة الميديا',  icon:'video', tone:'indigo', members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]},
+    {title:'أسرة المؤتمرات', icon:'conf', tone:'teal',   members:[{role:'الأمين', g:'m'},{role:'الأمين المساعد', g:'f'}]}
   ]
 };
 /* ---- التخزين المشترك: الأسماء في مفتاح واحد صغير، وكل صورة في مفتاح لوحدها (بتتحمّل بس لما تتغيّر) ---- */
@@ -12749,12 +12766,17 @@ const MS_MEMBER_TONES = [
   {a:'#A6D96C', b:'#52B04A', r:'#3E9B3C', t:'#fff', bd:'#2E8B3A'},
   {a:'#62D6D3', b:'#1FA6B3', r:'#139AA6', t:'#fff', bd:'#0E8591'}
 ];
+const MS_PATRON_TONE = {a:'#E2B8FF', b:'#9B5DE5', r:'#8A4FD6', t:'#fff', bd:'#5B2A9E'};
+function msFamLogoUrl(gi){ return msResolve('FL'+gi,{}).photo || ''; }
+function msFamIconHtml(f,gi){ const u = msFamLogoUrl(gi); return u ? `<img class="ms-flogo" alt="" src="${msPhotoCss(u)}">` : (MS_ICONS[f.icon]||MS_ICONS.group); }
 const MS_FAM_TONES = {
   purple:{r:'#6F42C1', rd:'#5A32A8', bg:'rgba(111,66,193,.07)', l:'rgba(111,66,193,.28)'},
   coral: {r:'#F0575F', rd:'#D8434C', bg:'rgba(240,87,95,.07)',  l:'rgba(240,87,95,.28)'},
-  indigo:{r:'#4B3FC4', rd:'#392FA8', bg:'rgba(75,63,196,.07)',  l:'rgba(75,63,196,.28)'}
+  indigo:{r:'#4B3FC4', rd:'#392FA8', bg:'rgba(75,63,196,.07)',  l:'rgba(75,63,196,.28)'},
+  teal:  {r:'#1596A0', rd:'#0F7A83', bg:'rgba(21,150,160,.07)', l:'rgba(21,150,160,.28)'}
 };
 const MS_ICONS = {
+  conf:'<svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3zM5 9v10h14V9zm3 2h8v2H8zm0 4h5v2H8z"/></svg>',
   crown:'<svg viewBox="0 0 24 24"><path d="M3 8l4.6 4.2L12 5l4.4 7.2L21 8l-1.8 10.5H4.8z"/><rect x="5" y="19.5" width="14" height="2" rx="1"/></svg>',
   group:'<svg viewBox="0 0 24 24"><circle cx="8" cy="8.5" r="3"/><circle cx="16.5" cy="8.5" r="3"/><path d="M2 19c0-3 2.7-5 6-5s6 2 6 5zM14.6 14.2c.6-.1 1.3-.2 1.9-.2 3 0 5.500 1.800 5.500 5h-6.600c-.1-2-.5-3.700-.8-4.800z"/></svg>',
   mic:'<svg viewBox="0 0 24 24"><path d="M12 14.500a3.500 3.500 0 0 0 3.500-3.500V6a3.500 3.500 0 0 0-7 0v5a3.500 3.500 0 0 0 3.500 3.500zM18 11a6 6 0 0 1-12 0H4a8 8 0 0 0 7 7.900V22h2v-3.100A8 8 0 0 0 20 11z"/></svg>',
@@ -12783,11 +12805,11 @@ function msItemHtml(m, tone, icon, o){
 }
 function renderMeetingStructurePage(){
   const S = MEETING_STRUCTURE;
-  const leaders = S.leaders.map((m,i)=>msItemHtml(msResolve('L'+i,m), MS_LEADER_TONES[i%2], 'crown', {reveal:1, d:i*140, key:'L'+i})).join('');
+  const leaders = S.leaders.map((m,i)=>msItemHtml(msResolve('L'+i,m), MS_LEADER_TONES[i?1:0], 'crown', {reveal:1, d:i*140, key:'L'+i})).join('');
   const fams = S.families.map((f,gi)=>{
     const t = MS_FAM_TONES[f.tone] || MS_FAM_TONES.purple;
     return `<div class="ms-fam ms-reveal" style="--r:${t.r};--rd:${t.rd};--fbg:${t.bg};--fl:${t.l}">
-      <div class="ms-famhead" data-ms-fam="${gi}" role="button" tabindex="0" aria-label="عرض أعضاء ${escapeHtml(f.title)}"><span class="ms-ficon">${MS_ICONS[f.icon]||MS_ICONS.group}</span><span class="ribbon">${escapeHtml(f.title)}</span><span class="ms-fchev">${MS_CHEV_SVG}</span></div>
+      <div class="ms-famhead" data-ms-fam="${gi}" role="button" tabindex="0" aria-label="عرض أعضاء ${escapeHtml(f.title)}"><span class="ms-ficon">${msFamIconHtml(f,gi)}</span><span class="ribbon">${escapeHtml(f.title)}</span><span class="ms-fchev">${MS_CHEV_SVG}</span></div>
       <div class="ms-leaders">${f.members.map((m,pi)=>msItemHtml(msResolve(`F${gi}-${pi}`,m), MS_MEMBER_TONES[pi%2], 'group', {key:`F${gi}-${pi}`})).join('')}</div>
       <button type="button" class="ms-fam-more" data-ms-fam="${gi}"><span>عرض كل أعضاء الأسرة</span><b>${msFamMembers(gi).length}</b>${MS_CHEV_SVG}</button>
     </div>`;
@@ -12810,7 +12832,7 @@ function renderMeetingStructurePage(){
         </div>
         <svg class="ms-underline" viewBox="0 0 150 12" aria-hidden="true"><path pathLength="1" d="M4 8C40 3 100 3 146 6" stroke="#FFC933" stroke-width="5" stroke-linecap="round" fill="none"/></svg>
       </div>
-      <div class="ms-leaders">${leaders}</div>
+      <div class="ms-leaders ms-lead3">${leaders}</div>
       ${fams}
       <div class="ms-foot">لأن كل دور مهم ${MS_HEART_LINE}</div>
     </div>
@@ -12838,7 +12860,8 @@ function msInitReveal(){
 })();
 function msFindPerson(key){
   const S = MEETING_STRUCTURE;
-  if(key[0]==='L'){ const i = +key.slice(1), m = S.leaders[i]; return m ? {m:msResolve(key,m), tone:MS_LEADER_TONES[i%2], icon:'crown', fam:'قيادة الاجتماع'} : null; }
+  if(key.slice(0,2)==='FP'){ const gi = +key.slice(2), f = S.families[gi]; return f ? {m:msResolve(key,{role:'شفيع الأسرة', g:'m'}), tone:MS_PATRON_TONE, icon:'heart', fam:f.title} : null; }
+  if(key[0]==='L'){ const i = +key.slice(1), m = S.leaders[i]; return m ? {m:msResolve(key,m), tone:MS_LEADER_TONES[i?1:0], icon:'crown', fam:'قيادة الاجتماع'} : null; }
   if(key[0]==='X'){
     const gi = +key.slice(1).split('-')[0], f = S.families[gi]; if(!f) return null;
     const x = msFamMembers(gi).find(z=>z.key===key); if(!x) return null;
@@ -12870,6 +12893,8 @@ function msOpenFamily(gi, ev){
   let ox = '50%', oy = '42%';
   if(ev && typeof ev.clientX==='number' && (ev.clientX||ev.clientY)){ ox = ev.clientX+'px'; oy = ev.clientY+'px'; }
   const cells = list.map((x,i)=>`<div class="ms-fp-cell" style="--i:${i}">${msItemHtml(msResolve(x.key,x.base), x.tone, 'group', {key:x.key})}</div>`).join('');
+  const pr = msResolve('FP'+gi,{role:'شفيع الأسرة', g:'m'});
+  const patronHtml = (pr.name || pr.photo) ? `<div class="ms-fp-div"><i></i><span>شفيع الأسرة</span><i></i></div><div class="ms-fp-patron">${msItemHtml(pr, MS_PATRON_TONE, 'heart', {key:'FP'+gi})}</div>` : '';
   const words = String(f.title).split(' ').map((w,i)=>`<span style="--w:${i}">${escapeHtml(w)}</span>`).join(' ');
   const dots = Array.from({length:10},(_,i)=>`<i style="--x:${(i*10+6)%100}%;--s:${5+(i*5)%9}px;--t:${5+(i*7)%5}s;--dl:${(i*0.55).toFixed(2)}s"></i>`).join('');
   const o = document.createElement('div');
@@ -12880,11 +12905,12 @@ function msOpenFamily(gi, ev){
     <div class="ms-fp-hero">
       <div class="ms-fp-dots" aria-hidden="true">${dots}</div>
       <button type="button" class="ms-fp-back" data-ms-fpclose="1" aria-label="رجوع"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
-      <div class="ms-fp-ico">${MS_ICONS[f.icon]||MS_ICONS.group}</div>
+      <div class="ms-fp-ico">${msFamIconHtml(f,gi)}</div>
       <div class="ms-fp-title">${words}</div>
       <div class="ms-fp-count"><b class="ms-fp-num" data-to="${n}">0</b><span>${msCountLabel(n)}</span></div>
     </div>
     <div class="ms-fp-body">
+      ${patronHtml}
       <div class="ms-fp-div"><i></i><span>أعضاء الأسرة</span><i></i></div>
       <div class="ms-fp-grid">${cells}</div>
     </div>`;
@@ -12952,21 +12978,84 @@ function renderAdminStructureTab(){
       </div>
     </div>`;
   };
-  const lead = S.leaders.map((m,i)=>row('L'+i, m, MS_LEADER_TONES[i%2])).join('');
-  const fams = S.families.map((f,gi)=>`
-    <div class="admin-section-title"><span>${MS_FAM_EMOJI[f.icon]||'👥'}</span><span>${escapeHtml(f.title)}</span></div>
-    <div class="card ms-adm-card">${f.members.map((m,pi)=>row(`F${gi}-${pi}`, m, MS_MEMBER_TONES[pi%2])).join('')}${msExtras(gi).map((e,i)=>row(`X${gi}-${e.id}`, {role:e.role||'عضو', g:'m'}, MS_MEMBER_TONES[i%2], {gi, id:e.id})).join('')}
-      <div class="ms-adm-addrow"><input type="text" class="ms-adm-newrole" data-fam="${gi}" placeholder="المسمى (مثال: خادم، عضو)" maxlength="30" /><button type="button" class="btn btn-primary" data-ms-adm="addmember" data-fam="${gi}">➕ إضافة عضو</button></div></div>`).join('');
+  const lead = S.leaders.map((m,i)=>row('L'+i, Object.assign({}, m, i>0 ? {role:m.role+' ('+(i===1?'الأول':'الثاني')+')'} : {}), MS_LEADER_TONES[i?1:0])).join('');
+  if(state.msFam!=null && S.families[state.msFam]) return renderAdminFamilyPage(state.msFam, row);
+  const fams = S.families.map((f,gi)=>{
+    const pr = msResolve('FP'+gi,{});
+    return `<button type="button" class="card ms-adm-famcard" data-ms-adm="famopen" data-fam="${gi}">
+      <span class="ms-adm-famlogo">${msFamIconHtml(f,gi)}</span>
+      <span class="ms-adm-famtx"><b>${escapeHtml(f.title)}</b><small>${msFamMembers(gi).length} عضو${pr.name?' · شفيع: '+escapeHtml(pr.name):''}</small></span>
+      <span class="ms-adm-famgo">${MS_CHEV_SVG}</span></button>`;
+  }).join('');
   return `
     <div class="hint" style="margin:0 0 14px;">الأسماء والصور اللي هتحطها هنا بتظهر لكل المشاركين في صفحة «هيكلة الاجتماع» (من خانة المزيد). دوس على الصورة عشان تغيّرها. وتقدر تضيف أعضاء لأي أسرة، وهيظهروا لما المشارك يدوس على اسم الأسرة.</div>
     <div class="admin-section-title"><span>👑</span><span>القيادة</span></div>
     <div class="card ms-adm-card">${lead}</div>
+    <div class="admin-section-title"><span>👥</span><span>الأسر — دوس على الأسرة عشان تعدّلها</span></div>
     ${fams}
     <div class="admin-edit-actions" style="margin:6px 0 18px;">
       <button type="button" class="btn btn-primary" data-ms-adm="save" style="flex:1;">💾 حفظ الأسماء</button>
     </div>
   `;
 }
+function renderAdminFamilyPage(gi, row){
+  const f = MEETING_STRUCTURE.families[gi];
+  const logo = msFamLogoUrl(gi);
+  return `
+    <div class="back-row"><button type="button" class="icon-btn" data-ms-adm="famback" aria-label="رجوع">${ICO.back}</button><div class="back-title">${escapeHtml(f.title)}</div></div>
+    <div class="admin-section-title"><span>🖼️</span><span>لوجو الأسرة</span></div>
+    <div class="card ms-adm-logocard">
+      <button type="button" class="ms-adm-logobtn" data-ms-adm="picklogo" data-fam="${gi}" aria-label="تغيير اللوجو">${msFamIconHtml(f,gi)}<span class="cam">📷</span></button>
+      <div class="ms-adm-f"><div class="hint" style="margin:0 0 8px;text-align:start;">ارفع لوجو الأسرة (يفضّل صورة مربعة وخلفيتها شفافة). هيظهر جنب اسم الأسرة لكل المشاركين.</div>
+        <div class="ms-adm-tools"><button type="button" class="btn btn-outline" data-ms-adm="picklogo" data-fam="${gi}">${logo?'تغيير اللوجو':'رفع لوجو'}</button>${logo?`<button type="button" class="ms-adm-del" data-ms-adm="delphoto" data-key="FL${gi}">حذف اللوجو</button>`:''}</div></div>
+    </div>
+    <div class="admin-section-title"><span>🕊️</span><span>شفيع الأسرة</span></div>
+    <div class="card ms-adm-card">${row('FP'+gi, {role:'شفيع الأسرة', g:'m'}, MS_PATRON_TONE)}</div>
+    <div class="admin-section-title"><span>${MS_FAM_EMOJI[f.icon]||'👥'}</span><span>أمناء وأعضاء الأسرة</span></div>
+    <div class="card ms-adm-card">${f.members.map((m,pi)=>row(`F${gi}-${pi}`, m, MS_MEMBER_TONES[pi%2])).join('')}${msExtras(gi).map((e,i)=>row(`X${gi}-${e.id}`, {role:e.role||'عضو', g:'m'}, MS_MEMBER_TONES[i%2], {gi, id:e.id})).join('')}
+      <div class="ms-adm-addrow"><input type="text" class="ms-adm-newrole" data-fam="${gi}" placeholder="المسمى (مثال: خادم، عضو)" maxlength="30" /><button type="button" class="btn btn-primary" data-ms-adm="addmember" data-fam="${gi}">➕ إضافة عضو</button></div></div>
+    <div class="admin-edit-actions" style="margin:6px 0 18px;"><button type="button" class="btn btn-primary" data-ms-adm="save" style="flex:1;">💾 حفظ</button></div>`;
+}
+function msReadLogo(file){
+  return new Promise(res=>{
+    const fr = new FileReader(); fr.onerror = ()=>res(null);
+    fr.onload = ()=>{ const im = new Image(); im.onerror = ()=>res(null);
+      im.onload = ()=>{ const k = Math.min(1, 400/Math.max(im.width, im.height)), w = Math.max(1,Math.round(im.width*k)), h = Math.max(1,Math.round(im.height*k));
+        const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(im,0,0,w,h); res(c.toDataURL('image/png')); };
+      im.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
+async function msAdmSetLogo(gi, file){
+  const key = 'FL'+gi, data = await msReadLogo(file);
+  if(!data){ showToast('الصورة مش مقروءة، جرّب صورة تانية', true); return; }
+  msAdmCollectNames();
+  showToast('جاري حفظ اللوجو...');
+  let ok = false;
+  for(let a=1; a<=3 && !ok; a++){
+    try{ const r = await window.storage.set('glavera-ms-photo-'+key, data, true, 45000); ok = r ? true : false; }catch(e){}
+    if(!ok) await sleep(800*a);
+  }
+  if(!ok){ showToast('ماقدرناش نحفظ اللوجو، جرّب تاني', true); return; }
+  const sl = (MS_DATA.slots[key] = MS_DATA.slots[key] || {});
+  sl.pv = Date.now(); MS_PHOTO_CACHE[key] = {pv:sl.pv, url:data};
+  const saved = await saveMeetingStructureData();
+  showToast(saved ? 'اتحفظ اللوجو ✅' : 'حصلت مشكلة في التسجيل، دوس حفظ', !saved);
+  render();
+}
+document.addEventListener('click', e=>{
+  const el = e.target.closest && e.target.closest('[data-ms-adm]');
+  if(!el) return;
+  const act = el.dataset.msAdm;
+  if(act==='famopen'){ msAdmCollectNames(); state.msFam = +el.dataset.fam; render(); window.scrollTo && window.scrollTo(0,0); }
+  else if(act==='famback'){ msAdmCollectNames(); saveMeetingStructureData(); state.msFam = null; render(); }
+  else if(act==='picklogo'){
+    const gi = +el.dataset.fam, inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*';
+    inp.addEventListener('change', ()=>{ const f = inp.files && inp.files[0]; if(f) msAdmSetLogo(gi, f); });
+    inp.click();
+  }
+}, true);
 function msAdmCollectNames(){
   if(!MS_DATA.slots) MS_DATA.slots = {};
   document.querySelectorAll('.ms-adm-role').forEach(i=>{
