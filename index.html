@@ -11649,7 +11649,7 @@ function showDeviceKickedOverlay(){
 const GAMES_LOCK_REVIEWER_ID = '6666'; /* المشارك المسموح له بدخول Games وهي مقفولة عشان يراجع التعديل */
 const MAINT_DEFAULT_MSG = 'نعمل حاليًا على تحديث هذه الخدمة لنقدّم لك تجربة أفضل وأكثر سلاسة. ستعود للعمل خلال وقت قصير، ونشكرك على تفهّمك وصبرك.';
 function featureLockedForMe(key){
-  const f = key==='attendance' ? 'attendanceLocked' : key==='retreat' ? 'retreatLocked' : key==='structure' ? 'structureLocked' : null;
+  const f = key==='attendance' ? 'attendanceLocked' : key==='retreat' ? 'retreatLocked' : key==='structure' ? 'structureLocked' : key==='glavera' ? 'glaveraLocked' : null;
   return !!(f && CONF_SETTINGS && CONF_SETTINGS[f] && state.pid!==GAMES_LOCK_REVIEWER_ID);
 }
 function maintMessage(){ return ((CONF_SETTINGS && CONF_SETTINGS.maintMsg) || '').trim() || MAINT_DEFAULT_MSG; }
@@ -12353,13 +12353,13 @@ function renderNavDock(){
 function renderNavTiles(){
   const gamesLockedForMe = CONF_SETTINGS.gamesLocked && state.pid!==GAMES_LOCK_REVIEWER_ID;
   const items = NAV_TILE_ITEMS.filter(it=>it.page!=='settings').map(it=>{
-    const locked = (it.page==='games' && gamesLockedForMe) || (it.page==='structure' && featureLockedForMe('structure'));
+    const locked = (it.page==='games' && gamesLockedForMe) || (it.page==='structure' && featureLockedForMe('structure')) || (it.page==='glavera' && featureLockedForMe('glavera'));
     return `
     <button type="button" class="nav-tile" data-action="tile-nav" data-page="${it.page}">
       <span class="nt-chev">${locked?'🔒':ICO.chev}</span>
       <span class="nt-ico" style="background:${it.color}${locked?';filter:grayscale(1) opacity(.6)':''}">${it.icon}</span>
       <span class="nt-lab">${tr(it.labelKey)}</span>
-      <span class="nt-sub">${locked?(it.page==='structure'?'🔧 جاري التحديث':'مقفولة مؤقتًا'):tr(it.subKey)}</span>
+      <span class="nt-sub">${locked?((it.page==='structure'||it.page==='glavera')?'🔧 جاري التحديث':'مقفولة مؤقتًا'):tr(it.subKey)}</span>
     </button>`;
   }).join('');
   return `<div class="nav-tile-grid">${items}</div>`;
@@ -12369,7 +12369,8 @@ function renderCapabilitiesPage(){
   const all = (window.capOrdered||(x=>x))([...NAV_TILE_ITEMS.filter(it=>it.page!=='settings'), ...NAV_DOCK_ITEMS]);
   const tiles = all.map(it=>{
     const bg = (!it.color || it.color==='transparent') ? 'linear-gradient(145deg,#FFB86B,#FF6B9D)' : it.color;
-    const sub = it.subKey ? tr(it.subKey) : '';
+    const gLk = it.page==='glavera' && featureLockedForMe('glavera');
+    const sub = gLk ? '🔒 جاري التحديث' : (it.subKey ? tr(it.subKey) : '');
     return `
     <button type="button" class="cap-tile" style="--cap-color:${bg}" data-action="tile-nav" data-page="${it.page}">
       <span class="cap-tile-ico">${it.icon}</span>
@@ -33400,7 +33401,7 @@ setTimeout(()=>{ try{ attRefresh(true); }catch(e){} }, 1500);
 setInterval(async ()=>{ try{
   if(document.hidden || state.adminUnlocked) return;
   const r = await window.storage.get('glavera-conf-settings', true); if(!r || !r.value) return;
-  const v = JSON.parse(r.value); const sig = ()=>[featureLockedForMe('attendance'), featureLockedForMe('retreat'), featureLockedForMe('structure'), maintMessage()].join('|');
+  const v = JSON.parse(r.value); const sig = ()=>[featureLockedForMe('attendance'), featureLockedForMe('retreat'), featureLockedForMe('structure'), featureLockedForMe('glavera'), maintMessage()].join('|');
   const before = sig();
   ['attendanceLocked','retreatLocked','structureLocked','maintMsg'].forEach(k=>{ CONF_SETTINGS[k] = v[k]; });
   if(before === sig()) return;
@@ -37866,6 +37867,7 @@ function adminMaintCardsHtml(){
     ${row('✅','قفل الحضور','attendance',!!CONF_SETTINGS.attendanceLocked)}
     ${row('✝️','قفل الخلوة الفردية','retreat',!!CONF_SETTINGS.retreatLocked)}
     ${row('👥','قفل هيكلة الاجتماع','structure',!!CONF_SETTINGS.structureLocked)}
+    ${row('✨','قفل خانة جلافيرا','glavera',!!CONF_SETTINGS.glaveraLocked)}
     <div class="card" style="margin-bottom:16px;">
       <div class="admin-session-name" style="margin-bottom:6px;">💬 رسالة الخانات المقفولة</div>
       <textarea class="field" id="maint-msg-input" rows="3" placeholder="${escapeHtml(MAINT_DEFAULT_MSG)}" style="min-height:76px;resize:vertical;">${escapeHtml(CONF_SETTINGS.maintMsg||'')}</textarea>
@@ -37874,10 +37876,10 @@ function adminMaintCardsHtml(){
     </div>`;
 }
 async function doToggleFeatureLock(key){
-  const f = key==='attendance' ? 'attendanceLocked' : key==='retreat' ? 'retreatLocked' : key==='structure' ? 'structureLocked' : null; if(!f) return;
+  const f = key==='attendance' ? 'attendanceLocked' : key==='retreat' ? 'retreatLocked' : key==='structure' ? 'structureLocked' : key==='glavera' ? 'glaveraLocked' : null; if(!f) return;
   CONF_SETTINGS[f] = !CONF_SETTINGS[f];
   await saveConfSettings(CONF_SETTINGS);
-  const nm = key==='attendance' ? 'الحضور' : key==='structure' ? 'هيكلة الاجتماع' : 'الخلوة الفردية';
+  const nm = key==='attendance' ? 'الحضور' : key==='structure' ? 'هيكلة الاجتماع' : key==='glavera' ? 'خانة جلافيرا' : 'الخلوة الفردية';
   showToast(CONF_SETTINGS[f] ? '🔧 اتقفل '+nm+' — المشاركين شايفين "جاري التحديث"' : '✅ اتفتح '+nm+' للجميع');
   render();
 }
@@ -44806,12 +44808,13 @@ document.addEventListener('click', function(ev){
 });
 
 /* ============================ القوائم ============================ */
+window.GLAFERA_LOGO = '<svg viewBox="0 0 48 48" aria-hidden="true" style="width:1.2em;height:1.2em;display:inline-block;vertical-align:-.22em" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="19" stroke-width="2.6" opacity=".95"/><path d="M33.5 19A10.5 10.5 0 1 0 34.5 25.5H24.5" stroke-width="3.4"/><path d="M38 5.5l1.5 3.5 3.5 1.5-3.5 1.5L38 15.5l-1.5-3.5L33 10.5 36.5 9z" fill="#fff" stroke="none"/></svg>';
 if(typeof NAV_TILE_ITEMS!=='undefined'){
   ['gallery','opinion','myphotos','wrapped'].forEach(function(pg){
     for(var i=NAV_TILE_ITEMS.length-1; i>=0; i--){ if(NAV_TILE_ITEMS[i].page===pg) NAV_TILE_ITEMS.splice(i,1); }
   });
   NAV_TILE_ITEMS.unshift(
-    {page:'glavera', icon:'✨', labelKey:'جلافيرا',   subKey:'عن جلافيرا وكل جديد',          color:'linear-gradient(145deg,#F1B53F,#B8862B)'},
+    {page:'glavera', icon:window.GLAFERA_LOGO, labelKey:'جلافيرا',   subKey:'عن جلافيرا وكل جديد',          color:'linear-gradient(145deg,#F1B53F,#B8862B)'},
     {page:'book',    icon:'🎟️', labelKey:'احجز الآن', subKey:'أمسيات ورحلات — احجز مكانك', color:'linear-gradient(145deg,#7A5CFF,#2FD0C0)'}
   );
 }
@@ -44821,7 +44824,7 @@ if(typeof BNAV_TABS!=='undefined'){
     if(!tb.quick) return;
     tb.quick = tb.quick.filter(function(q){ return ['gallery','opinion','myphotos','wrapped'].indexOf(q[2])<0; });
     if(tb.page==='profile' || tb.page==='capabilities'){
-      tb.quick.unshift(['✨','جلافيرا','glavera','عن جلافيرا وكل جديد'], ['🎟️','احجز الآن','book','أمسيات ورحلات احجز مكانك']);
+      tb.quick.unshift([window.GLAFERA_LOGO,'جلافيرا','glavera','عن جلافيرا وكل جديد'], ['🎟️','احجز الآن','book','أمسيات ورحلات احجز مكانك']);
     }
   });
 }
@@ -44829,7 +44832,7 @@ if(typeof ADMIN_HUB_ITEMS!=='undefined'){
   ADMIN_HUB_ITEMS.push(
     {group:'people',  tab:'book',    short:'فعاليات، صور، عربون، تذاكر وحضور', desc:'إضافة أنواع الحجز والفعاليات بصورها ولوكيشنها وعربونها، ومتابعة المحجوزين وقايمة الانتظار ومسح تذاكر QR', icon:'🎟️', label:'احجز الآن', color:'linear-gradient(145deg,#7A5CFF,#2FD0C0)'},
     {group:'content', tab:'caporder', short:'رتّب خانات صفحة الإمكانيات', desc:'تحديد ترتيب ظهور كل الخانات في صفحة الإمكانيات للمشاركين', icon:'🧩', label:'ترتيب الإمكانيات', color:'linear-gradient(145deg,#5FE0A4,#2F8FD0)'},
-    {group:'content', tab:'glavera', short:'صفحة التعريف والكروت',               desc:'نص صفحة جلافيرا والكروت اللي بتظهر للمشاركين', icon:'✨', label:'جلافيرا', color:'linear-gradient(145deg,#F1B53F,#B8862B)'}
+    {group:'content', tab:'glavera', short:'صفحة التعريف والكروت',               desc:'نص صفحة جلافيرا والكروت اللي بتظهر للمشاركين', icon:window.GLAFERA_LOGO, label:'جلافيرا', color:'linear-gradient(145deg,#F1B53F,#B8862B)'}
   );
 }
 
@@ -44915,6 +44918,7 @@ st.textContent = [
 ].join('');
 document.head.appendChild(st);
 window.bkLoad = load;
+(function(){ var _gv = window.FXVIEWS && window.FXVIEWS.glavera; if(_gv){ window.FXVIEWS.glavera = function(){ if(typeof featureLockedForMe==='function' && featureLockedForMe('glavera')) return renderMaintenancePage('جلافيرا', window.GLAFERA_LOGO); return _gv.apply(this, arguments); }; } })();
 (function(){ var _go = window.go; if(typeof _go==='function'){ window.go = function(v){ if(v==='book') state.bkCat = null; if(v==='glavera') state.glSub = null; return _go.apply(this, arguments); }; } })();
 load(true);
 })();
