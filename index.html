@@ -47404,6 +47404,28 @@ setTimeout(function(){ load(true); }, 6000);
   box-shadow:0 0 0 3px var(--frame),inset 0 2px 0 rgba(255,255,255,.2),inset 0 -4px 10px rgba(0,0,0,.3),0 3px 3px 3px rgba(0,0,0,.22),0 26px 34px -10px rgba(0,0,0,.55);
   transform:rotateX(6deg);transform-origin:50% 100%;transition:background .7s}
 .wh-board.pk{gap:4px;padding:6px}
+/* بطاقة السؤال/الإجابة الكبيرة + أنيميشن اختفاء الخانات */
+.wh-st.big{min-height:110px;padding:12px 16px;border-radius:22px;gap:12px;animation:none}
+.wh-st.big .ic{width:46px;height:46px}
+.wh-st.big .tx{font-size:16.5px}
+.wh-st.big .tx small{font-size:12px}
+.wh-st.big.enter{animation:whCardIn .6s cubic-bezier(.2,1.25,.35,1) both}
+@keyframes whCardIn{from{opacity:0;transform:translateY(42px) scale(.9)}to{opacity:1;transform:none}}
+.wh-st.big.fresh.yes{animation:whFlashY .9s ease both}
+.wh-st.big.fresh.no{animation:whFlashN .9s ease both}
+@keyframes whFlashY{0%{box-shadow:0 0 0 0 rgba(34,164,85,.0)}35%{box-shadow:0 0 0 6px rgba(34,164,85,.55),0 0 34px rgba(34,164,85,.6)}100%{box-shadow:0 0 0 2px rgba(255,255,255,.55),0 4px 0 rgba(0,0,0,.14),0 12px 22px rgba(0,0,0,.18)}}
+@keyframes whFlashN{0%{transform:translateX(0)}15%{transform:translateX(-7px)}30%{transform:translateX(6px)}45%{transform:translateX(-4px)}60%{transform:translateX(3px)}100%{transform:none;box-shadow:0 0 0 2px rgba(255,255,255,.55),0 4px 0 rgba(0,0,0,.14),0 12px 22px rgba(0,0,0,.18)}}
+.wh-ansslot{display:flex;align-items:center;justify-content:center;min-width:86px;flex:none}
+.wh-ansslot.still .wh-yes,.wh-ansslot.still .wh-no{animation:none}
+.wh-st.big .wh-yes,.wh-st.big .wh-no{font-size:27px}
+.wh-st.big .wh-yes svg,.wh-st.big .wh-no svg{width:34px;height:34px}
+.wh-st.big .wh-dots i{width:11px;height:11px;margin:0 3px}
+.wh-st .tx small.late{animation:whLate .5s ease .15s both}
+@keyframes whLate{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.wh-cats.in .wh-cat{animation:whCatIn .45s cubic-bezier(.2,1.3,.4,1) both;animation-delay:calc(var(--i)*45ms)}
+@keyframes whCatIn{from{opacity:0;transform:translateY(24px) scale(.82)}to{opacity:1;transform:none}}
+.wh-panel.leaving .wh-cat{animation:whCatOut .34s cubic-bezier(.55,0,.85,.4) both;animation-delay:calc(var(--i)*28ms);pointer-events:none}
+@keyframes whCatOut{to{opacity:0;transform:translateY(22px) scale(.78)}}
 .wh-slot{position:relative;width:var(--cw);height:calc(var(--cw)*1.28);border-radius:12px;background:var(--slot);box-shadow:inset 0 3px 7px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.2);transition:background-color .7s;perspective:520px;cursor:pointer}
 /* الكارت */
 .wh-c{position:absolute;inset:0;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;
@@ -47808,8 +47830,8 @@ function fit(){
   if(!G) return; var bw=G.ov.querySelector('.wh-bw'); if(!bw) return;
   var w=bw.clientWidth-14-20, h=bw.clientHeight-14-6, cw=Math.floor(Math.min(w/5, h/6/1.28, 80));
   /* شاشة اختيار الشخصية: الفريم أكبر ويملا المساحة لحد خط الـ 80% من الشاشة، والعرض والطول بيكبروا بنفس النسبة */
-  var bd0=G.ov.querySelector('.wh-board'); if(bd0) bd0.classList.toggle('pk',G.phase==='pick');
-  if(G.phase==='pick'){ cw=Math.floor(Math.min((bw.clientWidth-44)/5, (bw.clientHeight-52)/7.68, 100)); }
+  var pk0=(G.phase==='pick'||G.phase==='ask'||G.phase==='bot'); var bd0=G.ov.querySelector('.wh-board'); if(bd0) bd0.classList.toggle('pk',pk0);
+  if(pk0){ cw=Math.floor(Math.min((bw.clientWidth-44)/5, (bw.clientHeight-52)/7.68, 100)); }
   G.ov.style.setProperty('--cw',Math.max(36,cw)+'px'); G.ov.classList.toggle('big',cw>=50);
 }
 function setTheme(t){ G.ov.setAttribute('data-t',t); }
@@ -47865,14 +47887,17 @@ function panelHtml(){
   } else if(G.guessing){
     st='<div class="wh-st"><div class="ic">🎯</div><div class="tx">اضغط على الشخصية اللي بتتوقعها<small>لو غلطت هتخسر على طول!</small></div></div>';
   } else if(G.last&&G.qThisTurn){
-    st='<div class="wh-st"><div class="ic">'+catIcon(G.last.k)+'</div><div class="tx">'+esc(opt(G.last.k,G.last.v)[2])+'<small>اضغط على الكروت اللي مش مطابقة عشان تستبعدها</small></div>'+ansHtml(G.last.ans)+'</div>';
-  } else st='<div class="wh-st"><div class="ic">❓</div><div class="tx">دورك! اختار سؤال عن شخصية الجهاز<small>أو خمّن لو عارفها 🎯</small></div></div>';
+    var shownA=!G.ansHide;
+    st='<div class="wh-st"><div class="ic">'+catIcon(G.last.k)+'</div><div class="tx">'+esc(opt(G.last.k,G.last.v)[2])+(shownA?'<small class="late">اضغط على الكروت اللي مش مطابقة عشان تستبعدها</small>':'')+'</div><div class="wh-ansslot'+(G.cardFresh?'':' still')+'">'+(shownA?ansHtml(G.last.ans):'<div class="wh-dots"><i></i><i></i><i></i></div>')+'</div></div>';
+  } else st='';
   if(ph!=='pick'){
-    CATS.forEach(function(c){
-      var hl=(ph==='bot'&&G.botQ&&G.botQ.k===c.k)?' hl':'';
-      cats+='<button type="button" class="wh-cat'+hl+'" data-wh="cat" data-k="'+c.k+'"'+(canAsk?'':' disabled')+'>'+catIcon(c.k)+'<span>'+c.n+'</span></button>';
-    });
-    cats='<div class="wh-cats">'+cats+'</div>';
+    if(st){ var fOk=(ph==='ask')?(G.last&&G.last.ans):(G.botQ&&G.botQ.ans); st=st.replace('<div class="wh-st">','<div class="wh-st big'+(G.cardEnter?' enter':'')+(G.cardFresh?' fresh '+(fOk?'yes':'no'):'')+'">'); }
+    if(ph==='ask'&&!G.qThisTurn&&!G.guessing){
+      CATS.forEach(function(c,ci){
+        cats+='<button type="button" class="wh-cat" style="--i:'+ci+'" data-wh="cat" data-k="'+c.k+'"'+(canAsk?'':' disabled')+'>'+catIcon(c.k)+'<span>'+c.n+'</span></button>';
+      });
+      cats='<div class="wh-cats'+(G.catsEnter?' in':'')+'">'+cats+'</div>';
+    }
     var inTurn=(ph==='ask'); var ready=inTurn&&passReady();
     ctl='<div class="wh-ctl"><button type="button" class="wh-rb" data-wh="undo" aria-label="تراجع"'+((inTurn&&G.undo.length)?'':' disabled')+'>↶</button>'
       +'<button type="button" class="wh-pass'+(ready?' go':'')+'" data-wh="pass"'+(ready?'':' disabled')+'>Pass</button>'
@@ -47882,7 +47907,24 @@ function panelHtml(){
   }
   return st+cats+ctl;
 }
-function drawPanel(){ var p=G.ov.querySelector('.wh-panel'); if(p){ p.innerHTML=panelHtml(); p.style.minHeight = G.phase==='pick' ? Math.max(112, Math.round(G.ov.clientHeight*0.165-14))+'px' : ''; } drawTop(); }
+function whCardKey(){
+  if(G.phase==='pick') return 'pick';
+  if(G.phase==='ask'){ if(G.guessing) return 'g'+G.asked; if(G.qThisTurn&&G.last) return 'm'+G.asked; return ''; }
+  if(G.phase==='bot') return 'b'+(G.bkey||0);
+  return 'x';
+}
+function drawPanel(){
+  var p=G.ov.querySelector('.wh-panel');
+  if(p){
+    var key=whCardKey(), prev=G.cardKey;
+    G.cardEnter=!!key&&key!==prev; G.catsEnter=(G.phase==='ask'&&key===''&&prev!==''); G.cardKey=key;
+    var rev=(G.phase==='ask'&&G.qThisTurn&&G.last&&!G.ansHide)||(G.phase==='bot'&&G.botQ&&G.botQ.ans!=null);
+    G.cardFresh=!!(rev&&key&&G.revealKey!==key); if(G.cardFresh) G.revealKey=key;
+    p.innerHTML=panelHtml();
+    p.style.minHeight = G.phase==='pick' ? Math.max(112, Math.round(G.ov.clientHeight*0.165-14))+'px' : ((G.phase==='ask'||G.phase==='bot') ? '172px' : '');
+  }
+  drawTop();
+}
 /* ---------- مسار اللعب ---------- */
 function start(lvl){
   destroy(true);
@@ -47966,8 +48008,18 @@ function ask(k,v){
   if(G.phase!=='ask'||G.qThisTurn) return;
   var ans=match(CH[G.bot],k,v); setKnown(G.known,k,v,ans);
   G.qThisTurn=true; G.asked++; G.last={k:k,v:v,ans:ans}; G.log.push({who:'me',k:k,v:v,ans:ans});
-  snd(ans?'success':'error'); vib(ans?[15,30,15]:25); markBad(); drawPanel(); burst(ans);
-  var bd=G.ov.querySelector('.wh-board'); if(bd){ bd.classList.add('hint'); later(function(){ var b2=G.ov.querySelector('.wh-board'); if(b2) b2.classList.remove('hint'); },1500); }
+  G.busy=true; G.ansHide=true; snd('click'); vib(8);
+  /* 1) الخانات تختفي بأنيميشن  2) يظهر السؤال مع نقط "بيفكر"  3) تظهر الإجابة بأنيميشن */
+  var pn=G.ov.querySelector('.wh-panel'); if(pn) pn.classList.add('leaving');
+  later(function(){
+    var p2=G.ov.querySelector('.wh-panel'); if(p2) p2.classList.remove('leaving');
+    drawPanel(); snd('whoosh');
+    later(function(){
+      G.ansHide=false; snd(ans?'success':'error'); vib(ans?[15,30,15]:25); markBad(); drawPanel(); burst(ans);
+      var bd=G.ov.querySelector('.wh-board'); if(bd){ bd.classList.add('hint'); later(function(){ var b2=G.ov.querySelector('.wh-board'); if(b2) b2.classList.remove('hint'); },1500); }
+      G.busy=false;
+    },950);
+  },380);
 }
 function undo(){
   var u=G.undo.pop(); if(!u) return;
@@ -47982,7 +48034,7 @@ function autoElim(){
   later(function(){ G.busy=false; markBad(); drawPanel(); },batch.length*55+80);
 }
 function startPlayerTurn(){
-  G.phase='ask'; G.qThisTurn=false; G.guessing=false; G.undo=[]; G.last=null; G.botQ=null; G.botGuess=null; G.busy=false;
+  G.phase='ask'; G.qThisTurn=false; G.guessing=false; G.ansHide=false; G.undo=[]; G.last=null; G.botQ=null; G.botGuess=null; G.busy=false;
   setTheme('me'); drawBoard('me'); drawPanel();
 }
 function passReady(){
@@ -47993,7 +48045,7 @@ function passReady(){
 function pass(){ if(!passReady()) return; snd('click'); botTurn(); }
 function botTurn(){
   G.phase='bot'; G.busy=true; G.guessing=false; G.botQ=null; G.botGuess=null; G.botC=candsOf(G.botK);
-  setTheme('bot'); drawBoard('bot'); drawPanel();
+  G.bkey=Date.now(); setTheme('bot'); drawBoard('bot'); drawPanel();
   later(function(){
     if(botShouldGuess()){
       G.botGuess=G.botC[rnd(G.botC.length)]; drawPanel(); snd('whoosh');
