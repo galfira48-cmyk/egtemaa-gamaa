@@ -11510,25 +11510,107 @@ let state = FRESH_STATE();
 /* ============================= جلسة الجهاز الواحد (منع فتح نفس الكود من جهازين في نفس الوقت) ============================= */
 const DEVICE_SESSION_ID = 'sess'+Date.now()+Math.random().toString(36).slice(2,10);
 let _deviceKickCheckBusy = false;
+/* معرّف ثابت للجهاز (بيفضل زي ما هو بعد ريفريش) + الحساب بيتقفل على الجهاز المفتوح منه لحد ما يخرج أو يبطّل يبعت نبضات */
+const GLV_DEVICE_ID = (function(){ try{ let d = localStorage.getItem('glv-device-id'); if(!d){ d = 'dv'+Date.now()+Math.random().toString(36).slice(2,10); localStorage.setItem('glv-device-id', d); } return d; }catch(e){ return DEVICE_SESSION_ID; } })();
+const SESSION_FRESH_MS = 10*60*1000; /* لو الجهاز المفتوح مبعتش نبضة 10 دقايق نعتبر الجلسة ميتة ونسمح بالدخول من جهاز تاني */
 async function claimDeviceSession(pid){
   if(!pid) return;
-  try{ await window.storage.set('glavera-active-session-'+pid, JSON.stringify({sessionId:DEVICE_SESSION_ID, ts:Date.now()}), true); }
+  try{ await window.storage.set('glavera-active-session-'+pid, JSON.stringify({sessionId:DEVICE_SESSION_ID, deviceId:GLV_DEVICE_ID, ts:Date.now()}), true); }
   catch(e){ console.error('claimDeviceSession failed:', e); }
 }
 async function clearDeviceSession(pid){
   if(!pid) return;
+  try{
+    const r = await window.storage.get('glavera-active-session-'+pid, true);
+    const d = r && r.value ? JSON.parse(r.value) : null;
+    if(d && d.deviceId && d.deviceId !== GLV_DEVICE_ID) return; /* متمسحش جلسة جهاز تاني */
+  }catch(e){}
   try{ await window.storage.delete('glavera-active-session-'+pid, true); }catch(e){}
 }
+async function gxSessionUpdate(pid, fn){
+  const key = 'glavera-active-session-'+pid;
+  try{
+    if(window.storage.update){
+      await window.storage.update(key, (cur)=>{ let o=null; try{ o = cur ? JSON.parse(cur) : null; }catch(e){ o = null; } if(!o) return undefined; const n = fn(o); return n ? JSON.stringify(n) : undefined; }, true);
+    }else{
+      const r = await window.storage.get(key, true); const o = r && r.value ? JSON.parse(r.value) : null; if(!o) return;
+      const n = fn(o); if(n) await window.storage.set(key, JSON.stringify(n), true);
+    }
+  }catch(e){}
+}
+function gxHeartbeat(){
+  if(!state || !state.pid) return;
+  gxSessionUpdate(state.pid, (o)=> o.sessionId===DEVICE_SESSION_ID ? Object.assign(o,{ts:Date.now()}) : null);
+}
+setInterval(function(){ try{ gxHeartbeat(); }catch(e){} }, 60000);
+document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ gxHeartbeat(); }catch(e){} } });
+/* بوّابة الدخول: false = الحساب مفتوح دلوقتي من جهاز تاني */
+async function gxLoginGate(pid){
+  try{
+    const r = await window.storage.get('glavera-active-session-'+pid, true);
+    if(!r || !r.value) return true;
+    const d = JSON.parse(r.value);
+    if(!d || !d.sessionId) return true;
+    if(d.deviceId && d.deviceId === GLV_DEVICE_ID) return true;
+    if(!d.deviceId && d.sessionId === DEVICE_SESSION_ID) return true;
+    if(Date.now() - (d.ts||0) > SESSION_FRESH_MS) return true;
+    return false;
+  }catch(e){ return true; }
+}
+async function gxShowLoginBlocked(pid){
+  /* بنسجّل المحاولة في جلسة صاحب الحساب، وجهازه هيعرضها له كإشعار */
+  gxSessionUpdate(pid, (o)=> Object.assign(o,{attempt:{ts:Date.now()}}));
+  if(document.getElementById('login-blocked-overlay')) return;
+  const p = PARTICIPANTS.find(x=>x.id===pid) || {};
+  const bd = document.createElement('div');
+  bd.className = 'lightbox-backdrop'; bd.id = 'login-blocked-overlay'; bd.style.zIndex = '99999';
+  bd.innerHTML = `
+    <div style="max-width:330px;width:86%;margin:auto;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 22px;text-align:center;">
+      <div style="font-size:44px;margin-bottom:10px;">🔒</div>
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:16px;margin-bottom:8px;">الحساب ده مفتوح من موبايل تاني</div>
+      <div class="hint" style="margin-bottom:18px;">مينفعش تدخل لحد ما صاحب الحساب يخرج من الموبايل التاني. وإحنا بعتنا له تنبيه إن حد حاول يفتح حسابه. لو الحساب ده حسابك ومش إنت اللي فاتحه، ابعت بلاغ للأدمن.</div>
+      <button type="button" class="btn btn-primary" style="width:100%;margin-bottom:10px;" id="login-blocked-report">📮 إرسال بلاغ للأدمن</button>
+      <button type="button" class="btn btn-outline" style="width:100%;" id="login-blocked-close">حسنًا</button>
+    </div>`;
+  document.body.appendChild(bd);
+  document.getElementById('login-blocked-close').addEventListener('click', ()=>bd.remove());
+  const rb = document.getElementById('login-blocked-report');
+  rb.addEventListener('click', async ()=>{
+    rb.disabled = true; rb.textContent = 'جاري الإرسال...';
+    const report = { id:'rp'+Date.now(), pid:pid, name:p.name||'مجهول', ts:Date.now(), resolved:false,
+      text:'🔒 حد حاول يدخل على حساب «'+(p.name||pid)+'» (كود '+pid+') وهو مفتوح من موبايل تاني. صاحب الحساب بيقول إنه مش هو اللي فاتحه.' };
+    try{
+      if(window.storage.update){ await window.storage.update('glavera-reports', (cur)=>{ let a=[]; try{ a = cur ? JSON.parse(cur) : []; }catch(e){ a=[]; } if(!Array.isArray(a)) a=[]; a.push(report); return JSON.stringify(a); }, true); }
+      else { const cur = await loadReports(); cur.push(report); await saveReports(cur); }
+      try{ if(!REPORTS.some(x=>x.id===report.id)) REPORTS.push(report); }catch(e){}
+      rb.textContent = '✅ وصل البلاغ للأدمن';
+      showToast('وصل بلاغك للأدمن 🙏');
+    }catch(e){ rb.disabled = false; rb.textContent = '📮 إرسال بلاغ للأدمن'; showToast('معرفناش نبعت البلاغ، جرّب تاني', true); }
+  });
+}
+function gxAttemptSeenGet(pid){ try{ return +localStorage.getItem('glv-attempt-seen-'+pid)||0; }catch(e){ return 0; } }
+function gxAttemptSeenSet(pid,ts){ try{ localStorage.setItem('glv-attempt-seen-'+pid, String(ts)); }catch(e){} }
 async function checkDeviceSessionKicked(){
   if(!state.pid || _deviceKickCheckBusy) return;
   _deviceKickCheckBusy = true;
   try{
     const r = await window.storage.get('glavera-active-session-'+state.pid, true);
     _deviceKickCheckBusy = false;
-    if(!r || !r.value) return;
+    if(!r || !r.value){ claimDeviceSession(state.pid); return; }
     const data = JSON.parse(r.value);
     if(data && data.sessionId && data.sessionId !== DEVICE_SESSION_ID){
       showDeviceKickedOverlay();
+      return;
+    }
+    if(data && data.sessionId === DEVICE_SESSION_ID){
+      const at = data.attempt && data.attempt.ts;
+      if(at && at > gxAttemptSeenGet(state.pid)){
+        gxAttemptSeenSet(state.pid, at);
+        showToast('🔒 حد حاول يفتح حسابك من جهاز تاني', true);
+        try{ pushNotification(state.pid, '🔒 حد حاول يفتح حسابك من جهاز تاني. لو مش إنت، غيّر الباسورد وبلّغ الأدمن', '🔒'); }catch(e){}
+        try{ notifyNative('🔒 محاولة دخول على حسابك', 'حد حاول يفتح حسابك من جهاز تاني', 'login-attempt'); }catch(e){}
+      }
+      if(Date.now() - (data.ts||0) > 30000) gxHeartbeat();
     }
   }catch(e){ _deviceKickCheckBusy = false; }
 }
@@ -37755,9 +37837,17 @@ async function doLogin(){
     doLoginWithCode(acc.id);
   } finally { state._loggingIn = false; }
 }
-function doLoginWithCode(code){
+function doLoginWithCode(code, opts){
+  if(opts && opts.skipGate){ return doLoginWithCodeNow(code); }
+  const pid = String(code||'').trim().toUpperCase();
+  if(state._gating) return;
+  state._gating = true;
+  gxLoginGate(pid).then(ok=>{ state._gating = false; if(ok) doLoginWithCodeNow(code); else gxShowLoginBlocked(pid); })
+    .catch(()=>{ state._gating = false; doLoginWithCodeNow(code); });
+}
+function doLoginWithCodeNow(code){
   const p = PARTICIPANTS.find(x=>x.id===code.trim().toUpperCase());
-  if(!p && !__loginDataReady){ loginWaitAndRetry(()=>doLoginWithCode(code)); return; }
+  if(!p && !__loginDataReady){ loginWaitAndRetry(()=>doLoginWithCodeNow(code)); return; }
   if(!p){ showToast('كود الدخول غير صحيح', true); return; }
   const extra = myExtra(p.id);
   document.documentElement.dataset.theme = extra.mode==='light' ? 'light' : 'dark';
@@ -37827,7 +37917,7 @@ async function doSignup(){
     }catch(e){}
     SU = {stage:'', year:'', step:1};
     state._signingUp = false;
-    doLoginWithCode(newId);
+    doLoginWithCode(newId, {skipGate:true});
     suCelebrate(celebName, celebPhoto, gift);
   }catch(e){
     reset();
