@@ -47403,6 +47403,7 @@ setTimeout(function(){ load(true); }, 6000);
   background:linear-gradient(160deg,var(--board),var(--board2));direction:ltr;
   box-shadow:0 0 0 3px var(--frame),inset 0 2px 0 rgba(255,255,255,.2),inset 0 -4px 10px rgba(0,0,0,.3),0 3px 3px 3px rgba(0,0,0,.22),0 26px 34px -10px rgba(0,0,0,.55);
   transform:rotateX(6deg);transform-origin:50% 100%;transition:background .7s}
+.wh-board.pk{gap:4px;padding:6px}
 .wh-slot{position:relative;width:var(--cw);height:calc(var(--cw)*1.28);border-radius:12px;background:var(--slot);box-shadow:inset 0 3px 7px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.2);transition:background-color .7s;perspective:520px;cursor:pointer}
 /* الكارت */
 .wh-c{position:absolute;inset:0;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;
@@ -47806,6 +47807,9 @@ function inspect(i){
 function fit(){
   if(!G) return; var bw=G.ov.querySelector('.wh-bw'); if(!bw) return;
   var w=bw.clientWidth-14-20, h=bw.clientHeight-14-6, cw=Math.floor(Math.min(w/5, h/6/1.28, 80));
+  /* شاشة اختيار الشخصية: الفريم أكبر ويملا المساحة لحد خط الـ 80% من الشاشة، والعرض والطول بيكبروا بنفس النسبة */
+  var bd0=G.ov.querySelector('.wh-board'); if(bd0) bd0.classList.toggle('pk',G.phase==='pick');
+  if(G.phase==='pick'){ cw=Math.floor(Math.min((bw.clientWidth-44)/5, (bw.clientHeight-52)/7.68, 100)); }
   G.ov.style.setProperty('--cw',Math.max(36,cw)+'px'); G.ov.classList.toggle('big',cw>=50);
 }
 function setTheme(t){ G.ov.setAttribute('data-t',t); }
@@ -47878,7 +47882,7 @@ function panelHtml(){
   }
   return st+cats+ctl;
 }
-function drawPanel(){ var p=G.ov.querySelector('.wh-panel'); if(p) p.innerHTML=panelHtml(); drawTop(); }
+function drawPanel(){ var p=G.ov.querySelector('.wh-panel'); if(p){ p.innerHTML=panelHtml(); p.style.minHeight = G.phase==='pick' ? Math.max(112, Math.round(G.ov.clientHeight*0.165-14))+'px' : ''; } drawTop(); }
 /* ---------- مسار اللعب ---------- */
 function start(lvl){
   destroy(true);
@@ -49635,8 +49639,8 @@ var DIFF={
   expert:{n:'صعب جدًا', en:'EXTRA HARD', ic:'💎', col:'#FF4D6D', W:[8,9], H:[9,11], segs:[13,17], dens:[.07,.13], hints:1, mult:5,   stars:[4,4], d:'شبكات ضخمة بأشكال معقدة وتلميحة واحدة بس'}
 };
 var ORDER=['easy','medium','hard','expert'];
-/* لون الأرضية بيتغيّر مع كل مرحلة */
-var RP_PAL=[['#f06680','#d23f5c'],['#4fc3f7','#1e88c9'],['#7ddc6f','#3ea83a'],['#ffb74d','#ef8a17'],['#b583ff','#7c4dd6'],['#26d0c0','#12968a'],['#ff7ab8','#d8408a'],['#ffe45e','#e0b800']];
+/* لون الأرضية بيتغيّر كل 5 مراحل */
+var RP_PAL=[['#f06680','#d23f5c'],['#4fc3f7','#1e88c9'],['#7ddc6f','#3ea83a'],['#ffb74d','#ef8a17'],['#b583ff','#7c4dd6'],['#26d0c0','#12968a'],['#ff7ab8','#d8408a'],['#ffe45e','#e0b800'],['#ff8a65','#e64a19'],['#5c7cfa','#364fc7'],['#a3e635','#65a30d'],['#f472b6','#be185d'],['#22d3ee','#0e7490'],['#fb923c','#c2410c'],['#c084fc','#9333ea'],['#2dd4bf','#0f766e'],['#facc15','#a16207'],['#f87171','#b91c1c'],['#60a5fa','#1d4ed8'],['#4ade80','#15803d'],['#e879f9','#a21caf'],['#94a3b8','#475569'],['#fda4af','#e11d48'],['#34d399','#047857']];
 
 function hashStr(s){ var h=2166136261; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
 function mulberry(a){ a=a>>>0; return function(){ a=(a+0x6D2B79F5)|0; var t=Math.imul(a^(a>>>15),1|a); t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296; }; }
@@ -49928,7 +49932,7 @@ function draw(now){
     if(G.painted[i]){
       var age=now-G.paintedAt[i]; if(age>=0&&age<280) sc=1+.16*Math.sin(Math.PI*age/280);
       var cxm=tx+cs/2, cym=ty+cs/2, s2=(cs-2.4)*sc;
-      var gr=c.createLinearGradient(0,cym-s2/2,0,cym+s2/2); var pl=RP_PAL[((G.n||1)-1)%RP_PAL.length]; gr.addColorStop(0,pl[0]); gr.addColorStop(1,pl[1]);
+      var gr=c.createLinearGradient(0,cym-s2/2,0,cym+s2/2); var pl=RP_PAL[Math.floor(((G.n||1)-1)/5)%RP_PAL.length]; gr.addColorStop(0,pl[0]); gr.addColorStop(1,pl[1]);
       c.fillStyle=gr; rr(c,cxm-s2/2,cym-s2/2,s2,s2,Math.max(2,cs*.07)); c.fill();
       c.fillStyle='rgba(255,255,255,.22)'; c.fillRect(cxm-s2/2+2,cym-s2/2+1.2,s2-4,Math.max(1.4,cs*.05));
       if(won){ var a2=Math.max(0,Math.sin((now-G.wonAt)*.006-(x+y)*.45)); if(a2>0&&now-G.wonAt<2600){ c.fillStyle='rgba(255,255,255,'+(a2*.34)+')'; rr(c,cxm-s2/2,cym-s2/2,s2,s2,3); c.fill(); } }
