@@ -6716,145 +6716,6 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .dt-pip-shade2{fill:rgba(255,255,255,.07);}
   .dt-pip-glint{fill:rgba(255,255,255,.35);}
   .dt-in{border-radius:10px;}
-  /* ===================== UNO (landscape table view) ===================== */
-  .uno-stage{position:fixed; inset:0; z-index:70; background:#08150d; overflow:hidden;}
-  .uno-rotor{position:fixed; top:50%; left:50%; width:100vh; height:100vw; transform:translate(-50%,-50%) rotate(90deg); transform-origin:center center; overflow:hidden;}
-  @media (orientation:landscape){ .uno-rotor{width:100vw; height:100vh; transform:translate(-50%,-50%) rotate(0deg);} }
-  .uno-felt{position:absolute; inset:4%; border-radius:46%; background:radial-gradient(circle at 50% 42%, #2f8f52, #1c6b3c 55%, #124e2c 100%);
-    box-shadow:0 0 0 14px #6b4423, 0 0 0 18px #4a2f18, inset 0 0 60px rgba(0,0,0,.35), 0 20px 50px rgba(0,0,0,.5);}
-  .uno-topbar{position:absolute; top:10px; left:10px; right:10px; display:flex; align-items:center; justify-content:space-between; z-index:5;}
-  .uno-round-ico{width:34px; height:34px; border-radius:50%; background:rgba(10,20,14,.55); border:1px solid rgba(255,255,255,.18); color:#fff;
-    display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; backdrop-filter:blur(2px);}
-  .uno-clock{width:38px; height:38px; border-radius:50%; background:radial-gradient(circle,#fff,#e7e2d8); border:3px solid #c8461e; display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 3px 8px rgba(0,0,0,.4);}
-  .uno-me-tag{position:absolute; top:52px; left:10px; display:flex; flex-direction:column; align-items:center; gap:3px; z-index:4;}
-  .uno-seat{position:absolute; display:flex; flex-direction:column; align-items:center; gap:3px; z-index:4;}
-  .uno-seat-top{top:8px; left:50%; transform:translateX(-50%);}
-  .uno-seat-right{top:42%; right:4%; transform:translateY(-50%);}
-  .uno-seat-corner{bottom:16%; right:6%;}
-  .uno-seat-avatar-wrap{position:relative; width:60px; height:60px; border-radius:50%; padding:3px; background:rgba(0,0,0,.25);}
-  .uno-seat.is-turn .uno-seat-avatar-wrap, .uno-me-tag.is-turn .uno-seat-avatar-wrap{background:linear-gradient(145deg,var(--gold),#fff2c9); animation:unoTurnGlow 1.4s infinite;}
-  @keyframes unoTurnGlow{0%,100%{box-shadow:0 0 0 3px rgba(244,183,64,.35),0 0 10px rgba(244,183,64,.5);} 50%{box-shadow:0 0 0 5px rgba(244,183,64,.55),0 0 22px rgba(244,183,64,.85);}}
-  .uno-seat-avatar-wrap .pl-avatar, .uno-seat-avatar-wrap .pl-ai{width:100%; height:100%; font-size:19px; margin:0;}
-  .uno-seat-name{font-size:11px; font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); max-width:78px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .uno-seat-count{font-size:10.5px; font-weight:800; color:#ffe9b0; display:flex; align-items:center; gap:2px; text-shadow:0 1px 2px rgba(0,0,0,.6);}
-  .uno-catch-btn{border:none; border-radius:10px; padding:4px 9px; font-family:'Cairo',sans-serif; font-weight:800; font-size:10px; background:linear-gradient(145deg,#FF6B6B,#C81E3A); color:#fff; cursor:pointer; animation:unoPulse 1s infinite;}
-  @keyframes unoPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.08);}}
-  .uno-fan{position:relative; width:76px; height:44px;}
-  .uno-seat-right .uno-fan, .uno-seat-corner .uno-fan{width:30px; height:76px;}
-  .uno-fan-card{position:absolute; top:50%; left:50%;}
-  .uno-center{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; align-items:center; justify-content:center; gap:16px; z-index:3;}
-  .uno-dir-arrows{position:absolute; inset:-46px; pointer-events:none;}
-  .uno-dir-arrows svg{width:100%; height:100%;}
-  .uno-discard-stack{position:relative;}
-  .uno-color-dot{position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:14px; height:14px; border-radius:50%; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.4); z-index:2;}
-  .uno-draw-pile{position:relative; border:none; background:none; padding:0; cursor:pointer;}
-  .uno-draw-pile:disabled{opacity:.5; cursor:default;}
-  .uno-draw-pile .uno-card.uno-back{box-shadow:0 2px 0 #14102f, 0 4px 0 #14102f, 0 6px 0 #14102f, 0 3px 10px rgba(0,0,0,.5), inset 0 0 0 3px rgba(255,255,255,.55);}
-  .uno-draw-count{position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); background:#fff; border:1px solid rgba(0,0,0,.15); border-radius:9px; padding:1px 6px; font-size:10px; font-weight:800; color:#333;}
-  .uno-status{position:absolute; top:80px; left:50%; transform:translateX(-50%); text-align:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:13.5px; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.6); background:rgba(0,0,0,.28); padding:4px 12px; border-radius:999px; z-index:4; white-space:nowrap;}
-  .uno-card{position:relative; width:50px; height:74px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 3px 8px rgba(0,0,0,.4), inset 0 0 0 3px #fff, inset 0 0 0 4.5px rgba(0,0,0,.65); border:none; padding:0; cursor:default; font-family:'Cairo',sans-serif; overflow:hidden;}
-  .uno-card.mini{width:28px; height:42px; border-radius:5px; box-shadow:0 2px 5px rgba(0,0,0,.4), inset 0 0 0 2px #fff, inset 0 0 0 3px rgba(0,0,0,.65);}
-  .uno-card[data-color="red"]{background:linear-gradient(155deg,#F3392E,#C4141B 65%,#A00E15);}
-  .uno-card[data-color="yellow"]{background:linear-gradient(155deg,#FFDA1E,#F6B800 65%,#D99900);}
-  .uno-card[data-color="green"]{background:linear-gradient(155deg,#3FBE4C,#1E9E30 65%,#127A22);}
-  .uno-card[data-color="blue"]{background:linear-gradient(155deg,#2E8CE0,#0F63C4 65%,#0A4A96);}
-  .uno-card[data-color="wild"]{background:linear-gradient(155deg,#2b2b2f,#111114 65%,#000);}
-  .uno-card .uno-oval{position:absolute; top:6%; left:9%; right:9%; bottom:6%; background:#fff; border-radius:50%; transform:rotate(-20deg); box-shadow:0 0 0 1.5px rgba(0,0,0,.15) inset; z-index:0;}
-  .uno-card[data-color="wild"] .uno-oval{background:conic-gradient(from 200deg,#F3392E,#FFDA1E,#3FBE4C,#2E8CE0,#F3392E);}
-  .uno-card .uno-center-pip{position:relative; z-index:1; font-size:24px; font-weight:900; color:#111; text-shadow:0 0 0 #000; -webkit-text-stroke:1.5px #111; transform:rotate(-20deg); font-style:italic; letter-spacing:-1px;}
-  .uno-card[data-color="red"] .uno-center-pip{color:#E4161C;}
-  .uno-card[data-color="yellow"] .uno-center-pip{color:#F6B800;}
-  .uno-card[data-color="green"] .uno-center-pip{color:#1E9E30;}
-  .uno-card[data-color="blue"] .uno-center-pip{color:#0F63C4;}
-  .uno-card[data-color="wild"] .uno-center-pip{color:#fff; -webkit-text-stroke:1.5px #000;}
-  .uno-card.mini .uno-center-pip{font-size:13px; -webkit-text-stroke:.8px #111;}
-  .uno-card .uno-corner{position:absolute; font-size:11px; font-weight:900; color:#fff; -webkit-text-stroke:.6px #000; font-style:italic; z-index:1;}
-  .uno-card.mini .uno-corner{display:none;}
-  .uno-card .uno-corner.tl{top:4px; left:5px;}
-  .uno-card .uno-corner.br{bottom:4px; right:5px; transform:rotate(180deg);}
-  .uno-card.uno-back{background:linear-gradient(155deg,#F3392E,#C4141B 60%,#8E0E13); box-shadow:0 3px 8px rgba(0,0,0,.4), inset 0 0 0 3px #fff, inset 0 0 0 4.5px rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center;}
-  .uno-back-logo{font-family:'Cairo',sans-serif; font-weight:900; font-style:italic; font-size:15px; letter-spacing:-.5px; color:#fff; -webkit-text-stroke:1px rgba(0,0,0,.35); transform:rotate(-16deg);}
-  .uno-card.mini .uno-back-logo{font-size:9px;}
-  .uno-card.playable{cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55), 0 0 0 3px var(--gold), 0 0 14px rgba(244,183,64,.55); animation:unoCardGlow 1.3s ease-in-out infinite;}
-  @keyframes unoCardGlow{0%,100%{box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55), 0 0 0 3px var(--gold), 0 0 10px rgba(244,183,64,.4);} 50%{box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.55), 0 0 0 4px var(--gold), 0 0 22px rgba(244,183,64,.85);}}
-  .uno-card.playable:active{transform:translateY(-8px) scale(1.04); animation:none;}
-  .uno-card.dim{opacity:.42;}
-  .uno-card.uno-just-landed{animation:unoCardLand .32s cubic-bezier(.2,.9,.32,1.4);}
-  @keyframes unoCardLand{0%{transform:scale(.3) rotate(-40deg) translateY(-30px); opacity:0;} 70%{transform:scale(1.08) rotate(6deg);} 100%{transform:none; opacity:1;}}
-  .uno-card.uno-just-drawn{animation:unoCardDrawIn .3s cubic-bezier(.2,.9,.32,1.4);}
-  @keyframes unoCardDrawIn{0%{transform:translateY(34px) scale(.7); opacity:0;} 100%{transform:none; opacity:1;}}
-  .uno-bottom-row{position:absolute; left:0; right:0; bottom:8px; display:flex; align-items:flex-end; gap:8px; padding:0 10px; z-index:4;}
-  .uno-call-btn{flex-shrink:0; width:70px; height:70px; border-radius:50%; border:3px solid #fff; background:radial-gradient(circle at 35% 30%, #ff8a7a, #d6301e 70%); color:#fff;
-    font-family:'Cairo',sans-serif; font-weight:900; font-size:11px; line-height:1.15; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;
-    box-shadow:0 6px 16px rgba(0,0,0,.45); text-shadow:0 1px 3px rgba(0,0,0,.4);}
-  .uno-call-btn.is-active{animation:unoPulse .8s infinite; box-shadow:0 0 0 4px rgba(255,217,61,.5), 0 6px 16px rgba(0,0,0,.45);}
-  .uno-call-btn:disabled{opacity:.42; cursor:default; animation:none;}
-  .uno-hand-scroller{flex:1; display:flex; justify-content:center; overflow-x:auto; padding:14px 2px 4px; -webkit-overflow-scrolling:touch; align-items:flex-end;}
-  .uno-hand-card-wrap{flex-shrink:0; margin:0 -13px; transform:translateY(var(--fan-y,0px)) rotate(var(--fan-rot,0deg)); transition:transform .15s; position:relative;}
-  .uno-hand-card-wrap:hover{ z-index:20 !important; transform:translateY(calc(var(--fan-y,0px) - 10px)) rotate(var(--fan-rot,0deg)); }
-  .uno-hand-scroller .uno-card{transition:transform .15s, box-shadow .15s;}
-  .uno-hand-count{flex-shrink:0; font-size:10.5px; font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); align-self:center; white-space:nowrap;}
-  .uno-actions-row{position:absolute; bottom:98px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:5;}
-  .uno-color-overlay{position:absolute; inset:0; z-index:60; background:rgba(6,5,20,.68); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; animation:dylFade .2s ease;}
-  .uno-color-card{background:var(--surface); border-radius:20px; padding:20px; width:240px; max-width:70%; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.4);}
-  .uno-color-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; color:var(--text); margin-bottom:14px;}
-  .uno-color-wheel{position:relative; width:170px; height:170px; margin:4px auto 0; border-radius:50%;
-    background:conic-gradient(from -45deg, #F3392E 0 25%, #FFDA1E 0 50%, #3FBE4C 0 75%, #2E8CE0 0 100%);
-    box-shadow:0 10px 30px rgba(0,0,0,.4), inset 0 0 0 5px rgba(255,255,255,.9), inset 0 0 0 8px rgba(0,0,0,.15);
-    animation:unoWheelIn .35s cubic-bezier(.2,.9,.32,1.4);}
-  @keyframes unoWheelIn{0%{transform:scale(.4) rotate(-120deg); opacity:0;} 100%{transform:none; opacity:1;}}
-  .uno-color-wheel::after{content:''; position:absolute; inset:38%; background:var(--surface); border-radius:50%; box-shadow:inset 0 0 0 3px rgba(0,0,0,.1); pointer-events:none;}
-  .uno-color-btn{position:absolute; width:50%; height:50%; border:none; background:transparent; cursor:pointer;}
-  .uno-color-btn:active{filter:brightness(1.3);}
-  .uno-color-btn[data-color="red"]{top:0; right:50%; clip-path:polygon(100% 100%, 0 0, 100% 0);}
-  .uno-color-btn[data-color="yellow"]{top:0; left:50%; clip-path:polygon(0 100%, 0 0, 100% 0);}
-  .uno-color-btn[data-color="blue"]{bottom:0; right:50%; clip-path:polygon(100% 0, 0 100%, 100% 100%);}
-  .uno-color-btn[data-color="green"]{bottom:0; left:50%; clip-path:polygon(0 0, 0 100%, 100% 100%);}
-  .uno-fx-banner{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:12; pointer-events:none;
-    font-family:'Cairo',sans-serif; font-weight:900; font-size:30px; color:#fff; text-shadow:0 3px 10px rgba(0,0,0,.6), 0 0 20px rgba(0,0,0,.4);
-    padding:10px 26px; border-radius:16px; white-space:nowrap; animation:unoFxPop .9s cubic-bezier(.2,.9,.32,1.4) forwards;}
-  @keyframes unoFxPop{0%{transform:translate(-50%,-50%) scale(.3) rotate(-8deg); opacity:0;} 22%{transform:translate(-50%,-50%) scale(1.15) rotate(2deg); opacity:1;} 75%{transform:translate(-50%,-50%) scale(1) rotate(0); opacity:1;} 100%{transform:translate(-50%,-50%) scale(1.1) rotate(0); opacity:0;}}
-  .uno-fx-banner.fx-red{background:radial-gradient(circle,#FF6B6B,#C81E3A);}
-  .uno-fx-banner.fx-yellow{background:radial-gradient(circle,#FFE066,#E0A400); color:#3A2400;}
-  .uno-fx-banner.fx-green{background:radial-gradient(circle,#79D989,#1E8E3E);}
-  .uno-fx-banner.fx-blue{background:radial-gradient(circle,#63A4FF,#1450B8);}
-  .uno-fx-banner.fx-skip{background:radial-gradient(circle,#666,#111);}
-  .uno-fx-banner.fx-plus{background:radial-gradient(circle,#FF8A3D,#C8471E); font-size:38px;}
-  .uno-win-overlay{position:absolute; inset:0; z-index:8; display:flex; align-items:center; justify-content:center; padding:20px;}
-  .uno-win-card{width:min(320px,84%); padding:20px 16px 16px; border-radius:18px; text-align:center; border:1.5px solid var(--gold);
-    background:linear-gradient(160deg, rgba(244,183,64,.94), rgba(255,107,107,.88)); animation:dtPop .4s cubic-bezier(.34,1.56,.64,1); box-shadow:0 20px 50px rgba(0,0,0,.5);}
-  .uno-win-ico{font-size:40px; margin-bottom:6px;}
-  .uno-win-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:#2A1400; margin-bottom:4px;}
-  .uno-win-sub{font-size:13px; color:#3A2400; font-weight:700;}
-  .uno-lobby-list{display:flex; flex-direction:column; gap:8px; margin:12px 0;}
-  .uno-lobby-row{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--surface-2); border:1px solid var(--border);}
-  .uno-lobby-row.empty{opacity:.5; justify-content:center;}
-  .uno-lobby-pname{font-size:13px; font-weight:800; color:var(--text); flex:1;}
-  /* ---- شاشة المواجهة (VS) قبل بدء اليونو ---- */
-  .uno-vs-screen{text-align:center; padding:22px 6px 8px;}
-  .uno-vs-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:20px; color:var(--gold); margin-bottom:20px; letter-spacing:.3px; animation:unoVsTitleIn .5s ease both;}
-  .uno-vs-arena{position:relative; display:flex; justify-content:center; align-items:center; min-height:126px; margin-bottom:22px;}
-  .uno-vs-players{display:flex; flex-wrap:wrap; justify-content:center; gap:20px 26px; width:100%;}
-  .uno-vs-card{display:flex; flex-direction:column; align-items:center; gap:7px; opacity:0; animation:unoVsCardIn .55s cubic-bezier(.34,1.56,.64,1) both;}
-  .uno-vs-pname{font-size:12px; font-weight:800; color:var(--text); max-width:82px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .uno-vs-badge{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); width:54px; height:54px; border-radius:50%;
-    background:linear-gradient(145deg,var(--gold),var(--gold-2)); color:#171449; font-family:'Cinzel',serif; font-weight:800; font-size:14px;
-    display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px var(--bg-2),0 8px 24px rgba(0,0,0,.4);
-    animation:unoVsBadgeIn .5s .32s cubic-bezier(.34,1.56,.64,1) both, unoVsBadgePulse 1.1s 1s ease-in-out infinite;}
-  .uno-vs-loading{font-size:12.5px; color:var(--text-muted); font-weight:700; display:flex; align-items:center; justify-content:center; gap:7px;}
-  .uno-vs-dots span{display:inline-block; width:4px; height:4px; border-radius:50%; background:var(--text-muted); margin:0 1px; animation:unoVsDot 1.1s infinite ease-in-out;}
-  .uno-vs-dots span:nth-child(2){animation-delay:.15s;}
-  .uno-vs-dots span:nth-child(3){animation-delay:.3s;}
-  @keyframes unoVsTitleIn{from{opacity:0; transform:translateY(-8px);}to{opacity:1; transform:none;}}
-  @keyframes unoVsCardIn{from{opacity:0; transform:translateY(14px) scale(.8);}to{opacity:1; transform:none;}}
-  @keyframes unoVsBadgeIn{from{transform:translate(-50%,-50%) scale(0) rotate(-25deg);}to{transform:translate(-50%,-50%) scale(1) rotate(0);}}
-  @keyframes unoVsBadgePulse{0%,100%{box-shadow:0 0 0 4px var(--bg-2),0 8px 24px rgba(0,0,0,.4);}50%{box-shadow:0 0 0 4px var(--bg-2),0 8px 34px rgba(244,183,64,.6);}}
-  @keyframes unoVsDot{0%,80%,100%{opacity:.25; transform:scale(.7);}40%{opacity:1; transform:scale(1);}}
-  @media (prefers-reduced-motion: reduce){
-    .uno-vs-card,.uno-vs-badge,.uno-vs-title{animation:none !important; opacity:1 !important; transform:translate(-50%,-50%) !important;}
-    .uno-vs-title{transform:none !important;}
-  }
   /* ===================== LUDO ===================== */
   .ludo-hero{text-align:center; padding:6px 0 10px;}
   .ludo-hero-dice{width:64px; height:64px; margin:0 auto 6px; border-radius:18px; background:linear-gradient(145deg,#fff,#E8E2D2); border:3px solid #F00315; box-shadow:0 10px 22px rgba(0,0,0,.45), inset 0 -6px 10px rgba(0,0,0,.08), inset 0 3px 4px rgba(255,255,255,.7); transform:rotate(-8deg);}
@@ -7801,7 +7662,7 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .room-wait-dots span:nth-child(2){animation-delay:.2s;}
   .room-wait-dots span:nth-child(3){animation-delay:.4s;}
   @keyframes roomWaitPulse{0%,60%,100%{opacity:.3; transform:scale(.75);} 30%{opacity:1; transform:scale(1);}}
-  /* ---- شاشة "البحث عن لاعبين" (matchmaking) قبل ما اليونو يبدأ ---- */
+  /* ---- شاشة "البحث عن لاعبين" (matchmaking) قبل ما اللعبة تبدأ ---- */
   .uno-mm-header{text-align:center; margin-bottom:16px;}
   .uno-mm-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:15.5px; color:var(--text); display:flex;
     align-items:center; justify-content:center; gap:6px;}
@@ -14447,7 +14308,7 @@ const ACH_GROUPS = [
   {cat:'تحديات خاصة', m:null, items:[['played',1,'b','بداية الرحلة','🚀','خض أول مباراة لك'],['comp',1,'s','الصامد','🛡️','كمّلت المباراة بعد انسحاب خصمك'],['dayWins',3,'s','ليلة الحظ','🌙','حقق 3 انتصارات في يوم واحد'],['bigwin',100,'g','الضربة الكبرى','💥','اكسب 100 نقطة أو أكثر في فوز واحد']]}
 ];
 const ACH_LEVELS = [[0,'مبتدئ'],[30,'لاعب'],[90,'محترف'],[180,'خبير'],[300,'أسطورة']];
-const ACH_KEYS = [['xo',/إكس أو/],['reflex',/أسرع/],['num',/الرقم/],['math',/الرياضيات/],['c4',/كونكت/],['bil',/البلياردو/],['stack',/برج/],['cube',/مكعب/],['darts',/النشان/],['bowling',/البولينج/],['quiz',/سيربح المليون/],['ludo',/لودو/],['domino',/دومينو/],['chess',/شطرنج/],['uno',/أونو|uno/i],['checkers',/داما/],['backgammon',/طاولة/],['snakes',/سلم|ثعبان/],['memory',/ذاكرة/],['rps',/حجر/]];
+const ACH_KEYS = [['xo',/إكس أو/],['reflex',/أسرع/],['num',/الرقم/],['math',/الرياضيات/],['c4',/كونكت/],['bil',/البلياردو/],['stack',/برج/],['cube',/مكعب/],['darts',/النشان/],['bowling',/البولينج/],['quiz',/سيربح المليون/],['ludo',/لودو/],['domino',/دومينو/],['chess',/شطرنج/],['colorcards',/ألوان/],['checkers',/داما/],['backgammon',/طاولة/],['snakes',/سلم|ثعبان/],['memory',/ذاكرة/],['rps',/حجر/]];
 function achDefs(){
   const out=[];
   ACH_GROUPS.forEach(g=>{
@@ -14913,7 +14774,7 @@ function renderRoomLobby(){
 }
 
 /* ============================= نظام "جاهز" في غرف الانتظار ============================= */
-const RDY_START_RE = /^room-(?:ludo|uno|quiz|mystery|eb|pv|st|ua|dg|bs|fh|fs|fz|snr|kh)-start$/;
+const RDY_START_RE = /^room-(?:ludo|quiz|mystery|eb|pv|st|ua|dg|bs|fh|fs|fz|snr|kh)-start$/;
 function rdyIsReady(room, pid){ return !!room['rdy_'+pid]; }
 function rdyInfo(room){
   const ps = room.players || [];
@@ -14946,14 +14807,14 @@ window.__rdyWrap = function(html, room){
     if(!room || room.status!=='waiting' || !Array.isArray(room.players) || typeof html!=='string') return html;
     const info = rdyInfo(room);
     const panel = `<div class="rdy-wrap">${rdyPanelHtml(room, info)}</div>`;
-    const startRe = /<button[^>]*data-action="room-(?:ludo|uno|quiz|mystery|eb|pv|st|ua|dg|bs|fh|fs|fz|snr|kh)-start"[^>]*>/;
+    const startRe = /<button[^>]*data-action="room-(?:ludo|quiz|mystery|eb|pv|st|ua|dg|bs|fh|fs|fz|snr|kh)-start"[^>]*>/;
     let out = html.replace(startRe, m=>{
       if(info.all) return m.replace('class="','class="rdy-go ');
       return /\bdisabled\b/.test(m) ? m : m.replace(/>$/, ' disabled>');
     });
     out = out.replace(/✅ جاهز/g, '🟢 متصل'); /* قديم: كان بيظهر "جاهز" لأي لاعب منضم من غير ما يضغط */
     if(out.indexOf('<div class="snp-foot">')>-1) return out.replace('<div class="snp-foot">', panel+'<div class="snp-foot">');
-    const bi = out.search(/<button[^>]*data-action="room-(?:ludo|uno|quiz|mystery|eb|pv|st|ua|dg|bs|fh|fs|fz|snr|kh)-start"/);
+    const bi = out.search(/<button[^>]*data-action="room-(?:ludo|quiz|mystery|eb|pv|st|ua|dg|bs|fh|fs|fz|snr|kh)-start"/);
     if(bi>-1) return out.slice(0,bi)+panel+out.slice(bi);
     const hi = out.search(/<div class="hint"[^>]*>⏳ في انتظار صاحب الغرفة/);
     if(hi>-1) return out.slice(0,hi)+panel+out.slice(hi);
@@ -15006,7 +14867,7 @@ const GAME_CATEGORY_OF = {
   crossmath:'mind',
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
   memory:'mind', who:'mind', revword:'mind', blocky:'mind', cube:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind',
-  uno:'cards', rps:'cards',
+  colorcards:'cards', rps:'cards',
   quiz:'party', mystery:'party', emojibible:'party', proverb:'party', stoptimer:'skill', uniqans:'party', fahmeen:'party', placemem:'mind', fazzura:'party', drawguess:'party', battleship:'board', khatfa:'party',
 };
 /* rectangular category cards — tap one to open the games inside it */
@@ -15083,7 +14944,7 @@ const GAMES_CATALOG = [
   {id:'numguess', icon:'🔢', title:'تخمين الرقم', sub:'خمّن الرقم من 6 محاولات واكسب 100 نقطة', color:'linear-gradient(145deg,#4FACFE,#00F2FE)'},
   {id:'bus', icon:'🚌', title:'أتوبيس كومبليت', sub:'اسم ولد وبنت وحيوان وجماد ونبات وبلد — رحلة من 3 مراحل، اختار وقت كل مرحلة وكل ما يقل تتضاعف النقط', color:'linear-gradient(145deg,#FFB347,#FF6B6B)'},
   {id:'math', icon:'➗', title:'رياضيات سريعة', sub:'20 سؤال، 5 ثواني لكل سؤال، واكسب 50 نقطة', color:'linear-gradient(145deg,#F6D365,#FDA085)'},
-  {id:'uno', icon:'🃏', title:'أونو', sub:'حدّ صديقك أو العب ضد 3 بوتات', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
+  {id:'colorcards', icon:'🎴', title:'كروت الألوان', sub:'انت و3 بوتات — طابق اللون أو الرقم وخلّص ورقك الأول', color:'linear-gradient(145deg,#C8553D,#F9B92E)'},
   {id:'reflex', icon:'⚡', title:'أسرع واحد', sub:'استنى الإشارة الخضرا ودوس بأسرع ما تقدر', color:'linear-gradient(145deg,#FFD93D,#FF6B6B)'},
   {id:'billiards', icon:'🎱', title:'بلياردو', sub:'8 بول احترافي — ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#1E8A4C,#0d5c36)'},
   {id:'darts', icon:'🎯', title:'لعبة النشان', sub:'اسحب السهم وصوّبه على اللوحة وسيبه يطير — ضد الجهاز', color:'linear-gradient(145deg,#C23B3B,#2b0e0e)'},
@@ -15114,7 +14975,7 @@ const GH_SOLO_SUB = {
   xo:'ضد الجهاز أو صديقك', connect4:'', domino:'ضد الجهاز أو صديقك', ludo:'لحد 4 لاعبين على نفس الموبايل',
   placemem:'احفظ أماكن الصور في ثواني وبعدين دوّر عليها — جاوب صح في 7 من 9 واكسب نقط', memory:'لاقي الأزواج بأقل حركات', rps:'جولة سريعة ضد الجهاز', numguess:'خمّن رقم من 1 لـ100 في 6 محاولات واكسب 100 نقطة', math:'20 سؤال و5 ثواني لكل سؤال، جاوبهم صح كلهم واكسب 50 نقطة',
   who:'لكل واحد شخصية سرية — اسأل أسئلة بنعم/لأ، استبعد الكروت وخمّن شخصية الجهاز قبل ما يخمّن شخصيتك. 4 مستويات والمكافأة بتزيد مع الصعوبة',
-  uno:'انت و3 بوتات، أول واحد يخلّص ورقه يكسب',
+  colorcards:'انت و3 بوتات على ترابيزة دايرية — طابق اللون أو الرقم وأول واحد يخلّص ورقه يكسب',
   bus:'حرف عشوائي و6 خانات: اسم ولد واسم بنت وحيوان وجماد ونبات وبلد/دولة — رحلة من 3 مراحل، إنت بتختار وقت كل مرحلة: وقت أقل = نقط مضاعفة. لو جمعت أكتر من الجهاز تكسب مكافأة بتكبر مع المخاطرة',
   reflex:'استنى الإشارة الخضرا ودوس أسرع من الجهاز — الدوس بدري يخسّرك الجولة',
   billiards:'دور فيزيائي حقيقي — اسحب واضرب واحصد كوراتك قبل الخصم',
@@ -15647,7 +15508,7 @@ const AI_LEVELS = [
   {id:'hard',   name:'صعب',   icon:'🔥', color:'#FF9F43', mult:1,   stars:3, desc:'تفكير قوي وغلطات نادرة'},
   {id:'expert', name:'خبير',  icon:'👑', color:'#9B7CFF', mult:1.6, stars:4, desc:'أقوى مستوى — أعلى مكافأة'}
 ];
-const AI_GAME_NAMES = {xo:'إكس أو', c4:'كونكت فور', chess:'الشطرنج', ck:'الداما', tmm:'الطاحونة الصغيرة', bg:'طاولة الزهر', domino:'دومينو', ludo:'لودو', uno:'أونو', bil:'بلياردو', darts:'النشان', bowling:'البولينج', reflex:'أسرع واحد'};
+const AI_GAME_NAMES = {xo:'إكس أو', c4:'كونكت فور', chess:'الشطرنج', ck:'الداما', tmm:'الطاحونة الصغيرة', bg:'طاولة الزهر', domino:'دومينو', ludo:'لودو', bil:'بلياردو', darts:'النشان', bowling:'البولينج', reflex:'أسرع واحد'};
 function aiLevelOf(key){ const id=(state.aiLvl||{})[key]; return AI_LEVELS.find(l=>l.id===id)||null; }
 function aiBaseReward(key){ const s=GAME_POINTS_SETTINGS||{}; return ({xo:s.soloXoReward, c4:s.soloC4Reward, reflex:(s.soloReflexReward==null?30:s.soloReflexReward), bil:(s.soloBilliardsReward==null?40:s.soloBilliardsReward), darts:(s.soloDartsReward==null?35:s.soloDartsReward), bowling:(s.soloBowlingReward==null?40:s.soloBowlingReward), tmm:(s.soloTmmReward==null?25:s.soloTmmReward)})[key]||0; }
 function aiLv(key){ return (aiLevelOf(key)||{id:'hard'}).id; }
@@ -15686,7 +15547,6 @@ const LVL_THEMES = {
   tmm:     {crest:'⚪', g:['#1c2a3a','#080d14','#9FB4CC'], ic:['🌱','⚪','🔥','👑'], ds:['بيحرّك قطعه عشوائي','بيلعب كويس وبيغلط أحيانًا','بيسد عليك الطرق ونادرًا يغلط','بيحاصر قطعك من أول نقلة']},
   bg:      {crest:'🎲', g:['#3d2a10','#130d05','#E0B04A'], ic:['🎲','🎯','🔥','👑'], ds:['بيلعب بالزهر من غير حسابات','بيلعب كويس وبيضيّع فرص أحيانًا','بيحمي قطعه ويضرب بذكاء','بيحسب كل رمية — صعب تسبقه']},
   domino:  {crest:'🁫', g:['#3a2a12','#0c0b16','#F4B740'], ic:['🌱','🁫','🔥','👑'], ds:['بينزّل أي قطعة معاه','بيلعب المناسب وبيغلط أحيانًا','بيحتفظ بالقطع المهمة ويقفل عليك','بيعدّ القطع ويتوقع إيدك']},
-  uno:     {crest:'🃏', g:['#4a1420','#14060a','#FFD93D'], ic:['🌱','🃏','🔥','👑'], ds:['بيرمي ورقه كيفما اتفق','بيلعب كويس وبيضيّع كروت قوية','بيحتفظ بالكروت القوية للحظة المناسبة','بيحاصرك بالكروت الخاصة — بلا رحمة']},
   reflex:  {crest:'⚡', g:['#4a3a0a','#140f04','#FFD93D'], ic:['🐢','⚡','🔥','🚀'], ds:['رد فعل الجهاز بطيء — فرصتك!','رد فعله عادي وممكن تسبقه','سريع جدًا وصعب تسبقه','سرعة خارقة — أجزاء من الثانية']},
   bowling: {crest:'🎳', g:['#2a1a5c','#0a0716','#8E6CFF'], ic:['🌱','🎳','🔥','👑'], ds:['الجهاز بيطيّح قليل ومش دقيق','بيضرب كويس وبيخطئ أحيانًا','استرايكات كتير وسبيرات ثابتة','دقة قاتلة — بيجمع استرايكات']},
   bil:     {crest:'🎱', g:['#0e4a2c','#041109','#5FE0A4'], ic:['🎱','⚔️','🔥','👑'], ds:['ضرباته مش دقيقة ويفوّت كتير','بيحط كورات كويس وبيغلط أحيانًا','دقيق وبيخطط لضربته الجاية','محترف — نادرًا ما يفوّت']},
@@ -22614,455 +22474,6 @@ async function doRoomLudoNext(){
   render();
 }
 
-/* ============================= GAMES: UNO (شامل: منفرد ضد بوتات + غرفة أصحاب) ============================= */
-const UNO_COLORS = ['red','yellow','green','blue'];
-const UNO_COLOR_NAMES = {red:'أحمر', yellow:'أصفر', green:'أخضر', blue:'أزرق'};
-function unoFullDeck(){
-  const deck = []; let uid = 0;
-  UNO_COLORS.forEach(c=>{
-    deck.push({id:'u'+(uid++), color:c, type:'number', value:0});
-    for(let n=1;n<=9;n++){
-      deck.push({id:'u'+(uid++), color:c, type:'number', value:n});
-      deck.push({id:'u'+(uid++), color:c, type:'number', value:n});
-    }
-    for(let k=0;k<2;k++){
-      deck.push({id:'u'+(uid++), color:c, type:'skip'});
-      deck.push({id:'u'+(uid++), color:c, type:'reverse'});
-      deck.push({id:'u'+(uid++), color:c, type:'draw2'});
-    }
-  });
-  for(let k=0;k<4;k++){
-    deck.push({id:'u'+(uid++), color:'wild', type:'wild'});
-    deck.push({id:'u'+(uid++), color:'wild', type:'wild4'});
-  }
-  return deck;
-}
-function unoCardVisual(card){
-  if(card.type==='number') return String(card.value);
-  if(card.type==='skip') return '⊘';
-  if(card.type==='reverse') return '⇄';
-  if(card.type==='draw2') return '+2';
-  if(card.type==='wild') return '★';
-  if(card.type==='wild4') return '+4';
-  return '?';
-}
-function unoCardHtml(card, opts){
-  opts = opts || {};
-  if(opts.back){
-    return `<div class="uno-card uno-back ${opts.mini?'mini':''}"><span class="uno-back-logo">UNO</span></div>`;
-  }
-  const color = card.color==='wild' ? (card.chosen || 'wild') : card.color;
-  const v = unoCardVisual(card);
-  const cls = ['uno-card', opts.mini?'mini':'', opts.selectable?'playable':'', opts.dim?'dim':'', opts.extraCls||''].filter(Boolean).join(' ');
-  if(opts.selectable){
-    return `<button type="button" class="${cls}" data-color="${color}" data-action="${opts.action}" data-cid="${card.id}">
-      <span class="uno-oval"></span><span class="uno-corner tl">${v}</span><span class="uno-center-pip">${v}</span><span class="uno-corner br">${v}</span>
-    </button>`;
-  }
-  return `<div class="${cls}" data-color="${color}">
-    <span class="uno-oval"></span><span class="uno-corner tl">${v}</span><span class="uno-center-pip">${v}</span><span class="uno-corner br">${v}</span>
-  </div>`;
-}
-function unoMiniFanHtml(count, vertical){
-  const n = Math.max(0, Math.min(count, 5));
-  let out = '';
-  for(let i=0;i<n;i++){
-    const off = i - (n-1)/2;
-    const rot = off*9;
-    const pos = vertical ? `top:${50+off*17}%; left:50%;` : `left:${50+off*17}%; top:50%;`;
-    out += `<div class="uno-fan-card" style="${pos} transform:translate(-50%,-50%) rotate(${rot}deg); z-index:${i};">${unoCardHtml({},{mini:true,back:true})}</div>`;
-  }
-  return `<div class="uno-fan">${out}</div>`;
-}
-function unoDirArrowsHtml(dir){
-  return `<div class="uno-dir-arrows" style="transform:${dir<0?'scaleX(-1)':'none'}">
-    <svg viewBox="0 0 140 140">
-      <path d="M30 70a40 40 0 0 1 70-30" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="5" stroke-linecap="round"/>
-      <path d="M96 30l7 13-14 1z" fill="rgba(255,255,255,.6)"/>
-      <path d="M110 70a40 40 0 0 1 -70 30" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="5" stroke-linecap="round"/>
-      <path d="M44 110l-7-13 14-1z" fill="rgba(255,255,255,.6)"/>
-    </svg>
-  </div>`;
-}
-function unoStageShell(prefix, innerHtml){
-  const backAction = prefix==='room-' ? 'leave-room' : 'back';
-  return `<div class="uno-stage"><div class="uno-rotor">
-    <div class="uno-felt"></div>
-    <div class="uno-topbar">
-      <button type="button" class="uno-round-ico" data-action="${backAction}" style="transform:scaleX(-1);">${ICO.back}</button>
-      <div class="uno-clock">⏱️</div>
-    </div>
-    ${innerHtml}
-  </div></div>`;
-}
-function unoTopCard(g){ return g.discard[g.discard.length-1]; }
-function unoCardPlayable(g, card){
-  const top = unoTopCard(g);
-  if(card.type==='wild' || card.type==='wild4') return true;
-  if(card.color===g.color) return true;
-  if(card.type==='number' && top.type==='number' && card.value===top.value) return true;
-  if(card.type!=='number' && card.type===top.type) return true;
-  return false;
-}
-function unoBestColor(hand){
-  const counts = {};
-  (hand||[]).forEach(c=>{ if(c.color && c.color!=='wild') counts[c.color] = (counts[c.color]||0)+1; });
-  let best = null, bestN = -1;
-  UNO_COLORS.forEach(c=>{ if((counts[c]||0)>bestN){ bestN = counts[c]||0; best = c; } });
-  return best || UNO_COLORS[Math.floor(Math.random()*4)];
-}
-function unoNextIdx(g, fromIdx, dir){
-  const n = g.players.length;
-  return ((fromIdx + dir) % n + n) % n;
-}
-function unoAdvance(g, skip){
-  const steps = skip ? 2 : 1;
-  g.turnIdx = ((g.turnIdx + g.dir*steps) % g.players.length + g.players.length) % g.players.length;
-  g.drewThisTurn = false;
-}
-function unoDrawOne(g){
-  if(g.deck.length===0){
-    if(g.discard.length<=1) return null;
-    const top = g.discard.pop();
-    g.deck = shuffleArray(g.discard);
-    g.discard = [top];
-  }
-  return g.deck.pop();
-}
-function unoDrawN(g, key, n){
-  const hand = g.hands[key];
-  for(let i=0;i<n;i++){ const c = unoDrawOne(g); if(c) hand.push(c); }
-}
-function unoNewGame(players){
-  const deck = shuffleArray(unoFullDeck());
-  const hands = {};
-  players.forEach(p=>{ hands[p.key] = deck.splice(0,7); });
-  let first = deck.pop();
-  while(first.type==='wild4'){ deck.unshift(first); first = deck.pop(); }
-  /* اللي يبدأ (أنا ولا بوت عشوائي) بيتبادل كل جولة جديدة */
-  const startIdx = nextAiStarterIsHuman() ? 0 : 1 + Math.floor(Math.random()*(players.length-1));
-  const g = {
-    players, hands, deck, discard:[first],
-    turnIdx:startIdx, dir:1,
-    color: first.color==='wild' ? UNO_COLORS[Math.floor(Math.random()*4)] : first.color,
-    drewThisTurn:false, unoPending:null, unoCalledFlag:false,
-    winner:null, log:null
-  };
-  if(first.type==='skip') unoAdvance(g,true);
-  else if(first.type==='reverse'){ if(players.length===2) unoAdvance(g,true); else { g.dir=-1; } }
-  else if(first.type==='draw2'){ unoDrawN(g, players[startIdx].key, 2); unoAdvance(g,true); }
-  return g;
-}
-function unoPlayCard(g, key, cardId, chosenColor){
-  const hand = g.hands[key];
-  const idx = hand.findIndex(c=>c.id===cardId);
-  if(idx<0) return false;
-  const card = hand[idx];
-  if(!unoCardPlayable(g, card)) return false;
-  hand.splice(idx,1);
-  if(card.type==='wild' || card.type==='wild4'){
-    card.chosen = chosenColor || unoBestColor(hand);
-    g.discard.push(card);
-    g.color = card.chosen;
-  } else {
-    g.discard.push(card);
-    g.color = card.color;
-  }
-  if(hand.length===1){ g.unoPending = key; g.unoCalledFlag = false; }
-  else if(g.unoPending===key){ g.unoPending = null; }
-  if(hand.length===0){
-    g.winner = key;
-    g.wins = g.wins || {};
-    g.wins[key] = (g.wins[key]||0)+1;
-    g._fxSeq = (g._fxSeq||0)+1;
-    g.lastFx = {seq:g._fxSeq, type:card.type, color:card.chosen||card.color||g.color};
-    return true;
-  }
-  const curIdx = g.turnIdx;
-  if(card.type==='skip'){ unoAdvance(g,true); }
-  else if(card.type==='reverse'){
-    if(g.players.length===2){ unoAdvance(g,true); }
-    else { g.dir *= -1; unoAdvance(g,false); }
-  } else if(card.type==='draw2'){
-    const nxt = unoNextIdx(g, curIdx, g.dir);
-    unoDrawN(g, g.players[nxt].key, 2);
-    unoAdvance(g,true);
-  } else if(card.type==='wild4'){
-    const nxt = unoNextIdx(g, curIdx, g.dir);
-    unoDrawN(g, g.players[nxt].key, 4);
-    unoAdvance(g,true);
-  } else { unoAdvance(g,false); }
-  g._fxSeq = (g._fxSeq||0)+1;
-  g.lastFx = {seq:g._fxSeq, type:card.type, color:card.chosen||card.color||g.color};
-  return true;
-}
-function unoBotTakeTurn(g, key){
-  if(g.unoPending && g.unoPending!==key && !g.unoCalledFlag && g.hands[g.unoPending] && g.hands[g.unoPending].length===1){
-    if(Math.random()<0.5){ unoDrawN(g, g.unoPending, 2); g.log = '🚨 ' + (g.players.find(p=>p.key===g.unoPending)||{}).name + ' نسي يقول أونو!'; g.unoPending = null; }
-  }
-  const hand = g.hands[key];
-  const playable = hand.filter(c=>unoCardPlayable(g,c));
-  if(playable.length===0){
-    const card = unoDrawOne(g);
-    if(!card){ unoAdvance(g,false); return; }
-    hand.push(card);
-    if(unoCardPlayable(g, card)){
-      const color = (card.type==='wild'||card.type==='wild4') ? unoBestColor(hand.filter(c=>c.id!==card.id)) : undefined;
-      unoPlayCard(g, key, card.id, color);
-    } else { unoAdvance(g,false); }
-  } else {
-    const nonWild = playable.filter(c=>c.type!=='wild' && c.type!=='wild4');
-    let choice = playable[0];
-    if(nonWild.length){
-      const counts = {};
-      hand.forEach(c=>{ if(c.color && c.color!=='wild') counts[c.color]=(counts[c.color]||0)+1; });
-      nonWild.sort((a,b)=>(counts[b.color]||0)-(counts[a.color]||0));
-      choice = nonWild[0];
-    }
-    if(Math.random()<({easy:.7,medium:.35,hard:.08,expert:0})[aiLv('uno')]) choice = aiPick(playable);
-    const color = (choice.type==='wild'||choice.type==='wild4') ? unoBestColor(hand.filter(c=>c.id!==choice.id)) : undefined;
-    unoPlayCard(g, key, choice.id, color);
-  }
-  if(g.hands[key] && g.hands[key].length===1) g.unoCalledFlag = true;
-}
-const UNO_FX_SEEN = {};
-function unoFxInfo(fx){
-  switch(fx.type){
-    case 'skip': return {text:'⛔ سكيب', cls:'fx-skip', snd:'unoSkip'};
-    case 'reverse': return {text:'🔄 عكس', cls:'fx-skip', snd:'unoReverse'};
-    case 'draw2': return {text:'+2', cls:'fx-plus', snd:'unoDrawPenalty'};
-    case 'wild4': return {text:'+4', cls:'fx-plus', snd:'unoDrawPenalty'};
-    case 'wild': return {text:UNO_COLOR_NAMES[fx.color]||'', cls:'fx-'+(fx.color||'wild'), snd:'unoWild'};
-    default: return null;
-  }
-}
-function unoMaybeShowFx(g){
-  if(!g || !g.lastFx) return;
-  const key = (state.roomCode||'local');
-  if((UNO_FX_SEEN[key]||0) >= g.lastFx.seq) return;
-  UNO_FX_SEEN[key] = g.lastFx.seq;
-  const info = unoFxInfo(g.lastFx);
-  if(!info) return;
-  try{ SND[info.snd] && SND[info.snd](); }catch(e){}
-  const mount = document.querySelector('.uno-stage .uno-center');
-  if(!mount) return;
-  const el = document.createElement('div');
-  el.className = 'uno-fx-banner '+info.cls;
-  el.textContent = info.text;
-  mount.appendChild(el);
-  setTimeout(()=>{ try{ el.remove(); }catch(e){} }, 950);
-}
-function unoAlive(g){ return state.uno===g && state.view==='game-uno'; }
-function unoLater(g, ms, fn){ setTimeout(()=>{ if(!unoAlive(g) || g.winner) return; fn(); }, ms); }
-function unoRunBots(g, silent){
-  if(g.winner) return;
-  const cur = g.players[g.turnIdx];
-  if(!cur.isBot) { if(!silent) render(); return; }
-  if(!silent) render();
-  unoLater(g, 850, ()=>{
-    unoBotTakeTurn(g, cur.key);
-    render();
-    unoMaybeShowFx(g);
-    if(g.winner){ vibrate([20,20,30]); SND.coinChime(); }
-    else unoRunBots(g);
-  });
-}
-function initUnoGame(){
-  const me = PARTICIPANTS.find(x=>x.id===state.pid);
-  const players = [
-    {key:'me', name: me?me.name:'أنا', isBot:false},
-    {key:'bot1', name:'بوتي 🤖', isBot:true},
-    {key:'bot2', name:'روبوتيكا 🤖', isBot:true},
-    {key:'bot3', name:'زد9 🤖', isBot:true},
-  ];
-  const prevWins = state.uno ? state.uno.wins : null;
-  state.uno = unoNewGame(players);
-  if(prevWins) state.uno.wins = prevWins;
-  state.unoColorPick = null;
-}
-function doUnoNextRound(){
-  const wins = state.uno ? state.uno.wins : null;
-  initUnoGame();
-  if(wins) state.uno.wins = wins;
-  unoRunBots(state.uno);
-}
-function doUnoPlay(cardId){
-  const g = state.uno;
-  if(!g || g.winner) return;
-  const cur = g.players[g.turnIdx];
-  if(cur.key!=='me') return;
-  const card = g.hands.me.find(c=>c.id===cardId);
-  if(!card || !unoCardPlayable(g, card)) return;
-  if(card.type==='wild' || card.type==='wild4'){
-    state.unoColorPick = {cardId, prefix:''};
-    render();
-    return;
-  }
-  g._justDrew = false;
-  SND.unoPlay(card);
-  unoPlayCard(g, 'me', cardId);
-  render();
-  unoMaybeShowFx(g);
-  if(g.winner){ vibrate([20,20,30]); if(g.winner==='me') launchConfetti(); SND.coinChime(); }
-  else unoRunBots(g);
-}
-function doUnoColorChoice(color){
-  const g = state.uno;
-  const pick = state.unoColorPick;
-  if(!g || !pick) return;
-  state.unoColorPick = null;
-  g._justDrew = false;
-  SND.unoPlay({type:'wild'});
-  unoPlayCard(g, 'me', pick.cardId, color);
-  render();
-  unoMaybeShowFx(g);
-  if(g.winner){ vibrate([20,20,30]); if(g.winner==='me') launchConfetti(); SND.coinChime(); }
-  else unoRunBots(g);
-}
-function doUnoDraw(){
-  const g = state.uno;
-  if(!g || g.winner || g.drewThisTurn) return;
-  const cur = g.players[g.turnIdx];
-  if(cur.key!=='me') return;
-  const card = unoDrawOne(g);
-  if(card) g.hands.me.push(card);
-  g.drewThisTurn = true;
-  g._justDrew = true;
-  SND.unoDraw();
-  render();
-}
-function doUnoEndTurn(){
-  const g = state.uno;
-  if(!g || g.winner || !g.drewThisTurn) return;
-  const cur = g.players[g.turnIdx];
-  if(cur.key!=='me') return;
-  unoAdvance(g, false);
-  render();
-  unoRunBots(g);
-}
-function doUnoCallUno(){
-  const g = state.uno;
-  if(!g) return;
-  if(g.unoPending==='me'){ g.unoCalledFlag = true; SND.click(); render(); }
-}
-function doUnoCatch(targetKey){
-  const g = state.uno;
-  if(!g || g.winner) return;
-  if(g.unoPending===targetKey && !g.unoCalledFlag){
-    unoDrawN(g, targetKey, 2);
-    g.log = '🚨 مسكته! سحب كرتين';
-    g.unoPending = null;
-    SND.click(); vibrate([15,15]);
-    render();
-  }
-}
-function unoStatusText(g, myKey){
-  if(g.winner) return null;
-  const cur = g.players[g.turnIdx];
-  return cur.key===myKey ? 'دورك! 🎯' : `دور ${escapeHtml(cur.name)}...`;
-}
-function unoColorOverlayHtml(prefix){
-  if(!state.unoColorPick || state.unoColorPick.prefix!==prefix) return '';
-  return `<div class="uno-color-overlay">
-    <div class="uno-color-card">
-      <div class="uno-color-title">🎨 اختار لون</div>
-      <div class="uno-color-wheel">
-        ${UNO_COLORS.map(c=>`<button type="button" class="uno-color-btn" data-color="${c}" data-action="${prefix}uno-color"></button>`).join('')}
-      </div>
-    </div>
-  </div>`;
-}
-function unoOpponentsHtml(g, myKey, prefix){
-  const seatClasses = ['uno-seat-top','uno-seat-right','uno-seat-corner'];
-  return g.players.filter(p=>p.key!==myKey).map((p,i)=>{
-    const cnt = (g.hands[p.key]||[]).length;
-    const isTurn = !g.winner && g.players[g.turnIdx].key===p.key;
-    const canCatch = g.unoPending===p.key && !g.unoCalledFlag;
-    const seatCls = seatClasses[i] || 'uno-seat-top';
-    const vertical = seatCls!=='uno-seat-top';
-    return `<div class="uno-seat ${seatCls} ${isTurn?'is-turn':''}">
-      ${unoMiniFanHtml(cnt, vertical)}
-      <div class="uno-seat-avatar-wrap">${p.isBot ? gameAiAvatar('') : gameAvatar(p.key,'')}</div>
-      <div class="uno-seat-name">${escapeHtml(p.name)}</div>
-      <div class="uno-seat-count">🂠${cnt}</div>
-      ${canCatch ? `<button type="button" class="uno-catch-btn" data-action="${prefix}uno-catch" data-key="${p.key}">🚨 امسكه!</button>` : ''}
-    </div>`;
-  }).join('');
-}
-function unoTableHtml(g, myKey, prefix){
-  const myHand = g.hands[myKey] || [];
-  const top = unoTopCard(g);
-  const canAct = !g.winner && g.players[g.turnIdx].key===myKey;
-  const meP = g.players.find(p=>p.key===myKey) || {};
-  const isMyTurn = !g.winner && g.players[g.turnIdx].key===myKey;
-  const handN = myHand.length;
-  const handHtml = myHand.map((c,i)=>{
-    const sel = canAct && unoCardPlayable(g,c);
-    const justDrawn = i===handN-1 && g._justDrew && (!g._justDrewBy || g._justDrewBy===myKey) ? 'uno-just-drawn' : '';
-    const off = i - (handN-1)/2;
-    const rot = Math.max(-24, Math.min(24, off*7));
-    const ty = Math.abs(off)*3;
-    return `<div class="uno-hand-card-wrap" style="--fan-rot:${rot}deg; --fan-y:${ty}px; z-index:${i};">${unoCardHtml(c, {selectable:sel, action:prefix+'uno-play', extraCls:justDrawn})}</div>`;
-  }).join('');
-  const drawDisabled = !canAct || g.drewThisTurn;
-  const showEndTurn = canAct && g.drewThisTurn;
-  const showUnoBtn = g.unoPending===myKey && !g.unoCalledFlag;
-  const statusTxt = unoStatusText(g, myKey);
-  const inner = `
-    <div class="uno-me-tag ${isMyTurn?'is-turn':''}">
-      <div class="uno-seat-avatar-wrap">${gameAvatar(state.pid,'')}</div>
-      <div class="uno-seat-name">${escapeHtml(meP.name||'')}</div>
-    </div>
-    ${unoOpponentsHtml(g, myKey, prefix)}
-    <div class="uno-center">
-      ${unoDirArrowsHtml(g.dir)}
-      <div class="uno-discard-stack">
-        ${unoCardHtml(top,{extraCls:'uno-just-landed'})}
-        <div class="uno-color-dot" style="background:${UNO_GRAD(g.color)}"></div>
-      </div>
-      <button type="button" class="uno-draw-pile" data-action="${prefix}uno-draw" ${drawDisabled?'disabled':''}>
-        ${unoCardHtml({type:'x'},{back:true})}
-        <span class="uno-draw-count">${g.deck.length}</span>
-      </button>
-    </div>
-    ${statusTxt ? `<div class="uno-status">${statusTxt}</div>` : ''}
-    ${showEndTurn ? `<div class="uno-actions-row"><button type="button" class="btn btn-outline" data-action="${prefix}uno-endturn">⏭️ خلّص دوري</button></div>` : ''}
-    <div class="uno-bottom-row">
-      <button type="button" class="uno-call-btn ${showUnoBtn?'is-active':''}" data-action="${prefix}uno-uno" ${showUnoBtn?'':'disabled'}>CALL<br>UNO</button>
-      <div class="uno-hand-scroller">${handHtml}</div>
-      <div class="uno-hand-count">🃏${myHand.length}</div>
-    </div>
-    ${unoColorOverlayHtml(prefix)}
-  `;
-  return unoStageShell(prefix, inner);
-}
-function UNO_GRAD(color){
-  const m = {red:'linear-gradient(150deg,#FF6B6B,#C81E3A)', yellow:'linear-gradient(150deg,#FFE066,#E0A400)',
-    green:'linear-gradient(150deg,#79D989,#1E8E3E)', blue:'linear-gradient(150deg,#63A4FF,#1450B8)'};
-  return m[color] || '#888';
-}
-function unoWinHtml(g, myKey, prefix, nextAction){
-  const iWon = g.winner===myKey;
-  const winnerP = g.players.find(p=>p.key===g.winner);
-  const others = g.players.filter(p=>p.key!==g.winner).map(p=>`${escapeHtml(p.name)}: ${g.hands[p.key].length} ورقة`).join(' • ');
-  const inner = `
-    <div class="uno-win-overlay">
-      <div class="uno-win-card">
-        <div class="uno-win-ico">${iWon?'🏆':'😅'}</div>
-        <div class="uno-win-title">${iWon ? 'مبروك! خلّصت ورقك الأول' : escapeHtml(winnerP.name)+' فاز في الجولة'}</div>
-        <div class="uno-win-sub">${others}</div>
-        ${nextProBtn(nextAction)}
-      </div>
-    </div>
-  `;
-  return unoStageShell(prefix, inner);
-}
-function renderUnoGame(){
-  aiLevelGate('uno', true);
-  if(!state.uno) initUnoGame();
-  const g = state.uno;
-  return g.winner ? unoWinHtml(g,'me','','uno-next') : unoTableHtml(g,'me','');
-}
 /* ============================= GAMES: SHARED PLAYER HELPERS ============================= */
 // يعرض صورة المشارك (أو الحروف الأولى لو مفيش صورة) بدل الاسم
 function gameAvatar(pid, badgeText, size, dotColorId){
@@ -23515,8 +22926,6 @@ async function createGameRoom(gameType, paid){
       scoreHost:0, scoreGuest:0, scoreDraw:0, roundGain:0, matchOver:false, matchWinner:null});
   } else if(gameType==='ludo'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], ludo:null});
-  } else if(gameType==='uno'){
-    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], uno:null});
   } else if(gameType==='connect4'){
     Object.assign(room, {board:newC4Board(), turn:'host', round:0, hostColor:null, guestColor:null,
       winner:null, winCells:null, scoreHost:0, scoreGuest:0, scoreDraw:0});
@@ -23588,7 +22997,7 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(room.game==='ludo' || room.game==='uno' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='stoptimer' || room.game==='uniqans' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura' || room.game==='drawguess' || room.game==='battleship' || room.game==='snakes' || room.game==='khatfa'){
+  if(room.game==='ludo' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='stoptimer' || room.game==='uniqans' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura' || room.game==='drawguess' || room.game==='battleship' || room.game==='snakes' || room.game==='khatfa'){
     room.players = room.players || [{id:room.hostId, name:room.hostName}];
     if(!room.players.some(x=>x.id===state.pid)){
       if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
@@ -23680,9 +23089,6 @@ async function applyLeaveRoomPenalty(code){
         const seats = (room.ludo && room.ludo.seats) || (room.players||[]).map(p=>({pid:p.id, left:false}));
         recipients = seats.filter(s=> s.pid && s.pid!==state.pid && !s.left).map(s=>s.pid);
       } else if(room.game==='snakes' || room.game==='khatfa'){
-        recipients = (room.players||[]).filter(p=> p.id && p.id!==state.pid).map(p=>p.id);
-      } else if(room.game==='uno'){
-        // غرفة يونو ممكن يكون فيها لغاية 4 لاعبين مش مجرد host/guest، فلازم نوزع على كل الباقيين النشطين
         recipients = (room.players||[]).filter(p=> p.id && p.id!==state.pid).map(p=>p.id);
       } else {
         recipients = [room.hostId, room.guestId].filter(id=> id && id!==state.pid);
@@ -23784,37 +23190,6 @@ async function leaveGameRoom(){
         if(room.hostId===state.pid){ room.hostId = room.players[0].id; room.hostName = room.players[0].name; }
         roomTouch(room);
         room.players.forEach(pl=>pushNotification(pl.id, `🚪 ${myName} خرج من الغرفة`, '🚪'));
-      }
-    } else if(room.game==='uno'){
-      const myName = (room.players||[]).find(p=>p.id===state.pid)?.name
-        || (PARTICIPANTS.find(x=>x.id===state.pid)||{}).name || 'لاعب';
-      room.players = (room.players||[]).filter(p=>p.id!==state.pid);
-      if(room.uno){
-        const G = room.uno;
-        const myIdx = G.players.findIndex(pl=>pl.key===state.pid);
-        if(myIdx>=0){
-          const leftover = G.hands[state.pid]||[];
-          delete G.hands[state.pid];
-          G.deck = shuffleArray((G.deck||[]).concat(leftover));
-          G.players.splice(myIdx,1);
-          if(G.players.length<2){
-            delete GAME_ROOMS[code];
-          } else {
-            if(myIdx < G.turnIdx) G.turnIdx--;
-            if(G.turnIdx>=G.players.length) G.turnIdx = 0;
-            G.unoPending = null;
-            G.log = '🚪 ' + myName + ' خرج من اللعبة';
-            roomTouch(room);
-          }
-        }
-      } else {
-        if(room.players.length===0){
-          delete GAME_ROOMS[code];
-        } else {
-          if(room.hostId===state.pid){ room.hostId = room.players[0].id; room.hostName = room.players[0].name; }
-          roomTouch(room);
-          room.players.forEach(pl=>pushNotification(pl.id, `🚪 ${myName} خرج من الغرفة`, '🚪'));
-        }
       }
     } else {
       // 2-player rooms: with only two seats, one leaving means no one is left to continue
@@ -24097,7 +23472,7 @@ function startRoomPolling(){
       if(before!==after){
         /* الغرفة اختفت فجأة وكانت شغالة فعلاً: يبقى الخصم خرج، نبلغ اللاعب الباقي بشكل واضح */
         if(prevRoom && !freshRoom && prevRoom.status==='playing' && !state.roomSpectate){
-          const opponentName = (prevRoom.game==='ludo' || prevRoom.game==='uno')
+          const opponentName = (prevRoom.game==='ludo')
             ? null
             : (prevRoom.hostId===state.pid ? prevRoom.guestName : prevRoom.hostName);
           showRoomLeftAlert(opponentName, currentLeaveRoomPenalty());
@@ -24138,7 +23513,6 @@ const ROOM_GAMES = [
   {id:'memory',   sub:'مين يلاقي أزواج أكتر؟'},
   {id:'numguess', sub:'خمّنوا الرقم بالدور'},
   {id:'math',     sub:'سباق — الأسرع ياخد النقطة'},
-  {id:'uno',      sub:'لحد 4 أصحاب، خلّص ورقك الأول'},
   {id:'reflex',   sub:'استنى الإشارة ودوس بأسرع وقت'},
   {id:'quiz',     sub:'لحد 4 أصحاب — الأسرع والصح ياخد نقط أكتر'},
   {id:'mystery',  sub:'ادخلوا الغرفة مع بعض وفكّوا الألغاز والأقفال قبل ما الوقت يخلص'},
@@ -24168,230 +23542,6 @@ const ROOM_ONLY_TILES = {
   battleship: {id:'battleship', icon:'⚓', title:'المعركة البحرية', sub:'1 ضد 1 — رتّب أسطولك وغرّق أسطول صاحبك، والإصابة بتدّيك دور تاني', color:'linear-gradient(145deg,#0b3a63,#4FACFE)'},
   khatfa: {id:'khatfa', icon:'⚡', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjIgMTYgOTYgODQiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2U0ZGVmYSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxnIHN0cm9rZT0icmdiYSgwLDAsMCwuMjIpIiBzdHJva2Utd2lkdGg9IjEiPjxyZWN0IHg9IjYiIHk9IjI4IiB3aWR0aD0iMjYiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSJ1cmwoI2cpIiB0cmFuc2Zvcm09InJvdGF0ZSgtMTIgMTkgNDgpIi8+PHJlY3QgeD0iMzciIHk9IjIyIiB3aWR0aD0iMjYiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSJ1cmwoI2cpIi8+PHJlY3QgeD0iNjgiIHk9IjI4IiB3aWR0aD0iMjYiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSJ1cmwoI2cpIiB0cmFuc2Zvcm09InJvdGF0ZSgxMiA4MSA0OCkiLz48L2c+PGcgZm9udC1mYW1pbHk9IlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmb250LXNpemU9IjMwIiBmaWxsPSIjNWIyMWI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj48dGV4dCB4PSIxOSIgeT0iNTgiIHRyYW5zZm9ybT0icm90YXRlKC0xMiAxOSA0OCkiPtiuPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI1MiI+2Lc8L3RleHQ+PHRleHQgeD0iODEiIHk9IjU4IiB0cmFuc2Zvcm09InJvdGF0ZSgxMiA4MSA0OCkiPtmBPC90ZXh0PjwvZz48cG9seWdvbiBwb2ludHM9IjU2LDYwIDQ0LDgwIDUyLDgwIDQ4LDk2IDY2LDcyIDU3LDcyIDYyLDYwIiBmaWxsPSIjZmZkMjNmIiBzdHJva2U9IiNiODg2MGIiIHN0cm9rZS13aWR0aD0iMS4yIi8+PC9zdmc+', title:'خطفة', sub:'اخطف الحروف وكوّن كلمتك — من 2 لـ8 لاعبين، كل واحد بموبايله', color:'linear-gradient(145deg,#6d28d9,#18c4d4)'},
 };
-/* ---------- rooms: UNO (2-4 لاعبين، نفس محرك اللعبة المنفردة) ---------- */
-/* بيتتبع مين من اللاعبين ظهر قبل كده في نفس الغرفة، عشان نعرض حركة "انضم الآن" مرة واحدة بس لكل لاعب */
-const _unoLobbySeen = {};
-function renderRoomUnoLobby(room){ return window.__rdyWrap(__rdy_renderRoomUnoLobby(room), room); }
-function __rdy_renderRoomUnoLobby(room){
-  const ps = room.players || [];
-  const isHost = room.hostId===state.pid;
-  if(!_unoLobbySeen[room.code]) _unoLobbySeen[room.code] = new Set();
-  const seen = _unoLobbySeen[room.code];
-  const slots = [0,1,2,3].map(i=>{
-    const p = ps[i];
-    if(!p) return `<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
-    const isNew = !seen.has(p.id);
-    seen.add(p.id);
-    return `<div class="uno-lobby-row${isNew?' uno-row-in':''}">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div>${isNew?'<span class="uno-lobby-joined">انضم الآن ✅</span>':''}</div>`;
-  }).join('');
-  const filled = ps.length;
-  const pct = Math.round((filled/4)*100);
-  return `
-    <div class="room-waiting">
-      ${roomWaitHead()}
-      <div class="uno-mm-header">
-        <div class="uno-mm-title">جاري تجهيز الطاولة...</div>
-        <div class="uno-mm-count">${filled}/4 لاعبين انضموا</div>
-        <div class="uno-mm-bar"><div class="uno-mm-bar-fill" style="width:${pct}%"></div></div>
-      </div>
-      ${roomCodeCard(room.code, room.game, true)}
-      <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 🃏</div>
-      <button type="button" class="btn btn-ghost uno-mm-share" style="width:100%;margin-bottom:12px;" data-action="room-uno-share" data-code="${room.code}">📤 شارك الكود مع صحابك</button>
-      <div class="uno-lobby-list">${slots}</div>
-      ${isHost
-        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-uno-start" ${ps.length<2?'disabled':''}>🃏 ابدأ اللعب (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
-        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ اللعب</div>`}
-    </div>`;
-}
-async function doRoomUnoShare(code){
-  const text = `تعال العب أونو معايا في اجتماع جامعة! 🃏 كود الغرفة: ${code}`;
-  if(navigator.share){
-    try{ await navigator.share({ title:'اجتماع جامعة — أونو', text }); return; }catch(e){}
-  }
-  try{
-    await navigator.clipboard.writeText(text);
-    showToast('تم نسخ رسالة الدعوة — شاركها مع أصحابك');
-  }catch(e){
-    showToast('انسخ الكود يدويًا: '+code, true);
-  }
-}
-function renderRoomUno(){
-
-  const room = GAME_ROOMS[state.roomCode];
-  if(!room) return roomGate('أونو', room);
-  if(room.status==='vs') return roomHead('أونو', room) + renderUnoVsScreen(room);
-  if(room.status==='waiting' || !room.uno) return roomHead('أونو', room) + renderRoomUnoLobby(room);
-  const G = room.uno;
-  const myKey = state.pid;
-  return G.winner ? unoWinHtml(G, myKey, 'room-', 'room-uno-next') : unoTableHtml(G, myKey, 'room-');
-}
-/* شاشة المواجهة (VS) اللي بتظهر لكل اللاعبين لثواني قليلة قبل ما ورق اليونو يتوزع */
-function renderUnoVsScreen(room){
-  const ps = room.players || [];
-  const cards = ps.map((p,i)=>`
-    <div class="uno-vs-card" style="animation-delay:${i*110}ms">
-      ${gameAvatar(p.id,'','xl')}
-      <div class="uno-vs-pname">${escapeHtml(p.name)}</div>
-    </div>`).join('');
-  return `
-    <div class="uno-vs-screen">
-      <div class="uno-vs-title">🃏 استعدوا للمواجهة!</div>
-      <div class="uno-vs-arena">
-        <div class="uno-vs-players">${cards}</div>
-        <div class="uno-vs-badge">VS</div>
-      </div>
-      <div class="uno-vs-loading">جاري تحضير الطاولة<span class="uno-vs-dots"><span></span><span></span><span></span></span></div>
-    </div>`;
-}
-async function doRoomUnoStart(){
-  GAME_ROOMS = await loadGameRooms();
-  const room = GAME_ROOMS[state.roomCode];
-  if(!room || room.game!=='uno' || room.hostId!==state.pid || room.status!=='waiting') return;
-  const ps = room.players || [];
-  if(ps.length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
-  room.status = 'vs';
-  roomTouch(room);
-  await saveGameRooms(GAME_ROOMS);
-  delete _unoLobbySeen[room.code];
-  try{ SND.coinChime(); }catch(e){}
-  render();
-  scheduleUnoVsCommit(room.code);
-}
-/* بعد ما شاشة الـ VS تتعرض لثانيتين ونص، صاحب الغرفة (وبس هو، وبس لو لسه صاحبها) بيوزع الورق فعلياً ويبدأ اللعبة.
-   بنعيد قراءة قايمة اللاعبين وقت التنفيذ نفسه (مش قايمة قديمة) عشان لو حد خرج من الغرفة أثناء عرض شاشة الـ VS. */
-function scheduleUnoVsCommit(code){
-  setTimeout(async ()=>{
-    GAME_ROOMS = await loadGameRooms();
-    const room = GAME_ROOMS[code];
-    if(!room || room.status!=='vs' || room.hostId!==state.pid) return;
-    const ps = room.players || [];
-    if(ps.length<2){
-      room.status = 'waiting';
-      roomTouch(room);
-      await saveGameRooms(GAME_ROOMS);
-      if(state.view==='room-uno' && state.roomCode===code) render();
-      return;
-    }
-    const players = ps.map(p=>({key:p.id, name:p.name, isBot:false}));
-    room.uno = unoNewGame(players);
-    room.status = 'playing';
-    roomTouch(room);
-    await saveGameRooms(GAME_ROOMS);
-    if(state.view==='room-uno' && state.roomCode===code) render();
-  }, 2600);
-}
-async function doRoomUnoPlay(cardId){
-  GAME_ROOMS = await loadGameRooms();
-  const room = GAME_ROOMS[state.roomCode];
-  if(!room || !room.uno || room.uno.winner) return;
-  const G = room.uno;
-  const cur = G.players[G.turnIdx];
-  if(!cur || cur.key!==state.pid) return;
-  const card = (G.hands[state.pid]||[]).find(c=>c.id===cardId);
-  if(!card || !unoCardPlayable(G, card)) return;
-  if(card.type==='wild' || card.type==='wild4'){
-    state.unoColorPick = {cardId, prefix:'room-'};
-    render();
-    return;
-  }
-  G._justDrew = false;
-  SND.unoPlay(card);
-  unoPlayCard(G, state.pid, cardId);
-  roomTouch(room);
-  await saveGameRooms(GAME_ROOMS);
-  render();
-  unoMaybeShowFx(G);
-  if(G.winner){ vibrate([20,20,30]); SND.coinChime(); if(G.winner===state.pid) launchConfetti(); }
-}
-async function doRoomUnoColorChoice(color){
-  const pick = state.unoColorPick;
-  if(!pick || pick.prefix!=='room-') return;
-  state.unoColorPick = null;
-  GAME_ROOMS = await loadGameRooms();
-  const room = GAME_ROOMS[state.roomCode];
-  if(!room || !room.uno || room.uno.winner) return;
-  const G = room.uno;
-  const cur = G.players[G.turnIdx];
-  if(!cur || cur.key!==state.pid) return;
-  G._justDrew = false;
-  SND.unoPlay({type:'wild'});
-  unoPlayCard(G, state.pid, pick.cardId, color);
-  roomTouch(room);
-  await saveGameRooms(GAME_ROOMS);
-  render();
-  unoMaybeShowFx(G);
-  if(G.winner){ vibrate([20,20,30]); SND.coinChime(); if(G.winner===state.pid) launchConfetti(); }
-}
-async function doRoomUnoDraw(){
-  GAME_ROOMS = await loadGameRooms();
-  const room = GAME_ROOMS[state.roomCode];
-  if(!room || !room.uno || room.uno.winner) return;
-  const G = room.uno;
-  if(G.drewThisTurn) return;
-  const cur = G.players[G.turnIdx];
-  if(!cur || cur.key!==state.pid) return;
-  const card = unoDrawOne(G);
-  if(card) (G.hands[state.pid]=G.hands[state.pid]||[]).push(card);
-  G.drewThisTurn = true;
-  G._justDrew = true; G._justDrewBy = state.pid;
-  SND.unoDraw();
-  roomTouch(room);
-  await saveGameRooms(GAME_ROOMS);
-  render();
-}
-async function doRoomUnoEndTurn(){
-  GAME_ROOMS = await loadGameRooms();
-  const room = GAME_ROOMS[state.roomCode];
-  if(!room || !room.uno || room.uno.winner) return;
-  const G = room.uno;
-  if(!G.drewThisTurn) return;
-  const cur = G.players[G.turnIdx];
-  if(!cur || cur.key!==state.pid) return;
-  unoAdvance(G, false);
-  roomTouch(room);
-  await saveGameRooms(GAME_ROOMS);
-  render();
-}
-async function doRoomUnoCallUno(){
-  GAME_ROOMS = await loadGameRooms();
-  const room = GAME_ROOMS[state.roomCode];
-  if(!room || !room.uno) return;
-  const G = room.uno;
-  if(G.unoPending===state.pid){
-    G.unoCalledFlag = true;
-    SND.click();
-    roomTouch(room);
-    await saveGameRooms(GAME_ROOMS);
-    render();
-  }
-}
-async function doRoomUnoCatch(targetKey){
-  GAME_ROOMS = await loadGameRooms();
-  const room = GAME_ROOMS[state.roomCode];
-  if(!room || !room.uno || room.uno.winner) return;
-  const G = room.uno;
-  if(G.unoPending===targetKey && !G.unoCalledFlag){
-    unoDrawN(G, targetKey, 2);
-    G.log = '🚨 اتمسك!';
-    G.unoPending = null;
-    SND.click(); vibrate([15,15]);
-    roomTouch(room);
-    await saveGameRooms(GAME_ROOMS);
-    render();
-  }
-}
-async function doRoomUnoNext(){
-  GAME_ROOMS = await loadGameRooms();
-  const room = GAME_ROOMS[state.roomCode];
-  if(!room || !room.uno) return;
-  const oldWins = room.uno.wins;
-  const players = room.uno.players.map(p=>({key:p.key, name:p.name, isBot:false}));
-  room.uno = unoNewGame(players);
-  if(oldWins) room.uno.wins = oldWins;
-  roomTouch(room);
-  await saveGameRooms(GAME_ROOMS);
-  render();
-}
 /* ---------- rooms: تحدي الأسئلة (لحد 4 أصحاب — نفس الأسئلة، الأسرع والصح ياخد نقط أكتر) ---------- */
 /* بنك أسئلة افتراضي (بيتزرع مرة واحدة بس أول ما اللعبة تتفتح لأول مرة)؛ بعد كده الأدمن هو اللي بيضيف/يعدّل/يحذف الأسئلة من لوحة التحكم.
    img اختياري (إيموجي كبير بديل عن صورة) لأي سؤال محتاج توضيح بصري */
@@ -32218,7 +31368,6 @@ function render(){
   else if(state.view==='game-placemem') html = renderPlaceMemGame();
   else if(state.view==='game-math') html = renderMathGame();
   else if(state.view==='game-bus') html = renderBusGame();
-  else if(state.view==='game-uno') html = renderUnoGame();
   else if(state.view==='game-chess') html = renderChessGame();
   else if(state.view==='game-checkers') html = renderCheckersGame();
   else if(state.view==='game-tmm') html = renderTmmGame();
@@ -32237,7 +31386,6 @@ function render(){
   else if(state.view==='room-numguess') html = renderRoomNumGuess();
   else if(state.view==='room-math') html = renderRoomMath();
   else if(state.view==='room-reflex') html = renderRoomReflex();
-  else if(state.view==='room-uno') html = renderRoomUno();
   else if(state.view==='room-quiz') html = renderRoomQuiz();
   else if(state.view==='room-mystery') html = renderRoomMystery();
   else if(state.view==='room-emojibible') html = renderRoomEb();
@@ -32902,16 +32050,16 @@ const SND = {
       setTimeout(()=>luxTone(f, .5, 'sine', .09, {chorus:true, wet:.3, cutoff:7000}), i*90);
     });
   },
-  unoPlay(card){
+  ccPlay(card){
     whooshSweep(false, .12);
     const t = card && card.type;
     if(t==='number' || !t) setTimeout(()=>luxTone(640, .1, 'sine', .05, {cutoff:2200, wet:.18}), 60);
   },
-  unoDraw(){
+  ccDraw(){
     whooshSweep(true, .09);
     setTimeout(()=>luxTone(300, .08, 'sine', .04, {cutoff:1500, wet:.15}), 40);
   },
-  unoSkip(){
+  ccSkip(){
     luxTone(180, .16, 'sawtooth', .08, {wet:.14});
     setTimeout(()=>luxTone(130, .16, 'sawtooth', .07, {wet:.14}), 70);
   },
@@ -32920,10 +32068,10 @@ const SND = {
     setTimeout(()=>luxTone(380, .09, 'triangle', .06, {wet:.16}), 60);
     setTimeout(()=>luxTone(500, .09, 'triangle', .06, {wet:.16}), 120);
   },
-  unoWild(){
+  ccWild(){
     [523.25,659.25,783.99].forEach((f,i)=> setTimeout(()=>luxTone(f, .18, 'triangle', .06, {chorus:true, wet:.22}), i*55));
   },
-  unoDrawPenalty(){
+  ccPenalty(){
     [1,2,3].forEach(i=> setTimeout(()=>luxTone(220-i*20, .12, 'sawtooth', .07, {wet:.15}), i*70));
   },
   chessMove(){
@@ -34803,7 +33951,7 @@ function closeScanModal(){
 
 /* ============================= EVENTS ============================= */
 const NEXT_PRO_ACTIONS = new Set([
-  'xo-reset','c4-reset','domino-reset','ludo-again','uno-next','room-uno-next',
+  'xo-reset','c4-reset','domino-reset','ludo-again',
   'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next',
   'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-st-next','room-ua-next','room-fh-next','room-fs-next','room-fz-next','room-dg-next','room-bs-next','pm-next',
   'chess-reset','ck-reset','bg-reset','snl-reset','room-snr-next'
@@ -34813,7 +33961,6 @@ const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-rps-pick','room-rps-next','room-c4-color','room-c4-col','room-c4-next',
   'room-memory-card','room-memory-next','room-num-key','room-num-next','room-math-pick','room-math-next',
   'room-ludo-start','room-ludo-skip','ludo-token','ludo-roll',
-  'room-uno-start','room-uno-play','room-uno-draw','room-uno-endturn','room-uno-color','room-uno-uno','room-uno-catch','room-uno-next',
   'room-reflex-start','room-reflex-tap','room-reflex-target','room-reflex-rematch',
   'room-quiz-start','room-quiz-pick','room-quiz-next',
   'room-mystery-start','room-mystery-submit','room-mystery-hint','room-mystery-next',
@@ -35083,6 +34230,7 @@ document.addEventListener('click', (e)=>{
     if(gid==='millionaire'){ openMillionaireGame(); return; }
     if(gid==='revword'){ openRevWordGame(); return; }
     if(gid==='who'){ openWhoGame(); return; }
+    if(gid==='colorcards'){ openColorCardsGame(); return; }
     if(gid==='xo'){ initXoGame(); xoStartPick(450); }
     else if(gid==='connect4'){ initConnect4Game(); c4SoloPick('R', 450); }
     else if(gid==='domino'){ initDominoGame(); dominoProcessTurn(true); }
@@ -35093,7 +34241,6 @@ document.addEventListener('click', (e)=>{
     else if(gid==='numguess'){ initNumberGame(); setTimeout(showNumLevelDialog,350); }
     else if(gid==='placemem'){ initPlaceMemGame(); setTimeout(showPmLevelDialog,350); }
     else if(gid==='math'){ initMathGame(null,true); setTimeout(showMathLevelDialog,350); }
-    else if(gid==='uno'){ initUnoGame(); unoRunBots(state.uno, true); }
     else if(gid==='chess'){ initChessGame(); }
     else if(gid==='checkers'){ initCheckersGame(); }
     else if(gid==='tmm'){ initTmmGame(); }
@@ -35198,7 +34345,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='invite-room-friend'){ openInvitePicker(el.dataset.code, el.dataset.game); }
   else if(action==='close-invite-picker'){ closeInvitePicker(); }
   else if(action==='send-room-invite'){ sendRoomInvite(el.dataset.pid, el.dataset.name, el); }
-  else if(action==='room-uno-share'){ doRoomUnoShare(el.dataset.code); }
   else if(action==='room-xo-cell'){ doRoomXoMove(parseInt(el.dataset.idx,10)); }
   else if(action==='room-xo-next'){ doRoomXoNext(); }
   else if(action==='room-domino-tile'){ doRoomDominoMove(parseInt(el.dataset.idx,10)); }
@@ -35323,21 +34469,6 @@ document.addEventListener('click', (e)=>{
   else if(action==='math-pick'){ doMathPick(el.dataset.val); }
   else if(action==='math-reset'){ initMathGame(); render(); }
   else if(action==='math-level'){ showMathLevelDialog(); }
-  else if(action==='uno-play'){ doUnoPlay(el.dataset.cid); }
-  else if(action==='uno-draw'){ doUnoDraw(); }
-  else if(action==='uno-endturn'){ doUnoEndTurn(); }
-  else if(action==='uno-color'){ doUnoColorChoice(el.dataset.color); }
-  else if(action==='uno-uno'){ doUnoCallUno(); }
-  else if(action==='uno-catch'){ doUnoCatch(el.dataset.key); }
-  else if(action==='uno-next'){ doUnoNextRound(); }
-  else if(action==='room-uno-start'){ doRoomUnoStart(); }
-  else if(action==='room-uno-play'){ doRoomUnoPlay(el.dataset.cid); }
-  else if(action==='room-uno-draw'){ doRoomUnoDraw(); }
-  else if(action==='room-uno-endturn'){ doRoomUnoEndTurn(); }
-  else if(action==='room-uno-color'){ doRoomUnoColorChoice(el.dataset.color); }
-  else if(action==='room-uno-uno'){ doRoomUnoCallUno(); }
-  else if(action==='room-uno-catch'){ doRoomUnoCatch(el.dataset.key); }
-  else if(action==='room-uno-next'){ doRoomUnoNext(); }
   else if(action==='ai-level'){ showAiLevelDialog(el.dataset.game); }
   else if(action==='xo-cell'){ doXoMove(parseInt(el.dataset.idx,10)); }
   else if(action==='xo-mode'){
@@ -48820,6 +47951,587 @@ window.openWhoGame=begin;
 })();
 </script>
 
+<style id="cc-css">
+/* ===================== كروت الألوان (Color Cards) — لعبة ورق ضد 3 بوتات ===================== */
+.cc-ov{position:fixed;inset:0;z-index:9600;overflow:hidden;direction:ltr;font-family:'Cairo','Tajawal',system-ui,sans-serif;color:#fff;
+  background:radial-gradient(120% 80% at 50% 46%,#8b4627 0%,#7a3a21 58%,#6a301b 100%);
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.cc-ov::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.018) 0 3px,transparent 3px 9px);pointer-events:none}
+.cc-ov *{box-sizing:border-box}
+.cc-stage{position:absolute;left:50%;top:0;bottom:0;width:min(100vw,480px);transform:translateX(-50%)}
+.cc-stage>*{position:absolute}
+.cc-fx{position:absolute;inset:0;pointer-events:none;z-index:25;overflow:hidden}
+.cc-fly{position:absolute;pointer-events:none;will-change:transform;z-index:26}
+
+/* أزرار الأعلى */
+.cc-rb{top:calc(12px + env(safe-area-inset-top,0px));width:42px;height:42px;border-radius:50%;border:0;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);cursor:pointer;padding:0;z-index:5}
+.cc-rb.b{left:12px}.cc-rb.r{right:12px}
+.cc-rb svg{width:22px;height:22px;stroke:#c15a8d;fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.cc-rb:active{transform:scale(.92)}
+
+/* الترابيزة */
+.cc-tbl{border-radius:50%;background:radial-gradient(circle at 50% 42%,#914c2c 0%,#86412a 62%,#7b3a20 100%);box-shadow:0 0 0 4px #9a5232,inset 0 0 0 7px rgba(60,20,8,.14),0 10px 30px rgba(0,0,0,.18)}
+.cc-aw{width:calc(var(--tb)*.2);height:calc(var(--tb)*.2);fill:#5b2713;stroke:#5b2713;opacity:.92;pointer-events:none}
+.cc-aw.a1{left:-9%;top:-9%}
+.cc-aw.a2{right:-9%;top:-9%;transform:rotate(90deg)}
+.cc-aw.a3{right:-9%;bottom:-9%;transform:rotate(180deg)}
+.cc-aw.a4{left:-9%;bottom:-9%;transform:rotate(270deg)}
+
+/* ورق: وش */
+.cc-card{--f:#999;position:relative;width:var(--cw);height:calc(var(--cw)*1.42);flex:none;border-radius:calc(var(--cw)*.14);background:var(--f);border:calc(var(--cw)*.05) solid #fff;
+  box-shadow:0 0 0 calc(var(--cw)*.028) #1d0e08,0 calc(var(--cw)*.05) calc(var(--cw)*.09) rgba(0,0,0,.38);overflow:hidden}
+.cc-card.c-red{--f:#f2655d}.cc-card.c-yellow{--f:#f9b92e}.cc-card.c-green{--f:#38b34a}.cc-card.c-blue{--f:#2c6dd2}
+.cc-card.c-wild{--f:#232329}
+.cc-card .m{position:absolute;left:50%;top:50%;width:72%;height:50%;transform:translate(-50%,-50%);background:#fff;border-radius:44% / 52%;display:flex;align-items:center;justify-content:center;
+  color:var(--f);font-weight:900;font-size:calc(var(--cw)*.52);line-height:1;letter-spacing:-.02em;font-family:'Cairo',system-ui,sans-serif;padding-top:calc(var(--cw)*.02)}
+.cc-card.sp .m{font-size:calc(var(--cw)*.4);padding-top:0}
+.cc-card.c-wild .m{background:conic-gradient(from 45deg,#f2655d 0 25%,#f9b92e 0 50%,#38b34a 0 75%,#2c6dd2 0);color:#fff;-webkit-text-stroke:calc(var(--cw)*.025) rgba(0,0,0,.55);text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.cc-card .k{position:absolute;font-style:normal;font-weight:900;font-size:calc(var(--cw)*.21);line-height:1;color:#fff;text-shadow:0 1px 1.5px rgba(0,0,0,.35);font-family:'Cairo',system-ui,sans-serif}
+.cc-card .k.tl{left:9%;top:5%}.cc-card .k.br{right:9%;bottom:5%}
+.cc-card.sp .k{font-size:calc(var(--cw)*.17)}
+
+/* ورق: ضهر */
+.cc-bk{--w:30px;position:absolute;width:var(--w);height:calc(var(--w)*1.4);border-radius:calc(var(--w)*.17);background:#8d8d8d;border:calc(var(--w)*.07) solid #fff;
+  box-shadow:0 0 0 calc(var(--w)*.04) #1d0e08;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cc-bk span{writing-mode:vertical-rl;font-size:calc(var(--w)*.135);font-weight:900;letter-spacing:0;color:rgba(255,255,255,.5);white-space:nowrap;font-family:'Cairo',system-ui,sans-serif}
+.cc-bk.h{width:calc(var(--w)*1.4);height:var(--w)}
+.cc-bk.h span{writing-mode:horizontal-tb}
+
+/* الأوراق عند البوتات */
+.cc-seat{pointer-events:none}
+.cc-nm{display:flex;align-items:center;gap:5px;font-weight:900;font-size:15px;color:#4a1f10;opacity:.82;border-radius:12px;padding:3px 12px;white-space:nowrap;transition:background .25s,color .25s,opacity .25s}
+.cc-nm.t{transform:translateX(-50%)}
+.cc-nm.me{transform:translateX(-50%);color:#ff9a6c;opacity:1;font-size:17px;letter-spacing:.02em}
+.cc-nm.v{writing-mode:vertical-rl;padding:12px 3px;flex-direction:row;transform:translateY(-50%)}
+.cc-nm.v.l{transform:translateY(-50%) rotate(180deg)}
+.cc-nm em{font-style:normal;font-size:11px;font-weight:900;min-width:19px;height:19px;border-radius:10px;background:rgba(60,20,8,.5);color:#ffe3cf;display:inline-flex;align-items:center;justify-content:center;padding:0 4px}
+.cc-nm.v em{writing-mode:horizontal-tb}
+.cc-nm.turn{background:#a45733;color:#fff1e4;opacity:1;box-shadow:0 2px 8px rgba(0,0,0,.25);animation:ccTurn 1.3s ease-in-out infinite}
+.cc-nm.me.turn{color:#fff}
+@keyframes ccTurn{0%,100%{box-shadow:0 2px 8px rgba(0,0,0,.25)}50%{box-shadow:0 0 0 4px rgba(255,190,140,.28),0 2px 10px rgba(0,0,0,.25)}}
+
+/* السحب والرمي */
+.cc-deck{padding:0;border:0;background:none;cursor:pointer;z-index:3}
+.cc-deck .cc-bk{box-shadow:0 0 0 calc(var(--w)*.04) #1d0e08,0 calc(var(--w)*.06) 0 #2c1a12,0 calc(var(--w)*.12) 0 #1d0e08,0 calc(var(--w)*.14) calc(var(--w)*.12) rgba(0,0,0,.4)}
+.cc-deck .dc{position:absolute;right:-6px;top:-8px;min-width:22px;height:22px;border-radius:11px;background:#fff;color:#7a3a21;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 5px;box-shadow:0 1px 4px rgba(0,0,0,.35);font-style:normal;z-index:2}
+.cc-deck.hint{animation:ccHint 1s ease-in-out infinite}
+@keyframes ccHint{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+.cc-deck:active{transform:scale(.95)}
+.cc-pile .cc-pw{position:absolute;left:0;top:0}
+.cc-pile .cc-pw.u .cc-card{filter:brightness(.62) saturate(.8)}
+.cc-pile .cc-pw.land{animation:ccLand .3s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes ccLand{0%{transform:scale(1.18) rotate(var(--r,0deg));opacity:.4}100%{transform:rotate(var(--r,0deg));opacity:1}}
+
+/* إيدي */
+.cc-hand{left:0;right:0;pointer-events:none;z-index:4}
+.cc-hc{position:absolute;bottom:0;pointer-events:auto;cursor:pointer;transition:transform .16s,filter .16s}
+.cc-hc.pl{transform:translateY(-11%)}
+.cc-hc.pl .cc-card{box-shadow:0 0 0 calc(var(--cw)*.028) #1d0e08,0 0 calc(var(--cw)*.22) rgba(255,236,160,.85),0 calc(var(--cw)*.05) calc(var(--cw)*.09) rgba(0,0,0,.38)}
+.cc-hc.dim{filter:brightness(.78) saturate(.85)}
+.cc-hc.sh{animation:ccShake .34s}
+@keyframes ccShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.cc-hc.new{animation:ccNew .3s ease-out}
+@keyframes ccNew{0%{transform:translateY(40%);opacity:0}100%{transform:none;opacity:1}}
+
+/* تأثيرات +1 و +4 */
+.cc-fxc{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(38,12,6,.92) 0%,rgba(38,12,6,.86) 100%);display:flex;align-items:center;justify-content:center;animation:ccFxIn .22s ease-out;overflow:visible}
+.cc-fxc.out{animation:ccFxOut .25s ease-in forwards}
+@keyframes ccFxIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+@keyframes ccFxOut{to{opacity:0;transform:scale(1.06)}}
+.cc-fxc .t{position:relative;z-index:2;font-size:calc(var(--tb)*.3);font-weight:900;color:#fff;-webkit-text-stroke:calc(var(--tb)*.012) rgba(0,0,0,.35);text-shadow:0 3px 10px rgba(0,0,0,.5);animation:ccPop .45s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes ccPop{0%{transform:scale(.4)}100%{transform:scale(1)}}
+.cc-fxc .ar{position:absolute;left:50%;top:50%;width:0;height:0;transform:rotate(var(--a));z-index:3}
+.cc-fxc .ar svg{position:absolute;left:calc(var(--tb)*.14);top:calc(var(--tb)*-.1);width:calc(var(--tb)*.34);height:calc(var(--tb)*.2);overflow:visible;animation:ccAr .7s ease-out infinite}
+@keyframes ccAr{0%{transform:translateX(-20%);opacity:.3}60%{opacity:1}100%{transform:translateX(18%);opacity:1}}
+.cc-no{width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:#fff;border:5px solid #e8423a;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4);animation:ccPop .35s cubic-bezier(.2,.9,.3,1.4)}
+.cc-no::after{content:'';position:absolute;width:5px;height:100%;background:#e8423a;transform:rotate(45deg);border-radius:3px}
+.cc-no.out{opacity:0;transition:opacity .25s}
+
+/* اختيار اللون */
+.cc-cp{inset:0;background:rgba(26,9,4,.66);display:flex;align-items:center;justify-content:center;z-index:12;animation:ccFxIn .2s ease-out}
+.cc-cpc{background:#fff7ec;border-radius:22px;padding:18px 18px 20px;width:min(78%,290px);text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.cc-cpc h4{margin:0 0 14px;font-size:17px;font-weight:900;color:#4a2010}
+.cc-cpg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cc-cpb{height:64px;border:0;border-radius:18px;cursor:pointer;font-family:inherit;font-weight:900;font-size:15px;color:#fff;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),0 3px 8px rgba(0,0,0,.2);text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.cc-cpb:active{transform:scale(.94)}
+.cc-cpb.red{background:#f2655d}.cc-cpb.yellow{background:#f9b92e}.cc-cpb.green{background:#38b34a}.cc-cpb.blue{background:#2c6dd2}
+
+/* النتيجة */
+.cc-sheet{position:absolute;inset:0;background:rgba(20,8,4,.74);display:flex;align-items:center;justify-content:center;z-index:30;animation:ccFxIn .25s ease-out;padding:16px}
+.cc-rc{background:#fff7ec;color:#4a2010;border-radius:24px;padding:24px 20px 20px;width:min(100%,340px);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.cc-rc .ic{font-size:54px;line-height:1;margin-bottom:6px}
+.cc-rc h2{margin:0 0 6px;font-size:21px;font-weight:900}
+.cc-rc p{margin:0 0 12px;font-size:13.5px;font-weight:700;opacity:.78;line-height:1.7}
+.cc-rs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px}
+.cc-rs span{background:#f3e2cf;border-radius:12px;padding:4px 10px;font-size:12px;font-weight:800;color:#6b3418}
+.cc-rs span.g{background:#ffe6a3;color:#7a4a00}
+.cc-btn{display:block;width:100%;border:0;border-radius:16px;padding:12px;margin-top:8px;font-family:inherit;font-size:15px;font-weight:900;cursor:pointer;background:linear-gradient(180deg,#43c15a,#2c9e44);color:#fff;box-shadow:0 4px 0 #1f7a33}
+.cc-btn.alt{background:#efdcc6;color:#6b3418;box-shadow:0 4px 0 #cdb08f}
+.cc-btn:active{transform:translateY(2px);box-shadow:none}
+.cc-toast{left:50%;top:calc(50% + var(--tb)*.62 + 8px);transform:translateX(-50%);background:rgba(30,10,4,.82);color:#fff;font-size:13px;font-weight:800;padding:7px 14px;border-radius:14px;white-space:nowrap;z-index:9;pointer-events:none;animation:ccFxIn .2s ease-out}
+
+/* نافذة "كمّل لعبتك؟" */
+.cc-dlg{position:fixed;inset:0;z-index:9650;background:rgba(18,12,30,.78);display:flex;align-items:center;justify-content:center;padding:20px;font-family:'Cairo','Tajawal',system-ui,sans-serif;animation:ccFxIn .2s ease-out;direction:rtl}
+.cc-dlgc{background:#3a3550;border-radius:22px;padding:26px 20px 20px;width:min(100%,330px);text-align:center;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.cc-dlgc h3{margin:0 0 12px;font-size:22px;font-weight:900;color:#ffc93c;line-height:1.4}
+.cc-dlgc p{margin:0 0 20px;font-size:14px;font-weight:700;opacity:.86;line-height:1.7}
+.cc-dlgc .r{display:flex;gap:10px}
+.cc-dlgc button{flex:1;border:0;border-radius:12px;padding:12px 6px;font-family:inherit;font-size:15px;font-weight:900;color:#fff;cursor:pointer}
+.cc-dlgc .no{background:#d9675d;box-shadow:0 4px 0 #a94139}
+.cc-dlgc .ok{background:#34b24d;box-shadow:0 4px 0 #23812f}
+.cc-dlgc button:active{transform:translateY(2px);box-shadow:none}
+
+@media (prefers-reduced-motion:reduce){.cc-ov *{animation:none!important;transition:none!important}}
+
+.cc-deck .dw{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);z-index:3;background:#fff;color:#c0392b;font-size:15px;font-weight:900;letter-spacing:.06em;padding:3px 8px;border-radius:9px;box-shadow:0 2px 6px rgba(0,0,0,.45);font-family:'Cairo',system-ui,sans-serif;pointer-events:none}
+
+</style>
+<script id="cc-module">
+/* =====================================================================
+   لعبة «كروت الألوان»: انت و3 بوتات على ترابيزة دايرية. طابق لون أو رقم الورقة اللي على الترابيزة،
+   ولو مفيش معاك ورقة تنفع اسحب من الكومة لحد ما تلاقي ورقة تنفع. كارت +2 بيخلّي اللي بعدك يسحب ورقتين
+   ويتخطّاه الدور، وكارت +4 الملوّن بيخلّيه يسحب 4 وتختار انت اللون. أول واحد يخلّص ورقه يكسب.
+   ===================================================================== */
+(function(){
+'use strict';
+var G=null, UID=0;
+var COLS=['red','yellow','green','blue'];
+var CN={red:'أحمر',yellow:'أصفر',green:'أخضر',blue:'أزرق'};
+var PLAYERS=[{k:'me',n:'أنت',me:true},{k:'l',n:'بوتي'},{k:'t',n:'روبوتيكا'},{k:'r',n:'زد9'}];
+var NS='http://www.w3.org/2000/svg';
+var ARW='<svg viewBox="0 0 24 24"><path d="M10 3.5h10.5V14z"/><path d="M4.5 19.5 16 8" stroke-width="4.6" stroke-linecap="round" fill="none"/></svg>';
+var ARR='<svg viewBox="0 0 40 24"><path d="M26 2l13 10-13 10v-6H2V8h24z"/></svg>';
+
+/* ---------- أدوات ---------- */
+function esc(s){ return (typeof escapeHtml==='function')?escapeHtml(String(s==null?'':s)):String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function snd(n,a){ try{ SND[n](a); }catch(e){} }
+function vib(p){ try{ vibrate(p); }catch(e){} }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=rnd(i+1),t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function alive(id){ return !!G && G.id===id; }
+function sleep(ms){ return new Promise(function(res){ if(!G) return; G.t.push(setTimeout(res,ms)); }); }
+function settings(){ try{ return GAME_POINTS_SETTINGS||{}; }catch(e){ return {}; } }
+function baseReward(){ var s=settings(); return s.soloColorCardsReward==null?35:s.soloColorCardsReward; }
+function maxSessions(){ var s=settings(); return s.soloColorCardsSessions==null?5:s.soloColorCardsSessions; }
+function pid(){ try{ return (typeof state!=='undefined'&&state.pid)||'x'; }catch(e){ return 'x'; } }
+function today(){ return new Date().toDateString(); }
+function dayKey(){ return 'glv-cc-day-'+pid(); }
+function saveKey(){ return 'glv-cc-save-'+pid(); }
+function lvlOf(id){ try{ for(var i=0;i<AI_LEVELS.length;i++) if(AI_LEVELS[i].id===id) return AI_LEVELS[i]; }catch(e){} return {id:id,mult:1,name:'',icon:'🎯'}; }
+function rewardsLeft(){ var max=maxSessions(); try{ var o=JSON.parse(localStorage.getItem(dayKey())||'null'); if(o&&o.d===today()) return Math.max(0,max-o.n); }catch(e){} return max; }
+function useReward(){ try{ var o=JSON.parse(localStorage.getItem(dayKey())||'null'), n=(o&&o.d===today())?o.n:0; localStorage.setItem(dayKey(),JSON.stringify({d:today(),n:n+1})); }catch(e){} }
+function stat(fn){ try{ var st=(typeof state!=='undefined'&&state.pid)?myGameStats(state.pid):null; if(st){ fn(st); saveGameStats(GAME_STATS); } }catch(e){} }
+function countLoss(){ stat(function(st){ st.ccPlayed=(st.ccPlayed||0)+1; }); }
+
+/* ---------- الورق ---------- */
+function newDeck(){
+  var d=[],id=0;
+  COLS.forEach(function(c){
+    for(var n=1;n<=9;n++){ d.push({id:'c'+(id++),color:c,type:'num',v:n}); d.push({id:'c'+(id++),color:c,type:'num',v:n}); }
+    d.push({id:'c'+(id++),color:c,type:'num',v:0});
+    for(var k=0;k<3;k++) d.push({id:'c'+(id++),color:c,type:'p1'});
+  });
+  for(var w=0;w<4;w++) d.push({id:'c'+(id++),color:'wild',type:'w4'});
+  return d;
+}
+function top(){ return G.discard[G.discard.length-1]; }
+function canPlay(c){
+  var t=top();
+  if(c.type==='w4') return true;
+  if(c.color===G.color) return true;
+  if(c.type==='num'&&t.type==='num'&&c.v===t.v) return true;
+  if(c.type==='p1'&&t.type==='p1') return true;
+  return false;
+}
+function sortHand(h){
+  h.sort(function(a,b){
+    var ca=a.color==='wild'?9:COLS.indexOf(a.color), cb=b.color==='wild'?9:COLS.indexOf(b.color);
+    if(ca!==cb) return ca-cb;
+    var va=a.type==='num'?a.v:10, vb=b.type==='num'?b.v:10;
+    return va-vb;
+  });
+}
+function drawCard(){
+  if(!G.deck.length){
+    if(G.discard.length<=1) return null;
+    var t=G.discard.pop(), rest=G.discard;
+    rest.forEach(function(c){ delete c.chosen; delete c.rot; });
+    G.deck=shuffle(rest); G.discard=[t];
+  }
+  return G.deck.pop();
+}
+function cardHtml(c,cw){
+  var col=c.type==='w4'?(c.chosen||'wild'):c.color;
+  var v=c.type==='num'?c.v:(c.type==='p1'?'+2':'+4');
+  return '<div class="cc-card c-'+col+(c.type!=='num'?' sp':'')+'"'+(cw?' style="--cw:'+cw+'px"':'')+'><i class="k tl">'+v+'</i><i class="k br">'+v+'</i><b class="m">'+v+'</b></div>';
+}
+function backHtml(w,h){ return '<div class="cc-bk'+(h?' h':'')+'" style="--w:'+w+'px;position:relative"><span>COLOR CARDS</span></div>'; }
+
+/* ---------- القياسات والرسم ---------- */
+function dims(){
+  var W=Math.min(G.ov.clientWidth||360,480), H=G.ov.clientHeight||700;
+  var tb=Math.min(W*0.64,H*0.36), cw=Math.min(W*0.158,H*0.115,88), sw=Math.min(W*0.075,36);
+  return {W:W,H:H,tb:tb,cw:cw,sw:sw,cy:H*0.49};
+}
+function vis(k){ return G.hands[k].filter(function(c){ return !G.pend[c.id]; }); }
+function myTurn(){ return !!G && !G.over && !G.busy && G.turn===0; }
+function fanBacks(n,sw,step,horiz){
+  var out='';
+  for(var i=0;i<n;i++) out+='<div class="cc-bk'+(horiz?' h':'')+'" style="--w:'+sw+'px;'+(horiz?'top:':'left:')+(i*step)+'px;'+(horiz?'left:0':'top:0')+'"><span>COLOR CARDS</span></div>';
+  return out;
+}
+function build(d){
+  var W=d.W,H=d.H,tb=d.tb,cw=d.cw,sw=d.sw,cy=d.cy, h='';
+  var turn=function(i){ return (!G.over&&G.turn===i)?' turn':''; };
+  var cnt={l:vis('l').length,t:vis('t').length,r:vis('r').length};
+  h+='<button type="button" class="cc-rb b" data-cc="back" aria-label="رجوع"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>';
+  h+='<button type="button" class="cc-rb r" data-cc="restart" aria-label="إعادة"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v5h5"/></svg></button>';
+  /* فوق */
+  var ny=cy-tb/2-34, fh=sw*1.4, step=Math.min(sw*.46,(W*.5-sw)/Math.max(1,cnt.t-1)), fw=Math.max(0,(cnt.t-1)*step+sw);
+  h+='<div class="cc-seat" data-s="t" style="left:50%;margin-left:'+(-fw/2)+'px;top:'+(ny-fh-4)+'px;width:'+fw+'px;height:'+fh+'px">'+fanBacks(cnt.t,sw,step,false)+'</div>';
+  h+='<div class="cc-nm t'+turn(2)+'" style="left:50%;top:'+ny+'px">'+esc(PLAYERS[2].n)+'<em>'+cnt.t+'</em></div>';
+  /* يمين وشمال */
+  [['l',1,'left'],['r',3,'right']].forEach(function(s){
+    var k=s[0],n=cnt[k], st=Math.min(sw*.46,(H*.34-sw)/Math.max(1,n-1)), fl=Math.max(0,(n-1)*st+sw), bw=sw*1.4;
+    h+='<div class="cc-seat" data-s="'+k+'" style="'+s[2]+':2px;top:'+(cy-fl/2)+'px;width:'+bw+'px;height:'+fl+'px">'+fanBacks(n,sw,st,true)+'</div>';
+    h+='<div class="cc-nm v '+k+turn(s[1])+'" style="'+s[2]+':'+(bw+5)+'px;top:'+cy+'px">'+esc(PLAYERS[s[1]].n)+'<em>'+n+'</em></div>';
+  });
+  /* الترابيزة */
+  var dw=cw, pw=cw*1.05, hh=function(w){ return w*1.42; };
+  var tc=G.discard.slice(-3), pile='';
+  tc.forEach(function(c,i){
+    var last=i===tc.length-1, r=c.rot!=null?c.rot:((parseInt(c.id.slice(1),10)*37)%30-15);
+    pile+='<div class="cc-pw'+(last?'':' u')+(last&&G.landId===c.id?' land':'')+'" style="--r:'+r+'deg;transform:rotate('+r+'deg)">'+cardHtml(c,pw)+'</div>';
+  });
+  h+='<div class="cc-tbl" style="--tb:'+tb+'px;left:50%;top:'+cy+'px;width:'+tb+'px;height:'+tb+'px;margin:'+(-tb/2)+'px 0 0 '+(-tb/2)+'px">'
+    +'<svg class="cc-aw a1" style="position:absolute" viewBox="0 0 24 24">'+ARW.slice(ARW.indexOf('>')+1,-6)+'</svg>'
+    +'<svg class="cc-aw a2" style="position:absolute" viewBox="0 0 24 24">'+ARW.slice(ARW.indexOf('>')+1,-6)+'</svg>'
+    +'<svg class="cc-aw a3" style="position:absolute" viewBox="0 0 24 24">'+ARW.slice(ARW.indexOf('>')+1,-6)+'</svg>'
+    +'<svg class="cc-aw a4" style="position:absolute" viewBox="0 0 24 24">'+ARW.slice(ARW.indexOf('>')+1,-6)+'</svg>'
+    +'<button type="button" class="cc-deck'+((myTurn()&&!G.hands.me.some(canPlay))?' hint':'')+'" data-cc="deck" style="position:absolute;left:'+(tb*.12)+'px;top:'+(tb/2-hh(dw)/2)+'px;width:'+dw+'px;height:'+hh(dw)+'px;--w:'+dw+'px"><div class="cc-bk" style="--w:'+dw+'px;left:0;top:0"><span>COLOR CARDS</span></div><em class="dc">'+G.deck.length+'</em>'+((myTurn()&&!G.hands.me.some(canPlay))?'<b class="dw">DRAW</b>':'')+'</button>'
+    +'<div class="cc-pile" style="position:absolute;right:'+(tb*.12)+'px;top:'+(tb/2-hh(pw)/2)+'px;width:'+pw+'px;height:'+hh(pw)+'px">'+pile+'</div>'
+    +'</div>';
+  h+='<div class="cc-nm me'+turn(0)+'" style="left:50%;top:'+(cy+tb/2+10)+'px">أنت</div>';
+  /* إيدي */
+  var hand=vis('me'), n=hand.length, hs=Math.min(cw*.9,(W-24-cw)/Math.max(1,n-1)), tot=Math.max(0,(n-1)*hs+cw), x0=(W-tot)/2, can=myTurn(), hc='';
+  hand.forEach(function(c,i){
+    var pl=can&&canPlay(c);
+    hc+='<div class="cc-hc'+(can?(pl?' pl':' dim'):'')+(G.newId===c.id?' new':'')+'" data-cc="card" data-id="'+c.id+'" style="left:'+(x0+i*hs)+'px;z-index:'+i+'">'+cardHtml(c,cw)+'</div>';
+  });
+  h+='<div class="cc-hand" style="bottom:calc(14px + env(safe-area-inset-bottom,0px));height:'+hh(cw)+'px;--cw:'+cw+'px">'+hc+'</div>';
+  if(G.pick){
+    h+='<div class="cc-cp" data-cc="cpbg"><div class="cc-cpc"><h4>🎨 اختار اللون</h4><div class="cc-cpg">'+COLS.map(function(c){ return '<button type="button" class="cc-cpb '+c+'" data-cc="color" data-c="'+c+'">'+CN[c]+'</button>'; }).join('')+'</div></div></div>';
+  }
+  if(G.toast) h+='<div class="cc-toast">'+esc(G.toast)+'</div>';
+  return h;
+}
+function render(){
+  if(!G) return;
+  var st=G.ov.querySelector('.cc-stage'), d=dims(); G.d=d;
+  st.style.setProperty('--tb',d.tb+'px');
+  st.innerHTML=build(d);
+  G.landId=null; G.newId=null;
+}
+function toast(m){ if(!G) return; G.toast=m; render(); var id=G.id; setTimeout(function(){ if(alive(id)&&G.toast===m){ G.toast=null; render(); } },1600); }
+function rectOf(sel){ var e=G.ov.querySelector(sel); return e?e.getBoundingClientRect():null; }
+function seatRect(k){
+  if(k==='me'){ var r=rectOf('.cc-hand'), d=G.d; return {left:r.left+r.width/2-d.cw/2,top:r.top,width:d.cw,height:d.cw*1.42}; }
+  var e=G.ov.querySelector('.cc-seat[data-s="'+k+'"]'), b=e.getBoundingClientRect(), s=G.d.sw;
+  return {left:b.left+b.width/2-s/2,top:b.top+b.height/2-s*.7,width:s,height:s*1.4};
+}
+function fly(html,from,to,ms,r1){
+  return new Promise(function(res){
+    if(!G||!from||!to){ res(); return; }
+    var el=document.createElement('div'); el.className='cc-fly';
+    el.style.cssText='left:'+from.left+'px;top:'+from.top+'px;width:'+from.width+'px;height:'+from.height+'px';
+    el.innerHTML=html; G.fx.appendChild(el);
+    var dx=(to.left+to.width/2)-(from.left+from.width/2), dy=(to.top+to.height/2)-(from.top+from.height/2), s=to.width/from.width, done=false;
+    function fin(){ if(done) return; done=true; if(el.parentNode) el.parentNode.removeChild(el); res(); }
+    try{
+      var a=el.animate([{transform:'translate(0,0) scale(1) rotate(0deg)'},{transform:'translate('+dx+'px,'+dy+'px) scale('+s+') rotate('+(r1||0)+'deg)'}],{duration:ms,easing:'cubic-bezier(.22,.8,.3,1)',fill:'forwards'});
+      a.onfinish=fin;
+    }catch(e){ setTimeout(fin,ms); }
+    setTimeout(fin,ms+150);
+  });
+}
+
+/* ---------- حركات اللعب ---------- */
+async function animDraw(id,k,card){
+  var from=rectOf('.cc-deck .cc-bk'), to=seatRect(k);
+  if(!from||!to){ delete G.pend[card.id]; render(); return; }
+  var html=(k==='me')?cardHtml(card,from.width):backHtml(from.width);
+  snd('ccDraw');
+  await fly(html,from,to,320);
+  if(!alive(id)) return;
+  delete G.pend[card.id]; if(k==='me') G.newId=card.id;
+  render();
+}
+async function animPlay(id,k,card){
+  var to=rectOf('.cc-pile'), from;
+  if(k==='me'){ var e=G.ov.querySelector('.cc-hc[data-id="'+card.id+'"] .cc-card'); from=e?e.getBoundingClientRect():seatRect('me'); }
+  else from=seatRect(k);
+  if(!from||!to) return;
+  await fly(cardHtml(card,from.width),from,{left:to.left,top:to.top,width:to.width,height:to.height},300,(Math.random()*24-12));
+}
+async function showFx(id,kind,vk){
+  var tb=rectOf('.cc-tbl'), sr=seatRect(vk); if(!tb||!sr) return;
+  var tcx=tb.left+tb.width/2, tcy=tb.top+tb.height/2, ang=Math.atan2(sr.top+sr.height/2-tcy,sr.left+sr.width/2-tcx)*180/Math.PI;
+  var offs=kind==='w4'?[-34,-12,12,34]:[0];
+  var d=document.createElement('div'); d.className='cc-fxc';
+  d.style.cssText='--tb:'+tb.width+'px;left:'+tb.left+'px;top:'+tb.top+'px;width:'+tb.width+'px;height:'+tb.height+'px';
+  d.innerHTML='<b class="t">'+(kind==='w4'?'+4':'+2')+'</b>'+offs.map(function(o,i){
+    return '<i class="ar" style="--a:'+(ang+o)+'deg"><svg viewBox="0 0 40 24" style="fill:'+(kind==='w4'?'#f2655d':'#6fb1ff')+';animation-delay:'+(i*.08)+'s">'+ARR.slice(ARR.indexOf('>')+1,-6)+'</svg></i>';
+  }).join('');
+  var nb=document.createElement('div'); nb.className='cc-no'; nb.style.cssText='position:absolute;left:'+(sr.left+sr.width/2)+'px;top:'+(sr.top+sr.height/2)+'px';
+  G.fx.appendChild(d); G.fx.appendChild(nb);
+  snd('ccPenalty'); vib([15,30,15]);
+  await sleep(1050); if(!alive(id)) return;
+  d.classList.add('out'); nb.classList.add('out');
+  await sleep(260); if(!alive(id)) return;
+  d.remove(); nb.remove();
+}
+function advance(n){ G.turn=(G.turn+n)%4; }
+async function playCard(id,i,card,color){
+  var k=PLAYERS[i].k, hand=G.hands[k], idx=hand.findIndex(function(x){ return x.id===card.id; });
+  if(idx<0) return;
+  await animPlay(id,k,card); if(!alive(id)) return;
+  hand.splice(idx,1);
+  card.rot=Math.round(Math.random()*30-15);
+  if(card.type==='w4'){ card.chosen=color; G.color=color; } else G.color=card.color;
+  G.discard.push(card); G.landId=card.id; G.passes=0;
+  snd(card.type==='w4'?'ccWild':'ccPlay',card); render();
+  var vk=PLAYERS[(i+1)%4].k, n=card.type==='p1'?2:(card.type==='w4'?4:0);
+  if(hand.length===0){
+    for(var q=0;q<n;q++){ var cc=drawCard(); if(cc) G.hands[vk].push(cc); }
+    finish(k); return;
+  }
+  if(n){
+    await sleep(250); if(!alive(id)) return;
+    await showFx(id,card.type,vk); if(!alive(id)) return;
+    for(var j=0;j<n;j++){
+      var c=drawCard(); if(!c) break;
+      G.hands[vk].push(c); G.pend[c.id]=true; if(vk==='me') sortHand(G.hands.me);
+      await animDraw(id,vk,c); if(!alive(id)) return;
+      await sleep(100); if(!alive(id)) return;
+    }
+    advance(2);
+  } else advance(1);
+}
+async function drawOne(id,k){
+  var c=drawCard(); if(!c) return null;
+  var hand=G.hands[k]; hand.push(c); G.pend[c.id]=true; if(k==='me') sortHand(hand);
+  await animDraw(id,k,c); if(!alive(id)) return null;
+  return c;
+}
+function botColor(hand,card){
+  var cnt={}; hand.forEach(function(c){ if(c.id!==card.id&&c.color!=='wild') cnt[c.color]=(cnt[c.color]||0)+1; });
+  var best=null,bn=-1; COLS.forEach(function(c){ if((cnt[c]||0)>bn){ bn=cnt[c]||0; best=c; } });
+  return best||COLS[rnd(4)];
+}
+function botChoose(i,playable){
+  var lv=G.lvl, k=PLAYERS[i].k, hand=G.hands[k], nxtN=G.hands[PLAYERS[(i+1)%4].k].length;
+  var mist={easy:.7,medium:.35,hard:.08,expert:0}[lv]; if(mist==null) mist=.08;
+  if(Math.random()<mist) return playable[rnd(playable.length)];
+  var nums=playable.filter(function(c){ return c.type==='num'; }), p1=playable.filter(function(c){ return c.type==='p1'; }), w4=playable.filter(function(c){ return c.type==='w4'; });
+  var smart=(lv==='hard'||lv==='expert');
+  if(smart&&nxtN<=2){ if(p1.length) return p1[0]; if(w4.length) return w4[0]; }
+  if(smart&&hand.length<=3&&p1.length) return p1[0];
+  var pool=nums.length?nums:(p1.length?p1:w4);
+  var cnt={}; hand.forEach(function(c){ if(c.color!=='wild') cnt[c.color]=(cnt[c.color]||0)+1; });
+  pool=pool.slice().sort(function(a,b){ var d=(cnt[b.color]||0)-(cnt[a.color]||0); if(d) return d; return (b.v||0)-(a.v||0); });
+  return pool[0];
+}
+async function botTurn(id,i){
+  var k=PLAYERS[i].k, hand=G.hands[k];
+  await sleep(600+rnd(450)); if(!alive(id)) return;
+  var playable=hand.filter(canPlay);
+  if(!playable.length){
+    var dc=await drawOne(id,k); if(!alive(id)) return;
+    if(!dc||!canPlay(dc)){ G.passes++; advance(1); return; }
+    playable=[dc]; await sleep(350); if(!alive(id)) return;
+  }
+  var ch=botChoose(i,playable), col=ch.type==='w4'?botColor(hand,ch):null;
+  await playCard(id,i,ch,col);
+}
+async function loop(id){
+  while(alive(id)&&!G.over){
+    if(G.passes>=8){ var best=0,bn=99; PLAYERS.forEach(function(p,x){ var l=G.hands[p.k].length; if(l<bn){ bn=l; best=x; } }); finish(PLAYERS[best].k); return; }
+    G.busy=(G.turn!==0); render();
+    if(G.turn===0){ save(); return; }
+    await botTurn(id,G.turn);
+  }
+}
+
+/* ---------- تحكم اللاعب ---------- */
+function onCard(cid){
+  if(!myTurn()) return;
+  var c=G.hands.me.filter(function(x){ return x.id===cid; })[0]; if(!c) return;
+  if(!canPlay(c)){
+    var e=G.ov.querySelector('.cc-hc[data-id="'+cid+'"]'); if(e){ e.classList.remove('sh'); void e.offsetWidth; e.classList.add('sh'); }
+    snd('error'); vib(30); return;
+  }
+  if(c.type==='w4'){ G.pick=c.id; snd('click'); render(); return; }
+  myPlay(c,null);
+}
+async function myPlay(card,color){
+  var id=G.id; G.busy=true; G.pick=null; render();
+  await playCard(id,0,card,color); if(!alive(id)) return;
+  if(!G.over) loop(id);
+}
+function onDeck(){
+  if(!myTurn()) return;
+  if(G.hands.me.some(canPlay)){ snd('click'); toast('عندك ورق ينفع تلعبه 👇'); return; }
+  myDraw();
+}
+async function myDraw(){
+  var id=G.id; G.busy=true; render();
+  var c=await drawOne(id,'me'); if(!alive(id)) return;
+  if(c&&canPlay(c)){ G.busy=false; render(); save(); return; }
+  G.passes++; toast(c?'الورقة مش بتنفع — الدور عدّى':'الكومة خلصت — الدور عدّى');
+  advance(1); await sleep(1000); if(alive(id)) loop(id);
+}
+
+/* ---------- حفظ واستكمال ---------- */
+function save(){
+  if(!G||G.over||G.turn!==0) return;
+  try{ localStorage.setItem(saveKey(),JSON.stringify({v:1,lvl:G.lvl,hands:G.hands,deck:G.deck,discard:G.discard,color:G.color,passes:G.passes})); }catch(e){}
+}
+function clearSave(){ try{ localStorage.removeItem(saveKey()); }catch(e){} }
+function loadSave(){
+  try{
+    var s=JSON.parse(localStorage.getItem(saveKey())||'null');
+    if(s&&s.v===1&&s.hands&&s.hands.me&&s.hands.me.length&&s.discard&&s.discard.length) return s;
+  }catch(e){}
+  return null;
+}
+
+/* ---------- بداية ونهاية ---------- */
+function mount(){
+  destroy(true);
+  var ov=document.createElement('div'); ov.className='cc-ov'; ov.id='cc-ov';
+  ov.innerHTML='<div class="cc-stage"></div><div class="cc-fx"></div>';
+  document.body.appendChild(ov);
+  G={id:++UID,ov:ov,fx:ov.querySelector('.cc-fx'),lvl:'hard',hands:{me:[],l:[],t:[],r:[]},pend:{},deck:[],discard:[],color:null,turn:0,over:false,busy:true,t:[],pick:null,passes:0,toast:null};
+  ov.addEventListener('click',onClick);
+  ov.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+  G.onResize=function(){ if(G) render(); };
+  window.addEventListener('resize',G.onResize);
+  document.addEventListener('keydown',onKey,true);
+}
+async function start(lvl){
+  mount(); var id=G.id; G.lvl=lvl; clearSave();
+  var deck=shuffle(newDeck()), k;
+  PLAYERS.forEach(function(p){ G.hands[p.k]=deck.splice(0,7); });
+  sortHand(G.hands.me);
+  var first=deck.pop(); while(first.type!=='num'){ deck.unshift(first); first=deck.pop(); }
+  G.deck=deck; G.discard=[first]; G.color=first.color; first.rot=Math.round(Math.random()*20-10);
+  var st=true; try{ st=nextAiStarterIsHuman(); }catch(e){ st=Math.random()<.5; }
+  G.turn=st?0:1+rnd(3);
+  PLAYERS.forEach(function(p){ G.hands[p.k].forEach(function(c){ G.pend[c.id]=true; }); });
+  render(); snd('click');
+  /* توزيع الورق */
+  await sleep(300); if(!alive(id)) return;
+  var from=rectOf('.cc-deck .cc-bk');
+  for(var r=0;r<7;r++) for(var j=0;j<4;j++){
+    (function(p,c){
+      var to=seatRect(p.k);
+      fly(p.me?cardHtml(c,from.width):backHtml(from.width),from,to,360).then(function(){ if(!alive(id)) return; delete G.pend[c.id]; render(); });
+    })(PLAYERS[j],G.hands[PLAYERS[j].k][r]);
+    snd('ccDraw');
+    await sleep(70); if(!alive(id)) return;
+  }
+  await sleep(500); if(!alive(id)) return;
+  G.pend={}; render();
+  loop(id);
+}
+function resume(sv){
+  mount(); var id=G.id;
+  G.lvl=sv.lvl; G.hands=sv.hands; G.deck=sv.deck; G.discard=sv.discard; G.color=sv.color; G.passes=sv.passes||0; G.turn=0;
+  render(); snd('click'); loop(id);
+}
+function destroy(silent){
+  if(!G) return;
+  G.t.forEach(clearTimeout); window.removeEventListener('resize',G.onResize); document.removeEventListener('keydown',onKey,true);
+  var ov=G.ov; G=null; if(ov&&ov.parentNode) ov.parentNode.removeChild(ov);
+  if(!silent) snd('back');
+}
+function finish(wk){
+  G.over=true; G.busy=true; G.winner=wk; clearSave(); render();
+  var win=(wk==='me'), lv=lvlOf(G.lvl), pts=0, note='';
+  if(win){
+    if(!(typeof state!=='undefined'&&state.pid)) note='';
+    else if(rewardsLeft()<=0) note='وصلت للحد اليومي للمكافآت — العب للمتعة 😉';
+    else pts=Math.max(1,Math.round(baseReward()*(lv.mult||1)));
+  }
+  stat(function(st){ st.ccPlayed=(st.ccPlayed||0)+1; if(win) st.ccWins=(st.ccWins||0)+1; });
+  var w=PLAYERS.filter(function(p){ return p.k===wk; })[0];
+  var others=PLAYERS.filter(function(p){ return p.k!==wk; }).map(function(p){ return '<span>'+esc(p.n)+': '+G.hands[p.k].length+' ورقة</span>'; }).join('');
+  var sh=document.createElement('div'); sh.className='cc-sheet';
+  sh.innerHTML='<div class="cc-rc"><div class="ic">'+(win?'🏆':'😅')+'</div><h2>'+(win?'مبروك! خلّصت ورقك الأول':esc(w.n)+' كسب الجولة')+'</h2>'
+    +'<p>'+(win?'لعبت صح وغلبت الـ3 بوتات!':'حاول تاني، الحظ هيبقى معاك.')+'</p>'
+    +'<div class="cc-rs">'+others+'<span>'+lv.icon+' '+esc(lv.name)+'</span>'+(pts?'<span class="g">🎁 +'+pts+' نقطة</span>':'')+'</div>'
+    +(note?'<p>'+esc(note)+'</p>':'')
+    +'<button type="button" class="cc-btn" data-cc="again">العب تاني 🔄</button><button type="button" class="cc-btn alt" data-cc="exit">خروج</button></div>';
+  G.ov.appendChild(sh);
+  if(win){ snd('fanfare'); try{ launchConfetti(); }catch(e){} vib([20,30,20,30,40]); } else { snd('error'); vib(60); }
+  if(pts){ useReward(); var id=G.id; setTimeout(function(){ try{ awardSoloGamePoints(pts,'كسبت لعبة كروت الألوان'); }catch(e){} },700); }
+}
+function askExit(){
+  if(!G) return;
+  if(G.over){ destroy(); return; }
+  if(typeof gxExitConfirm==='function') gxExitConfirm({game:'colorcards',msg:'مش هتخسر حاجة — لعبتك هتتحفظ وتقدر تكمّلها بعدين.',onConfirm:function(){ destroy(); }});
+  else if(confirm('تغادر اللعبة؟')) destroy();
+}
+function askRestart(){
+  if(!G) return;
+  var lv=G.lvl;
+  if(G.over){ start(lv); return; }
+  var go=function(){ countLoss(); start(lv); };
+  if(typeof gxExitConfirm==='function') gxExitConfirm({game:'colorcards',title:'تبدأ لعبة جديدة؟',msg:'لو بدأت من جديد اللعبة الحالية هتتحسب خسارة.',stayLabel:'كمّل اللعب',leaveLabel:'ابدأ من جديد',onConfirm:go});
+  else if(confirm('تبدأ لعبة جديدة؟ اللعبة الحالية هتتحسب خسارة.')) go();
+}
+function onKey(e){ if(e.key==='Escape'&&G&&!G.over){ if(G.pick){ G.pick=null; render(); } } }
+function onClick(e){
+  var t=e.target.closest&&e.target.closest('[data-cc]'); if(!t||!G) return;
+  var a=t.getAttribute('data-cc');
+  if(a==='back') return askExit();
+  if(a==='restart') return askRestart();
+  if(a==='exit'){ destroy(); return; }
+  if(a==='again'){ var lv=G.lvl; start(lv); return; }
+  if(a==='card') return onCard(t.getAttribute('data-id'));
+  if(a==='deck') return onDeck();
+  if(a==='cpbg'){ if(e.target===t){ G.pick=null; render(); } return; }
+  if(a==='color'){
+    var c=G.hands.me.filter(function(x){ return x.id===G.pick; })[0]; if(!c) return;
+    snd('click'); myPlay(c,t.getAttribute('data-c'));
+  }
+}
+
+/* ---------- نقطة الدخول ---------- */
+function levelScreen(){
+  var base=baseReward(), th=(typeof LVL_THEMES!=='undefined')?LVL_THEMES.colorcards:null;
+  if(typeof lvlScreen!=='function'||typeof AI_LEVELS==='undefined'){ start('hard'); return; }
+  lvlScreen({key:'colorcards',cur:null,game:'كروت الألوان',sub:'طابق اللون أو الرقم — كل ما زاد المستوى زادت المكافأة',
+    levels:AI_LEVELS.map(function(l,i){ return {id:l.id,name:l.name,color:l.color,stars:(typeof LVL_STARS!=='undefined'&&LVL_STARS[l.id])||[l.stars,4],icon:(th&&th.ic[i])||l.icon,desc:(th&&th.ds[i])||l.desc,pts:base>0?Math.round(base*l.mult):0}; }),
+    onPick:function(id){ start(id); }});
+}
+function askContinue(sv){
+  var d=document.createElement('div'); d.className='cc-dlg';
+  d.innerHTML='<div class="cc-dlgc"><h3>تكمّل لعبتك السابقة؟</h3><p>لو بدأت من جديد، اللعبة اللي فاتت هتتحسب خسارة.</p><div class="r"><button type="button" class="no">ابدأ من جديد</button><button type="button" class="ok">كمّل</button></div></div>';
+  document.body.appendChild(d);
+  d.querySelector('.ok').onclick=function(){ d.remove(); snd('click'); resume(sv); };
+  d.querySelector('.no').onclick=function(){ d.remove(); snd('click'); countLoss(); clearSave(); levelScreen(); };
+}
+function begin(){
+  var sv=loadSave();
+  if(sv) askContinue(sv); else levelScreen();
+}
+try{ if(typeof LVL_THEMES!=='undefined'&&!LVL_THEMES.colorcards) LVL_THEMES.colorcards={crest:'🎴',g:['#6a301b','#1d0c06','#F9B92E'],ic:['🌱','🎴','🔥','👑'],ds:['بيرمي ورقه كيفما اتفق','بيلعب كويس وبيضيّع كروت قوية','بيحتفظ بالكروت القوية للحظة المناسبة','بيحاصرك بالكروت الخاصة — بلا رحمة']}; }catch(e){}
+window.openColorCardsGame=begin;
+})();
+
+</script>
+
 <style id="su-meter-pro">
 /* شريط اكتمال الملف: نسخة مدمجة واحترافية — سطر واحد (العنوان | الشريط | النسبة) + رسالة صغيرة تحته */
 html body .su-meter, html body .su-card .su-meter{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; column-gap:10px; row-gap:4px;
@@ -48901,10 +48613,10 @@ html[data-theme="dark"] body .su-meter.full .msg, html[data-theme="dark"] body .
 </style>
 
 <script id="gx-exit-confirm-js">
-/* ===== تأكيد الخروج الموحّد لكل الألعاب (إكس أو، لودو، يونو، شطرنج، بلياردو، ... وكل الغرف) ===== */
+/* ===== تأكيد الخروج الموحّد لكل الألعاب (إكس أو، لودو، شطرنج، بلياردو، ... وكل الغرف) ===== */
 (function(){
   if(window.gxExitConfirm) return;
-  var EMO = {ludo:'🎲',connect4:'🔴',domino:'🎴',chess:'♟️',checkers:'⚫',uno:'🃏',memory:'🧠',rps:'✊',backgammon:'🎲',snakes:'🐍',reflex:'⚡',math:'➗',numguess:'🔢',placemem:'📍',bus:'🚌',tmm:'🎯',
+  var EMO = {ludo:'🎲',connect4:'🔴',domino:'🎴',chess:'♟️',checkers:'⚫',colorcards:'🎴',memory:'🧠',rps:'✊',backgammon:'🎲',snakes:'🐍',reflex:'⚡',math:'➗',numguess:'🔢',placemem:'📍',bus:'🚌',tmm:'🎯',
     billiards:'🎱',stack:'🧱',cube:'🧊',blocky:'🟦',darts:'🎯',bowling:'🎳',millionaire:'👑',revword:'🔤',who:'🕵️',crossmath:'➕',quiz:'❓',mystery:'🕵️',emojibible:'😀',proverb:'📜'};
   var open = null;
   function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
