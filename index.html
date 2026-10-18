@@ -93,6 +93,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   }
   function tryNext(){
     if(window.jsQR) return;
+    /* أوفلاين: نحمّل النسخة المحفوظة على الجهاز علطول من غير ما نستنى الـCDN */
+    if(typeof navigator!=='undefined' && navigator.onLine===false){ loadCached(); if(window.jsQR) return; }
     if(i >= sources.length){ loadCached(); return; }
     var s = document.createElement('script'), url = sources[i++];
     s.src = url;
@@ -8369,18 +8371,61 @@ function _fbWithTimeout(promise, fallback){
 // admin change is saved centrally and every visitor reads the same live data. Every call is
 // guarded so a missing/failed connection resolves safely instead of hanging the app.
 let _fbLastError = '';
+/* ===== كاش أوفلاين: كل بيان بيتقرا من السيرفر بيتحفظ على الجهاز (IndexedDB)، ولو مفيش نت التطبيق بيقرا منه — فكل الصفحات اللي فتحتها قبل كده تفضل شغّالة ===== */
+const _GC = (function(){
+  let dbp = null;
+  function open(){
+    if(dbp) return dbp;
+    dbp = new Promise(function(res){
+      try{
+        const rq = indexedDB.open('glv-offline-cache', 1);
+        rq.onupgradeneeded = function(){ rq.result.createObjectStore('kv'); };
+        rq.onsuccess = function(){ res(rq.result); };
+        rq.onerror = function(){ res(null); };
+      }catch(e){ res(null); }
+    });
+    return dbp;
+  }
+  function run(mode, fn){
+    return open().then(function(db){
+      if(!db) return undefined;
+      return new Promise(function(res){
+        try{ const st = db.transaction('kv', mode).objectStore('kv'); const rq = fn(st); rq.onsuccess = function(){ res(rq.result); }; rq.onerror = function(){ res(undefined); }; }
+        catch(e){ res(undefined); }
+      });
+    });
+  }
+  return {
+    get: function(k){ return run('readonly', function(s){ return s.get(k); }); },
+    set: function(k,v){ return run('readwrite', function(s){ return s.put(v,k); }); },
+    del: function(k){ return run('readwrite', function(s){ return s.delete(k); }); },
+    keys: function(){ return run('readonly', function(s){ return s.getAllKeys(); }); }
+  };
+})();
+const _GC_SKIP = /^glavera-active-session-/; /* جلسات الأجهزة لازم تتقرا لايف بس */
+const _FB_TO = {}; /* علامة انتهاء المهلة */
+function _gxOffline(){ return typeof navigator!=='undefined' && navigator.onLine===false; }
+async function _gcRead(key, shared){
+  if(_GC_SKIP.test(key)) return null;
+  const c = await _GC.get(key);
+  return c===undefined ? null : { key, value:c, shared:!!shared };
+}
 window.storage = {
   async get(key, shared){
-    if(!_fbDb){ _fbLastError = 'Firebase SDK لم يتم تحميله (مشكلة شبكة/CDN محجوب)'; return null; }
-    if(typeof navigator!=='undefined' && navigator.onLine===false) return null; /* أوفلاين: متستناش السيرفر */
+    if(!_fbDb){ _fbLastError = 'Firebase SDK لم يتم تحميله (مشكلة شبكة/CDN محجوب)'; return await _gcRead(key, shared); }
+    if(_gxOffline()) return await _gcRead(key, shared); /* أوفلاين: من نسخة الجهاز */
     try{
-      const snap = await _fbWithTimeout(_fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).once('value'), null);
-      if(!snap || !snap.exists()) return null;
-      return { key, value: snap.val(), shared: !!shared };
-    }catch(e){ _fbLastError = (e && (e.code || e.message)) || String(e); console.error('storage.get error', key, e); return null; }
+      const snap = await _fbWithTimeout(_fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).once('value'), _FB_TO);
+      if(snap === _FB_TO) return await _gcRead(key, shared); /* النت بطيء: آخر نسخة محفوظة */
+      if(!snap || !snap.exists()){ if(!_GC_SKIP.test(key)) _GC.del(key); return null; }
+      const val = snap.val();
+      if(!_GC_SKIP.test(key)) _GC.set(key, val);
+      return { key, value: val, shared: !!shared };
+    }catch(e){ _fbLastError = (e && (e.code || e.message)) || String(e); console.error('storage.get error', key, e); return await _gcRead(key, shared); }
   },
   async set(key, value, shared, timeoutMs){
     if(!_fbDb){ _fbLastError = 'Firebase SDK لم يتم تحميله (مشكلة شبكة/CDN محجوب)'; return null; }
+    if(_gxOffline()){ _fbLastError = 'أوفلاين'; return null; } /* متتكتبش فوق بيانات السيرفر بنسخة قديمة لما النت يرجع */
     const useTimeout = timeoutMs || _FB_TIMEOUT_MS;
     try{
       const TIMED_OUT = Symbol('timeout');
@@ -8393,12 +8438,13 @@ window.storage = {
         console.error('storage.set timed out (network too slow) — NOT confirmed saved', key);
         return null;
       }
+      if(!_GC_SKIP.test(key)) _GC.set(key, value);
       return { key, value, shared: !!shared };
     }catch(e){ _fbLastError = (e && (e.code || e.message)) || String(e); console.error('storage.set error', key, e); return null; }
   },
   // قراءة-تعديل-كتابة بشكل ذرّي (Firebase transaction) عشان لو أكتر من مشارك كتبوا في نفس اللحظة محدش يمسح رأي التاني
   async update(key, fn, shared, timeoutMs){
-    if(!_fbDb) return null;
+    if(!_fbDb || _gxOffline()) return null;
     try{
       const TIMED_OUT = Symbol('timeout');
       const res = await Promise.race([
@@ -8406,11 +8452,12 @@ window.storage = {
         new Promise((resolve)=> setTimeout(()=> resolve(TIMED_OUT), timeoutMs || _FB_TIMEOUT_MS))
       ]);
       if(res === TIMED_OUT || !res || !res.committed) return null;
+      if(!_GC_SKIP.test(key)) _GC.set(key, res.snapshot.val());
       return { key, value: res.snapshot.val(), shared: !!shared };
     }catch(e){ _fbLastError = (e && (e.code || e.message)) || String(e); console.error('storage.update error', key, e); return null; }
   },
   async delete(key, shared){
-    if(!_fbDb) return null;
+    if(!_fbDb || _gxOffline()) return null;
     try{
       const TIMED_OUT = Symbol('timeout');
       const result = await _fbWithTimeout(
@@ -8421,11 +8468,15 @@ window.storage = {
         console.error('storage.delete timed out (network too slow) — NOT confirmed deleted', key);
         return null;
       }
+      _GC.del(key);
       return { key, deleted: true, shared: !!shared };
     }catch(e){ console.error('storage.delete error', key, e); return null; }
   },
   async list(prefix, shared){
-    if(!_fbDb) return { keys: [], prefix, shared: !!shared };
+    if(!_fbDb || _gxOffline()){
+      const ks = (await _GC.keys()) || [];
+      return { keys: ks.filter(k => (!prefix || k.startsWith(prefix)) && !_GC_SKIP.test(k)), prefix, shared: !!shared };
+    }
     try{
       const snap = await _fbWithTimeout(_fbDb.ref(_FB_ROOT).once('value'), null);
       if(!snap || !snap.exists()) return { keys: [], prefix, shared: !!shared };
@@ -8435,6 +8486,18 @@ window.storage = {
     }catch(e){ console.error('storage.list error', prefix, e); return { keys: [], prefix, shared: !!shared }; }
   }
 };
+/* تسخين الكاش: أول ما المشارك يدخل بالنت نحمّل هيكلة الاجتماع وصورها عشان تفتح أوفلاين */
+(function(){
+  let warmed = '';
+  setInterval(function(){
+    try{
+      if(_gxOffline() || !state || !state.pid || warmed===state.pid) return;
+      if(typeof loadMeetingStructureData !== 'function') return;
+      warmed = state.pid;
+      setTimeout(function(){ try{ loadMeetingStructureData(); }catch(e){} }, 6000);
+    }catch(e){}
+  }, 10000);
+})();
 
 async function loadCheckins(){
   try{
@@ -14344,18 +14407,61 @@ function myGameStats(pid){ return GAME_STATS[pid] || (GAME_STATS[pid] = {}); }
 
 /* ============================= GAMES: SOLO WIN REWARDS (ضد الجهاز) ============================= */
 /* بتضيف النقاط لرصيد اللاعب وتظهر رسالة فوز احترافية باستخدام نفس ستايل match-result-card */
-async function awardSoloGamePoints(pts, title){
-  if(state.pid && pts>0){
-    try{
-      WALLET = await loadWallet();
-      WALLET[state.pid] = (WALLET[state.pid]||0) + pts;
-      await saveWallet(WALLET);
-      vtxLogSafe([{ pid:state.pid, type:'game_win', amount:pts, balAfter:(WALLET[state.pid]||0), note:String(title||'').slice(0,40) }]);
-      pushNotification(state.pid, `${title} +${pts} نقطة 🏆`, '🏆');
-    }catch(e){}
-  }
-  showGameWinModal(pts, title);
+/* ===== النقط أوفلاين: لو مفيش نت النقط بتتحفظ على الجهاز وبتتضاف لرصيدك أول ما النت يرجع (من غير ما نكتب على الرصيد القديم) ===== */
+const GX_OFFQ_KEY = 'glv-offline-pts';
+function gxOffqLoad(){ try{ const a = JSON.parse(localStorage.getItem(GX_OFFQ_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function gxOffqSave(a){ try{ localStorage.setItem(GX_OFFQ_KEY, JSON.stringify(a)); }catch(e){} }
+function gxOffqAdd(pid, pts, title){ const a = gxOffqLoad(); a.push({pid:pid, pts:pts, title:String(title||'').slice(0,40), ts:Date.now()}); gxOffqSave(a); }
+/* إضافة النقط للرصيد بمعاملة ذرّية: لو مقدرناش نوصل للسيرفر بترجع false من غير ما نمسح أو نكتب فوق رصيد حد */
+async function gxWalletAdd(pid, pts){
+  if(typeof navigator!=='undefined' && navigator.onLine===false) return false;
+  try{
+    if(!window.storage || !window.storage.update) return false;
+    const r = await window.storage.update('glavera-visa-wallet', function(cur){
+      let o = {}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o = {}; }
+      o[pid] = (o[pid]||0) + pts; return JSON.stringify(o);
+    }, true, 8000);
+    if(!r) return false;
+    try{ WALLET = JSON.parse(r.value); }catch(e){}
+    return true;
+  }catch(e){ return false; }
 }
+async function awardSoloGamePoints(pts, title){
+  let queued = false;
+  if(state.pid && pts>0){
+    const pid = state.pid;
+    const ok = await gxWalletAdd(pid, pts);
+    if(ok){
+      try{ vtxLogSafe([{ pid:pid, type:'game_win', amount:pts, balAfter:((WALLET&&WALLET[pid])||0), note:String(title||'').slice(0,40) }]); }catch(e){}
+      try{ pushNotification(pid, `${title} +${pts} نقطة 🏆`, '🏆'); }catch(e){}
+    }else{
+      gxOffqAdd(pid, pts, title); queued = true;
+    }
+  }
+  showGameWinModal(pts, title, queued);
+}
+let _gxOffqBusy = false;
+async function gxOffqSync(){
+  if(_gxOffqBusy || !state.pid) return;
+  if(typeof navigator!=='undefined' && navigator.onLine===false) return;
+  const mine = gxOffqLoad().filter(x=>x.pid===state.pid);
+  if(!mine.length) return;
+  _gxOffqBusy = true;
+  try{
+    let rest = gxOffqLoad(), done = 0, total = 0;
+    for(const it of mine){
+      const ok = await gxWalletAdd(it.pid, it.pts);
+      if(!ok) break;
+      rest = rest.filter(x=>x!==undefined && !(x.pid===it.pid && x.ts===it.ts && x.pts===it.pts));
+      gxOffqSave(rest); done++; total += it.pts;
+      try{ vtxLogSafe([{ pid:it.pid, type:'game_win', amount:it.pts, balAfter:((WALLET&&WALLET[it.pid])||0), note:String(it.title||'').slice(0,40) }]); }catch(e){}
+    }
+    if(done){ try{ pushNotification(state.pid, `اتضافت ${total} نقطة من ألعاب لعبتها أوفلاين 🏆`, '🏆'); }catch(e){} try{ showToast('اتضافت '+total+' نقطة من ألعابك الأوفلاين 🏆'); }catch(e){} }
+  }catch(e){}
+  _gxOffqBusy = false;
+}
+window.addEventListener('online', function(){ setTimeout(gxOffqSync, 1500); });
+setInterval(function(){ try{ gxOffqSync(); }catch(e){} }, 15000);
 /* ===== نقط الألعاب اللي فيها مراحل: بتتجمّع أثناء اللعب وبتتحوّل كلها مرة واحدة لما اللاعب يخرج/ينهي ===== */
 const GX_DEFER_KEY = 'glv-deferred-pts';
 function gxDeferLoad(){ try{ return JSON.parse(localStorage.getItem(GX_DEFER_KEY)||'{}')||{}; }catch(e){ return {}; } }
@@ -14374,7 +14480,7 @@ async function gxDeferFlush(game, titleFn){
   delete o[k]; gxDeferSave(o); /* بنمسحها الأول عشان متتحسبش مرتين */
   await awardSoloGamePoints(e.pts, titleFn(e));
 }
-function showGameWinModal(pts, title){
+function showGameWinModal(pts, title, queued){
   const old = document.getElementById('game-win-overlay');
   if(old) old.remove();
   const overlay = document.createElement('div');
@@ -14385,6 +14491,7 @@ function showGameWinModal(pts, title){
       <div class="gw-trophy">🏆</div>
       <div class="gw-title">${escapeHtml(title)}</div>
       <div class="gw-pts">+${pts}<span>نقطة</span></div>
+      ${queued?'<div class="hint" style="margin:-4px 0 10px;">📶 أنت أوفلاين، النقط اتحفظت على جهازك وهتتضاف لرصيدك أول ما النت يرجع</div>':''}
       <button type="button" class="btn btn-primary" style="width:100%;margin-top:6px;" id="game-win-close">تمام 👌</button>
     </div>`;
   document.body.appendChild(overlay);
@@ -47597,37 +47704,52 @@ setTimeout(function(){ load(true); }, 6000);
 'use strict';
 /* ---------- الشخصيات: الاسم، النوع، البشرة، العين، الشعر، لون الشعر، الإكسسوارات، شعر الوجه ---------- */
 var RAW=[
- ['Lucy','f','wheat','brown','curly','black',['hat','earrings'],null],['Tom','m','light','brown','bald',null,['glasses'],'mustache'],
- ['Sara','f','light','blue','long','brown',['hat','glasses','earrings'],null],['Emma','f','dark','brown','curly','gray',['earrings'],null],
- ['Henry','m','wheat','brown','short','brown',[],'beard'],['Rose','f','light','blue','short','black',['hat'],null],
- ['Jeff','m','light','brown','long','blond',['glasses'],'beard'],['Lia','f','wheat','brown','short','gray',['earrings'],null],
- ['Rob','m','tan','black','short','black',['hat'],'beard'],['Aria','f','light','brown','short','gray',['glasses','earrings'],null],
- ['Bob','m','tan','brown','short','brown',[],null],['Bella','f','light','green','long','red',['earrings'],null],
- ['Sophia','f','wheat','brown','curly','blond',['earrings'],null],['Jack','m','light','blue','short','gray',['hat'],'beard'],
- ['Jose','m','dark','brown','bald',null,[],'beard'],['Theo','m','light','blue','short','blond',[],null],
- ['Annie','f','light','brown','long','red',['earrings'],null],['Paul','m','light','green','long','red',[],'beard'],
- ['Olivia','f','dark','black','long','black',['hat','earrings'],null],['Chloe','f','wheat','green','long','brown',['earrings'],null],
- ['Nora','f','tan','brown','curly','red',['hat','glasses'],null],['James','m','light','brown','short','brown',['hat','glasses'],null],
- ['Bill','m','light','blue','short','blond',[],null],['Julia','f','dark','brown','curly','gray',['earrings'],null],
- ['Naomi','f','light','black','long','black',['earrings'],null],['Ryan','m','light','blue','short','brown',['hat','glasses'],'mustache'],
- ['David','m','dark','brown','curly','black',[],'mustache'],['Mila','f','tan','brown','long','blond',['glasses'],null],
- ['John','m','tan','blue','short','gray',['hat'],'beard'],['Ben','m','dark','brown','bald',null,['glasses'],null]
+ ['Lucy','f','wheat','brown','curly','black',['hat', 'earrings'],null],
+ ['Tom','m','wheat','blue','bald',null,['glasses'],'mustache'],
+ ['Sara','f','light','blue','long','brown',['hat', 'glasses', 'earrings'],null],
+ ['Emma','f','dark','black','curly','gray',['earrings'],null],
+ ['Henry','m','wheat','blue','short','brown',[],'beard'],
+ ['Rose','f','light','blue','short','black',['hat'],null],
+ ['Jeff','m','light','brown','long','blond',['glasses'],['beard', 'mustache']],
+ ['Lia','f','wheat','brown','short','gray',['earrings'],null],
+ ['Rob','m','wheat','brown','short','black',['hat'],'beard'],
+ ['Aria','f','light','brown','short','gray',['glasses', 'earrings'],null],
+ ['Bob','m','dark','brown','short','brown',[],null],
+ ['Bella','f','light','green','long','red',['earrings'],null],
+ ['Sophia','f','wheat','brown','short','blond',['earrings'],null],
+ ['Jack','m','light','blue','short','gray',['hat'],'beard'],
+ ['Jose','m','dark','black','bald',null,[],'beard'],
+ ['Theo','m','wheat','blue','short','blond',[],null],
+ ['Annie','f','light','brown','long','red',['earrings'],null],
+ ['Paul','m','wheat','green','long','red',[],'beard'],
+ ['Olivia','f','dark','blue','long','black',['hat', 'earrings'],null],
+ ['Chloe','f','wheat','green','long','brown',['earrings'],null],
+ ['Nora','f','dark','brown','curly','red',['hat', 'glasses', 'earrings'],null],
+ ['James','m','light','brown','short','brown',['hat', 'glasses'],null],
+ ['Bill','m','light','brown','short','blond',[],null],
+ ['Julia','f','dark','brown','short','gray',['earrings'],null],
+ ['Naomi','f','light','black','long','black',['earrings'],null],
+ ['Ryan','m','light','blue','short','brown',['hat', 'glasses'],'mustache'],
+ ['David','m','dark','black','curly','black',[],'mustache'],
+ ['Mila','f','dark','brown','long','blond',['glasses'],null],
+ ['John','m','dark','blue','short','gray',['hat'],'beard'],
+ ['Ben','m','dark','blue','bald',null,['glasses'],null]
 ];
-var CH=RAW.map(function(r){ return {n:r[0],g:r[1],s:r[2],e:r[3],h:r[4],c:r[5],a:r[6],f:r[7]}; });
+var CH=RAW.map(function(r){ var fx=r[7]?[].concat(r[7]):[]; return {n:r[0],g:r[1],s:r[2],e:r[3],h:r[4],c:r[5],a:r[6],f:fx[0]||null,fx:fx}; });
 /* ---------- الفئات والأسئلة ---------- */
 var CATS=[
  {k:'gender',n:'النوع',inf:1,o:[['m','ولد','هل الشخصية ولد؟'],['f','بنت','هل الشخصية بنت؟']]},
  {k:'eyes',n:'لون العين',inf:1,o:[['blue','أزرق','هل لون العين أزرق؟'],['green','أخضر','هل لون العين أخضر؟'],['brown','بني','هل لون العين بني؟'],['black','أسود','هل لون العين أسود؟']]},
  {k:'hair',n:'الشعر',inf:1,o:[['short','قصير','هل الشعر قصير؟'],['long','طويل','هل الشعر طويل؟'],['curly','مجعّد','هل الشعر مجعّد؟'],['bald','بدون شعر','هل الشخصية من غير شعر؟']]},
  {k:'c',n:'لون الشعر',o:[['blond','أشقر','هل لون الشعر أشقر؟'],['brown','بني','هل لون الشعر بني؟'],['black','أسود','هل لون الشعر أسود؟'],['red','أحمر','هل لون الشعر أحمر؟'],['gray','رمادي','هل لون الشعر رمادي؟']]},
- {k:'skin',n:'لون البشرة',inf:1,o:[['light','فاتح','هل لون البشرة فاتح؟'],['wheat','قمحي','هل لون البشرة قمحي؟'],['tan','حنطي','هل لون البشرة حنطي؟'],['dark','داكن','هل لون البشرة داكن؟']]},
+ {k:'skin',n:'لون البشرة',inf:1,o:[['light','فاتح','هل لون البشرة فاتح؟'],['wheat','قمحي','هل لون البشرة قمحي؟'],['dark','داكن','هل لون البشرة داكن؟']]},
  {k:'acc',n:'إكسسوارات',multi:1,o:[['glasses','نظارة','هل الشخصية بتلبس نظارة؟'],['hat','قبعة','هل الشخصية بتلبس قبعة أو غطاء راس؟'],['earrings','حلق','هل الشخصية بتلبس حلق؟']]},
  {k:'facial',n:'شعر الوجه',o:[['beard','لحية','هل الشخصية ليها لحية؟'],['mustache','شنب','هل الشخصية ليها شنب؟']]}
 ];
 var FIELD={gender:'g',eyes:'e',hair:'h',c:'c',skin:'s',facial:'f'};
 function cat(k){ for(var i=0;i<CATS.length;i++) if(CATS[i].k===k) return CATS[i]; }
 function opt(k,v){ var c=cat(k); for(var i=0;i<c.o.length;i++) if(c.o[i][0]===v) return c.o[i]; }
-function match(ch,k,v){ return k==='acc' ? ch.a.indexOf(v)>=0 : ch[FIELD[k]]===v; }
+function match(ch,k,v){ return k==='acc' ? ch.a.indexOf(v)>=0 : (k==='facial' ? ch.fx.indexOf(v)>=0 : ch[FIELD[k]]===v); }
 /* ---------- الرسم ---------- */
 var SKIN={light:'#FCDCC4',wheat:'#EDBB94',tan:'#C98F62',dark:'#86573A'}, SKD={light:'#E7B493',wheat:'#D39A70',tan:'#A9744B',dark:'#6B4129'};
 var HAIR={blond:'#F0C54A',brown:'#7B4A2B',black:'#2A2830',red:'#D4562B',gray:'#C4C9D3'};
@@ -47809,7 +47931,7 @@ function traitsHtml(ch){
   if(ch.c) chip('c',ch.c,'لون الشعر',opt('c',ch.c)[1]);
   chip('skin',ch.s,'البشرة',opt('skin',ch.s)[1]);
   ch.a.forEach(function(a){ chip('acc',a,'إكسسوار',opt('acc',a)[1]); });
-  if(ch.f) chip('facial',ch.f,'شعر الوجه',opt('facial',ch.f)[1]);
+  ch.fx.forEach(function(fv){ chip('facial',fv,'شعر الوجه',opt('facial',fv)[1]); });
   return out.join('');
 }
 function inspect(i){
