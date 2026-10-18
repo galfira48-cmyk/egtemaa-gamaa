@@ -33388,6 +33388,7 @@ function renderAdminAttendanceTabInner(){
     const dpct = total ? Math.round(dRecs.length/total*100) : 0;
     const dpts = attPtsOfCfg(type, day);
     const head = `<div class="aa-act-head"><span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>${escapeHtml(day.name||t.label)}</span></div>`;
+    const delBtn = `<button type="button" class="btn btn-outline" style="margin-top:14px;width:100%;color:var(--danger);" data-action="att-admin-delday" data-type="${type}" data-sid="${escapeHtml(sid)}">🗑️ حذف اليوم ده</button>`;
     if(isCur){
       return `${head}
       <div class="aa-hero">
@@ -33409,7 +33410,8 @@ function renderAdminAttendanceTabInner(){
           <button type="button" class="btn btn-outline" data-action="att-admin-print" data-type="${type}">🖨️ طباعة</button>
           <button type="button" class="btn btn-ghost" data-action="att-admin-regen" data-type="${type}">🔄 كود جديد</button>
         </div>
-      </div>`;
+      </div>
+      ${delBtn}`;
     }
     const rows = dRecs.slice(0,80).map(r=>{ const p = PARTICIPANTS.find(x=>String(x.id)===String(r.pid)); return `<div class="audit-row"><div class="audit-left">${escapeHtml((p&&p.name)||String(r.pid))}</div><div class="audit-time">${attFmtTime(r.ts)}</div></div>`; }).join('');
     return `${head}
@@ -33426,7 +33428,8 @@ function renderAdminAttendanceTabInner(){
         <div class="hint" style="margin-top:8px;">كود اليوم ده مش بيشتغل غير لما تفعّله — وقتها اليوم الحالي بيتحفظ في الأيام.</div>
         <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="att-admin-activate" data-type="${type}" data-sid="${escapeHtml(sid)}">🔁 فعّل اليوم ده</button>
       </div>
-      ${rows ? `<div class="aa-sec"><b>اللي حضروا (${dRecs.length})</b></div><div class="card">${rows}</div>` : ''}`;
+      ${rows ? `<div class="aa-sec"><b>اللي حضروا (${dRecs.length})</b></div><div class="card">${rows}</div>` : ''}
+      ${delBtn}`;
   }
   /* ---------- تسجيل يدوي ---------- */
   if(nav.page==='manual'){
@@ -33508,7 +33511,6 @@ function renderAdminAttendanceTabInner(){
       <span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>${escapeHtml(t.label)}</span>
       <button type="button" class="aa-logo-mini" data-action="att-admin-page" data-page="logo" data-type="${type}" aria-label="تعديل لوجو ${escapeHtml(t.label)}" title="لوجو ${escapeHtml(t.label)}"><span class="aa-lm-in">${attIconHtml(type)}</span></button>
     </div>
-    ${staleBanner}
     <button type="button" class="aa-att-card${formOpen?' on':''}" data-action="att-admin-page" data-page="${formOpen?'home':'new'}" data-type="${type}" aria-expanded="${formOpen}">
       <span class="aa-att-ico">🗓️</span>
       <span class="aa-att-txt"><b>الحضور</b><small>${daysAll.length} يوم · اليوم الحالي ${recs.length} حضور</small></span>
@@ -33532,6 +33534,18 @@ function attDrawAdminQr(){
   el.innerHTML = '';
   const c = attCfg(attAdminType()); if(!c) return;
   createQR(el, {text:c.code, width:180, height:180, colorDark:'#12112E', colorLight:'#ffffff'});
+  /* الصورة لازم تتحمّل فوراً (من غير lazy) وإلا ممكن تفضل بيضاء، ولو فشلت نعرض الكانفاس */
+  const im0 = el.querySelector('img'); if(im0){ im0.setAttribute('data-lz','1'); im0.loading = 'eager'; im0.decoding = 'sync'; }
+  setTimeout(()=>{
+    try{
+      if(!el.isConnected) return;
+      const im = el.querySelector('img'), cv = el.querySelector('canvas');
+      if((!im || !im.naturalWidth) && cv){
+        cv.style.cssText = 'display:block !important;width:180px !important;height:180px !important;';
+        if(im) im.style.display = 'none';
+      }
+    }catch(e){}
+  }, 900);
 }
 function attToggleAdminQr(btn){
   _attQrShown = !_attQrShown;
@@ -33954,6 +33968,23 @@ async function attAdminAction(action, el){
   
   if(action==='att-admin-open'){ state.attNav = {type:el.dataset.type, page:'home'}; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
   if(action==='att-admin-day'){ state.attNav = {type, page:'day', sid:el.dataset.sid}; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
+  if(action==='att-admin-delday'){
+    const sid = el.dataset.sid;
+    showConfirmDialog('هتحذف اليوم ده وكل تسجيلات الحضور اللي فيه (والنقاط بتاعتها). الخطوة دي مش بترجع. متأكد؟', async ()=>{
+      const ok = await attCfgUpdate(o=>{
+        const prev = o[type]; if(!prev) return;
+        if(prev.sessionId===sid){
+          const hist = (prev.history||[]).slice(); const last = hist.pop();
+          if(last){ o[type] = Object.assign({}, prev, {sessionId:last.sessionId, name:last.name, startedAt:last.startedAt, code:last.code||attGenCode(type), points:(last.points!=null?last.points:prev.points), history:hist}); }
+          else { const n = attNewCfg(type); n.open = !!prev.open; o[type] = n; }
+        } else { prev.history = (prev.history||[]).filter(x=>x.sessionId!==sid); }
+      });
+      if(ok) await attRecUpdate(o=>{ Object.keys(o).forEach(k=>{ if(o[k] && o[k].type===type && o[k].sid===sid) delete o[k]; }); });
+      if(ok && state.attNav){ state.attNav = {type, page:'home'}; }
+      saveToast(ok, 'تم حذف اليوم');
+    }, {icon:'🗑️', confirmLabel:'حذف'});
+    return;
+  }
   if(action==='att-admin-activate'){
     const sid = el.dataset.sid;
     showConfirmDialog('هتفعّل اليوم ده بكوده، واليوم الحالي هيتحفظ في الأيام. متأكد؟', async ()=>{
