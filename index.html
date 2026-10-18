@@ -8296,41 +8296,114 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .aa-logo-auto input{ width:18px; height:18px; accent-color:#7C9CFF; }
 </style>
 <style id="att-day-css">
-  .aa-act-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:2px 2px 14px; }
-  .aa-act-name{ display:flex; align-items:center; gap:10px; font-family:'Cairo',sans-serif; font-weight:800; font-size:17px; min-width:0; }
-  .aa-act-name .ai{ width:38px; height:38px; border-radius:13px; display:grid; place-items:center; font-size:20px; flex:0 0 auto; }
-  .aa-logo-mini{ position:relative; width:32px; height:32px; padding:0; border-radius:50%; border:1px solid var(--border,rgba(255,255,255,.2)); background:rgba(255,255,255,.08); display:grid; place-items:center; cursor:pointer; color:inherit; flex:0 0 auto; }
-  .aa-logo-mini:active{ transform:scale(.92); }
+  :root{ --aa-beige:#EADFC9; --aa-beige2:#D6C6A5; --aa-navy:#161A44; --aa-brown:#8B6B4A; }
+  .aa-act-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:2px 2px 16px; animation:drRise .5s cubic-bezier(.22,1,.36,1) backwards; }
+  .aa-act-name{ display:flex; align-items:center; gap:12px; font-family:'Cairo',sans-serif; font-weight:800; font-size:18px; min-width:0; }
+  .aa-act-name .ai{ width:40px; height:40px; border-radius:13px; display:grid; place-items:center; font-size:20px; flex:0 0 auto; background:rgba(234,223,201,.12); border:1px solid rgba(234,223,201,.22); }
+  .aa-logo-mini{ position:relative; width:32px; height:32px; padding:0; border-radius:50%; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.07); display:grid; place-items:center; cursor:pointer; color:inherit; flex:0 0 auto; transition:transform .2s; }
+  .aa-logo-mini:active{ transform:scale(.9); }
   .aa-lm-in{ width:100%; height:100%; display:grid; place-items:center; font-size:15px; border-radius:50%; overflow:hidden; }
   .aa-lm-in svg{ width:16px; height:16px; }
   .aa-lm-in .att-logo{ padding:4px; filter:none; }
-  .aa-logo-mini::after{ content:'✎'; position:absolute; inset-inline-end:-3px; bottom:-3px; width:14px; height:14px; border-radius:50%; background:#7C9CFF; color:#fff; font-size:8px; display:grid; place-items:center; line-height:1; }
-  .aa-att-card{ width:100%; display:flex; align-items:center; gap:14px; padding:14px 16px; text-align:start; font-family:inherit; color:inherit; border-radius:20px; cursor:pointer; border:1px solid var(--border,rgba(255,255,255,.14)); background:linear-gradient(145deg,rgba(124,156,255,.2),rgba(95,224,164,.12)); transition:transform .15s; }
-  .aa-att-card:active{ transform:scale(.98); }
-  .aa-att-card.on{ border-color:rgba(124,156,255,.6); }
-  .aa-att-ico{ width:46px; height:46px; border-radius:16px; display:grid; place-items:center; font-size:23px; background:linear-gradient(145deg,#7C9CFF,#5A67D8); flex:0 0 auto; }
-  .aa-att-txt{ flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; }
-  .aa-att-txt b{ font-family:'Cairo',sans-serif; font-size:16px; font-weight:800; }
-  .aa-att-txt small{ font-size:11.5px; opacity:.7; }
-  .aa-att-plus{ width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.1); font-size:16px; flex:0 0 auto; }
-  .aa-form{ margin-top:12px; animation:aaFormIn .35s ease both; }
+  .aa-logo-mini::after{ content:'✎'; position:absolute; inset-inline-end:-3px; bottom:-3px; width:14px; height:14px; border-radius:50%; background:var(--aa-beige); color:var(--aa-navy); font-size:8px; display:grid; place-items:center; line-height:1; }
+
+  /* شريط "الحضور" */
+  .at-bar{ width:100%; display:flex; align-items:center; gap:14px; padding:14px 16px; text-align:start; font-family:inherit; color:inherit; cursor:pointer; border-radius:20px;
+    background:var(--card,rgba(255,255,255,.06)); border:1px solid var(--border,rgba(255,255,255,.12)); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    transition:background .25s, border-color .25s, transform .2s; animation:drRise .5s .05s cubic-bezier(.22,1,.36,1) backwards; }
+  .at-bar:active{ transform:scale(.985); }
+  .at-bar.on{ border-color:rgba(234,223,201,.45); background:rgba(234,223,201,.08); }
+  .at-ico{ width:44px; height:44px; border-radius:14px; display:grid; place-items:center; font-size:22px; flex:0 0 auto; background:linear-gradient(160deg,var(--aa-beige),var(--aa-beige2)); box-shadow:0 6px 14px -8px rgba(0,0,0,.6); }
+  .at-txt{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .at-txt b{ font-family:'Cairo',sans-serif; font-size:17px; font-weight:800; }
+  .at-txt small{ font-size:11.5px; opacity:.65; }
+  .at-plus{ width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font-size:16px; flex:0 0 auto; background:rgba(255,255,255,.08); transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
+  .at-bar.on .at-plus{ transform:rotate(45deg); background:rgba(234,223,201,.25); }
+
+  /* الفورم */
+  .aa-form{ margin-top:10px; border-radius:20px; animation:drReveal .5s cubic-bezier(.22,1,.36,1) backwards; }
   .aa-form select.field{ width:100%; }
-  .aa-form-btns{ display:flex; gap:8px; margin-top:12px; }
+  .aa-form .field{ transition:border-color .2s, box-shadow .2s; }
+  .aa-form .field:focus{ border-color:var(--aa-beige); box-shadow:0 0 0 3px rgba(234,223,201,.18); outline:none; }
+  .aa-form .att-ns-f{ animation:drRise .45s .12s cubic-bezier(.22,1,.36,1) backwards; }
+  .aa-form .att-ns-grid + .att-ns-grid .att-ns-f{ animation-delay:.22s; }
+  .aa-form-btns{ display:flex; gap:8px; margin-top:12px; animation:drRise .45s .3s cubic-bezier(.22,1,.36,1) backwards; }
   .aa-form-btns .btn{ flex:1; margin:0; }
-  .aa-days{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
-  .aa-day{ position:relative; aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:8px 4px; border-radius:20px; border:1px solid var(--border,rgba(255,255,255,.14)); background:rgba(255,255,255,.06); color:inherit; font-family:inherit; cursor:pointer; text-align:center; overflow:hidden; }
-  .aa-day:active{ transform:scale(.95); }
-  .aa-day.cur{ border-color:#5FE0A4; background:linear-gradient(160deg,rgba(95,224,164,.22),rgba(124,156,255,.12)); }
-  .aa-day-wd{ font-size:11px; font-weight:700; opacity:.75; }
-  .aa-day-num{ font-family:'Cairo',sans-serif; font-size:28px; line-height:1; font-weight:900; }
-  .aa-day small{ font-size:10.5px; opacity:.7; line-height:1.3; }
-  .aa-day-st{ position:absolute; top:8px; inset-inline-end:8px; width:8px; height:8px; border-radius:50%; background:#5FE0A4; box-shadow:0 0 0 3px rgba(95,224,164,.22); }
-  .aa-day.in{ animation:aaDayIn .5s cubic-bezier(.34,1.56,.64,1) both; animation-delay:calc(var(--i,0)*55ms); }
-  .aa-day.fresh{ animation:aaDayFresh .85s cubic-bezier(.34,1.56,.64,1) both; }
-  @keyframes aaDayIn{ from{ opacity:0; transform:translateY(12px) scale(.8); } to{ opacity:1; transform:none; } }
-  @keyframes aaDayFresh{ 0%{ opacity:0; transform:scale(.3) rotate(-8deg); } 60%{ opacity:1; transform:scale(1.08) rotate(2deg); } 100%{ opacity:1; transform:none; } }
-  @keyframes aaFormIn{ from{ opacity:0; transform:translateY(-8px) scaleY(.96); } to{ opacity:1; transform:none; } }
-  @media (prefers-reduced-motion:reduce){ .aa-day.in, .aa-day.fresh, .aa-form{ animation:none; } }
+
+  /* قائمة الأيام */
+  .dr-head{ display:flex; align-items:center; justify-content:space-between; margin:20px 4px 10px; font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; opacity:.9; }
+  .dr-head span{ min-width:24px; height:22px; padding:0 8px; border-radius:11px; display:grid; place-items:center; font-size:11.5px; background:rgba(234,223,201,.14); color:var(--aa-beige); }
+  .dr-list{ display:flex; flex-direction:column; gap:10px; }
+  .dr{ position:relative; display:flex; align-items:center; gap:14px; width:100%; padding:12px 14px; text-align:start; font-family:inherit; color:inherit; cursor:pointer; border-radius:20px;
+    background:var(--card,rgba(255,255,255,.06)); border:1px solid var(--border,rgba(255,255,255,.1)); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); overflow:hidden;
+    transition:transform .2s cubic-bezier(.22,1,.36,1), background .2s, border-color .2s; }
+  .dr:active{ transform:scale(.985); background:rgba(255,255,255,.09); }
+  .dr.cur{ border-color:rgba(234,223,201,.4); background:linear-gradient(100deg,rgba(234,223,201,.12),rgba(255,255,255,.04)); }
+  .dr.cur::before{ content:''; position:absolute; inset-block:14px; inset-inline-start:0; width:3px; border-radius:0 3px 3px 0; background:var(--aa-beige); }
+  .dr-date{ flex:0 0 auto; width:54px; height:58px; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.1; color:var(--aa-navy);
+    background:linear-gradient(160deg,var(--aa-beige),var(--aa-beige2)); box-shadow:0 8px 16px -10px rgba(0,0,0,.7); }
+  .dr:not(.cur) .dr-date{ background:linear-gradient(160deg,rgba(234,223,201,.2),rgba(234,223,201,.1)); color:var(--aa-beige); box-shadow:none; border:1px solid rgba(234,223,201,.2); }
+  .dr-date b{ font-family:'Cairo',sans-serif; font-size:22px; font-weight:900; }
+  .dr-date small{ font-size:10.5px; font-weight:700; opacity:.8; }
+  .dr-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .dr-name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dr-sub{ font-size:11.5px; opacity:.62; }
+  .dr-bar{ display:block; height:4px; border-radius:2px; background:rgba(255,255,255,.1); overflow:hidden; margin-top:3px; text-decoration:none; }
+  .dr-bar i{ display:block; height:100%; border-radius:2px; background:linear-gradient(90deg,var(--aa-beige),var(--aa-beige2)); transform-origin:100% 50%; animation:drBar .9s .3s cubic-bezier(.22,1,.36,1) backwards; }
+  .dr-side{ flex:0 0 auto; display:flex; flex-direction:row; align-items:center; gap:6px; }
+  .dr-go{ opacity:.45; }
+  .dr-chip{ display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; font-size:10.5px; font-weight:800; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); white-space:nowrap; }
+  .dr-chip i{ width:6px; height:6px; border-radius:50%; background:#8d93b5; }
+  .dr-chip.st-open{ color:#8CF0C4; background:rgba(95,224,164,.12); border-color:rgba(95,224,164,.35); }
+  .dr-chip.st-open i{ background:#5FE0A4; animation:drPulse 1.8s ease-in-out infinite; }
+  .dr-chip.st-shut i{ background:#ff8d8d; }
+  .dr.in{ animation:drSlide .55s cubic-bezier(.22,1,.36,1) backwards; animation-delay:calc(var(--i)*.07s); }
+  .dr.fresh{ animation:drFresh 1s cubic-bezier(.22,1,.36,1) backwards; }
+  .dr.fresh .dr-date{ animation:drPop .7s .25s cubic-bezier(.34,1.56,.64,1) backwards; }
+
+  /* صفحة اليوم */
+  .dp{ border-radius:26px; padding:18px 16px 16px; background:var(--card,rgba(255,255,255,.06)); border:1px solid var(--border,rgba(255,255,255,.12)); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); animation:drRise .55s cubic-bezier(.22,1,.36,1) backwards; }
+  .dp-top{ display:flex; align-items:center; gap:16px; }
+  .dp-ring{ position:relative; width:92px; height:92px; flex:0 0 auto; }
+  .dp-ring svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .dp-ring circle{ fill:none; stroke-width:7; }
+  .dp-ring .bg{ stroke:rgba(255,255,255,.1); }
+  .dp-ring .fg{ stroke:var(--aa-beige); stroke-linecap:round; stroke-dasharray:213.6; stroke-dashoffset:var(--off); animation:drRing 1.1s .15s cubic-bezier(.22,1,.36,1) backwards; }
+  .dp-ring-n{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.05; }
+  .dp-ring-n b{ font-family:'Cairo',sans-serif; font-size:26px; font-weight:900; }
+  .dp-ring-n small{ font-size:10.5px; opacity:.65; }
+  .dp-info{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
+  .dp-info h2{ margin:2px 0 0; font-family:'Cairo',sans-serif; font-size:19px; font-weight:800; line-height:1.3; }
+  .dp-info p{ margin:0; font-size:12px; opacity:.68; }
+  .dp-info .dp-sub{ opacity:.9; color:var(--aa-beige); font-weight:700; }
+  .dp-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:16px; padding:12px 14px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); }
+  .dp-row b{ display:block; font-size:14px; font-weight:800; }
+  .dp-row small{ display:block; font-size:11px; opacity:.62; margin-top:2px; }
+  .dp-qr{ display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:16px; }
+  .dp-qr-card{ position:relative; padding:12px; border-radius:24px; background:#fff; line-height:0; box-shadow:0 18px 36px -18px rgba(0,0,0,.8); animation:drQr .7s .2s cubic-bezier(.34,1.3,.64,1) backwards; }
+  .dp-qr-card #att-admin-qr{ background:#fff; border-radius:14px; padding:0 !important; }
+  .dp-code{ direction:ltr; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; letter-spacing:1.2px; padding:7px 14px; border-radius:999px; background:rgba(234,223,201,.1); border:1px dashed rgba(234,223,201,.35); color:var(--aa-beige); word-break:break-all; text-align:center; animation:drRise .5s .35s ease backwards; }
+  .dp-actions{ display:flex; gap:8px; margin-top:16px; }
+  .dp-actions .btn{ flex:1; margin:0; }
+  .dp-del{ display:block; width:100%; margin-top:14px; padding:12px; border-radius:16px; background:transparent; border:1px solid rgba(255,120,120,.3); color:#ff8f8f; font-family:inherit; font-weight:700; font-size:13px; cursor:pointer; transition:background .2s; }
+  .dp-del:active{ background:rgba(255,120,120,.1); }
+  .dp-whos{ border-radius:20px; background:var(--card,rgba(255,255,255,.06)); border:1px solid var(--border,rgba(255,255,255,.1)); overflow:hidden; }
+  .dp-who{ display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid rgba(255,255,255,.06); }
+  .dp-who:last-child{ border-bottom:0; }
+  .dp-av{ width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:13px; flex:0 0 auto; background:rgba(234,223,201,.16); color:var(--aa-beige); }
+  .dp-wn{ flex:1; min-width:0; font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dp-wt{ font-size:11px; opacity:.55; direction:ltr; }
+
+  @keyframes drRise{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:none; } }
+  @keyframes drReveal{ from{ opacity:0; clip-path:inset(0 0 100% 0 round 20px); } to{ opacity:1; clip-path:inset(0 0 0 0 round 20px); } }
+  @keyframes drSlide{ from{ opacity:0; transform:translateX(-26px); } to{ opacity:1; transform:none; } }
+  @keyframes drFresh{ 0%{ opacity:0; transform:translateY(-14px) scale(.96); background:rgba(234,223,201,.35); } 60%{ opacity:1; } 100%{ transform:none; } }
+  @keyframes drPop{ from{ transform:scale(.4) rotate(-10deg); opacity:0; } to{ transform:none; opacity:1; } }
+  @keyframes drBar{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+  @keyframes drRing{ from{ stroke-dashoffset:213.6; } }
+  @keyframes drPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(95,224,164,.5); } 50%{ box-shadow:0 0 0 5px rgba(95,224,164,0); } }
+  @keyframes drQr{ from{ opacity:0; transform:scale(.88); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){ .aa-act-head, .at-bar, .aa-form, .aa-form *, .dr, .dr *, .dp, .dp *{ animation:none !important; } }
 </style>
 
 </head>
@@ -32795,6 +32868,7 @@ function attDefaultName(type, day){
 }
 const ATT_WEEKDAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 let _attDaysKey = '';
+function aaScope(t, html){ const cc = (String((t&&t.color)||'').match(/#[0-9A-Fa-f]{6}/g)||[]); return '<div class="aa-scope" style="--c1:'+(cc[0]||'#7C9CFF')+';--c2:'+(cc[1]||cc[0]||'#5A67D8')+'">'+html+'</div>'; }
 function attDaySnap(c){ return {sessionId:c.sessionId, name:c.name, startedAt:c.startedAt, code:c.code, points:c.points}; }
 function attNewSync(type, src){
   const g = id=>document.getElementById(id);
@@ -33333,7 +33407,7 @@ async function tryAttendance(codeRaw, typeArg){
 function attAdminType(){ const v = state.attNav && state.attNav.type; return ATT_TYPES[v] ? v : 'mass'; }
 let _attAnimKey = '';
 function renderAdminAttendanceTab(){
-  const html = renderAdminAttendanceTabInner(); const nav = state.attNav || {}; const key = (nav.type||'')+'/'+(nav.page||'home');
+  let html = renderAdminAttendanceTabInner(); const nav = state.attNav || {}; if(nav.type && ATT_TYPES[nav.type] && nav.page!=='addtype') html = aaScope(ATT_TYPES[nav.type], html); const key = (nav.type||'')+'/'+(nav.page||'home');
   const anim = key!==_attAnimKey; _attAnimKey = key;
   const showFab = nav.type && ATT_KEYS.includes(nav.type) && attCfg(nav.type) && ['home',undefined,'who','insights','audit'].includes(nav.page);
   const sxc = (!nav.type && typeof window.sxAdminCard==='function') ? window.sxAdminCard() : '';
@@ -33387,48 +33461,33 @@ function renderAdminAttendanceTabInner(){
     const dRecs = Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===sid).sort((x,y)=>y.ts-x.ts);
     const dpct = total ? Math.round(dRecs.length/total*100) : 0;
     const dpts = attPtsOfCfg(type, day);
-    const head = `<div class="aa-act-head"><span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>${escapeHtml(day.name||t.label)}</span></div>`;
-    const delBtn = `<button type="button" class="btn btn-outline" style="margin-top:14px;width:100%;color:var(--danger);" data-action="att-admin-delday" data-type="${type}" data-sid="${escapeHtml(sid)}">🗑️ حذف اليوم ده</button>`;
+    const head = `<div class="aa-act-head"><span class="aa-act-name"><span class="ai">${t.icon}</span>${escapeHtml(day.name||t.label)}</span></div>`;
+    const delBtn = `<button type="button" class="dp-del" data-action="att-admin-delday" data-type="${type}" data-sid="${escapeHtml(sid)}">🗑️ حذف اليوم ده</button>`;
+    const stc = isCur ? (c.open ? ['open','مفتوح'] : ['shut','مقفول']) : ['arch','أرشيف'];
+    const C = 213.6, off = (C*(1-Math.min(100,dpct)/100)).toFixed(1);
+    const top = `<div class="dp-top">
+        <span class="dp-ring"><svg viewBox="0 0 80 80"><circle class="bg" cx="40" cy="40" r="34"/><circle class="fg" cx="40" cy="40" r="34" style="--off:${off}"/></svg><span class="dp-ring-n"><b>${dRecs.length}</b><small>حضور</small></span></span>
+        <div class="dp-info"><span class="dr-chip st-${stc[0]}"><i></i>${stc[1]}</span><h2>${escapeHtml(day.name||t.label)}</h2><p>${attFmtTime(day.startedAt)} · ${dpts>0?dpts+' نقطة':'بدون نقاط'}</p><p class="dp-sub">${dRecs.length} من ${total} · ${dpct}%</p></div>
+      </div>`;
     if(isCur){
       return `${head}
-      <div class="aa-hero">
-        <div class="aa-hero-top">
-          <div><div class="aa-hero-name">${escapeHtml(c.name||t.label)}</div><div class="aa-hero-sub">${attFmtTime(c.startedAt)} · ${dpts>0?dpts+' نقطة':'بدون نقاط'}</div></div>
-          <span class="aa-pill ${c.open?'':'off'}"><i></i>${c.open?'مفتوح':'مقفول'}</span>
-        </div>
-        <div class="aa-hero-prog">
-          <div class="aa-hero-prog-top"><span><b>${dRecs.length}</b> من ${total} حضروا</span><span>${dpct}%</span></div>
-          <div class="aa-bar"><i style="width:${dpct}%"></i></div>
-        </div>
-        <div class="aa-set-row">
-          <div><b>استقبال الحضور</b><small>${c.open?'المخدومين يقدروا يمسحوا الكود دلوقتي':'مقفول — مفيش حد هيقدر يسجّل'}</small></div>
-          <button type="button" class="switch ${c.open?'on':''}" data-action="att-admin-toggle" data-type="${type}"></button>
-        </div>
-        <div class="aa-qr-box"><div id="att-admin-qr"></div></div>
-        <div class="hint" style="word-break:break-all;direction:ltr;text-align:center;">${escapeHtml(c.code)}</div>
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button type="button" class="btn btn-outline" data-action="att-admin-print" data-type="${type}">🖨️ طباعة</button>
-          <button type="button" class="btn btn-ghost" data-action="att-admin-regen" data-type="${type}">🔄 كود جديد</button>
-        </div>
-      </div>
+      <section class="dp">
+        ${top}
+        <div class="dp-row"><div><b>استقبال الحضور</b><small>${c.open?'المخدومين يقدروا يمسحوا الكود دلوقتي':'مقفول — مفيش حد هيقدر يسجّل'}</small></div><button type="button" class="switch ${c.open?'on':''}" data-action="att-admin-toggle" data-type="${type}"></button></div>
+        <div class="dp-qr"><div class="dp-qr-card"><div id="att-admin-qr"></div></div><div class="dp-code">${escapeHtml(c.code)}</div></div>
+        <div class="dp-actions"><button type="button" class="btn btn-outline" data-action="att-admin-print" data-type="${type}">🖨️ طباعة</button><button type="button" class="btn btn-ghost" data-action="att-admin-regen" data-type="${type}">🔄 كود جديد</button></div>
+      </section>
       ${delBtn}`;
     }
-    const rows = dRecs.slice(0,80).map(r=>{ const p = PARTICIPANTS.find(x=>String(x.id)===String(r.pid)); return `<div class="audit-row"><div class="audit-left">${escapeHtml((p&&p.name)||String(r.pid))}</div><div class="audit-time">${attFmtTime(r.ts)}</div></div>`; }).join('');
+    const who = dRecs.slice(0,80).map(r=>{ const p = PARTICIPANTS.find(x=>String(x.id)===String(r.pid)); const nm = (p&&p.name)||String(r.pid); return `<div class="dp-who"><span class="dp-av">${escapeHtml(nm.trim().charAt(0))}</span><span class="dp-wn">${escapeHtml(nm)}</span><span class="dp-wt">${attFmtTime(r.ts)}</span></div>`; }).join('');
     return `${head}
-      <div class="aa-hero">
-        <div class="aa-hero-top">
-          <div><div class="aa-hero-name">${escapeHtml(day.name||t.label)}</div><div class="aa-hero-sub">${attFmtTime(day.startedAt)} · ${dpts>0?dpts+' نقطة':'بدون نقاط'}</div></div>
-          <span class="aa-pill off"><i></i>غير نشط</span>
-        </div>
-        <div class="aa-hero-prog">
-          <div class="aa-hero-prog-top"><span><b>${dRecs.length}</b> من ${total} حضروا</span><span>${dpct}%</span></div>
-          <div class="aa-bar"><i style="width:${dpct}%"></i></div>
-        </div>
-        ${day.code?`<div class="hint" style="word-break:break-all;direction:ltr;text-align:center;margin-top:12px;">${escapeHtml(day.code)}</div>`:''}
-        <div class="hint" style="margin-top:8px;">كود اليوم ده مش بيشتغل غير لما تفعّله — وقتها اليوم الحالي بيتحفظ في الأيام.</div>
-        <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="att-admin-activate" data-type="${type}" data-sid="${escapeHtml(sid)}">🔁 فعّل اليوم ده</button>
-      </div>
-      ${rows ? `<div class="aa-sec"><b>اللي حضروا (${dRecs.length})</b></div><div class="card">${rows}</div>` : ''}
+      <section class="dp">
+        ${top}
+        ${day.code?`<div class="dp-code" style="margin-top:14px;">${escapeHtml(day.code)}</div>`:''}
+        <div class="hint" style="margin-top:8px;text-align:center;">كود اليوم ده مش بيشتغل غير لما تفعّله — وقتها اليوم الحالي بيتحفظ في الأيام.</div>
+        <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="att-admin-activate" data-type="${type}" data-sid="${escapeHtml(sid)}">🔁 فعّل اليوم ده</button>
+      </section>
+      ${who ? `<div class="dr-head"><b>اللي حضروا</b><span>${dRecs.length}</span></div><div class="dp-whos">${who}</div>` : ''}
       ${delBtn}`;
   }
   /* ---------- تسجيل يدوي ---------- */
@@ -33489,8 +33548,14 @@ function renderAdminAttendanceTabInner(){
   const fresh = state.attFreshSid || ''; state.attFreshSid = null;
   const dayTiles = daysAll.map((d,i)=>{
     let wd='', dn='', mo='';
-    try{ const dt = new Date(d.t); wd = dt.toLocaleDateString('ar-EG',{weekday:'long'}); dn = dt.toLocaleDateString('ar-EG',{day:'numeric'}); mo = dt.toLocaleDateString('ar-EG',{month:'long'}); }catch(e){}
-    return `<button type="button" class="aa-day${d.cur?' cur':''}${d.sid===fresh?' fresh':(playAll?' in':'')}" style="--i:${i}" data-action="att-admin-day" data-type="${type}" data-sid="${escapeHtml(d.sid)}" aria-label="${escapeHtml(d.name||'')}">${d.cur?'<i class="aa-day-st"></i>':''}<span class="aa-day-wd">${escapeHtml(wd)}</span><b class="aa-day-num">${escapeHtml(dn)}</b><small>${escapeHtml(mo)} · ${cntSid(d.sid)} حضور</small></button>`;
+    try{ const dt = new Date(d.t); wd = dt.toLocaleDateString('ar-EG',{weekday:'long'}); dn = dt.toLocaleDateString('ar-EG',{day:'numeric'}); mo = dt.toLocaleDateString('ar-EG',{month:'short'}); }catch(e){}
+    const n = cntSid(d.sid), pc = total ? Math.min(100, Math.round(n/total*100)) : 0;
+    const st = d.cur ? (c.open ? ['open','مفتوح'] : ['shut','مقفول']) : ['arch','أرشيف'];
+    return `<button type="button" class="dr${d.cur?' cur':''}${d.sid===fresh?' fresh':(playAll?' in':'')}" style="--i:${i}" data-action="att-admin-day" data-type="${type}" data-sid="${escapeHtml(d.sid)}" aria-label="${escapeHtml(d.name||'')}">
+      <span class="dr-date"><b>${escapeHtml(dn)}</b><small>${escapeHtml(mo)}</small></span>
+      <span class="dr-body"><span class="dr-name">${escapeHtml(d.name||wd)}</span><span class="dr-sub">${escapeHtml(wd)} · ${n} من ${total}</span><u class="dr-bar"><i style="width:${pc}%"></i></u></span>
+      <span class="dr-side"><span class="dr-chip st-${st[0]}"><i></i>${st[1]}</span><svg class="dr-go" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></span>
+    </button>`;
   }).join('');
   const todayWd = new Date().getDay();
   const formHtml = `<div class="card att-newsess aa-form">
@@ -33511,13 +33576,14 @@ function renderAdminAttendanceTabInner(){
       <span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>${escapeHtml(t.label)}</span>
       <button type="button" class="aa-logo-mini" data-action="att-admin-page" data-page="logo" data-type="${type}" aria-label="تعديل لوجو ${escapeHtml(t.label)}" title="لوجو ${escapeHtml(t.label)}"><span class="aa-lm-in">${attIconHtml(type)}</span></button>
     </div>
-    <button type="button" class="aa-att-card${formOpen?' on':''}" data-action="att-admin-page" data-page="${formOpen?'home':'new'}" data-type="${type}" aria-expanded="${formOpen}">
-      <span class="aa-att-ico">🗓️</span>
-      <span class="aa-att-txt"><b>الحضور</b><small>${daysAll.length} يوم · اليوم الحالي ${recs.length} حضور</small></span>
-      <span class="aa-att-plus">${formOpen?'✕':'＋'}</span>
+    <button type="button" class="at-bar${formOpen?' on':''}" data-action="att-admin-page" data-page="${formOpen?'home':'new'}" data-type="${type}" aria-expanded="${formOpen}">
+      <span class="at-ico">🗓️</span>
+      <span class="at-txt"><b>الحضور</b><small>${daysAll.length} يوم · اليوم الحالي ${recs.length} حضور</small></span>
+      <span class="at-plus">＋</span>
     </button>
     ${formOpen ? formHtml : ''}
-    <div class="aa-days">${dayTiles}</div>
+    <div class="dr-head"><b>الأيام</b><span>${daysAll.length}</span></div>
+    <div class="dr-list">${dayTiles}</div>
     <div class="aa-grid" style="margin-top:14px;">
       <button type="button" class="aa-tile" data-action="att-admin-page" data-page="manual" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#7C9CFF,#5A67D8)">✍️</span><b>تسجيل يدوي</b><small>سجّل المخدومين بنفسك</small></button>
       <button type="button" class="aa-tile" data-action="att-admin-page" data-page="who" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#5FE0A4,#2A9D78)">👁️</span><b>شوف مين حضر</b><small>${recs.length} حضروا</small></button>
