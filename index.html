@@ -8295,6 +8295,44 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .aa-logo-auto{ display:flex; align-items:center; gap:8px; margin-top:12px; font-size:12.5px; opacity:.85; cursor:pointer; }
   .aa-logo-auto input{ width:18px; height:18px; accent-color:#7C9CFF; }
 </style>
+<style id="att-day-css">
+  .aa-act-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:2px 2px 14px; }
+  .aa-act-name{ display:flex; align-items:center; gap:10px; font-family:'Cairo',sans-serif; font-weight:800; font-size:17px; min-width:0; }
+  .aa-act-name .ai{ width:38px; height:38px; border-radius:13px; display:grid; place-items:center; font-size:20px; flex:0 0 auto; }
+  .aa-logo-mini{ position:relative; width:32px; height:32px; padding:0; border-radius:50%; border:1px solid var(--border,rgba(255,255,255,.2)); background:rgba(255,255,255,.08); display:grid; place-items:center; cursor:pointer; color:inherit; flex:0 0 auto; }
+  .aa-logo-mini:active{ transform:scale(.92); }
+  .aa-lm-in{ width:100%; height:100%; display:grid; place-items:center; font-size:15px; border-radius:50%; overflow:hidden; }
+  .aa-lm-in svg{ width:16px; height:16px; }
+  .aa-lm-in .att-logo{ padding:4px; filter:none; }
+  .aa-logo-mini::after{ content:'✎'; position:absolute; inset-inline-end:-3px; bottom:-3px; width:14px; height:14px; border-radius:50%; background:#7C9CFF; color:#fff; font-size:8px; display:grid; place-items:center; line-height:1; }
+  .aa-att-card{ width:100%; display:flex; align-items:center; gap:14px; padding:14px 16px; text-align:start; font-family:inherit; color:inherit; border-radius:20px; cursor:pointer; border:1px solid var(--border,rgba(255,255,255,.14)); background:linear-gradient(145deg,rgba(124,156,255,.2),rgba(95,224,164,.12)); transition:transform .15s; }
+  .aa-att-card:active{ transform:scale(.98); }
+  .aa-att-card.on{ border-color:rgba(124,156,255,.6); }
+  .aa-att-ico{ width:46px; height:46px; border-radius:16px; display:grid; place-items:center; font-size:23px; background:linear-gradient(145deg,#7C9CFF,#5A67D8); flex:0 0 auto; }
+  .aa-att-txt{ flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .aa-att-txt b{ font-family:'Cairo',sans-serif; font-size:16px; font-weight:800; }
+  .aa-att-txt small{ font-size:11.5px; opacity:.7; }
+  .aa-att-plus{ width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.1); font-size:16px; flex:0 0 auto; }
+  .aa-form{ margin-top:12px; animation:aaFormIn .35s ease both; }
+  .aa-form select.field{ width:100%; }
+  .aa-form-btns{ display:flex; gap:8px; margin-top:12px; }
+  .aa-form-btns .btn{ flex:1; margin:0; }
+  .aa-days{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+  .aa-day{ position:relative; aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:8px 4px; border-radius:20px; border:1px solid var(--border,rgba(255,255,255,.14)); background:rgba(255,255,255,.06); color:inherit; font-family:inherit; cursor:pointer; text-align:center; overflow:hidden; }
+  .aa-day:active{ transform:scale(.95); }
+  .aa-day.cur{ border-color:#5FE0A4; background:linear-gradient(160deg,rgba(95,224,164,.22),rgba(124,156,255,.12)); }
+  .aa-day-wd{ font-size:11px; font-weight:700; opacity:.75; }
+  .aa-day-num{ font-family:'Cairo',sans-serif; font-size:28px; line-height:1; font-weight:900; }
+  .aa-day small{ font-size:10.5px; opacity:.7; line-height:1.3; }
+  .aa-day-st{ position:absolute; top:8px; inset-inline-end:8px; width:8px; height:8px; border-radius:50%; background:#5FE0A4; box-shadow:0 0 0 3px rgba(95,224,164,.22); }
+  .aa-day.in{ animation:aaDayIn .5s cubic-bezier(.34,1.56,.64,1) both; animation-delay:calc(var(--i,0)*55ms); }
+  .aa-day.fresh{ animation:aaDayFresh .85s cubic-bezier(.34,1.56,.64,1) both; }
+  @keyframes aaDayIn{ from{ opacity:0; transform:translateY(12px) scale(.8); } to{ opacity:1; transform:none; } }
+  @keyframes aaDayFresh{ 0%{ opacity:0; transform:scale(.3) rotate(-8deg); } 60%{ opacity:1; transform:scale(1.08) rotate(2deg); } 100%{ opacity:1; transform:none; } }
+  @keyframes aaFormIn{ from{ opacity:0; transform:translateY(-8px) scaleY(.96); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){ .aa-day.in, .aa-day.fresh, .aa-form{ animation:none; } }
+</style>
+
 </head>
 <body>
 <div id="app"></div>
@@ -30781,7 +30819,7 @@ const ADMIN_HUB_GROUPS = [
   {id:'system',  icon:'⚙️', title:'النظام والأمان',       accent:'var(--text-muted)'},
 ];
 const ADMIN_HUB_ITEMS = [
-  {group:'live',   tab:'attendance', short:"قداس واجتماع وتسبحة", desc:"كود QR وفتح/قفل حضور القداس والاجتماع والتسبحة", icon:'✅', label:'الحضور (QR)', color:'linear-gradient(145deg,#5FE0A4,#F4B740)'},
+  {group:'live',   tab:'attendance', short:"قداس واجتماع وتسبحة", desc:"كود QR وفتح/قفل حضور القداس والاجتماع والتسبحة", icon:'🗓️', label:'الحضور (QR)', color:'linear-gradient(145deg,#5FE0A4,#F4B740)'},
   {group:'live',   tab:'audit', short:"تسجيلات الحضور بالتوقيت", desc:"كل تسجيلات الحضور بالتوقيت", icon:'🕓', label:'سجل الحضور', color:'linear-gradient(145deg,#9B8CFF,#5FE0A4)'},
   {group:'live',   tab:'analytics', short:"أرقام وتفاعل الحضور", desc:"أرقام ورسوم عن التفاعل والحضور", icon:'📊', label:'تحليلات', color:'linear-gradient(145deg,#5FE0A4,#3FDCC9)'},
   {group:'live',   tab:'alerts', short:"تنبيهات فورية ومجدولة", desc:"إرسال تنبيهات فورية أو مجدولة للمشاركين", icon:'📢', label:'إرسال تنبيه', color:'linear-gradient(145deg,#FF6B6B,#F4B740)'},
@@ -32755,6 +32793,19 @@ function attDefaultName(type, day){
   try{ d = (day ? attParseDay(day) : new Date()).toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'}); }catch(e){}
   return ATT_TYPES[type].label + ' ' + d;
 }
+const ATT_WEEKDAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+let _attDaysKey = '';
+function attDaySnap(c){ return {sessionId:c.sessionId, name:c.name, startedAt:c.startedAt, code:c.code, points:c.points}; }
+function attNewSync(type, src){
+  const g = id=>document.getElementById(id);
+  const dt = g('att-new-date'), wd = g('att-new-wd'), nm = g('att-new-name'); if(!dt) return;
+  if(src==='wd' && wd){
+    const d = new Date(); d.setHours(12,0,0,0);
+    d.setDate(d.getDate() + ((+wd.value - d.getDay() + 7) % 7));
+    const z = n=>String(n).padStart(2,'0'); dt.value = d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());
+  } else if(wd && dt.value){ wd.value = String(attParseDay(dt.value).getDay()); }
+  if(nm && !nm.dataset.t && dt.value){ nm.value = attDefaultName(type, dt.value); }
+}
 function attNewCfg(type, day){
   let t = Date.now();
   if(day && day!==attTodayISO()){ const d = attParseDay(day); d.setHours(12,0,0,0); t = d.getTime(); }
@@ -33324,20 +33375,58 @@ function renderAdminAttendanceTabInner(){
   const pct = total ? Math.round(recs.length/total*100) : 0;
   const R = state.attRoster || (state.attRoster = {f:'absent'});
   const here = new Set(recs.map(r=>r.pid));
-  /* ---------- إضافة يوم جديد ---------- */
-  if(nav.page==='new'){
-    return `<div class="card att-newsess">
-      <div class="att-ns-top"><span class="att-ns-ico">${t.icon}</span><div><b>يوم ${escapeHtml(t.label)} جديد</b><small>بتاريخ النهارده — تقدر تغيّره</small></div></div>
-      <div class="att-ns-grid">
-        <label class="att-ns-f"><span>📅 التاريخ</span><input class="field" type="date" id="att-new-date" value="${attTodayISO()}" dir="ltr" onchange="(function(d){var n=document.getElementById('att-new-name');if(n&&!n.dataset.t){n.value=attDefaultName('${type}',d.value);}})(this)" /></label>
-        <label class="att-ns-f"><span>🪙 قيمة الاسكان (نقاط)</span><input class="field" type="number" inputmode="numeric" min="0" max="1000" id="att-new-pts" dir="ltr" value="${attPtsOfCfg(type,c)}" /></label>
+  /* ---------- صفحة لوجو النشاط ---------- */
+  if(nav.page==='logo'){
+    return `<div class="aa-act-head"><span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>لوجو ${escapeHtml(t.label)}</span></div>${attLogoAdminCard(type)}`;
+  }
+  /* ---------- صفحة اليوم (الكود) ---------- */
+  if(nav.page==='day'){
+    const sid = nav.sid, isCur = sid===c.sessionId;
+    const day = isCur ? c : (c.history||[]).find(x=>x.sessionId===sid);
+    if(!day) return `<div class="card"><div class="empty-note">اليوم ده مش موجود</div><button type="button" class="btn btn-primary" style="width:100%;margin-top:10px;" data-action="att-admin-page" data-page="home" data-type="${type}">رجوع</button></div>`;
+    const dRecs = Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===sid).sort((x,y)=>y.ts-x.ts);
+    const dpct = total ? Math.round(dRecs.length/total*100) : 0;
+    const dpts = attPtsOfCfg(type, day);
+    const head = `<div class="aa-act-head"><span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>${escapeHtml(day.name||t.label)}</span></div>`;
+    if(isCur){
+      return `${head}
+      <div class="aa-hero">
+        <div class="aa-hero-top">
+          <div><div class="aa-hero-name">${escapeHtml(c.name||t.label)}</div><div class="aa-hero-sub">${attFmtTime(c.startedAt)} · ${dpts>0?dpts+' نقطة':'بدون نقاط'}</div></div>
+          <span class="aa-pill ${c.open?'':'off'}"><i></i>${c.open?'مفتوح':'مقفول'}</span>
+        </div>
+        <div class="aa-hero-prog">
+          <div class="aa-hero-prog-top"><span><b>${dRecs.length}</b> من ${total} حضروا</span><span>${dpct}%</span></div>
+          <div class="aa-bar"><i style="width:${dpct}%"></i></div>
+        </div>
+        <div class="aa-set-row">
+          <div><b>استقبال الحضور</b><small>${c.open?'المخدومين يقدروا يمسحوا الكود دلوقتي':'مقفول — مفيش حد هيقدر يسجّل'}</small></div>
+          <button type="button" class="switch ${c.open?'on':''}" data-action="att-admin-toggle" data-type="${type}"></button>
+        </div>
+        <div class="aa-qr-box"><div id="att-admin-qr"></div></div>
+        <div class="hint" style="word-break:break-all;direction:ltr;text-align:center;">${escapeHtml(c.code)}</div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button type="button" class="btn btn-outline" data-action="att-admin-print" data-type="${type}">🖨️ طباعة</button>
+          <button type="button" class="btn btn-ghost" data-action="att-admin-regen" data-type="${type}">🔄 كود جديد</button>
+        </div>
+      </div>`;
+    }
+    const rows = dRecs.slice(0,80).map(r=>{ const p = PARTICIPANTS.find(x=>String(x.id)===String(r.pid)); return `<div class="audit-row"><div class="audit-left">${escapeHtml((p&&p.name)||String(r.pid))}</div><div class="audit-time">${attFmtTime(r.ts)}</div></div>`; }).join('');
+    return `${head}
+      <div class="aa-hero">
+        <div class="aa-hero-top">
+          <div><div class="aa-hero-name">${escapeHtml(day.name||t.label)}</div><div class="aa-hero-sub">${attFmtTime(day.startedAt)} · ${dpts>0?dpts+' نقطة':'بدون نقاط'}</div></div>
+          <span class="aa-pill off"><i></i>غير نشط</span>
+        </div>
+        <div class="aa-hero-prog">
+          <div class="aa-hero-prog-top"><span><b>${dRecs.length}</b> من ${total} حضروا</span><span>${dpct}%</span></div>
+          <div class="aa-bar"><i style="width:${dpct}%"></i></div>
+        </div>
+        ${day.code?`<div class="hint" style="word-break:break-all;direction:ltr;text-align:center;margin-top:12px;">${escapeHtml(day.code)}</div>`:''}
+        <div class="hint" style="margin-top:8px;">كود اليوم ده مش بيشتغل غير لما تفعّله — وقتها اليوم الحالي بيتحفظ في الأيام.</div>
+        <button type="button" class="btn btn-primary" style="margin-top:10px;width:100%;" data-action="att-admin-activate" data-type="${type}" data-sid="${escapeHtml(sid)}">🔁 فعّل اليوم ده</button>
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">${[0,10,20,50,100].map(v=>`<button type="button" class="btn btn-ghost" style="width:auto;padding:6px 14px;font-size:12px;margin:0;" onclick="var i=document.getElementById('att-new-pts');if(i){i.value=${v};}">${v===0?'بدون نقاط':v}</button>`).join('')}</div>
-      <label class="att-ns-f"><span>✏️ اسم اليوم</span><input class="field" id="att-new-name" value="${escapeHtml(attDefaultName(type))}" oninput="this.dataset.t=1" /></label>
-      <input type="checkbox" id="att-new-open" checked style="display:none" />
-      <button type="button" class="btn btn-primary" data-action="att-admin-create" data-type="${type}">إنشاء</button>
-      <div class="hint">بيتولّد كود QR جديد وعدّاد من صفر، واليوم القديم بيتحفظ في السجل.</div>
-    </div>`;
+      ${rows ? `<div class="aa-sec"><b>اللي حضروا (${dRecs.length})</b></div><div class="card">${rows}</div>` : ''}`;
   }
   /* ---------- تسجيل يدوي ---------- */
   if(nav.page==='manual'){
@@ -33388,43 +33477,51 @@ function renderAdminAttendanceTabInner(){
   if(nav.page==='insights') return attInsightsHtml(type, c);
   if(nav.page==='audit') return attAuditHtml(type);
   /* ---------- صفحة النشاط ---------- */
-  const hist = (c.history||[]).slice().reverse().slice(0,10).map(h=>{
-    const n = Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===h.sessionId).length;
-    return `<div class="audit-row"><div class="audit-left">${escapeHtml(h.name||'')}<div class="audit-sub">${attFmtTime(h.startedAt)}</div></div><div class="audit-time">${n} حضور</div></div>`;
-  }).join('');
   const isStale = !!c.startedAt && new Date(c.startedAt).toDateString() !== new Date().toDateString();
   const staleBanner = isStale ? `<div class="att-stale"><div class="att-stale-txt"><b>⚠️ اليوم الحالي من تاريخ سابق</b><small>${escapeHtml(c.name||'')} · ${attFmtTime(c.startedAt)}</small></div><button type="button" class="btn btn-primary" data-action="att-admin-today" data-type="${type}">ابدأ يوم النهارده</button></div>` : '';
+  const formOpen = nav.page==='new';
+  const cntSid = sid => Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===sid).length;
+  const daysAll = [{sid:c.sessionId, name:c.name, t:c.startedAt, cur:true}].concat((c.history||[]).slice().reverse().map(h=>({sid:h.sessionId, name:h.name, t:h.startedAt, cur:false})));
+  const _dk = type+':'+(formOpen ? 'home' : (nav.page||'home')); const playAll = _dk!==_attDaysKey; _attDaysKey = _dk;
+  const fresh = state.attFreshSid || ''; state.attFreshSid = null;
+  const dayTiles = daysAll.map((d,i)=>{
+    let wd='', dn='', mo='';
+    try{ const dt = new Date(d.t); wd = dt.toLocaleDateString('ar-EG',{weekday:'long'}); dn = dt.toLocaleDateString('ar-EG',{day:'numeric'}); mo = dt.toLocaleDateString('ar-EG',{month:'long'}); }catch(e){}
+    return `<button type="button" class="aa-day${d.cur?' cur':''}${d.sid===fresh?' fresh':(playAll?' in':'')}" style="--i:${i}" data-action="att-admin-day" data-type="${type}" data-sid="${escapeHtml(d.sid)}" aria-label="${escapeHtml(d.name||'')}">${d.cur?'<i class="aa-day-st"></i>':''}<span class="aa-day-wd">${escapeHtml(wd)}</span><b class="aa-day-num">${escapeHtml(dn)}</b><small>${escapeHtml(mo)} · ${cntSid(d.sid)} حضور</small></button>`;
+  }).join('');
+  const todayWd = new Date().getDay();
+  const formHtml = `<div class="card att-newsess aa-form">
+      <div class="att-ns-top"><span class="att-ns-ico">${t.icon}</span><div><b>يوم ${escapeHtml(t.label)} جديد</b><small>اختار اليوم والتاريخ واكتب اسم اليوم</small></div></div>
+      <div class="att-ns-grid">
+        <label class="att-ns-f"><span>📆 اليوم</span><select class="field" id="att-new-wd" onchange="attNewSync('${type}','wd')">${ATT_WEEKDAYS.map((w,i)=>`<option value="${i}"${i===todayWd?' selected':''}>${w}</option>`).join('')}</select></label>
+        <label class="att-ns-f"><span>📅 التاريخ</span><input class="field" type="date" id="att-new-date" value="${attTodayISO()}" dir="ltr" onchange="attNewSync('${type}','date')" /></label>
+      </div>
+      <div class="att-ns-grid">
+        <label class="att-ns-f"><span>✏️ اسم اليوم</span><input class="field" id="att-new-name" value="${escapeHtml(attDefaultName(type))}" oninput="this.dataset.t=1" /></label>
+        <label class="att-ns-f"><span>🪙 النقاط</span><input class="field" type="number" inputmode="numeric" min="0" max="1000" id="att-new-pts" dir="ltr" value="${attPtsOfCfg(type,c)}" /></label>
+      </div>
+      <input type="checkbox" id="att-new-open" checked style="display:none" />
+      <div class="aa-form-btns"><button type="button" class="btn btn-primary" data-action="att-admin-create" data-type="${type}">إنشاء</button><button type="button" class="btn btn-ghost" data-action="att-admin-page" data-page="home" data-type="${type}">إلغاء</button></div>
+    </div>`;
   return `
-    <button type="button" class="btn btn-primary aa-newday" data-action="att-admin-page" data-page="new" data-type="${type}">＋ إضافة يوم جديد</button>
-    ${attLogoAdminCard(type)}
-    ${staleBanner}
-    <div class="aa-hero">
-      <div class="aa-hero-top">
-        <div><div class="aa-hero-name">${escapeHtml(c.name||t.label)}</div><div class="aa-hero-sub">${attFmtTime(c.startedAt)} · ${attPtsOfCfg(type,c)>0?attPtsOfCfg(type,c)+' نقطة':'بدون نقاط'}</div></div>
-        <span class="aa-pill ${c.open?'':'off'}"><i></i>${c.open?'مفتوح':'مقفول'}</span>
-      </div>
-      <div class="aa-hero-prog">
-        <div class="aa-hero-prog-top"><span><b>${recs.length}</b> من ${total} حضروا</span><span>${pct}%</span></div>
-        <div class="aa-bar"><i style="width:${pct}%"></i></div>
-      </div>
-      <div class="aa-set-row">
-        <div><b>استقبال الحضور</b><small>${c.open?'المخدومين يقدروا يمسحوا الكود دلوقتي':'مقفول — مفيش حد هيقدر يسجّل'}</small></div>
-        <button type="button" class="switch ${c.open?'on':''}" data-action="att-admin-toggle" data-type="${type}"></button>
-      </div>
-      <div class="aa-qr-box"><div id="att-admin-qr"></div></div>
-      <div class="hint" style="word-break:break-all;direction:ltr;text-align:center;">${escapeHtml(c.code)}</div>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button type="button" class="btn btn-outline" data-action="att-admin-print" data-type="${type}">🖨️ طباعة</button>
-        <button type="button" class="btn btn-ghost" data-action="att-admin-regen" data-type="${type}">🔄 كود جديد</button>
-      </div>
+    <div class="aa-act-head">
+      <span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>${escapeHtml(t.label)}</span>
+      <button type="button" class="aa-logo-mini" data-action="att-admin-page" data-page="logo" data-type="${type}" aria-label="تعديل لوجو ${escapeHtml(t.label)}" title="لوجو ${escapeHtml(t.label)}"><span class="aa-lm-in">${attIconHtml(type)}</span></button>
     </div>
+    ${staleBanner}
+    <button type="button" class="aa-att-card${formOpen?' on':''}" data-action="att-admin-page" data-page="${formOpen?'home':'new'}" data-type="${type}" aria-expanded="${formOpen}">
+      <span class="aa-att-ico">🗓️</span>
+      <span class="aa-att-txt"><b>الحضور</b><small>${daysAll.length} يوم · اليوم الحالي ${recs.length} حضور</small></span>
+      <span class="aa-att-plus">${formOpen?'✕':'＋'}</span>
+    </button>
+    ${formOpen ? formHtml : ''}
+    <div class="aa-days">${dayTiles}</div>
     <div class="aa-grid" style="margin-top:14px;">
       <button type="button" class="aa-tile" data-action="att-admin-page" data-page="manual" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#7C9CFF,#5A67D8)">✍️</span><b>تسجيل يدوي</b><small>سجّل المخدومين بنفسك</small></button>
       <button type="button" class="aa-tile" data-action="att-admin-page" data-page="who" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#5FE0A4,#2A9D78)">👁️</span><b>شوف مين حضر</b><small>${recs.length} حضروا</small></button>
       <button type="button" class="aa-tile" data-action="att-admin-page" data-page="insights" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#B388FF,#7C4DFF)">🧠</span><b>التحليلات الذكية</b><small>خطر الغياب · توقع · مساعد</small></button>
       <button type="button" class="aa-tile" data-action="att-admin-page" data-page="audit" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#FFB86B,#E67E22)">🛡️</span><b>سجل التدقيق</b><small>مين عمل إيه ومتى</small></button>
     </div>
-    ${hist ? `<div class="aa-sec"><b>الأيام السابقة</b></div><div class="card">${hist}</div>` : ''}
     <button type="button" class="btn btn-ghost" style="margin-top:18px;width:100%;color:var(--danger);" data-action="att-admin-reset" data-type="${type}">مسح كل سجلات ${escapeHtml(t.label)}</button>
     <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;color:var(--danger);" data-action="att-admin-deltype" data-type="${type}">🗑️ حذف نشاط ${escapeHtml(t.label)} بالكامل</button>
   `;
@@ -33856,6 +33953,21 @@ async function attAdminAction(action, el){
   const saveToast = (ok, msg)=>{ showToast(ok ? msg : 'تعذر الحفظ — تحقق من الاتصال وحاول مرة أخرى', !ok); render(); };
   
   if(action==='att-admin-open'){ state.attNav = {type:el.dataset.type, page:'home'}; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
+  if(action==='att-admin-day'){ state.attNav = {type, page:'day', sid:el.dataset.sid}; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
+  if(action==='att-admin-activate'){
+    const sid = el.dataset.sid;
+    showConfirmDialog('هتفعّل اليوم ده بكوده، واليوم الحالي هيتحفظ في الأيام. متأكد؟', async ()=>{
+      const ok = await attCfgUpdate(o=>{
+        const prev = o[type]; const h = prev && (prev.history||[]).find(x=>x.sessionId===sid); if(!h) return;
+        const n = Object.assign({}, prev, {sessionId:h.sessionId, name:h.name, startedAt:h.startedAt, code:h.code||attGenCode(type), points:(h.points!=null?h.points:prev.points)});
+        n.history = (prev.history||[]).filter(x=>x.sessionId!==sid).concat([attDaySnap(prev)]).slice(-60);
+        o[type] = n;
+      });
+      if(ok && state.attNav){ state.attNav = {type, page:'day', sid}; }
+      saveToast(ok, 'تم تفعيل اليوم');
+    }, {icon:'🔁', confirmLabel:'فعّل'});
+    return;
+  }
   if(action==='att-admin-scan'){ attOpenQrScanner(type); return; }
   if(action==='att-admin-msgcopy'){ const m = el.dataset.msg||''; try{ await navigator.clipboard.writeText(m); showToast('📋 تم نسخ الرسالة'); }catch(e){ showToast(m); } return; }
   if(action==='att-admin-ask' || action==='att-admin-askq'){
@@ -33951,7 +34063,7 @@ async function attAdminAction(action, el){
         const n = attNewCfg(type);
         if(newName) n.name = newName;
         n.open = !!prev.open; n.points = newPts;
-        n.history = (prev.history||[]).concat([{sessionId:prev.sessionId, name:prev.name, startedAt:prev.startedAt}]).slice(-30);
+        n.history = (prev.history||[]).concat([attDaySnap(prev)]).slice(-60);
         o[type] = n;
       });
       saveToast(ok, 'بدأت جلسة جديدة');
@@ -34033,13 +34145,14 @@ async function attAdminAction(action, el){
     const openNow = quick ? true : !!(document.getElementById('att-new-open') || {}).checked;
     const finalName = nm || attDefaultName(type, day);
     await (async ()=>{
+      let freshSid = '';
       const ok = await attCfgUpdate(o=>{
-        const prev = o[type]; const n = attNewCfg(type, day);
+        const prev = o[type]; const n = attNewCfg(type, day); freshSid = n.sessionId;
         n.name = finalName; n.points = pts; n.open = openNow;
-        n.history = (prev.history||[]).concat([{sessionId:prev.sessionId, name:prev.name, startedAt:prev.startedAt}]).slice(-30);
+        n.history = (prev.history||[]).concat([attDaySnap(prev)]).slice(-60);
         o[type] = n;
       });
-      if(ok && state.attNav){ state.attNav.page = 'home'; }
+      if(ok && state.attNav){ state.attNav.page = 'home'; state.attFreshSid = freshSid; }
       saveToast(ok, '🚀 '+finalName+(openNow?' — الحضور مفتوح':''));
     })();
   }
