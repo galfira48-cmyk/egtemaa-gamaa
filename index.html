@@ -3924,7 +3924,27 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .gs-sc small{ display:block; font-size:10px; font-weight:700; color:var(--text-muted); }
   .gs-tools{ display:flex; gap:8px; margin:0 0 12px; }
   .gs-tools .btn{ margin:0; padding:9px 12px; font-size:12px; }
-  #gsg-cup{ position:fixed; top:calc(env(safe-area-inset-top,0px) + 10px); inset-inline-start:10px; z-index:9600; width:40px; height:40px; border-radius:50%; display:none; align-items:center; justify-content:center; font-size:21px; line-height:1; padding:0; cursor:pointer; background:linear-gradient(145deg,#FFE29A,#F4B740); border:2px solid rgba(255,255,255,.55); box-shadow:0 4px 16px rgba(0,0,0,.45); animation:gsgCup 2.6s ease-in-out infinite; }
+  #pg-help{ position:fixed; top:calc(env(safe-area-inset-top,0px) + 12px); left:12px; z-index:70; width:34px; height:34px; border-radius:50%; display:none; align-items:center; justify-content:center; padding:0; cursor:pointer; font-family:inherit; font-weight:900; font-size:17px; line-height:1; color:var(--gold); background:color-mix(in srgb, var(--gold) 14%, var(--bg-2,#111)); border:1.5px solid color-mix(in srgb, var(--gold) 55%, transparent); -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+  #pg-help:active{ transform:scale(.92); }
+  #pg-help.new{ animation:ggPulse 1.8s ease-in-out infinite; }
+  .pg-overlay{ z-index:100003; }
+  .pg-card{ position:relative; animation:pgPop .55s cubic-bezier(.2,1.3,.35,1) both; transition:transform .2s, opacity .2s; }
+  .pg-card.out{ transform:scale(.94) translateY(8px); opacity:0; }
+  .pg-card::before{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,.14) 50%, transparent 65%); background-size:250% 100%; animation:pgShine 1.4s .35s ease-out 1 both; }
+  @keyframes pgPop{ from{ opacity:0; transform:translateY(34px) scale(.86); } to{ opacity:1; transform:none; } }
+  @keyframes pgShine{ from{ background-position:120% 0; } to{ background-position:-120% 0; } }
+  .pg-badge{ display:inline-block; font-size:32px; animation:pgFloat 2.6s ease-in-out infinite; }
+  @keyframes pgFloat{ 0%,100%{ transform:translateY(0) rotate(-4deg); } 50%{ transform:translateY(-5px) rotate(4deg); } }
+  .pg-spark i{ position:absolute; font-style:normal; font-size:14px; opacity:0; color:var(--gold); animation:pgTwinkle 2.4s ease-in-out infinite; }
+  .pg-spark i:nth-child(1){ top:12px; left:18px; } .pg-spark i:nth-child(2){ top:34px; left:62px; font-size:11px; animation-delay:.7s; } .pg-spark i:nth-child(3){ top:10px; left:104px; font-size:12px; animation-delay:1.3s; }
+  @keyframes pgTwinkle{ 0%,100%{ opacity:0; transform:scale(.4) rotate(0); } 50%{ opacity:1; transform:scale(1.1) rotate(25deg); } }
+  .pg-lead,.pg-tip,.pg-card .gg-label{ animation:pgRise .5s .15s cubic-bezier(.2,.9,.3,1) both; }
+  .pg-item{ animation:pgRise .5s var(--d,.3s) cubic-bezier(.2,.9,.3,1) both; }
+  .pg-item[open] .pg-ico{ animation:pgTap .5s ease; }
+  @keyframes pgRise{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+  @keyframes pgTap{ 40%{ transform:scale(1.35) rotate(-8deg); } }
+  @media (prefers-reduced-motion: reduce){ .pg-card,.pg-card::before,.pg-badge,.pg-spark i,.pg-lead,.pg-tip,.pg-item,#pg-help.new{ animation:none !important; } .pg-spark i{ opacity:0; } }
+  #gsg-cup{ position:fixed; top:calc(env(safe-area-inset-top,0px) + 10px); left:10px; z-index:9600; width:40px; height:40px; border-radius:50%; display:none; align-items:center; justify-content:center; font-size:21px; line-height:1; padding:0; cursor:pointer; background:linear-gradient(145deg,#FFE29A,#F4B740); border:2px solid rgba(255,255,255,.55); box-shadow:0 4px 16px rgba(0,0,0,.45); animation:gsgCup 2.6s ease-in-out infinite; }
   @keyframes gsgCup{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
   #gsg-modal{ position:fixed; inset:0; z-index:100002; background:rgba(6,5,20,.8); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:16px; }
   .gsg-sheet{ width:100%; max-width:440px; max-height:82vh; display:flex; flex-direction:column; border-radius:24px; overflow:hidden; background:var(--surface,#171449); color:var(--text,#fff); border:1px solid var(--border,rgba(255,255,255,.12)); box-shadow:0 20px 60px rgba(0,0,0,.6); }
@@ -12141,6 +12161,8 @@ function showGamesIntroModal(){
           <div class="gg-d">تقدر تبعت من رصيدك لأي صاحب ليك في الاجتماع بمجرد ما تكتب رقم فيزته.</div></details>
         <details class="gg-item"><summary><span class="gg-ico">📤</span><span class="gg-t">سحب</span><span class="gg-s">الفيزا ← نقاطك</span></summary>
           <div class="gg-d">لما رصيدك يوصل ${minW} نقطة أو أكتر تقدر تسحب منه ويرجع نقاط تاني.</div></details>
+        <details class="gg-item"><summary><span class="gg-ico">🏆</span><span class="gg-t">ترتيب كل لعبة</span><span class="gg-s">الكاس جوه اللعبة</span></summary>
+          <div class="gg-d">جوه أي لعبة هتلاقي كاس 🏆 فوق على الشمال، دوس عليه وهتشوف ترتيب المشاركين في اللعبة دي، والأعلى نقاط فوق. وتقدر تشوف كل الألعاب من "ترتيب الأبطال".</div></details>
         ${canVisa ? `<details class="gg-item"><summary><span class="gg-ico">⏳</span><span class="gg-t">صلاحية الفيزا</span><span class="gg-s">${created&&!expired?('باقي '+visaDaysLeft(pid)+' يوم'):(visaValidDays()+' يوم')}</span></summary>
           <div class="gg-d">الفيزا صلاحيتها ${visaValidDays()} يوم من الإنشاء، وبعدها بتجدّدها بـ ${visaRenewFee()} نقطة.</div></details>` : ''}
       </div>
@@ -15097,6 +15119,157 @@ function gsgOpenModal(gid){
   const cup = document.getElementById('gsg-cup'); if(cup) cup.style.display = 'none';
   Promise.resolve(gsRefresh()).catch(()=>{}).then(()=>{ if(document.getElementById('gsg-modal')===o) draw(); });
   setTimeout(()=>{ if(document.getElementById('gsg-modal')===o && !GS.ready) draw(); }, 2500);
+}
+
+/* ============================= زرار "؟" في كل خانة + كارت شرح متحرك ============================= */
+const PAGE_GUIDES = {
+  profile:{ico:'🏠',title:'الرئيسية',lead:'دي بوابتك للموقع كله — منها توصل لأي خانة.',tip:'الخانات اللي بتظهر هنا ممكن المنظمين يغيّروها، فلو لقيت حاجة اتغيّرت ده طبيعي.',items:[
+    ['🪪','ملفك الشخصي','بتشوف نقاطك وترتيبك وميدالياتك وتعدّل بياناتك.'],
+    ['🎯','التحديات والإنجازات','أنجز المطلوب منك واجمع نقاط وميداليات.'],
+    ['🧭','الشريط السفلي','بيوصّلك للألعاب والحضور والمزيد، واضغط ضغطة طويلة على أي أيقونة تشوف اختصارات سريعة.']]},
+  me:{ico:'🪪',title:'ملفي الشخصي',lead:'كل أرقامك وإنجازاتك في مكان واحد.',tip:'تقدر تعدّل بياناتك من زرار "تعديل بياناتي".',items:[
+    ['⭐','مجموع النقاط','نقاطك اللي جمعتها من الحضور والتحديات وغيرهم.'],
+    ['📈','الترتيب والحضور','ترتيبك بين المشاركين، وعدد الاجتماعات اللي حضرتها ونسبة حضورك.'],
+    ['🏅','الميداليات','كل ما تجمع نقاط أكتر بتفتح ميدالية جديدة.'],
+    ['📜','سجل الاجتماعات','قايمة بالاجتماعات اللي سجّلت حضورك فيها.']]},
+  badges:{ico:'🏅',title:'الإنجازات والميداليات',lead:'ميدالياتك بتتفتح لما تحقق المطلوب.',items:[
+    ['✅','قيد التقدم','الميداليات اللي لسه بتشتغل عليها.'],
+    ['🎁','استلام','لما تخلّص الميدالية دوس "استلام" عشان النقاط تضاف لرصيدك.']]},
+  quests:{ico:'🎯',title:'التحديات',lead:'أنجز واجمع نقاطك.',tip:'كل تحدي ليه مكافأة، دوس عليه تعرف المطلوب.',items:[
+    ['📝','المطلوب','كل تحدي مكتوب جنبه اللي لازم تعمله.'],
+    ['🎁','المكافأة','أول ما تخلّص بتستلم نقاطك.']]},
+  share:{ico:'📣',title:'المشاركة والدعوة',lead:'شارك التجربة مع أصحابك.',items:[
+    ['💌','دعوة صديق','ابعت دعوة لزميلك ينضم لاجتماع جامعة.'],
+    ['🃏','بطاقة إنجازك','شارك بطاقة فيها نقاطك وترتيبك.']]},
+  wall:{ico:'🧱',title:'حائط الاجتماع',lead:'مكان كل المشاركين يكتبوا فيه رأيهم وانطباعهم.',items:[
+    ['✍️','اكتب رأيك','اكتب انطباعك عن الاجتماع وانشره على الحائط.'],
+    ['👀','آراء المشاركين','كل المشاركين بيشوفوا اللي اتكتب.']]},
+  opinion:{ico:'💬',title:'رأيك',lead:'رأيك يهمنا.',items:[
+    ['📝','شاركنا ملاحظاتك','اكتب اللي عجبك واللي نفسك يتحسّن.'],
+    ['📬','بتوصل للمنظمين','كلامك بيتقري عشان الاجتماعات الجاية تبقى أحسن.']]},
+  capabilities:{ico:'✨',title:'المزيد',lead:'باقي خانات الموقع وكل اللي ليه علاقة بيك.',items:[
+    ['🧩','عن الموقع','تعريف بالموقع وإمكانياته.'],
+    ['🎂','عيد ميلادك','ضيف تاريخ ميلادك عشان يتحسب العدّ التنازلي وتوصلك التهنئة.'],
+    ['⚙️','الإعدادات','تحكّم في حسابك وتفضيلاتك.']]},
+  myphotos:{ico:'🖼️',title:'صوري',lead:'كل صورك في مكان واحد.',items:[
+    ['📷','صورك','الصور اللي اتضافت ليك بتظهر هنا.'],
+    ['⬇️','تحميل','افتح أي صورة وحمّلها على جهازك.']]},
+  gallery:{ico:'🖼️',title:'المعرض',lead:'صور المجموعة وذكرياتها.',items:[
+    ['📁','الألبومات','كل ألبوم فيه صور مناسبة معينة، دوس عليه تفتحه.'],
+    ['🔍','تكبير الصورة','دوس على أي صورة تكبّرها وتحمّلها.']]},
+  'gallery-album':{ico:'📁',title:'ألبوم الصور',lead:'صور الألبوم كلها.',items:[
+    ['🔍','تكبير','دوس على الصورة تكبّرها.'],
+    ['⬇️','تحميل','تقدر تحفظ الصورة على جهازك.']]},
+  visa:{ico:'💳',title:'فيزتي',lead:'محفظتك اللي بتلعب وتشتري منها.',tip:'الفيزا ليها مدة صلاحية، ولو خلصت لازم تجدّدها.',items:[
+    ['📥','إيداع وسحب','حوّل من نقاطك للفيزا أو ارجع نقاط تاني.'],
+    ['🤝','التحويل لصاحب','ابعت نقاط لأي زميل برقم فيزته أو بمسح كارته.'],
+    ['🎮','اللعب والشراء','رسوم الألعاب وتصاميم الكروت بتتدفع من رصيد الفيزا.'],
+    ['🎨','تصميم الكارت','اختار شكل كارتك من التصاميم اللي اشتريتها.']]},
+  'visa-history':{ico:'🧾',title:'كشف الحساب',lead:'كل عملية عملتها على فيزتك.',items:[
+    ['🔎','فلترة','اختار الفترة أو نوع العملية (تحويلات، مشتريات، إيداع وسحب).'],
+    ['🔔','إشعارات العمليات','فعّلها عشان توصلك أي عملية لحظة حدوثها.']]},
+  'sticker-store':{ico:'🛍️',title:'المتجر',lead:'اشتري استيكرات وتصاميم كروت بنقاط الفيزا.',items:[
+    ['🏷️','الاستيكرات','اشتريها وابعتها في الشات.'],
+    ['💳','تصاميم الكارت','التصميم اللي بتشتريه بتختاره من صفحة فيزتي.'],
+    ['💰','الرصيد','الشراء من رصيد الفيزا، ولو ناقص هتعرف فاضل كام.']]},
+  attendance:{ico:'✅',title:'الحضور',lead:'سجّل حضورك في الاجتماع.',tip:'الحضور بيزوّد نقاطك وحضورك المتتالي.',items:[
+    ['📷','مسح الكود','امسح الكود اللي مع المنظمين عشان يتسجّل حضورك.'],
+    ['⭐','النقاط','كل حضور بيدّيك نقاط حسب إعدادات المنظمين.'],
+    ['🔥','الحضور المتتالي','كل ما تحضر متتالي زاد رصيد انتظامك.']]},
+  'attendance-scan':{ico:'📷',title:'مسح كود الحضور',lead:'وجّه الكاميرا على كود الحضور.',items:[
+    ['🎯','ثبّت الكاميرا','خلّي الكود جوه الإطار لحد ما يتقرا.'],
+    ['✅','التأكيد','هتظهر رسالة تأكيد أول ما يتسجّل حضورك.']]},
+  stay:{ico:'🛏️',title:'الإقامة والأكل',lead:'بيانات سكنك ووجباتك.',items:[
+    ['🔑','الغرفة','رقم غرفتك واسم زميلك فيها.'],
+    ['🍽️','الوجبات','مواعيد الأكل ومكانه.']]},
+  kit:{ico:'🎒',title:'حاجاتي',lead:'الحاجات اللي استلمتها أو لسه هتستلمها.',items:[
+    ['✔️','استلمته','علامة على اللي خدته.'],
+    ['⏳','لسه','اللي لسه ما استلمتوش.']]},
+  transport:{ico:'🚌',title:'المواصلات',lead:'كل بيانات رحلتك.',items:[
+    ['📍','مكان التجمع','المكان اللي هتتجمعوا فيه.'],
+    ['🕒','ميعاد التحرك','الوقت اللي الأتوبيس بيتحرك فيه.'],
+    ['🚍','رقم الأتوبيس والمشرف','تعرف أتوبيسك ومين المسؤول عنه.']]},
+  timeline:{ico:'🧭',title:'خط رحلتك الزمني',lead:'كل تسجيلاتك مرتبة بالوقت الفعلي.',items:[
+    ['🕘','تسجيلاتك','كل مرة سجّلت فيها حضور بتظهر هنا بتوقيتها.'],
+    ['🔐','لوحة المنظمين','للمنظمين بس، ومحمية بكود.']]},
+  settings:{ico:'⚙️',title:'الإعدادات',lead:'تحكّم في حسابك وتفضيلاتك.',items:[
+    ['🔊','الصوت والتذكيرات','شغّل أو اقفل الأصوات والتنبيهات.'],
+    ['🌙','الوضع الليلي','بدّل بين الليلي والنهاري.'],
+    ['💾','البيانات','إدارة بياناتك على الجهاز.']]},
+  eco:{ico:'📊',title:'الاقتصاد والاستثمار',lead:'استثمر نقاطك وتابع الأسعار.',tip:'الاستثمار فيه مكسب وخسارة، فاستثمر بحساب.',items:[
+    ['📈','الأسعار','تابع الأسعار وهي بتتغيّر.'],
+    ['💼','محفظتك','شوف اللي اشتريته وأرباحك.']]},
+  askfather:{ico:'⛪',title:'اسأل أبونا',lead:'ابعت سؤالك واستنى الرد.',items:[
+    ['❓','اسأل','اكتب سؤالك وابعته.'],
+    ['📨','أسئلتي','تابع ردود أسئلتك هنا.']]},
+  bdaygreet:{ico:'🎂',title:'أعياد ميلاد الشهر',lead:'مين عيد ميلاده الشهر ده.',items:[
+    ['🎉','التهنئة','ابعت تهنئة لزميلك في عيد ميلاده.']]},
+  book:{ico:'📖',title:'الحجز',lead:'احجز مكانك.',items:[
+    ['📝','احجز الآن','اختار المطلوب وأكّد الحجز.']]},
+  'game-achievements':{ico:'🏅',title:'إنجازات الألعاب',lead:'أوسمتك من جوايز الألعاب.',items:[
+    ['🔓','المفتوحة','الأوسمة اللي حققتها.'],
+    ['🔒','المقفولة','اللي لسه محتاجة فوز أكتر.'],
+    ['🏆','المصدر','الأوسمة بتتحسب من جوايز الألعاب في كشف حساب الفيزا.']]},
+  'game-leaderboard':{ico:'🏆',title:'ترتيب الأبطال',lead:'مين الأعلى في الألعاب.',tip:'اختار لعبة من الأزرار فوق تشوف ترتيبها لوحدها.',items:[
+    ['🥇','الترتيب العام','حسب النقاط الحالية في الفيزا.'],
+    ['🎮','ترتيب كل لعبة','دوس على اسم لعبة تشوف مين الأعلى نقاط فيها.'],
+    ['🔄','التحديث','الترتيب بيتحدّث تلقائي، أو دوس "تحديث".']]},
+  'games-solo':{ico:'🎮',title:'العب ضد الجهاز',lead:'العب بمفردك وتحدّى نفسك.',items:[
+    ['📂','الفئات','الألعاب متقسمة فئات، اختار اللي يعجبك.'],
+    ['💰','الجوايز','لما تكسب بتتضاف النقاط لفيزتك.']]},
+  'games-solo-cat':{ico:'🎮',title:'ألعاب الفئة',lead:'اختار لعبة وابدأ.',items:[
+    ['▶️','ابدأ','دوس على اللعبة تفتح.'],
+    ['🏆','الكاس','جوه اللعبة هتلاقي كاس يوريك ترتيبها.']]},
+  'game-rooms':{ico:'🚪',title:'غرف الأصحاب',lead:'العب مع أصحابك في غرفة.',items:[
+    ['➕','إنشاء غرفة','اعمل غرفة وشارك الكود مع صحابك.'],
+    ['🔑','انضمام بكود','اكتب كود الغرفة وادخل.'],
+    ['💳','الفيزا','لازم تكون فيزتك شغالة عشان تدخل الغرف.']]},
+  'game-rooms-cat':{ico:'🚪',title:'ألعاب الغرف',lead:'اختار لعبة وافتح غرفة.',items:[
+    ['🎲','اختار لعبة','كل لعبة ليها عدد لاعبين مناسب.']]},
+  'watch-rooms':{ico:'👀',title:'مشاهدة المعارك',lead:'اتفرّج على مباريات أصحابك.',items:[
+    ['🔴','مباشر','المباريات الشغّالة دلوقتي بتظهر هنا.']]},
+  'room-lobby':{ico:'🚪',title:'انضمام لغرفة',lead:'ادخل غرفة بالكود.',items:[
+    ['🔢','اكتب الكود','اطلب الكود من صاحب الغرفة.'],
+    ['🔒','غرفة محمية','لو الغرفة ليها كلمة سر هتتسأل عنها.']]},
+  admin:{ico:'🛠️',title:'لوحة المنظمين',lead:'إدارة الموقع للمنظمين.',items:[
+    ['🔐','محمية','الدخول بكود المنظمين.'],
+    ['⚙️','التحكم','إعدادات الألعاب والنقاط والمحتوى.']]}
+};
+const PG_SEEN_KEY = 'glv-pg-seen';
+function pgSeenGet(){ try{ return JSON.parse(localStorage.getItem(PG_SEEN_KEY)||'{}')||{}; }catch(e){ return {}; } }
+function pgSeenSet(v){ try{ const o = pgSeenGet(); o[v] = 1; localStorage.setItem(PG_SEEN_KEY, JSON.stringify(o)); }catch(e){} }
+function pgHelpTick(){
+  let b = document.getElementById('pg-help');
+  const v = state.view, g = PAGE_GUIDES[v];
+  const hide = !g || !state.pid || document.getElementById('pg-guide') || document.querySelector('.modal-overlay, #gsg-modal, #gsg-cup[style*="flex"]');
+  if(hide){ if(b) b.style.display = 'none'; return; }
+  if(!b){
+    b = document.createElement('button'); b.id = 'pg-help'; b.type = 'button'; b.setAttribute('aria-label','شرح الخانة'); b.innerHTML = '<span>؟</span>';
+    b.addEventListener('click', e=>{ e.stopPropagation(); showPageGuide(b.dataset.v); });
+    document.body.appendChild(b);
+  }
+  b.dataset.v = v; b.style.display = 'flex';
+  b.classList.toggle('new', !pgSeenGet()[v]);
+}
+setInterval(pgHelpTick, 500);
+function showPageGuide(view){
+  const g = PAGE_GUIDES[view]; if(!g || document.getElementById('pg-guide')) return;
+  pgSeenSet(view);
+  const o = document.createElement('div'); o.id = 'pg-guide'; o.className = 'modal-overlay confirm-overlay pg-overlay';
+  const items = g.items.map((it,i)=>`<details class="gg-item pg-item" style="--d:${.28+i*.09}s"${i===0?' open':''}><summary><span class="gg-ico pg-ico">${it[0]}</span><span class="gg-t">${it[1]}</span></summary><div class="gg-d">${it[2]}</div></details>`).join('');
+  o.innerHTML = `<div class="confirm-card games-intro-card gg-card pg-card" role="dialog" aria-label="شرح ${g.title}">
+    <div class="pg-spark" aria-hidden="true"><i>✨</i><i>✦</i><i>✨</i></div>
+    <div class="gg-top pg-top"><span class="gg-badge pg-badge">${g.ico}</span><div class="gg-heading">${g.title}</div></div>
+    <div class="gg-status gg-good pg-lead"><div class="gg-status-b" style="margin:0">${g.lead}</div></div>
+    ${g.tip?`<div class="gg-note pg-tip">💡 ${g.tip}</div>`:''}
+    <div class="gg-label">اضغط على أي بند تعرف تفاصيله</div>
+    <div class="gg-list">${items}</div>
+    <div class="gg-actions"><button type="button" class="btn btn-primary" id="pg-ok" style="width:100%">فهمت</button></div>
+  </div>`;
+  document.body.appendChild(o);
+  const close = ()=>{ const c = o.querySelector('.pg-card'); if(c) c.classList.add('out'); o.style.opacity = '0'; o.style.transition = 'opacity .2s'; setTimeout(()=>o.remove(), 210); };
+  o.addEventListener('click', e=>{ if(e.target===o) close(); });
+  o.querySelector('#pg-ok').addEventListener('click', close);
 }
 async function gsAdd(pid, amt){
   try{
