@@ -12748,7 +12748,7 @@ function renderCapabilitiesPage(){
       <div class="back-title">${tr('conf_capabilities_title')}</div>
     </div>
     <div class="hint" style="margin:0 0 14px;">${tr('conf_capabilities_sub')}</div>
-    <div class="cap-grid">${tiles}<button type="button" class="cap-tile" data-gm-info style="--cap-color:linear-gradient(145deg,#F4B740,#845EC2)"><span class="cap-tile-ico">ℹ️</span><span class="cap-tile-lab">عن الموقع</span><span class="cap-tile-sub">كارت تعريفي بكل الإمكانيات</span></button></div>
+    <div class="cap-grid">${tiles}<button type="button" class="cap-tile" data-action="tile-nav" data-page="about" style="--cap-color:linear-gradient(145deg,#F4B740,#845EC2)"><span class="cap-tile-ico">ℹ️</span><span class="cap-tile-lab">عن الموقع</span><span class="cap-tile-sub">البطاقة التعريفية الرسمية</span></button></div>
   `;
 }
 function renderProNavList(){
@@ -51620,108 +51620,112 @@ if(document.readyState==='complete') boot(); else window.addEventListener('load'
 window.__ipm={show:function(m){ shown=false; show(m||mode()||'native'); },reset:function(){ try{ localStorage.removeItem(SNZ); localStorage.removeItem('ipm-done'); }catch(e){} }};
 })();
 </script>
-<!-- ============ زر معلومات عن الموقع ============ -->
-<style>
-  #gm-info-ov{
-    position:fixed; inset:0; z-index:100000; display:none; align-items:center; justify-content:center;
-    padding:14px; background:rgba(5,4,20,.7); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);
-  }
-  #gm-info-ov.open{ display:flex; animation:gmFade .2s ease; }
-  .gm-card{
-    width:100%; max-width:400px; max-height:calc(100vh - 28px); max-height:calc(100dvh - 28px);
-    display:flex; flex-direction:column; overflow:hidden; border-radius:26px; text-align:center;
-    background:linear-gradient(165deg,var(--surface,#1D1A52),var(--surface-2,#262161));
-    border:1.5px solid var(--border,rgba(255,255,255,.12)); color:var(--text,#F6F5FF);
-    box-shadow:0 24px 60px -20px rgba(0,0,0,.65); font-family:'Cairo','Tajawal',sans-serif;
-    animation:gmPop .25s cubic-bezier(.2,.9,.3,1.2);
-  }
-  .gm-head{
-    padding:22px 20px 16px; position:relative;
-    background:radial-gradient(circle at 50% 0%, rgba(244,183,64,.22), transparent 70%);
-    border-bottom:1px solid var(--border,rgba(255,255,255,.1));
-  }
-  .gm-logo{
-    width:62px; height:62px; margin:0 auto 10px; border-radius:20px; display:flex; align-items:center; justify-content:center;
-    font-size:30px; font-weight:900; color:#1b1500; background:linear-gradient(135deg,var(--gold-2,#FFDE94),var(--gold,#F4B740));
-    box-shadow:0 10px 24px -8px rgba(244,183,64,.6);
-  }
-  .gm-head h3{ margin:0 0 4px; font-size:21px; font-weight:900; }
-  .gm-tag{ margin:0; font-size:13.5px; line-height:1.8; color:var(--text-muted,#9D9BC4); }
-  .gm-x{
-    position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:50%; border:0; cursor:pointer;
-    background:rgba(255,255,255,.08); color:var(--text,#F6F5FF); font-size:18px; line-height:1; padding:0;
-  }
-  .gm-body{ overflow-y:auto; -webkit-overflow-scrolling:touch; padding:16px 16px 6px; text-align:right; }
-  .gm-sec{ margin:0 0 6px; font-size:14px; font-weight:800; color:var(--gold,#F4B740); }
-  .gm-about{ margin:0 0 16px; font-size:13.5px; line-height:1.9; color:var(--text-muted,#9D9BC4); }
-  .gm-grid{ display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:16px; }
-  .gm-f{
-    border-radius:16px; padding:11px 10px; background:rgba(255,255,255,.045);
-    border:1.5px solid var(--border,rgba(255,255,255,.09));
-  }
-  .gm-f.wide{ grid-column:1 / -1; }
-  .gm-f i{ font-style:normal; font-size:22px; display:block; margin-bottom:4px; }
-  .gm-f b{ display:block; font-size:13.5px; font-weight:800; margin-bottom:2px; }
-  .gm-f span{ display:block; font-size:12px; line-height:1.65; color:var(--text-muted,#9D9BC4); }
-  .gm-foot{ padding:12px 16px 16px; border-top:1px solid var(--border,rgba(255,255,255,.1)); }
-  .gm-credit small{ display:block; font-size:12px; color:var(--text-muted,#9D9BC4); margin-bottom:2px; }
-  .gm-credit b{ font-size:17px; font-weight:800; letter-spacing:.3px; direction:ltr; unicode-bidi:isolate; display:inline-block; }
-  .gm-close{
-    margin-top:12px; width:100%; padding:12px; border:0; border-radius:14px; cursor:pointer;
-    font:700 15px 'Cairo','Tajawal',sans-serif; color:#1b1500; background:linear-gradient(135deg,var(--gold-2,#FFDE94),var(--gold,#F4B740));
-  }
-  @keyframes gmFade{ from{opacity:0} to{opacity:1} }
-  @keyframes gmPop{ from{opacity:0; transform:translateY(12px) scale(.96)} to{opacity:1; transform:none} }
-</style>
-<div id="gm-info-ov" role="dialog" aria-modal="true" aria-labelledby="gm-info-title">
-  <div class="gm-card">
-    <div class="gm-head">
-      <button class="gm-x" type="button" aria-label="إغلاق">×</button>
-      <div class="gm-logo">ج</div>
-      <h3 id="gm-info-title">اجتماع جامعة</h3>
-      <p class="gm-tag">كارت تعريفي بالموقع وكل إمكانياته</p>
-    </div>
-    <div class="gm-body">
-      <div class="gm-sec">عن الموقع</div>
-      <p class="gm-about">تطبيق ويب متكامل للمشاركين في اجتماع جامعة: تسجّل حسابك، تحصل على بطاقتك الرقمية ونقاطك، تتابع الحضور، وتتسلّى بالألعاب وتشارك لحظات الاجتماع وآراءك — كله في مكان واحد وعلى موبايلك.</p>
-
-      <div class="gm-sec">كل الإمكانيات</div>
-      <div class="gm-grid">
-        <div class="gm-f"><i>🪪</i><b>حساب وبطاقة رقمية</b><span>تسجيل حساب ذاتي وبطاقة بكود QR لتوثيق هويتك.</span></div>
-        <div class="gm-f"><i>⭐</i><b>النقاط والرصيد</b><span>رصيد نقاط، كشف حساب وسجل بكل العمليات.</span></div>
-        <div class="gm-f"><i>✅</i><b>الحضور</b><span>تسجيل حضور القداس والاجتماع والتسبحة بمسح الكود.</span></div>
-        <div class="gm-f"><i>🏅</i><b>الأوسمة والتحديات</b><span>مهام يومية بمكافآت فورية وأوسمة تجمعها.</span></div>
-        <div class="gm-f"><i>🎮</i><b>ألعاب فردية</b><span>العب بمفردك وتحدَّ نفسك.</span></div>
-        <div class="gm-f"><i>👫</i><b>غرف الأصحاب</b><span>العب مع أصدقائك أونلاين في غرفة واحدة (إكس أو، شطرنج، دومينو، لودو، سلم وثعبان وغيرها).</span></div>
-        <div class="gm-f"><i>🏆</i><b>إنجازات ولوحة الصدارة</b><span>تابع إنجازاتك في الألعاب وترتيبك بين المشاركين.</span></div>
-        <div class="gm-f"><i>🛍️</i><b>متجر الاستيكر</b><span>تصفّح الاستيكرات المتاحة.</span></div>
-        <div class="gm-f"><i>🖼️</i><b>معرض الصور</b><span>صور الاجتماع وألبوماته، ومعرض صور خاص بك لوحدك.</span></div>
-        <div class="gm-f"><i>👥</i><b>هيكلة الاجتماع</b><span>الأمناء وأسر الخدمة.</span></div>
-        <div class="gm-f"><i>📝</i><b>رأيك</b><span>إيجابيات وسلبيات واقتراحات توصل للمنظمين مباشرة.</span></div>
-        <div class="gm-f"><i>🧱</i><b>حائط الاجتماع</b><span>شارك رأيك وتفاعل مع باقي المشاركين.</span></div>
-        <div class="gm-f wide"><i>⚙️</i><b>الإعدادات والتحكم</b><span>موسيقى الخلفية ومستوى الصوت، تصدير رحلتك كملف PDF، والإبلاغ عن أي مشكلة. ويمكن تثبيت الموقع على الموبايل كتطبيق.</span></div>
-      </div>
-    </div>
-    <div class="gm-foot">
-      <div class="gm-credit">
-        <small>صُمّم وطُوِّر بواسطة</small>
-        <b>George Magdy Isaac</b>
-      </div>
-      <button class="gm-close" type="button">تمام</button>
-    </div>
-  </div>
-</div>
+<!-- ============ صفحة «عن الموقع» الرسمية ============ -->
 <script>
 (function(){
-  var ov=document.getElementById('gm-info-ov');
-  if(!ov) return;
-  function open(){ ov.classList.add('open'); var b=ov.querySelector('.gm-body'); if(b) b.scrollTop=0; }
-  function close(){ ov.classList.remove('open'); }
-  document.addEventListener('click', function(e){
-    if(e.target.closest && e.target.closest('[data-gm-info]')){ e.preventDefault(); open(); }
-  }, true);
-  ov.addEventListener('click', function(e){ if(e.target===ov || e.target.closest('.gm-close') || e.target.closest('.gm-x')) close(); });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+  var css = `
+  .ab-wrap{ --nv:#0B1B3F; --nv2:#16306B; --mut:#4A5878; --ln:#D5DCEB; --soft:#EEF2FA;
+    padding-bottom:30px; font-family:'Cairo','Tajawal',sans-serif; }
+  .ab-wrap *{ font-family:inherit; }
+  .ab-hero{
+    position:relative; text-align:center; padding:34px 20px 28px; margin-top:6px; border-radius:22px; color:#fff;
+    background:linear-gradient(160deg,var(--nv) 0%,var(--nv2) 100%);
+    box-shadow:0 16px 36px -20px rgba(11,27,63,.8);
+  }
+  .ab-hero::before,.ab-hero::after{
+    content:""; position:absolute; left:16px; right:16px; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);
+  }
+  .ab-hero::before{ top:11px; } .ab-hero::after{ bottom:11px; }
+  .ab-seal{ width:84px; height:84px; margin:0 auto 14px; border-radius:50%; padding:5px; background:#fff; box-shadow:0 0 0 3px rgba(255,255,255,.25); }
+  .ab-seal span{
+    width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:var(--nv); color:#fff; border:2px solid #fff; font-size:42px; font-weight:800; line-height:1;
+  }
+  .ab-title{ margin:0 0 6px; font-size:34px; font-weight:800; line-height:1.4; color:#fff; }
+  .ab-sub{ margin:0; font-size:16px; font-weight:500; color:rgba(255,255,255,.82); }
+  .ab-orn{ display:flex; align-items:center; gap:10px; margin:16px auto 0; max-width:230px; color:#fff; font-size:11px; }
+  .ab-orn::before{ content:""; flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.8)); }
+  .ab-orn::after{ content:""; flex:1; height:1px; background:linear-gradient(270deg,transparent,rgba(255,255,255,.8)); }
+
+  .ab-paper{ margin-top:16px; padding:6px 18px 20px; border-radius:22px; background:#fff; color:var(--nv); box-shadow:0 14px 32px -22px rgba(0,0,0,.6); }
+  .ab-sec{ display:flex; align-items:center; gap:12px; margin:22px 0 12px; }
+  .ab-sec h2{ margin:0; font-size:22px; font-weight:800; line-height:1.4; color:var(--nv); white-space:nowrap; }
+  .ab-sec::after{ content:""; flex:1; height:2px; background:var(--nv); opacity:.18; border-radius:2px; }
+  .ab-text{ margin:0; font-size:16px; font-weight:500; line-height:2.1; text-align:justify; color:var(--nv); }
+
+  .ab-table{ border-radius:16px; overflow:hidden; border:1.5px solid var(--ln); background:#fff; }
+  .ab-grp{ padding:10px 16px; font-size:15px; font-weight:800; color:#fff; background:var(--nv); }
+  .ab-row{ display:grid; grid-template-columns:42px 1fr; gap:12px; align-items:start; padding:14px 16px; border-bottom:1px solid var(--ln); }
+  .ab-row:nth-child(even){ background:var(--soft); }
+  .ab-row:last-child{ border-bottom:0; }
+  .ab-no{ font-size:22px; font-weight:800; line-height:1.3; color:var(--nv2); text-align:center; }
+  .ab-row b{ display:block; margin-bottom:3px; font-size:16.5px; font-weight:800; color:var(--nv); }
+  .ab-row span{ display:block; font-size:14.5px; font-weight:500; line-height:1.9; color:var(--mut); }
+
+  .ab-credit{
+    margin-top:16px; text-align:center; padding:24px 16px 22px; border-radius:22px; color:#fff;
+    background:linear-gradient(160deg,var(--nv) 0%,var(--nv2) 100%); box-shadow:0 16px 36px -20px rgba(11,27,63,.8);
+  }
+  .ab-credit small{ display:block; font-size:15px; font-weight:500; color:rgba(255,255,255,.8); margin-bottom:6px; }
+  .ab-credit b{ display:inline-block; direction:ltr; unicode-bidi:isolate; font-size:25px; font-weight:800; letter-spacing:.5px; color:#fff; }
+  `;
+  var st=document.createElement('style'); st.id='ab-style'; st.textContent=css; document.head.appendChild(st);
+
+  var GROUPS = [
+    {t:'الهوية والحساب', items:[
+      ['الحساب الشخصي والبطاقة الرقمية','إنشاء حساب ذاتي لكل مشارك، وبطاقة رقمية تحمل رمز QR لتوثيق الهوية.'],
+      ['النقاط والرصيد','رصيد نقاط خاص بكل مشارك مع كشف حساب وسجلّ تفصيلي لجميع العمليات.']
+    ]},
+    {t:'المتابعة والحضور', items:[
+      ['الحضور','تسجيل الحضور في القدّاس والاجتماع والتسبحة عن طريق مسح الرمز.'],
+      ['التحديات والأوسمة','مهام يومية بمكافآت فورية، وأوسمة تُمنح عند تحقيق الإنجازات.']
+    ]},
+    {t:'الترفيه والألعاب', items:[
+      ['الألعاب الفردية','مجموعة ألعاب يلعبها المشارك بمفرده ليتحدّى نفسه.'],
+      ['غرف الأصدقاء','لعب جماعي مباشر عبر غرف خاصة، ومنها: إكس أو، الشطرنج، الدومينو، اللودو، السلّم والثعبان وغيرها.'],
+      ['الإنجازات ولوحة الصدارة','متابعة إنجازات الألعاب وترتيب المشاركين.'],
+      ['متجر الاستيكر','تصفّح الاستيكرات المتاحة واقتناؤها.']
+    ]},
+    {t:'المحتوى والمشاركة', items:[
+      ['معرض الصور','ألبومات صور الاجتماع، إضافةً إلى معرض خاص يراه صاحبه فقط.'],
+      ['هيكلة الاجتماع','التعريف بالأمناء وأُسر الخدمة.'],
+      ['رأيك','إبداء الإيجابيات والسلبيات والمقترحات بحيث تصل إلى المنظِّمين مباشرةً.'],
+      ['حائط الاجتماع','مساحة لمشاركة الآراء والتفاعل بين المشاركين.']
+    ]},
+    {t:'الإعدادات والخدمات', items:[
+      ['الإعدادات','التحكم في موسيقى الخلفية ومستوى الصوت، وتصدير الرحلة بصيغة PDF، والإبلاغ عن أي مشكلة، مع إمكانية تثبيت الموقع على الهاتف كتطبيق.']
+    ]}
+  ];
+
+  function num(n){ try{ return n.toLocaleString('ar-EG',{minimumIntegerDigits:2}); }catch(e){ return (n<10?'0':'')+n; } }
+
+  window.FXVIEWS = window.FXVIEWS || {};
+  window.FXVIEWS.about = function(){
+    var n = 0;
+    var rows = GROUPS.map(function(g){
+      return '<div class="ab-grp">'+g.t+'</div>' + g.items.map(function(it){
+        n++;
+        return '<div class="ab-row"><div class="ab-no">'+num(n)+'</div><div><b>'+it[0]+'</b><span>'+it[1]+'</span></div></div>';
+      }).join('');
+    }).join('');
+    var back = (typeof ICO!=='undefined' && ICO.back) ? ICO.back : '‹';
+    return '<div class="back-row"><button class="icon-btn" data-action="back">'+back+'</button><div class="back-title">عن الموقع</div></div>'
+      + '<div class="ab-wrap">'
+      +   '<div class="ab-hero"><div class="ab-seal"><span>ج</span></div>'
+      +     '<h1 class="ab-title">اجتماع جامعة</h1>'
+      +     '<p class="ab-sub">المنصّة الرقمية للاجتماع</p>'
+      +     '<div class="ab-orn">◆</div></div>'
+      +   '<div class="ab-paper">'
+      +   '<div class="ab-sec"><h2>نبذة عن المنصّة</h2></div>'
+      +   '<p class="ab-text">منصّة ويب متكاملة أُعدّت لخدمة المشاركين في اجتماع جامعة، تجمع في مكان واحد ما يحتاجه المشارك قبل الاجتماع وأثناءه وبعده: الهوية الرقمية والنقاط، ومتابعة الحضور، والأنشطة والألعاب، ومعرض الصور، وإبداء الرأي والمقترحات، وذلك بواجهة عربية بسيطة تعمل على الهاتف.</p>'
+      +   '<div class="ab-sec"><h2>الإمكانيات والخدمات</h2></div>'
+      +   '<div class="ab-table">'+rows+'</div>'
+      +   '</div>'
+      +   '<div class="ab-credit"><small>تصميم وتطوير</small><b>George Magdy Isaac</b><div class="ab-orn">◆</div></div>'
+      + '</div>';
+  };
+  if(typeof BNAV_VIEW_TAB!=='undefined'){ BNAV_VIEW_TAB.about = 'capabilities'; }
 })();
 </script>
 
