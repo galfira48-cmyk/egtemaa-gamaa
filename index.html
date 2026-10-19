@@ -3924,6 +3924,23 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .gs-sc small{ display:block; font-size:10px; font-weight:700; color:var(--text-muted); }
   .gs-tools{ display:flex; gap:8px; margin:0 0 12px; }
   .gs-tools .btn{ margin:0; padding:9px 12px; font-size:12px; }
+  #gsg-cup{ position:fixed; top:calc(env(safe-area-inset-top,0px) + 10px); inset-inline-start:10px; z-index:9600; width:40px; height:40px; border-radius:50%; display:none; align-items:center; justify-content:center; font-size:21px; line-height:1; padding:0; cursor:pointer; background:linear-gradient(145deg,#FFE29A,#F4B740); border:2px solid rgba(255,255,255,.55); box-shadow:0 4px 16px rgba(0,0,0,.45); animation:gsgCup 2.6s ease-in-out infinite; }
+  @keyframes gsgCup{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
+  #gsg-modal{ position:fixed; inset:0; z-index:100002; background:rgba(6,5,20,.8); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:16px; }
+  .gsg-sheet{ width:100%; max-width:440px; max-height:82vh; display:flex; flex-direction:column; border-radius:24px; overflow:hidden; background:var(--surface,#171449); color:var(--text,#fff); border:1px solid var(--border,rgba(255,255,255,.12)); box-shadow:0 20px 60px rgba(0,0,0,.6); }
+  .gsg-head{ display:flex; align-items:center; gap:12px; padding:14px 14px 12px; background:linear-gradient(135deg,rgba(244,183,64,.22),transparent); border-bottom:1px solid var(--border,rgba(255,255,255,.12)); }
+  .gsg-cupbig{ font-size:34px; line-height:1; filter:drop-shadow(0 4px 10px rgba(244,183,64,.5)); }
+  .gsg-t{ font-family:'Cairo',sans-serif; font-weight:900; font-size:15px; }
+  .gsg-s{ font-size:12px; color:var(--text-muted,#bbb); margin-top:2px; }
+  .gsg-s b{ color:var(--gold,#F4B740); }
+  .gsg-x{ margin-inline-start:auto; width:32px; height:32px; border-radius:50%; border:none; cursor:pointer; color:inherit; background:rgba(255,255,255,.1); font-size:14px; }
+  .gsg-body{ overflow-y:auto; padding:8px 6px 12px; -webkit-overflow-scrolling:touch; }
+  .gsg-chips{ display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; margin:0 -2px 8px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .gsg-chips::-webkit-scrollbar{ display:none; }
+  .gsg-chip{ flex:0 0 auto; display:flex; align-items:center; gap:6px; padding:8px 13px; border-radius:999px; cursor:pointer; font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; color:var(--text); background:var(--surface); border:1px solid var(--border); white-space:nowrap; }
+  .gsg-chip small{ font-weight:700; font-size:10.5px; color:var(--text-muted); }
+  .gsg-chip.on{ color:#1a1633; background:linear-gradient(135deg,var(--gold),var(--gold-2)); border-color:transparent; }
+  .gsg-chip.on small{ color:#1a1633; opacity:.7; }
   /* ---------- ترتيب الأبطال: منصة تتويج متصلة + قائمة نظيفة ---------- */
   .gs-stage.gsx{ padding:20px 12px 0; }
   .gs-stage.gsx .gs-rays{ opacity:.28; }
@@ -8846,7 +8863,7 @@ async function logVisaTx(entries){
       if(window.storage && window.storage.update){ await window.storage.update(vtxKey(e.pid), apply, true); }
       else { const c = await window.storage.get(vtxKey(e.pid), true); await window.storage.set(vtxKey(e.pid), apply(c ? c.value : null), true); }
     }catch(err){}
-    if(e.type==='game_win' && entry.amount>0){ try{ gsAdd(e.pid, entry.amount); }catch(_){} }
+    if(e.type==='game_win' && entry.amount>0){ try{ gsAdd(e.pid, entry.amount); }catch(_){} try{ gsgAdd(e.pid, entry.amount, e.note); }catch(_){} }
   }));
 }
 function vtxLogSafe(entries){ try{ const _p = logVisaTx(entries); (entries||[]).forEach(e=>{ if(e && e.pid===state.pid && /^game_/.test(e.type)) visaGameToast(e); }); _p.then(()=>{ if((entries||[]).some(e=>e && e.pid===state.pid && e.type==='game_win')){ ACH.loading=false; achRefresh(true); } }).catch(()=>{}); }catch(e){} }
@@ -14923,6 +14940,164 @@ function renderGameAchievements(){
    التخزين المشترك: glavera-game-score = { pid: {pts, wins, ts} } */
 const GS_KEY = 'glavera-game-score';
 const GS = {ready:false, loading:false, data:{}, at:0};
+
+/* ===== ترتيب كل لعبة لوحدها: glavera-game-score-by = { gameId: { pid: {pts, wins, best, ts} } } ===== */
+const GSG_KEY = 'glavera-game-score-by';
+const GSG = {data:{}};
+const GSG_DEFS = [
+  ['xo',/إكس أو/],['connect4',/كونكت/],['ludo',/لودو/],['billiards',/البلياردو/],['darts',/النشان/],['bowling',/البولينج/],
+  ['millionaire',/المليون|الجايزة الكبرى/],['blocky',/بلوكي/],['stack',/^برج\s|طابق/],['cube',/روبيك|مكعب/],
+  ['math',/الرياضيات|جاوبت صح/],['numguess',/الرقم صح|تخمين/],['reflex',/أسرع واحد/],
+  ['placemem',/ذاكرتك قوية|ذاكرة الأماكن/],['sqorder',/ذاكرتك|🔲/],['tmm',/الطاحونة/],['bus',/أتوبيس/],
+  ['revword',/المعكوسة/],['who',/مين هو/],['colorcards',/كروت الألوان/],['crossmath',/كروس ماث/],
+  ['rollpaint',/الأرضية/],['simon',/سايمن/],['mystery',/الغموض/],['fahmeen',/فاهمين/],['fazzura',/فزورة/]
+];
+function gsgOf(note){
+  note = String(note||''); if(/عجلة الحظ/.test(note)) return null;
+  for(const d of GSG_DEFS){ if(d[1].test(note)) return d[0]; }
+  return null;
+}
+async function gsgAdd(pid, amt, note){
+  const g = gsgOf(note); if(!g || !(amt>0)) return;
+  try{
+    await window.storage.update(GSG_KEY, cur=>{
+      let o = {}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o = {}; }
+      const gm = o[g] = o[g] || {}, r = gm[pid] || {pts:0, wins:0, best:0};
+      r.pts = (r.pts||0) + amt; r.wins = (r.wins||0) + 1; if(amt > (r.best||0)) r.best = amt; r.ts = Date.now();
+      gm[pid] = r; return JSON.stringify(o);
+    }, true);
+  }catch(e){}
+}
+function gsgFromTx(tx){
+  const out = {};
+  (tx||[]).forEach(t=>{
+    if(!t || t.type!=='game_win') return;
+    const g = gsgOf(t.note); if(!g) return;
+    const amt = Number(t.amount)||0, r = out[g] || (out[g] = {pts:0, wins:0, best:0, ts:0});
+    r.pts += amt; r.wins++; if(amt > r.best) r.best = amt; if((t.ts||0) > r.ts) r.ts = t.ts||0;
+  });
+  return out;
+}
+/* map = { pid: { gameId: rec } } — بيدمج بالأعلى عشان السجل ممكن يتقصّ */
+async function gsgMerge(map){
+  try{
+    await window.storage.update(GSG_KEY, cur=>{
+      let o = {}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o = {}; }
+      Object.keys(map||{}).forEach(pid=>{
+        Object.keys(map[pid]).forEach(g=>{
+          const n = map[pid][g], gm = o[g] = o[g] || {}, r = gm[pid] || {pts:0, wins:0, best:0, ts:0};
+          if((n.pts||0) > (r.pts||0)) r.pts = n.pts;
+          if((n.wins||0) > (r.wins||0)) r.wins = n.wins;
+          if((n.best||0) > (r.best||0)) r.best = n.best;
+          if((n.ts||0) > (r.ts||0)) r.ts = n.ts;
+          gm[pid] = r;
+        });
+      });
+      return JSON.stringify(o);
+    }, true);
+  }catch(e){}
+}
+function gsgRows(gid){
+  const m = GSG.data[gid] || {};
+  const rows = PARTICIPANTS.map(p=>{ const r = m[p.id]; return r ? {p, pts:Number(r.pts)||0, wins:Number(r.wins)||0, best:Number(r.best)||0, ts:r.ts||0} : null; })
+    .filter(x=>x && (x.pts>0 || x.wins>0))
+    .sort((a,b)=> (b.pts-a.pts) || (b.wins-a.wins) || (b.best-a.best) || ((a.ts||0)-(b.ts||0)));
+  let last = null, lastRank = 0;
+  rows.forEach((x,i)=>{ if(last && x.pts===last.pts && x.wins===last.wins){ x.rank = lastRank; } else { x.rank = i+1; lastRank = x.rank; } last = x; });
+  return rows;
+}
+function gsgChips(cur){
+  const cnt = g => Object.keys(GSG.data[g]||{}).length;
+  const ids = GSG_DEFS.map(d=>d[0]).sort((a,b)=> cnt(b)-cnt(a));
+  const chip = (id, ico, name, n)=> `<button type="button" class="gsg-chip${cur===id?' on':''}" data-action="gs-game" data-g="${id}"><span>${ico}</span>${escapeHtml(name)}${n!=null?`<small>${n}</small>`:''}</button>`;
+  return `<div class="gsg-chips">${chip('all','🏆','الكل',null)}${ids.map(id=>{ const g = jrGame(id); return chip(id, g.icon||'🎮', g.title||id, cnt(id)); }).join('')}</div>`;
+}
+function renderGsGameView(){
+  const gid = state.gsGame, g = jrGame(gid), rows = gsgRows(gid);
+  const lim = state.gsLimit || 30;
+  const meIdx = rows.findIndex(x=>x.p.id===state.pid), me = meIdx>=0 ? rows[meIdx] : null;
+  const wn = n => n===1 ? 'فوز' : 'انتصارات';
+  const pod = (x, n)=> x ? `<div class="gsp gsp${n}${x.p.id===state.pid?' me':''}">${n===1?'<div class="gsp-crown">👑</div>':''}<div class="gsp-av">${gsAvatar(x.p)}</div><div class="gsp-nm">${escapeHtml(x.p.name||'')}</div><div class="gsp-pt"><span>${x.pts}</span><small>نقطة</small></div><div class="gsp-step"><b>${x.rank}</b><span>${x.wins} ${wn(x.wins)}</span></div></div>` : '<div class="gsp gsp-empty"></div>';
+  let stage = `<div class="gs-stage gsx"><div class="gs-rays" aria-hidden="true"></div><div class="gs-stage-t">${g.icon||'🎮'} ${escapeHtml(g.title||'')}</div><div class="gsx-chip">الترتيب بإجمالي النقاط اللي اتكسبت في اللعبة دي</div>`;
+  if(rows.length) stage += `<div class="gsp-wrap">${pod(rows[1],2)}${pod(rows[0],1)}${pod(rows[2],3)}</div>`;
+  else stage += `<div class="gs-champ" style="padding-bottom:22px"><div class="gs-crown" style="opacity:.5">👑</div><div class="gs-champ-name" style="margin-top:14px;">لسه مفيش حد كسب هنا</div><div class="gs-champ-sub" style="margin-top:4px;">أول واحد يكسب في اللعبة دي هيتصدّر الترتيب</div></div>`;
+  stage += `</div>`;
+  let msg;
+  if(me){
+    const above = rows.slice(0,meIdx).reverse().find(x=>x.pts>me.pts), below = rows.slice(meIdx+1).find(x=>x.pts<me.pts);
+    if(above) msg = `فاضل <strong>${above.pts-me.pts+1}</strong> نقطة وتتخطى ${escapeHtml(above.p.name||'')}`;
+    else if(rows.filter(x=>x.pts===me.pts).length>1) msg = 'متعادل على الصدارة — فوزة كمان تحسمها';
+    else msg = below ? `أنت في الصدارة بفارق <strong>${me.pts-below.pts}</strong> نقطة عن ${escapeHtml(below.p.name||'')}` : 'أنت في الصدارة، حافظ على مركزك';
+    msg += `<br><span style="color:var(--text-muted);font-size:11.5px">${me.pts} نقطة · ${me.wins} ${wn(me.wins)} · أعلى جايزة ${me.best}</span>`;
+  } else msg = 'لسه ما كسبتش نقاط في اللعبة دي. أول فوزة هتدخّلك الترتيب.';
+  const meCard = `<div class="gs-me"><div class="gs-me-ring"><svg viewBox="0 0 68 68"><circle class="bg" cx="34" cy="34" r="29"/></svg><b>${me?me.rank:'—'}<small>ترتيبك</small></b></div><div class="gs-me-txt">${msg}</div></div>`;
+  const top = rows.length ? rows[0].pts : 0;
+  const rest = rows.slice(3, Math.max(3,lim));
+  const list = rest.map(x=>{
+    const mine = x.p.id===state.pid, pct = top ? Math.max(4, Math.round(x.pts/top*100)) : 0;
+    return `<div class="gs-row ${mine?'me':''} ${x.rank<=10?'top10':''}"><div class="gs-rk">${x.rank}</div>${gsAvatar(x.p)}<div class="gs-mid"><div class="gs-nm">${escapeHtml(x.p.name||'')}${mine?'<em class="gs-you">أنت</em>':''}</div><div class="gs-bar"><i style="width:${pct}%"></i></div></div><div class="gs-sc">${x.pts}<small>${x.wins} ${wn(x.wins)} · أعلى ${x.best}</small></div></div>`;
+  }).join('');
+  const more = rows.length > lim ? `<button type="button" class="btn btn-outline" style="width:100%;margin-top:10px;" data-action="gs-more">عرض المزيد (${rows.length-lim})</button>` : '';
+  const adminBtn = state.adminUnlocked ? `<button type="button" class="btn btn-ghost" data-action="gs-rebuild">إعادة حساب من السجلات</button>` : '';
+  return `
+    <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">ترتيب الألعاب</div></div>
+    ${gsgChips(gid)}
+    ${GS.ready ? stage + meCard : '<div class="empty-note">جاري تحميل الترتيب…</div>'}
+    ${list ? `<div class="gs-sec">باقي المتسابقين<span>${rows.length} لاعب</span></div><div class="card" style="padding:12px 6px">${list}</div>${more}` : ''}
+    <div class="gs-tools" style="margin-top:12px;"><button type="button" class="btn btn-outline" data-action="gs-refresh">تحديث</button>${adminBtn}</div>
+    <div class="hint" style="text-align:center;">الأعلى نقاط في اللعبة فوق · عند التعادل يتقدّم صاحب أكتر انتصارات</div>
+  `;
+}
+
+/* ===== كاس الترتيب جوه كل لعبة ===== */
+const GSG_OVERLAY_GAME = {'bil-overlay':'billiards','blk-overlay':'blocky','stk-overlay':'stack','cube-overlay':'cube','drt-overlay':'darts','bwl-overlay':'bowling','mil-overlay':'millionaire','cm-ov':'crossmath','wh-ov':'who','cc-ov':'colorcards','rpt-ov':'rollpaint','sim-ov':'simon','rw-ov':'revword'};
+function gsgCurrentGame(){
+  try{
+    for(const id in GSG_OVERLAY_GAME){ if(document.getElementById(id)) return GSG_OVERLAY_GAME[id]; }
+    const m = /^(?:game|room)-(.+)$/.exec(state.view||'');
+    if(m && !/^(?:achievements|leaderboard|rooms|rooms-cat|lobby)$/.test(m[1])){
+      const id = m[1];
+      if(GAMES_CATALOG.some(g=>g.id===id) || (typeof ROOM_ONLY_TILES!=='undefined' && ROOM_ONLY_TILES[id])) return id;
+    }
+  }catch(e){}
+  return null;
+}
+let _gsgCupGame = null;
+function gsgCupTick(){
+  let b = document.getElementById('gsg-cup');
+  const g = (state.pid && !document.getElementById('gsg-modal')) ? gsgCurrentGame() : null;
+  if(!g){ if(b) b.style.display = 'none'; _gsgCupGame = null; return; }
+  if(!b){
+    b = document.createElement('button'); b.id = 'gsg-cup'; b.type = 'button'; b.setAttribute('aria-label','ترتيب اللعبة'); b.textContent = '🏆';
+    b.addEventListener('click', ev=>{ ev.stopPropagation(); if(_gsgCupGame) gsgOpenModal(_gsgCupGame); });
+    document.body.appendChild(b);
+  }
+  _gsgCupGame = g; b.style.display = 'flex';
+}
+setInterval(gsgCupTick, 600);
+function gsgModalHtml(gid){
+  const g = jrGame(gid), rows = gsgRows(gid);
+  const meIdx = rows.findIndex(x=>x.p.id===state.pid), me = meIdx>=0 ? rows[meIdx] : null;
+  const top = rows.length ? rows[0].pts : 0, medal = n => n===1?'🥇':n===2?'🥈':n===3?'🥉':n;
+  const list = rows.slice(0,30).map(x=>{
+    const mine = x.p.id===state.pid, pct = top ? Math.max(4, Math.round(x.pts/top*100)) : 0;
+    return `<div class="gs-row ${mine?'me':''} ${x.rank<=3?'top10':''}"><div class="gs-rk" style="${x.rank<=3?'font-size:17px;background:none':''}">${medal(x.rank)}</div>${gsAvatar(x.p)}<div class="gs-mid"><div class="gs-nm">${escapeHtml(x.p.name||'')}${mine?'<em class="gs-you">أنت</em>':''}</div><div class="gs-bar"><i style="width:${pct}%"></i></div></div><div class="gs-sc">${x.pts}<small>${x.wins} فوز · أعلى ${x.best}</small></div></div>`;
+  }).join('');
+  const mine = me ? `ترتيبك <b>#${me.rank}</b> · ${me.pts} نقطة` : 'لسه ما كسبتش نقاط هنا';
+  return `<div class="gsg-sheet"><div class="gsg-head"><div class="gsg-cupbig">🏆</div><div><div class="gsg-t">${g.icon||'🎮'} ${escapeHtml(g.title||'')}</div><div class="gsg-s">${GS.ready?mine:'جاري التحميل…'}</div></div><button type="button" class="gsg-x" aria-label="إغلاق">✕</button></div>
+    <div class="gsg-body">${!GS.ready ? '<div class="empty-note">جاري تحميل الترتيب…</div>' : (list || '<div class="empty-note">لسه مفيش حد كسب في اللعبة دي — كن أول واحد 🥇</div>')}</div></div>`;
+}
+function gsgOpenModal(gid){
+  if(document.getElementById('gsg-modal')) return;
+  const o = document.createElement('div'); o.id = 'gsg-modal';
+  const draw = ()=>{ o.innerHTML = gsgModalHtml(gid); o.querySelector('.gsg-x').onclick = close; };
+  const close = ()=>{ o.remove(); };
+  o.addEventListener('click', e=>{ if(e.target===o) close(); });
+  draw(); document.body.appendChild(o);
+  const cup = document.getElementById('gsg-cup'); if(cup) cup.style.display = 'none';
+  Promise.resolve(gsRefresh()).catch(()=>{}).then(()=>{ if(document.getElementById('gsg-modal')===o) draw(); });
+  setTimeout(()=>{ if(document.getElementById('gsg-modal')===o && !GS.ready) draw(); }, 2500);
+}
 async function gsAdd(pid, amt){
   try{
     await window.storage.update(GS_KEY, cur=>{
@@ -14958,28 +15133,33 @@ async function gsSyncMine(){
   const tx = (await loadVisaTx())[state.pid] || [];
   const m = gsFromTx(tx);
   if(m.pts>0 || m.wins>0) await gsMerge({[state.pid]: m});
+  const bg = gsgFromTx(tx); if(Object.keys(bg).length) await gsgMerge({[state.pid]: bg});
 }
 /* بيقرأ كشف حساب كل المشاركين ويبني الترتيب (مرة أولى أو بزرار الأدمن) */
 async function gsRebuildAll(){
-  const out = {}; let legacy = {};
+  const out = {}, byG = {}; let legacy = {};
   try{ const r = await window.storage.get('glavera-visa-tx', true); if(r && r.value) legacy = JSON.parse(r.value) || {}; }catch(e){}
   const ids = PARTICIPANTS.map(p=>p.id);
   for(let i=0;i<ids.length;i+=12){
     await Promise.all(ids.slice(i,i+12).map(async pid=>{
       let mine = [];
       try{ const r = await window.storage.get(vtxKey(pid), true); if(r && r.value) mine = vtxParse(r.value); }catch(e){}
-      const m = gsFromTx(vtxMerge(mine, Array.isArray(legacy[pid])?legacy[pid]:[]));
+      const all = vtxMerge(mine, Array.isArray(legacy[pid])?legacy[pid]:[]);
+      const m = gsFromTx(all);
       if(m.pts>0 || m.wins>0) out[pid] = m;
+      const bg = gsgFromTx(all); if(Object.keys(bg).length) byG[pid] = bg;
     }));
   }
   await gsMerge(out);
+  await gsgMerge(byG);
 }
 async function gsRefresh(opts){
   if(GS.loading) return; GS.loading = true;
   try{
     let r = null;
     try{ r = await window.storage.get(GS_KEY, true); }catch(e){}
-    if(!r || !r.value || (opts && opts.rebuild)){
+    let gr0 = null; try{ gr0 = await window.storage.get(GSG_KEY, true); }catch(e){}
+    if(!r || !r.value || !gr0 || !gr0.value || (opts && opts.rebuild)){
       await gsRebuildAll();
     } else {
       await gsSyncMine();
@@ -14987,6 +15167,7 @@ async function gsRefresh(opts){
     try{ r = await window.storage.get(GS_KEY, true); }catch(e){}
     let o = {}; try{ o = (r && r.value) ? (JSON.parse(r.value)||{}) : {}; }catch(e){ o = {}; }
     try{ WALLET = await loadWallet(); }catch(e){} /* الترتيب بالرصيد الحالي في الفيزا */
+    try{ const gr = await window.storage.get(GSG_KEY, true); GSG.data = (gr && gr.value) ? (JSON.parse(gr.value)||{}) : {}; }catch(e){ GSG.data = GSG.data || {}; }
     GS.data = o; GS.ready = true; GS.at = Date.now();
     if(!GS.snapDone){ GS.snapDone = true; gsSnap(gsRows()); }
   }catch(e){ GS.ready = true; }
@@ -15021,6 +15202,7 @@ function gsDelta(x){
   return d>0 ? `<i class="gs-dl up">▲ ${d}</i>` : `<i class="gs-dl dn">▼ ${-d}</i>`;
 }
 function renderGameLeaderboard(){
+  if(state.gsGame && state.gsGame!=='all') return renderGsGameView();
   const rows = gsRows(), top = rows.length ? rows[0].pts : 0;
   const meIdx = rows.findIndex(x=>x.p.id===state.pid), me = meIdx>=0 ? rows[meIdx] : null;
   const lim = state.gsLimit || 30, seen = !!state._gsSeen;
@@ -15057,6 +15239,7 @@ function renderGameLeaderboard(){
   const adminBtn = state.adminUnlocked ? `<button type="button" class="btn btn-ghost" data-action="gs-rebuild">إعادة حساب من السجلات</button>` : '';
   return `
     <div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">ترتيب الأبطال</div></div>
+    ${gsgChips('all')}
     ${GS.ready ? stage + meCard : '<div class="empty-note">جاري تحميل الترتيب…</div>'}
     ${list ? `<div class="gs-sec">باقي المتسابقين<span>${rows.length} لاعب</span></div><div class="card" style="padding:12px 6px">${list}</div>${more}` : ''}
     <div class="gs-tools" style="margin-top:12px;"><button type="button" class="btn btn-outline" data-action="gs-refresh">تحديث</button>${adminBtn}</div>
@@ -32217,6 +32400,7 @@ function render(){
     }
   }
   if(state.view==='game-leaderboard'){
+    if(state._gsChipScroll){ state._gsChipScroll = false; try{ const on = document.querySelector('.gsg-chip.on'); if(on && on.scrollIntoView) on.scrollIntoView({inline:'center', block:'nearest'}); }catch(e){} }
     const cs = document.querySelectorAll('.gs-count');
     if(cs.length && !state._gsSeen){
       state._gsSeen = true;
@@ -35190,7 +35374,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='visa-save-design'){ doVisaSaveDesign(); }
   else if(action==='open-solo-cat'){ go('games-solo-cat', {soloCatKey: el.dataset.cat}); }
   else if(action==='open-achievements'){ state.friendTile = null; state.achFilter='all'; go('game-achievements'); achRefresh(false); }
-  else if(action==='open-gs'){ state.friendTile = null; state.gsLimit = 30; state._gsSeen = false; go('game-leaderboard'); gsRefresh(); }
+  else if(action==='open-gs'){ state.friendTile = null; state.gsLimit = 30; state._gsSeen = false; state.gsGame = 'all'; go('game-leaderboard'); gsRefresh(); }
+  else if(action==='gs-game'){ state.gsGame = el.dataset.g || 'all'; state.gsLimit = 30; state._gsSeen = false; state._gsChipScroll = true; render(); }
   else if(action==='gs-more'){ state.gsLimit = (state.gsLimit||30)+30; render(); }
   else if(action==='gs-refresh'){ gsRefresh(); showToast('جاري التحديث…'); }
   else if(action==='gs-rebuild'){ if(state.adminUnlocked){ showToast('جاري إعادة الحساب من كل السجلات…'); gsRefresh({rebuild:true}).then(()=>showToast('تم تحديث الترتيب')); } }
