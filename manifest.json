@@ -1,6 +1,6 @@
 {
-  "name": "أسرة الميديا",
-  "short_name": "الميديا",
+  "name": "اجتماع جامعة",
+  "short_name": "اجتماع جامعة",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
