@@ -1132,7 +1132,7 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   @keyframes suPop{ from{ transform:scale(.6); opacity:0;} to{ transform:none; opacity:1;} }
   .su-celebrate .ring{ position:relative; width:128px; height:128px; margin:0 auto 18px; border-radius:50%; padding:5px; background:conic-gradient(var(--gold),var(--coral),var(--violet),var(--teal),var(--gold)); animation:suSpin 3s linear infinite; }
   .su-celebrate .ring .av{ width:100%; height:100%; border-radius:50%; background:var(--bg-2) center/cover no-repeat; border:4px solid var(--bg); animation:suSpin 3s linear infinite reverse; }
-  .su-celebrate .tick{ position:absolute; bottom:-4px; left:-4px; width:42px; height:42px; border-radius:50%; background:var(--good); color:#06281a; font-size:22px; font-weight:900; display:flex; align-items:center; justify-content:center; border:3px solid var(--bg); }
+  .su-celebrate .tick{ display:none !important; position:absolute; bottom:-4px; left:-4px; width:42px; height:42px; border-radius:50%; background:var(--good); color:#06281a; font-size:22px; font-weight:900; display:flex; align-items:center; justify-content:center; border:3px solid var(--bg); }
   .su-celebrate h2{ font-family:'Cairo',sans-serif; font-weight:900; font-size:24px; margin:0 0 6px; color:var(--text); }
   .su-celebrate p{ margin:0; color:var(--text-muted); font-size:14px; font-weight:700; }
   .su-confetti{ position:absolute; top:-14px; width:9px; height:15px; border-radius:2px; opacity:.95; animation:suFall linear forwards; }
@@ -12553,7 +12553,7 @@ function suCelebrate(name, photo, gift){
   const o = document.createElement('div'); o.className = 'su-celebrate';
   const cols = ['var(--gold)','var(--coral)','var(--teal)','var(--violet)','var(--good)'];
   let conf = ''; for(let i=0;i<46;i++){ const w = 6+Math.random()*7, h = w*(1+Math.random()*1.2), rd = Math.random()<.3 ? '50%' : '2px'; conf += `<span class="su-confetti" style="left:${Math.random()*100}%;width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;border-radius:${rd};background:${cols[i%cols.length]};--dx:${((Math.random()*2-1)*90).toFixed(0)}px;--rot:${(360+Math.random()*720).toFixed(0)}deg;animation-duration:${(1.8+Math.random()*1.6).toFixed(2)}s;animation-delay:${(Math.random()*.6).toFixed(2)}s"></span>`; }
-  o.innerHTML = conf + `<div class="box"><div class="ring"><div class="av" style="${photo?`background-image:url('${photo}')`:'display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:var(--gold);'}">${photo?'':escapeHtml(first.charAt(0))}</div><span class="tick">✓</span></div><h2>أهلاً بيك يا ${escapeHtml(first)} 🎉</h2><p>اتعمل حسابك بنجاح — يلا نبدأ</p>${gift?`<div class="su-gift">🎁 هدية الانضمام +<b data-n="${gift}">٠</b> نقطة</div>`:''}<div class="su-cel-perks"><span>🎮 العب</span><span>💳 فيزتك</span><span>🔥 سجّل حضورك</span></div></div>`;
+  o.innerHTML = conf + `<div class="box"><div class="ring"><div class="av" style="${photo?`background-image:url('${photo}')`:'display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:var(--gold);'}">${photo?'':escapeHtml(first.charAt(0))}</div></div><h2>أهلاً بيك يا ${escapeHtml(first)} 🎉</h2><p>اتعمل حسابك بنجاح — يلا نبدأ</p>${gift?`<div class="su-gift">🎁 هدية الانضمام +<b data-n="${gift}">٠</b> نقطة</div>`:''}<div class="su-cel-perks"><span>🎮 العب</span><span>💳 فيزتك</span><span>🔥 سجّل حضورك</span></div></div>`;
   document.body.appendChild(o);
   const gn = o.querySelector('.su-gift b');
   if(gn){ const target = +gn.dataset.n, t0 = performance.now()+700; const stp = (now)=>{ const k = Math.min(1, Math.max(0,(now-t0)/1100)); gn.textContent = suAr(Math.round(target*(1-Math.pow(1-k,3)))); if(k<1 && o.parentNode) requestAnimationFrame(stp); }; requestAnimationFrame(stp); }
@@ -42275,7 +42275,8 @@ html,body{overflow-x:clip;max-width:100%}
 /* جولة تفاعلية */
 .glx-spot{position:fixed;inset:0;z-index:99991}
 .glx-hole{position:fixed;border-radius:18px;box-shadow:0 0 0 9999px rgba(10,9,24,.78),0 0 0 3px #F4B740,0 0 24px 4px rgba(244,183,64,.6);transition:all .35s cubic-bezier(.2,.8,.2,1);pointer-events:none}
-.glx-tip{position:fixed;left:50%;transform:translateX(-50%);width:min(320px,88vw);padding:16px;border-radius:22px;text-align:center;color:#F6F5FF;background:linear-gradient(160deg,#2c2380,#1D1A52);border:1px solid rgba(244,183,64,.5);box-shadow:0 20px 50px rgba(0,0,0,.6);animation:glxMtIn .4s both}
+.glx-tip{position:fixed;left:0;right:0;margin-inline:auto;transform:none;width:min(320px,88vw);transition:bottom .4s cubic-bezier(.2,.8,.2,1);padding:16px;border-radius:22px;text-align:center;color:#F6F5FF;background:linear-gradient(160deg,#2c2380,#1D1A52);border:1px solid rgba(244,183,64,.5);box-shadow:0 20px 50px rgba(0,0,0,.6);animation:glxTipIn .4s both}
+@keyframes glxTipIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 .glx-tip b{display:block;font-size:17px;font-weight:900;color:#FFDE94;margin-bottom:4px}.glx-tip span{font-size:13.5px;line-height:1.7;opacity:.92}
 .glx-tact{display:flex;gap:8px;justify-content:center;margin:12px 0 8px}
 .glx-tact button{font-family:inherit;font-weight:900;font-size:13px;padding:9px 18px;border-radius:99px;border:0;background:linear-gradient(180deg,#FFD66B,#F4B740);color:#1a1633;cursor:pointer}
