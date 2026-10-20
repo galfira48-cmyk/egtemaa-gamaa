@@ -3924,6 +3924,68 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .gs-sc small{ display:block; font-size:10px; font-weight:700; color:var(--text-muted); }
   .gs-tools{ display:flex; gap:8px; margin:0 0 12px; }
   .gs-tools .btn{ margin:0; padding:9px 12px; font-size:12px; }
+  .tour-banner{ width:100%; display:flex; align-items:center; gap:14px; padding:14px 16px; margin:4px 0 14px; border:none; border-radius:20px; cursor:pointer; text-align:right; font-family:inherit; color:#1a1633; background:linear-gradient(110deg,#F4B740,#FFE29A,#F4B740); background-size:220% 100%; animation:tourSheen 3.2s linear infinite; box-shadow:0 8px 24px rgba(244,183,64,.28); -webkit-tap-highlight-color:transparent; }
+  .tour-banner:active{ transform:scale(.98); }
+  @keyframes tourSheen{ from{ background-position:100% 0; } to{ background-position:-120% 0; } }
+  .tb-play{ flex:0 0 auto; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; color:#F4B740; background:#1a1633; animation:tourBeat 1.6s ease-in-out infinite; }
+  @keyframes tourBeat{ 0%,100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(26,22,51,.4); } 50%{ transform:scale(1.08); box-shadow:0 0 0 9px rgba(26,22,51,0); } }
+  .tb-txt{ display:flex; flex-direction:column; gap:2px; } .tb-txt b{ font-family:'Cairo',sans-serif; font-weight:900; font-size:16px; } .tb-txt small{ font-size:12px; font-weight:700; opacity:.75; }
+  #tour-ui{ position:fixed; inset:0; z-index:100010; font-family:'Cairo',inherit,sans-serif; transition:opacity .28s; }
+  #tour-ui.end{ opacity:0; }
+  .tr-block{ position:absolute; inset:0; }
+  .tr-dim{ position:absolute; inset:0; background:rgba(6,5,20,.78); opacity:0; transition:opacity .35s; pointer-events:none; backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); }
+  #tour-ui.nospot .tr-dim{ opacity:1; }
+  .tr-spot{ position:fixed; pointer-events:none; opacity:0; box-shadow:0 0 0 9999px rgba(6,5,20,.74), 0 0 0 2px rgba(244,183,64,.9), 0 0 26px 3px rgba(244,183,64,.35); transition:left .5s cubic-bezier(.22,.9,.3,1), top .5s cubic-bezier(.22,.9,.3,1), width .5s cubic-bezier(.22,.9,.3,1), height .5s cubic-bezier(.22,.9,.3,1), border-radius .5s, opacity .3s; }
+  #tour-ui.leaving .tr-spot{ opacity:0 !important; }
+  .tr-top{ position:absolute; top:0; left:0; right:0; height:3px; background:rgba(255,255,255,.12); } .tr-top i{ display:block; height:100%; width:0; margin-inline-start:auto; background:linear-gradient(90deg,#F4B740,#FFE29A); transition:width .5s ease; }
+  .tr-pop{ position:fixed; z-index:3; width:min(340px, calc(100vw - 24px)); padding:16px 16px 14px; border-radius:20px; text-align:right; color:var(--text,#fff); background:var(--bg-2,#171449); border:1px solid rgba(255,255,255,.12); box-shadow:0 20px 50px rgba(0,0,0,.55); transition:left .5s cubic-bezier(.22,.9,.3,1), top .5s cubic-bezier(.22,.9,.3,1), opacity .25s, transform .3s cubic-bezier(.22,.9,.3,1); }
+  #tour-ui.leaving .tr-pop{ opacity:0; transform:translateY(10px) scale(.97); transition:opacity .2s, transform .2s; }
+  .tr-arrow{ position:absolute; display:none; width:14px; height:14px; background:var(--bg-2,#171449); transform:rotate(45deg); border:1px solid rgba(255,255,255,.12); }
+  .tr-pop[data-place="below"] .tr-arrow{ top:-8px; border-width:1px 0 0 1px; } .tr-pop[data-place="above"] .tr-arrow{ bottom:-8px; border-width:0 1px 1px 0; }
+  .tr-meta{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; } .tr-chap{ font-size:11px; font-weight:800; letter-spacing:.2px; padding:3px 10px; border-radius:99px; color:#F4B740; background:rgba(244,183,64,.13); } .tr-n{ font-size:11.5px; font-weight:800; color:var(--text-muted,#9a9ab8); font-variant-numeric:tabular-nums; direction:ltr; }
+  .tr-row{ display:flex; align-items:center; gap:11px; margin-bottom:8px; } .tr-ic{ flex:0 0 auto; width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; background:linear-gradient(145deg,rgba(244,183,64,.28),rgba(244,183,64,.08)); border:1px solid rgba(244,183,64,.3); }
+  .tr-t{ font-weight:900; font-size:17px; line-height:1.4; } .tr-b{ font-size:13.8px; font-weight:600; line-height:1.85; color:var(--text-muted,#c3c3dc); }
+  .tr-bar{ height:3px; border-radius:3px; background:rgba(255,255,255,.1); margin:13px 0 12px; overflow:hidden; } .tr-bar i{ display:block; height:100%; width:0; margin-inline-start:auto; background:linear-gradient(90deg,#F4B740,#FFE29A); }
+  .tr-foot{ display:flex; align-items:center; gap:7px; } .tr-sp{ flex:1; }
+  .tr-ib{ width:36px; height:36px; border-radius:11px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; -webkit-tap-highlight-color:transparent; } .tr-ib.off{ opacity:.45; } .tr-ib:active{ transform:scale(.94); }
+  .tr-primary{ display:inline-flex; align-items:center; justify-content:center; gap:4px; height:36px; padding:0 15px; border:none; border-radius:11px; cursor:pointer; font-family:inherit; font-weight:900; font-size:13.5px; color:#1a1633; background:linear-gradient(135deg,#F4B740,#FFE29A); box-shadow:0 6px 16px rgba(244,183,64,.3); } .tr-primary:active{ transform:scale(.97); }
+  .tr-link{ border:none; background:none; color:var(--text-muted,#9a9ab8); font-family:inherit; font-weight:700; font-size:12.5px; cursor:pointer; padding:6px 4px; }
+  .tr-pop.center{ padding:26px 22px 18px; width:min(350px, calc(100vw - 32px)); } .tr-c{ text-align:center; } .tr-full{ width:100%; height:46px; margin-top:16px; font-size:15px; border-radius:14px; } .tr-pop.center .tr-link{ display:block; width:100%; margin-top:6px; }
+  .tr-pop.center .tr-t{ font-size:21px; margin-bottom:8px; }
+  .tr-hero{ display:flex; justify-content:center; margin-bottom:14px; } .tr-logo{ width:72px; height:72px; border-radius:22px; display:flex; align-items:center; justify-content:center; font-size:34px; background:linear-gradient(145deg,#F4B740,#B8651B); box-shadow:0 12px 30px rgba(244,183,64,.35); animation:trLogo 3s ease-in-out infinite; } .tr-logo.ok{ background:linear-gradient(145deg,#5FE0A4,#1f9d6b); box-shadow:0 12px 30px rgba(95,224,164,.3); color:#fff; font-weight:900; }
+  @keyframes trLogo{ 50%{ transform:translateY(-5px) rotate(-3deg); } }
+  .tr-chips{ display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:14px; } .tr-chips span{ font-size:11.5px; font-weight:700; padding:5px 11px; border-radius:99px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); color:var(--text-muted,#c3c3dc); }
+  .tr-scroll{ max-height:min(44vh, 360px); overflow-y:auto; -webkit-overflow-scrolling:touch; margin:0 -4px; padding:0 4px; }
+  .tr-scroll::-webkit-scrollbar{ width:3px; } .tr-scroll::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.2); border-radius:3px; }
+  .tr-ul{ list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:7px; }
+  .tr-ul li{ position:relative; padding:8px 12px 8px 10px; padding-inline-start:26px; border-radius:11px; background:rgba(255,255,255,.05); font-size:13px; font-weight:600; line-height:1.75; color:var(--text,#fff); }
+  .tr-ul li::before{ content:''; position:absolute; inset-inline-start:10px; top:15px; width:6px; height:6px; border-radius:50%; background:#F4B740; }
+  .tr-pop.wide{ width:min(380px, calc(100vw - 24px)); }
+  .tr-x{ position:absolute; top:10px; left:10px; width:26px; height:26px; border-radius:50%; border:none; background:rgba(255,255,255,.08); color:var(--text-muted,#aaa); font-size:11px; cursor:pointer; padding:0; display:none; }
+  .tr-pop.toc{ width:min(340px, calc(100vw - 32px)); } .tr-tocl{ display:flex; flex-direction:column; gap:7px; max-height:56vh; overflow-y:auto; }
+  .tr-tocl button{ display:flex; align-items:center; gap:10px; padding:11px 13px; border-radius:13px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); color:inherit; font-family:inherit; font-weight:800; font-size:14px; cursor:pointer; text-align:right; } .tr-tocl button.on{ border-color:rgba(244,183,64,.6); background:rgba(244,183,64,.12); }
+  .tm{ margin:12px 0 2px; padding:12px; border-radius:14px; background:rgba(255,255,255,.04); border:1px dashed rgba(255,255,255,.16); font-size:12px; color:var(--text-muted,#c3c3dc); }
+  .tm small{ display:block; font-size:10.5px; font-weight:700; opacity:.8; }
+  .tm-split{ display:flex; align-items:center; gap:8px; } .tm-b{ flex:1; text-align:center; padding:10px 4px; border-radius:12px; background:rgba(255,255,255,.06); } .tm-b span{ font-size:20px; display:block; } .tm-b b{ display:block; color:var(--text,#fff); font-size:12.5px; margin:2px 0; } .tm-b.g{ background:rgba(244,183,64,.14); border:1px solid rgba(244,183,64,.4); }
+  .tm-mid{ text-align:center; color:#F4B740; } .tm-mid i{ font-style:normal; font-size:20px; font-weight:900; display:block; }
+  .tm-card{ background:linear-gradient(145deg,#2a2745,#14122b); text-align:center; } .tm-stripe{ height:26px; background:#05050c; margin:-12px -12px 12px; border-radius:13px 13px 0 0; } .tm-sig{ display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:6px; } .tm-sig span{ font-weight:800; font-size:11px; } .tm-sig b{ display:flex; gap:5px; padding:6px 10px; border-radius:6px; background:#fff; } .tm-sig u{ width:8px; height:8px; border-radius:50%; background:#222; animation:tmBlink 1.4s infinite; } .tm-sig u:nth-child(2){ animation-delay:.2s; } .tm-sig u:nth-child(3){ animation-delay:.4s; }
+  @keyframes tmBlink{ 50%{ opacity:.25; } }
+  .tm-type{ display:flex; gap:8px; } .tm-opt{ flex:1; text-align:center; padding:12px 6px; border-radius:12px; font-weight:900; font-size:12.5px; } .tm-opt.coin{ background:linear-gradient(135deg,#F4B740,#FFE29A); color:#1a1633; } .tm-opt.free{ background:linear-gradient(135deg,#2f78f0,#6bb8ff); color:#fff; }
+  .tm-private .tm-pbtn{ text-align:center; padding:8px; border-radius:10px; background:rgba(255,255,255,.08); font-weight:800; color:var(--text,#fff); margin-bottom:8px; } .tm-field{ display:flex; align-items:center; justify-content:space-between; padding:9px 11px; border-radius:10px; background:#fff; color:#555; font-weight:700; } .tm-field i{ width:2px; height:15px; background:#2f78f0; animation:tmBlink 1s infinite; }
+  .tm-swipe{ position:relative; display:flex; align-items:center; justify-content:center; height:46px; border-radius:23px; background:rgba(255,255,255,.07); overflow:hidden; } .tm-swipe b{ font-size:12.5px; color:var(--text,#fff); } .tm-knob{ position:absolute; right:4px; top:4px; bottom:4px; width:56px; border-radius:20px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#F4B740,#FFE29A); color:#1a1633; font-weight:900; animation:tmSwipe 2.2s ease-in-out infinite; }
+  @keyframes tmSwipe{ 0%,15%{ transform:translateX(0); } 70%,100%{ transform:translateX(-210px); } }
+  .tm-chip{ display:flex; align-items:center; justify-content:space-around; text-align:center; } .tm-ph{ font-size:26px; } .tm-cd{ position:relative; width:118px; height:74px; border-radius:12px; background:linear-gradient(145deg,#3b3568,#1b1840); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; } .tm-dot{ width:30px; height:22px; border-radius:6px; background:linear-gradient(135deg,#FFE29A,#F4B740); box-shadow:0 0 0 0 rgba(244,183,64,.6); animation:tmPulse 1.6s infinite; } @keyframes tmPulse{ 70%{ box-shadow:0 0 0 12px rgba(244,183,64,0); } 100%{ box-shadow:0 0 0 0 rgba(244,183,64,0); } }
+  .tm-tags{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; } .tm-tags span{ padding:5px 11px; border-radius:99px; background:rgba(255,255,255,.08); font-weight:800; font-size:11.5px; color:var(--text,#fff); } .tm-tags span.g{ background:rgba(244,183,64,.18); color:#F4B740; }
+  .tour-cta{ position:relative; width:100%; display:flex; align-items:center; gap:14px; padding:16px; margin:0 0 16px; border-radius:20px; cursor:pointer; text-align:right; font-family:inherit; color:var(--text,#fff); overflow:hidden; background:linear-gradient(135deg, color-mix(in srgb,var(--gold,#F4B740) 18%, var(--surface,#171449)), var(--surface,#171449)); border:1px solid color-mix(in srgb,var(--gold,#F4B740) 45%, transparent); box-shadow:0 10px 28px rgba(0,0,0,.25); -webkit-tap-highlight-color:transparent; }
+  .tour-cta::after{ content:''; position:absolute; inset:0; background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.1) 50%,transparent 60%); background-size:260% 100%; animation:tourSheen 4s linear infinite; pointer-events:none; }
+  .tour-cta:active{ transform:scale(.985); }
+  .tc-ic{ flex:0 0 auto; width:50px; height:50px; border-radius:16px; display:flex; align-items:center; justify-content:center; color:#1a1633; background:linear-gradient(135deg,#F4B740,#FFE29A); box-shadow:0 8px 20px rgba(244,183,64,.35); animation:tourBeat 2s ease-in-out infinite; }
+  .tc-tx{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; } .tc-tx b{ font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; } .tc-tx small{ font-size:12px; font-weight:600; line-height:1.6; color:var(--text-muted,#aaa); }
+  .tc-tag{ flex:0 0 auto; align-self:flex-start; font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:99px; color:var(--gold,#F4B740); background:color-mix(in srgb,var(--gold,#F4B740) 14%, transparent); }
+  .tour-pill{ display:flex; align-items:center; gap:10px; margin:2px auto 14px; padding:7px 8px 7px 16px; border-radius:99px; cursor:pointer; font-family:inherit; color:var(--gold,#F4B740); background:color-mix(in srgb, var(--gold,#F4B740) 10%, transparent); border:1px solid color-mix(in srgb, var(--gold,#F4B740) 40%, transparent); -webkit-tap-highlight-color:transparent; }
+  .tour-pill:active{ transform:scale(.97); } .tour-pill b{ font-family:'Cairo',sans-serif; font-weight:900; font-size:13.5px; } .tour-pill small{ font-size:11px; font-weight:700; opacity:.7; color:var(--text-muted,#aaa); }
+  .tour-pill .tp-ic{ width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#F4B740,#FFE29A); color:#1a1633; animation:tourBeat 1.8s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce){ .tour-banner,.tb-play,.tr-logo{ animation:none !important; } }
   #pg-help{ position:fixed; top:calc(env(safe-area-inset-top,0px) + 12px); left:12px; z-index:70; width:34px; height:34px; border-radius:50%; display:none; align-items:center; justify-content:center; padding:0; cursor:pointer; font-family:inherit; font-weight:900; font-size:17px; line-height:1; color:var(--gold); background:color-mix(in srgb, var(--gold) 14%, var(--bg-2,#111)); border:1.5px solid color-mix(in srgb, var(--gold) 55%, transparent); -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
   #pg-help:active{ transform:scale(.92); }
   #pg-help.new{ animation:ggPulse 1.8s ease-in-out infinite; }
@@ -5165,15 +5227,6 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
 
   /* ============================= DIGITAL PASS ============================= */
 
-  /* ============================= INFO ROWS (STAY / TRANSPORT) ============================= */
-  .info-row{ display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
-  .info-row:last-child{ border-bottom:none; }
-  .info-ico{ font-size:20px; flex:0 0 auto; width:38px; height:38px; border-radius:12px; background:var(--bg-2);
-    display:flex; align-items:center; justify-content:center; }
-  .info-body{ flex:1; }
-  .info-lab{ font-size:11px; color:var(--text-muted); margin-bottom:2px; }
-  .info-val{ font-size:13.5px; font-weight:700; font-family:'Cairo',sans-serif; }
-
   /* ============================= CONFERENCE KIT ============================= */
   .kit-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .kit-item{ text-align:center; opacity:.55; filter:grayscale(.6); transition:all .3s ease; }
@@ -5182,12 +5235,6 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .kit-lab{ font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; }
   .kit-state{ font-size:10.5px; color:var(--text-muted); margin-top:4px; }
   .kit-item.got .kit-state{ color:var(--good); font-weight:700; }
-
-  /* ============================= TRANSPORT STATUS ============================= */
-  .transport-status-card{ text-align:center; margin-bottom:14px; background:linear-gradient(160deg,var(--surface),var(--surface-2)); }
-  .ts-ico{ font-size:34px; margin-bottom:4px; }
-  .ts-lab{ font-size:11px; color:var(--text-muted); }
-  .ts-status{ font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; color:var(--gold-2); margin-top:4px; }
 
   /* ============================= CERTIFICATE ============================= */
 
@@ -12105,6 +12152,7 @@ async function rememberGamesIntroIfChecked(){
   }
 }
 function showGamesIntroModal(){
+  if(window.__tourOn) return;
   closeGamesIntroModal();
   const pid = state.pid;
   const pts = (typeof BONUS!=='undefined' && BONUS[pid]) || 0;
@@ -12787,6 +12835,11 @@ function renderCapabilitiesPage(){
       <div class="back-title">${tr('conf_capabilities_title')}</div>
     </div>
     <div class="hint" style="margin:0 0 14px;">${tr('conf_capabilities_sub')}</div>
+    <button type="button" class="tour-cta" data-action="start-tour">
+      <span class="tc-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg></span>
+      <span class="tc-tx"><b>اشرح الآن</b><small>جولة تفصيلية بتلف الموقع وتشرح كل الأقسام: الحضور، الألعاب، الغرف، والفيزا خطوة بخطوة</small></span>
+      <span class="tc-tag">حوالي 8 دقايق</span>
+    </button>
     <div class="cap-grid">${tiles}<button type="button" class="cap-tile" data-action="tile-nav" data-page="about" style="--cap-color:linear-gradient(145deg,#F4B740,#845EC2)"><span class="cap-tile-ico">ℹ️</span><span class="cap-tile-lab">عن الموقع</span><span class="cap-tile-sub">البطاقة التعريفية الرسمية</span></button></div>
   `;
 }
@@ -14263,6 +14316,8 @@ function renderProfile(){
       ${title?`<div class="earned-title">🏷️ ${title}</div>`:''}
     </div>
 
+
+
     ${homeRetreatCardHtml()}
 
     ${attHomeSectionHtml()}
@@ -15179,16 +15234,9 @@ const PAGE_GUIDES = {
   'attendance-scan':{ico:'📷',title:'مسح كود الحضور',lead:'وجّه الكاميرا على كود الحضور.',items:[
     ['🎯','ثبّت الكاميرا','خلّي الكود جوه الإطار لحد ما يتقرا.'],
     ['✅','التأكيد','هتظهر رسالة تأكيد أول ما يتسجّل حضورك.']]},
-  stay:{ico:'🛏️',title:'الإقامة والأكل',lead:'بيانات سكنك ووجباتك.',items:[
-    ['🔑','الغرفة','رقم غرفتك واسم زميلك فيها.'],
-    ['🍽️','الوجبات','مواعيد الأكل ومكانه.']]},
   kit:{ico:'🎒',title:'حاجاتي',lead:'الحاجات اللي استلمتها أو لسه هتستلمها.',items:[
     ['✔️','استلمته','علامة على اللي خدته.'],
     ['⏳','لسه','اللي لسه ما استلمتوش.']]},
-  transport:{ico:'🚌',title:'المواصلات',lead:'كل بيانات رحلتك.',items:[
-    ['📍','مكان التجمع','المكان اللي هتتجمعوا فيه.'],
-    ['🕒','ميعاد التحرك','الوقت اللي الأتوبيس بيتحرك فيه.'],
-    ['🚍','رقم الأتوبيس والمشرف','تعرف أتوبيسك ومين المسؤول عنه.']]},
   timeline:{ico:'🧭',title:'خط رحلتك الزمني',lead:'كل تسجيلاتك مرتبة بالوقت الفعلي.',items:[
     ['🕘','تسجيلاتك','كل مرة سجّلت فيها حضور بتظهر هنا بتوقيتها.'],
     ['🔐','لوحة المنظمين','للمنظمين بس، ومحمية بكود.']]},
@@ -15196,16 +15244,35 @@ const PAGE_GUIDES = {
     ['🔊','الصوت والتذكيرات','شغّل أو اقفل الأصوات والتنبيهات.'],
     ['🌙','الوضع الليلي','بدّل بين الليلي والنهاري.'],
     ['💾','البيانات','إدارة بياناتك على الجهاز.']]},
-  eco:{ico:'📊',title:'الاقتصاد والاستثمار',lead:'استثمر نقاطك وتابع الأسعار.',tip:'الاستثمار فيه مكسب وخسارة، فاستثمر بحساب.',items:[
-    ['📈','الأسعار','تابع الأسعار وهي بتتغيّر.'],
-    ['💼','محفظتك','شوف اللي اشتريته وأرباحك.']]},
-  askfather:{ico:'⛪',title:'اسأل أبونا',lead:'ابعت سؤالك واستنى الرد.',items:[
-    ['❓','اسأل','اكتب سؤالك وابعته.'],
-    ['📨','أسئلتي','تابع ردود أسئلتك هنا.']]},
-  bdaygreet:{ico:'🎂',title:'أعياد ميلاد الشهر',lead:'مين عيد ميلاده الشهر ده.',items:[
-    ['🎉','التهنئة','ابعت تهنئة لزميلك في عيد ميلاده.']]},
-  book:{ico:'📖',title:'الحجز',lead:'احجز مكانك.',items:[
-    ['📝','احجز الآن','اختار المطلوب وأكّد الحجز.']]},
+  eco:{ico:'📊',title:'الاقتصاد والاستثمار',lead:'نقاط فيزتك تقدر تشغّلها: توفير، ودائع، أسهم، شركات وقروض.',tip:'الاستثمار فيه مكسب وخسارة، فاستثمر بحساب. والنقاط دي نقاط الفيزا (الألعاب) مش نقاط الحضور.',items:[
+    ['💰','محفظتي','ثروتك الكلية، حساب التوفير بفايدة أسبوعية، ودائع مقفولة أسبوع أو شهر، وهدف ادخار.'],
+    ['📈','السوق','أسهم بتتحرك أسعارها. عمولة الشراء 1%، وتقدر تحط وقف خسارة وجني ربح وتنبيهات سعر.'],
+    ['🧠','المستشار','تحليل ذكي لمحفظتك ونصايح تعليمية (مش توقعات مضمونة).'],
+    ['🏢','أعمال','أسّس شركتك (20 نقطة) أو اشتري أسهم شركات زمايلك، وسوق خدمات بعمولة 3%.'],
+    ['🏙️','المدينة','وظايف بمرتب أسبوعي، صندوق العطاء، قروض بتقييم ثقة، وترتيب مستثمر الموسم.']]},
+  retreat:{ico:'🕊️',title:'خلوة فردية',lead:'وقت هادي مع كلمة ربنا — الملاحظات هنا ليك إنت بس.',tip:'فعّل تذكير يومي بميعاد ثابت وخلّي الخلوة عادة.',items:[
+    ['🕊️','خلوة موجّهة','صلاة ← قراءة ← تأمل ← التزام، خطوة بخطوة.'],
+    ['📖','الكتاب المقدس','العهد القديم والجديد، وتقدر تحفظ آيات وتعلّم الأصحاحات المقروءة.'],
+    ['⏰','تذكير يومي','اختار ميعاد، وضيفه لتقويم موبايلك عشان يرن حتى والموقع مقفول.'],
+    ['📝','ملاحظاتي','اكتب الآية وتأمّلك والخطوة اللي هتلتزم بيها واحفظها.']]},
+  structure:{ico:'👥',title:'هيكلة الاجتماع',lead:'مين المسؤول عن إيه — القيادات والأسر وأعضاء كل أسرة.',items:[
+    ['👑','القيادات','أسماء القيادات في الأعلى.'],
+    ['👥','الأسر','لكل أسرة لون وأعضاء، دوس على اسم الأسرة أو "عرض كل الأعضاء".']]},
+  contests:{ico:'🏆',title:'المسابقات',lead:'اشترك في المسابقات المفتوحة وارجع شوف النتيجة.',items:[
+    ['🙋','اشترك دلوقتي','دوس مرة واحدة، وبعد الاشتراك مش بترجع.'],
+    ['🎉','الفايزين','لو كسبت بتظهرلك رسالة مبروك والجايزة بنقاط.']]},
+  askfather:{ico:'⛪',title:'اسأل أبونا',lead:'ابعت سؤالك لأبونا باسمك أو من غير اسم، وتابع الرد.',tip:'لو الموضوع محتاج متابعة شخصية، علّمه عشان ياخد أولوية.',items:[
+    ['✍️','اسأل','اكتب سؤالك واختار تبعته باسمك أو «مجهول».'],
+    ['📬','أسئلتي','كل أسئلتك وحالتها: مستني الرد أو اتجاوب. تقدر تسحب سؤال لسه ما اتجاوبش.'],
+    ['📖','أجوبة للجميع','الأسئلة اللي أبونا قرر ينشر إجابتها.']]},
+  bdaygreet:{ico:'🎂',title:'أعياد ميلاد الشهر',lead:'مين عيد ميلاده الشهر ده، واكتبله تهنئة.',tip:'تهانيك بتتفتح يوم عيد ميلادك وبتفضل محفوظة عندك.',items:[
+    ['🎉','اكتب تهنئة','اختار صاحب العيد واكتب تهنئتك، هتوصله يوم عيد ميلاده.'],
+    ['🎁','تهانيك','في شهر عيد ميلادك هتشوف كل التهاني اللي اتكتبتلك.']]},
+  book:{ico:'🎟️',title:'احجز الآن',lead:'احجز مكانك في الأمسيات والرحلات.',items:[
+    ['🎟️','احجز مكانك','اختار الفعالية وأكّد الحجز.'],
+    ['💳','العربون','لو فيه عربون بتدفعه من الفيزا، أو تحجز وتدفع كاش.'],
+    ['⏳','قايمة الانتظار','لو المكان خلص، سجّل في الانتظار وهتتحرك مكانك لما حد يلغي.'],
+    ['🎫','تذكرتي','بعد الحجز بتلاقي تذكرتك وحجوزاتك في «حجوزاتي».']]},
   'game-achievements':{ico:'🏅',title:'إنجازات الألعاب',lead:'أوسمتك من جوايز الألعاب.',items:[
     ['🔓','المفتوحة','الأوسمة اللي حققتها.'],
     ['🔒','المقفولة','اللي لسه محتاجة فوز أكتر.'],
@@ -15235,13 +15302,301 @@ const PAGE_GUIDES = {
     ['🔐','محمية','الدخول بكود المنظمين.'],
     ['⚙️','التحكم','إعدادات الألعاب والنقاط والمحتوى.']]}
 };
+
+/* ============================= اشرح الآن: جولة تفصيلية بتلف الموقع وتشرح كل جزء ============================= */
+const _GP = ()=> (typeof GAME_POINTS_SETTINGS!=='undefined' && GAME_POINTS_SETTINGS) || {};
+const TOUR_STEPS = [
+  {k:'intro'},
+  /* ===== الرئيسية ===== */
+  {v:'profile', ch:'الرئيسية', ico:'👤', t:'صورتك واسمك', x:'دوس عليها تفتح ملفك الشخصي: بياناتك ونقاطك وترتيبك وميدالياتك.', s:'.tb-me'},
+  {v:'profile', ch:'الرئيسية', ico:'🌙', t:'الوضع الليلي والنهاري', x:'بدّل بين الشكلين حسب راحة عينك.', s:'.theme-toggle-btn'},
+  {v:'profile', ch:'الرئيسية', ico:'⚙️', t:'الإعدادات', x:'الصوت وقفل الحساب وتصدير رحلتك والإبلاغ عن أي مشكلة. هنشرحها بالتفصيل في آخر الجولة.', s:'.top-bar [data-page="settings"]'},
+  {v:'profile', ch:'الرئيسية', ico:'🔔', t:'الإشعارات', x:'بتوصلك هنا جوايز الألعاب وأي تنبيه يخصك. النقطة اللي بتظهر على الجرس معناها إن فيه حاجة جديدة.', s:'.notif-btn'},
+  {v:'profile', ch:'الرئيسية', ico:'📜', t:'كلمة اليوم', x:'آية مختارة لكل يوم. من الأزرار اللي تحتها تفتحها في الكتاب المقدس، أو تنسخها، أو تشاركها مع أصحابك.', s:'.vd-card'},
+  {v:'profile', ch:'الرئيسية', ico:'📖', t:'خلوة فردية', x:'وقت هادي مع كلمة ربنا: اقرأ وتأمّل وسجّل ملاحظاتك. دوس «ادخل خلوتك» وابدأ.', s:'.home-retreat'},
+  {v:'profile', ch:'الرئيسية', ico:'✅', t:'بطاقة الحضور', x:'بتوريك حضرت كام نشاط من الأنشطة الثلاثة.', d:['القداس والاجتماع والتسبحة.','زرار «سجّل حضورك» بيفتح الكاميرا عشان تمسح كود QR.','التسجيل بيتفتح من المنظمين بس، ولو مكتوب «لا يوجد تسجيل مفتوح» استنى لما يتفتح.'], s:'.att-card'},
+  {v:'profile', ch:'الرئيسية', ico:'🧭', t:'الشريط السفلي', x:'بينقلك بين الأقسام الأساسية.', d:['الملف الشخصي · الألعاب · الرئيسية · الحضور · المزيد.','اضغط ضغطة طويلة على أي أيقونة تفتح اختصارات سريعة.'], s:'.bnav-bar'},
+  /* ===== ملفي ===== */
+  {v:'me', ch:'ملفي', ico:'📲', t:'تثبيت التطبيق', x:'ثبّت الموقع على موبايلك عشان يفتح من شاشتك الرئيسية زي أي تطبيق.', s:'.glx-inst'},
+  {v:'me', ch:'ملفي', ico:'🎫', t:'كارت الدخول', x:'اعرضه عند الحضور أو احفظه كصورة على موبايلك.', s:'.glx-idbtn'},
+  {v:'me', ch:'ملفي', ico:'🖼️', t:'صورتك وبياناتك', x:'دوس على الصورة تغيّرها. ومن «تعديل بياناتي» تضيف تاريخ ميلادك ورقمك وباقي بياناتك.', s:'.me-av'},
+  {v:'me', ch:'ملفي', ico:'⭐', t:'نقاطك وترتيبك', x:'إجمالي نقاطك المكتسبة (من الحضور والأنشطة والتحديات) وترتيبك بين كل المشاركين.', d:['دي نقاطك الأساسية، ومنفصلة عن رصيد الفيزا بتاع الألعاب.'], s:'.mp-hero'},
+  {v:'me', ch:'ملفي', ico:'🎖️', t:'الميداليات', x:'كل ما نقاطك تزيد بتفتح ميدالية جديدة: برونزية، فضية، وهكذا.', s:'.mp-mrow'},
+  {v:'me', ch:'ملفي', ico:'📊', t:'نشاطك وشاراتك وإحصائياتك', x:'ثلاث تابات: «نشاطي» و«شاراتي» و«إحصائيات»، وفيها سلسلة حضورك والتحدي الحالي وأهم حاجة ليك دلوقتي.', s:'.mx-tabs'},
+  /* ===== الحضور ===== */
+  {v:'attendance', ch:'الحضور', ico:'📷', t:'تسجيل الحضور', x:'اختار النشاط وامسح كود QR اللي مع المنظمين، وهتتسجّل في عدّاد حضورك وتكسب نقاط الحضور.', s:'.att-hero'},
+  {v:'attendance', ch:'الحضور', ico:'🎟️', t:'تذاكر الأنشطة', x:'لكل نشاط تذكرة: القداس والاجتماع والتسبحة.', d:['«في انتظار المنظمين» يعني التسجيل لسه ما اتفتحش.','لما يتفتح، دوس على التذكرة وامسح الكود.','كل نشاط بتسجّله بيزوّد نقاطك وسلسلة حضورك.'], s:'.tk'},
+  {v:'attendance', ch:'الحضور', ico:'⚖️', t:'نقاط الحضور ≠ رصيد الفيزا', x:'نقاط الحضور بتتحسب في ملفك وترتيبك. أما رصيد الفيزا فخاص بالألعاب بس، وهنشرحه بالتفصيل في الجزء الجاي.', mock:'split', ctr:true},
+  /* ===== الألعاب من الصفر ===== */
+  {v:'games', ch:'الألعاب', ico:'🎮', t:'مركز الألعاب', x:'دي نقطة البداية. كل جايزة بتكسبها بتروح لرصيد فيزتك مباشرة، وأول فوز بيدخلك لوحة الأبطال.', s:'.gx-hero'},
+  {v:'games', ch:'الألعاب', ico:'💳', t:'قبل ما تلعب', x:'لازم يكون عندك فيزا فعّالة وغير منتهية.', d:['من غير فيزا مش هتقدر تلعب ولا تدخل الغرف.','لو الفيزا انتهت صلاحيتها هتتنبّه وتجددها.','لو رصيدك مش كفاية لرسوم لعبة بكوين هتتنبّه وتشحن.'], ctr:true},
+  {v:'games', ch:'الألعاب', ico:'🤖', t:'العب ضد الجهاز', x:'حوالي 30 لعبة بدون انتظار، تلعب في أي وقت لوحدك.', d:['مقسمة فئات: طاولة، سرعة ومهارة، ذكاء وأسئلة، ورق وحظ.','لما تكسب بتاخد جايزة بتتضاف لفيزتك.','الجايزة بتختلف حسب اللعبة والمستوى، وبتشوفها قبل ما تبدأ.'], s:'.gh-tile', t2:'ضد الجهاز'},
+  {v:'games-solo', ch:'الألعاب', ico:'📂', t:'فئات الألعاب', x:'اختار فئة وبعدين اللعبة اللي تعجبك.', d:['جوه أي لعبة هتلاقي كاس 🏆 فوق على الشمال، يفتحلك ترتيب المشاركين في اللعبة دي.','لعبة بدّلت رأيك؟ ارجع بزرار الرجوع وكمّل.'], s:'.ghx-card'},
+  {v:'games', ch:'الألعاب', ico:'🧑‍🤝‍🧑', t:'العب ضد صديق', x:'غرف مباشرة مع أصحابك، كل واحد على موبايله.', d:['«إنشاء غرفة»: انت المضيف وتبعت الكود لصاحبك.','«انضمام لغرفة»: تكتب كود صاحبك وتدخل.'], s:'.gh-tile', t2:'ضد صديق'},
+  {v:'games', ch:'الألعاب', ico:'👀', t:'مشاهدة المعركة', x:'اتفرّج على أصحابك وهما بيلعبوا لايف من غير ما تدخل اللعبة.', s:'.gh-tile', t2:'مشاهدة المعركة'},
+  {v:'games', ch:'الألعاب', ico:'🏅', t:'إنجازاتك', x:'أوسمة بتفتحها كل ما تلعب وتكسب، وبتتابع مستواك وعدد انتصاراتك.', s:'.gh-tile', t2:'إنجازاتي'},
+  /* ===== الغرف مع الأصحاب ===== */
+  {v:'game-rooms', ch:'الغرف مع الأصحاب', ico:'🚪', t:'إنشاء غرفة: اختار الفئة', x:'الغرف مقسمة فئات: طاولة كلاسيكية، سرعة ومهارة، ذكاء وأسئلة، ورق وحظ، وتحديات جماعية (أسئلة وألغاز وإيموجي).', s:'.ghx-card'},
+  {v:'game-rooms-cat', ch:'الغرف مع الأصحاب', ico:'🎲', t:'اختار اللعبة', x:'دوس على اللعبة اللي عايزها، وهتتفتحلك شاشة اختيار نوع التحدي.', s:'.gh-tile[data-action="create-room"]', pre:()=>{ state.roomCatKey = 'board'; }},
+  {v:'game-rooms-cat', ch:'الغرف مع الأصحاب', ico:'🪙', t:'تحدي بكوين ولا مجاني؟', x:'بتختار نوع الغرفة قبل ما تتعمل:', d:()=>{ const g=_GP(); return ['🪙 تحدي بكوين: بتدفع رسوم من رصيد الفيزا ('+(g.roomCreateFee||0)+' نقطة لإنشاء الغرفة، و'+(g.roomJoinFee||0)+' نقطة لصاحبك لما ينضم) والفايز بياخد الجايزة.','🆓 تحدي مجاني: تلعب بدون أي نقاط، لا بتدفع ولا بتكسب.','في الاتنين الغرفة ليها كود يتشارك مع صاحبك.']; }, mock:'type', ctr:true},
+  {v:'game-rooms-cat', ch:'الغرف مع الأصحاب', ico:'🔒', t:'غرفة خاصة بكلمة سر', x:'قبل ما تختار بكوين أو مجاني، دوس «🔒 غرفة خاصة» واكتب كلمة سر لحد 12 حرف.', d:['محدش يدخل الغرفة غير اللي تديهاله الكلمة.','لو سيبتها فاضية بتبقى غرفة مفتوحة.','الكلمة بتتحفظ مشفّرة، والغرفة بتظهر في القايمة بعلامة 🔒 محمية.'], mock:'private', ctr:true},
+  {v:'game-rooms-cat', ch:'الغرف مع الأصحاب', ico:'📨', t:'كود الغرفة وبدء اللعب', x:'أول ما الغرفة تتعمل بتتفتحلك شاشة انتظار فيها كود الغرفة.', d:['ابعت الكود لصاحبك على أي تطبيق.','اللعبة بتبدأ أول ما صاحبك ينضم.','لو خرجت من معركة بكوين وانت في دورك بتتخصم منك غرامة انسحاب بتتوزع على الباقيين.'], ctr:true},
+  {v:'room-lobby', ch:'الغرف مع الأصحاب', ico:'🔑', t:'الانضمام بالكود', x:'اكتب الكود اللي بعتهولك صاحبك واضغط «انضم بالكود».', d:['لو الغرفة محمية هتتسأل عن كلمة السر.','لو الغرفة بكوين هتتخصم رسوم الانضمام من فيزتك.','لو غرفة مجانية بتدخل بدون نقاط.'], s:['#room-join-code','.jr-code-wrap']},
+  {v:'room-lobby', ch:'الغرف مع الأصحاب', ico:'📋', t:'قايمة الغرف المتاحة', x:'تحت خانة الكود هتلاقي الغرف المفتوحة اللي مستنية لاعبين، وتقدر تفلترها: الكل · مفتوحة · مجاني · بكوين.', d:['🔒 محمية / 🔓 مفتوحة.','🆓 مجانية / 🪙 بكوين.'], mock:'tags', s:'.jr-chips'},
+  {v:'watch-rooms', ch:'الغرف مع الأصحاب', ico:'👀', t:'مشاهدة المعارك', x:'اختار معركة شغّالة واتفرّج على أصحابك لايف.', s:'.opinion-hero'},
+  {v:'game-rooms', ch:'الغرف مع الأصحاب', ico:'🏆', t:'الجوايز', x:'جوايز الغرف بتتضاف لرصيد فيزتك على طول.', d:()=>{ const g=_GP(); return ['الغرف الجماعية: المركز الأول '+(g.first||0)+' نقطة، الثاني '+(g.second||0)+'، الثالث '+(g.third||0)+'.','المعارك الفردية (زي إكس أو): الفايز بياخد جايزة الغرفة.','الجوايز مش بتزوّد نقاطك الأساسية ولا ترتيبك في لوحة النقاط.']; }, ctr:true},
+  /* ===== الفيزا ===== */
+  {v:'visa', ch:'الفيزا', ico:'💳', t:'إيه هي الفيزا؟', x:'محفظتك الخاصة بالألعاب.', d:['منها بتدفع رسوم الغرف وتشتري من المتجر، وفيها بتنزل جوايز الألعاب.','نقاط الحضور (اللي في ملفك) حاجة منفصلة ملهاش علاقة برصيد الفيزا.','الوصل بينهم اختياري: تودع من نقاطك للفيزا، أو تسحب من الفيزا لنقاطك.'], mock:'split', ctr:true},
+  {v:'sticker-store', ch:'الفيزا', ico:'🛍️', t:'الخطوة 1: اشتري تصميم الكارد', x:'الفيزا بتبدأ بشراء تصميم كارد من المتجر (تاب «كارد»).', d:['تصاميم بسيطة وتصاميم VIP، وسعر كل تصميم مكتوب عليه.','مفيش تصميم مجاني، والدفع من رصيد الفيزا بالسحب للتأكيد.','وفيه طلب كارد مخصص بصورتك أو تصميمك.'], s:['[data-action="shop-tab"]','.opinion-hero'], all:true, pre:()=>{ state.shopTab='card'; }},
+  {v:'visa', ch:'الفيزا', ico:'✍️', t:'الخطوة 2: اكتب اسمك على البطاقة', x:()=>_vcNote()+'من صفحة «فيزتي» اكتب الاسم اللي هيظهر على البطاقة، وهتشوف بطاقتك بتتكوّن قدامك.', s:['#visa-new-name','.vc-scene']},
+  {v:'visa', ch:'الفيزا', ico:'🔐', t:'الخطوة 3: الرقم السري', x:()=>_vcNote()+'الرقم السري 3 أرقام (CVV) بتكتبهم مرتين للتأكيد، وبيتكتب على ظهر البطاقة.', d:['هتحتاجه في كل إيداع وسحب وتحويل وتجديد.','احفظه كويس.','لو نسيته كلّم المنظمين يعيدوا تعيينه.'], mock:'pin', s:['#visa-new-pin','.vc-scene']},
+  {v:'visa', ch:'الفيزا', ico:'✅', t:'الخطوة 4: إنشاء الفيزا', x:()=>_vcNote()+'دوس «إنشاء الفيزا» وبطاقتك بتتفعّل فورًا. وتبقى صالحة '+visaValidDays()+' يوم من لحظة الإنشاء.', s:['[data-action="visa-create"]','.vc-scene']},
+  {v:'visa', ch:'الفيزا', ico:'💳', t:'بطاقتك', x:'دوس على البطاقة تتقلب وتشوف ظهرها.', d:['الرقم الكبير على وجهها هو رقم بطاقتك، تديه لأي حد يحوّلك.','الشريحة الصفراء للاستلام السريع من شخص قريب منك.','تحتها مكتوب «صالحة حتى» وباقي كام يوم.'], s:'.vc-scene'},
+  {v:'visa', ch:'الفيزا', ico:'⏳', t:()=>'الفيزا بتخلص بعد '+visaValidDays()+' يوم', x:'مهم جدًا: الفيزا ليها مدة صلاحية.', d:()=>['صالحة '+visaValidDays()+' يوم من الإنشاء، وبعدها بتتوقف.','وهي متوقفة: مش هتقدر تلعب ولا تدخل غرف ولا تحوّل ولا تشتري.','لازم تجددها برسوم '+visaRenewFee()+' نقطة، من رصيد الفيزا أو من نقاطك، وبرضه بالسحب والرقم السري.','بعد التجديد بتشتغل '+visaValidDays()+' يوم تاني، وبتتفتح فرصة تعدّل تصميمها.'], s:'.vc-scene'},
+  {v:'visa', ch:'الفيزا', ico:'📥', t:'الإيداع', x:'بتحوّل من نقاطك لرصيد الفيزا.', d:['اكتب العدد أو اختار 25 / 50 / 100 / الكل.','اسحب شريط التأكيد، وبعدين اكتب الرقم السري.','النقاط بتتضاف فورًا وتستخدمها في الألعاب والمتجر.'], mock:'swipe', s:['#visa-amt','.vp-panel'], pre:()=>{ if(visaCreated(state.pid)){ state.visaTab='deposit'; render(); } }},
+  {v:'visa', ch:'الفيزا', ico:'📤', t:'السحب', x:'بترجّع نقاط من الفيزا لنقاطك.', d:()=>['السحب بيتفتح لما رصيد الفيزا يوصل '+visaMin()+' نقطة، وده أقل مبلغ للسحب.','الشريط تحت المبلغ بيوريك قربت من الحد ولا لأ.','نفس التأكيد بالسحب والرقم السري.'], s:['.vp-prog','#visa-amt','.vp-panel'], pre:()=>{ if(visaCreated(state.pid)){ state.visaTab='withdraw'; render(); } }},
+  {v:'visa', ch:'الفيزا', ico:'🔁', t:'التحويل برقم البطاقة', x:'ابعت نقاط لأي زميل من رصيد فيزتك.', d:['اكتب رقم بطاقة المستلم (الرقم الكبير على وجهها) أو اختاره من آخر اللي حوّلتلهم.','اكتب المبلغ وادوس «تحويل الآن».','بيتخصم من رصيدك ويوصله فورًا، بشرط إن عنده فيزا صالحة.','«نسخ رقم بطاقتي» عشان تبعت رقمك لأي حد يحوّلك.'], s:['#visa-to','.vp-panel'], pre:()=>{ if(visaCreated(state.pid)){ state.visaTab='transfer'; render(); } }},
+  {v:'visa', ch:'الفيزا', ico:'📡', t:'الاستلام من شخص قريب منك', x:'من غير ما تكتب أي رقم: بالشريحة الصفراء الموجودة على البطاقة.', d:['صاحبك يفتح صفحة «فيزتي» عنده وبطاقته قدامك.','انت تدوس على الشريحة الصفراء في بطاقتك (استلام) وتفتح الكاميرا.','وجّه الكاميرا على الشريحة الصفراء في بطاقة صاحبك.','اكتب المبلغ، وهيوصله طلب تأكيد لحظي على موبايله.'], mock:'chip', s:['.vc-chip-code','.vc-scene']},
+  {v:'visa', ch:'الفيزا', ico:'✔️', t:'تأكيد التحويل بالشريحة', x:'اللي بيبعت هو اللي بيأكد.', d:()=>['الطلب بيفضل شغّال '+Math.round(CHIPQ.TTL/1000)+' ثانية، بعدها بيتلغي من غير ما يتخصم حاجة.','لو المبلغ '+CHIPQ.PIN_OVER+' نقطة أو أكتر، بيكتب الرقم السري كمان.','لو الكاميرا مش شغّالة اسمح بيها من إعدادات المتصفح، أو استخدم «شارك رقم بطاقتي بدل المسح».'], ctr:true},
+  {v:'visa-history', ch:'الفيزا', ico:'🧾', t:'كشف الحساب', x:'رصيدك الحالي وإجمالي الوارد والصادر وعدد العمليات.', s:'.vst-hero'},
+  {v:'visa-history', ch:'الفيزا', ico:'🔎', t:'فلترة العمليات', x:'فلتر كشفك بالفترة (اليوم، آخر 7 أيام، آخر 30 يوم) وبنوع العملية: وارد، صادر، تحويلات، مشتريات، ألعاب. وتقدر تنزّله كملف Excel.', s:'.vst-chip'},
+  /* ===== الاقتصاد والاستثمار ===== */
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'📊', t:'إيه هو الاقتصاد والاستثمار؟', x:'قسم بتشغّل فيه نقاط فيزتك بدل ما تفضل واقفة. بتفتحه من صفحة الفيزا بزرار «الاستثمار والاقتصاد». النقاط هنا هي نقاط الفيزا (نقاط الألعاب)، ومالهاش علاقة بنقاط الحضور.', d:['ثروتك الكلية = رصيد الفيزا + التوفير + الودائع + قيمة أسهمك.','كل عملية بتخصم أو بترجّع من فيزتك فعلاً وبتظهر في كشف الحساب.','العمليات الحساسة (إيداع، وديعة، شراء) بتطلب الرقم السري.','المنظمين ممكن يقفلوا القسم مؤقتًا، ساعتها هتشوف علامة 🔒.'], s:['#eco-net','.back-title'], pos:'below'},
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🗂️', t:'التابات الخمسة', x:'محفظتي، السوق، المستشار، أعمال، المدينة. بتتنقل بينهم من الشريط ده.', d:['💰 محفظتي: توفير وودائع وهدف.','📈 السوق: أسهم.','🧠 المستشار: تحليل ذكي لمحفظتك.','🏢 أعمال: شركات وخدمات.','🏙️ المدينة: وظايف وقروض وترتيب الموسم.'], s:['[data-eco="tab"]'], all:true},
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'💰', t:'حساب التوفير', x:'ودّع نقاط من فيزتك في التوفير وخدها بفايدة أسبوعية يحددها المنظمين (مكتوبة فوق الخانة).', d:['اكتب المبلغ وادوس «إيداع» (بيطلب الرقم السري).','«سحب» بيرجّع النقاط لفيزتك في أي وقت.','الفايدة بتتحسب على رصيد التوفير.'], s:['#e-a'], pre:()=>{ setTimeout(()=>{ try{ const b=document.querySelector('[data-eco="tab"][data-v="w"]'); b&&b.click(); }catch(e){} },900); }},
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🔐', t:'الودائع المقفولة', x:'اقفل مبلغ لمدة أسبوع أو شهر بفايدة أعلى. الحد الأدنى 10 نقاط.', d:['النقاط بتتقفل لحد انتهاء المدة ومينفعش تسحبها قبلها.','لما المدة تخلص بيظهر زرار «استلم» وبتاخد أصل المبلغ + الفايدة.','فايدة الشهر أعلى من فايدة الأسبوع.'], s:['#e-d']},
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🎯', t:'هدفي وحاسبة التوفير والادخار التلقائي', x:'حدد هدف بالنقاط وشوف نسبة وصولك له، وجرّب الحاسبة قبل ما تقرر.', d:['اكتب اسم الهدف والمبلغ المطلوب وادوس «حفظ الهدف».','الادخار التلقائي: مبلغ أسبوعي (5 نقاط أو أكتر) بيتحول من الفيزا للتوفير لو رصيدك يسمح.','الحاسبة بتوريك ربحك المركّب بعد عدد أسابيع تختاره.'], s:['#g-n','#sm-a']},
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'📈', t:'سوق الأسهم', x:'أسهم أسعارها بتتغير على مدار اليوم. اشتري لما تحس إن السعر مناسب وبيع لما تكسب.', d:['عمولة الشراء 1%.','سقف المخاطرة: بتختار شخصيتك (حذر 30% / متوازن 50% / جريء 70%) وده أقصى جزء من ثروتك يدخل أسهم.','الإشارات (سخن / فرصة / صاعد / هابط) تعليمية وليست توقعات مضمونة.','المنظمين ممكن ينشروا خبر اقتصادي بيأثر على الأسعار.'], s:['[data-eco="buy"]','.eco-in'], pre:()=>{ setTimeout(()=>{ try{ const b=document.querySelector('[data-eco="tab"][data-v="m"]'); b&&b.click(); }catch(e){} },900); }},
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🛡️', t:'حماية أسهمك', x:'وقف خسارة، جني ربح، تنبيه سعر، وتأمين.', d:['وقف الخسارة (حتى 50%) بيبيع تلقائي لو السهم نزل للنسبة دي.','جني الربح (حتى 200%) بيبيع لما توصل للمكسب اللي حددته.','تنبيه السعر بيقولك لما السهم يوصل سعر معين.','التأمين بقسط 3% من قيمة السهم يحميك من النزول.'], s:['[data-eco="ord"]','[data-eco="ins"]','.eco-in']},
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🧠', t:'المستشار الذكي', x:'تحليل لمحفظتك: تنويع، سيولة، عادة ادخار، ونصايح لتحسين وضعك.', d:['كل ده تعليمي ومش ضمان للمكسب.'], pre:()=>{ setTimeout(()=>{ try{ const b=document.querySelector('[data-eco="tab"][data-v="i"]'); b&&b.click(); }catch(e){} },900); }, s:'.eco-in'},
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🏢', t:'أعمال: شركتك وسوق الخدمات', x:'أسّس شركة واجمع مساهمين، أو بيع خدماتك لزمايلك.', d:['تأسيس شركة = 20 نقطة، وبتتقسم 100 سهم: 20 ليك و80 للبيع، وسعر السهم 5 نقاط أو أكتر.','خزنة الشركة بتنمو 2% أسبوعيًا وصاحبها بيوزّع أرباح على المساهمين.','سوق الخدمات: انشر خدمة بسعر، والمشتري نقاطه بتتحجز عند الضمان لحد ما يأكد الاستلام. العمولة 3%.'], s:['#c-n','.eco-in'], pre:()=>{ setTimeout(()=>{ try{ const b=document.querySelector('[data-eco="tab"][data-v="b"]'); b&&b.click(); }catch(e){} },900); }},
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🏙️', t:'المدينة: وظايف وقروض وعطاء', x:'الجانب الاجتماعي للاقتصاد.', d:['الوظايف: قدّم على وظيفة واستلم مرتبها كل أسبوع.','صندوق العطاء: 2% من الأرباح بتتجمع وتصوّت لمشروع يستاهل التمويل.','مستثمر الموسم: ترتيب بنسبة نمو الثروة خلال 28 يوم، فالمبتدئ ينافس الغني.','القرض: أقصى قرض = تقييم الثقة × 4، والفايدة 3% لو تقييمك 70 فأكتر وإلا 8%. السداد في الميعاد بيرفع تقييمك والتأخير بيخفضه.'], s:'.eco-in', pre:()=>{ setTimeout(()=>{ try{ const b=document.querySelector('[data-eco="tab"][data-v="c"]'); b&&b.click(); }catch(e){} },900); }},
+  /* ===== المتجر ===== */
+  {v:'sticker-store', ch:'المتجر', ico:'🏷️', t:'الاستيكرات', x:'اشتري استيكرات من رصيد فيزتك. السعر مكتوب على كل استيكر، ولو رصيدك ناقص بيقولك فاضل كام.', s:['[data-action="shop-tab"]','.opinion-hero'], pre:()=>{ state.shopTab='stickers'; }},
+  /* ===== الترتيب والإنجازات ===== */
+  {v:'game-leaderboard', ch:'الترتيب والإنجازات', ico:'🥇', t:'ترتيب الأبطال', x:'الترتيب العام بنقاط الفيزا الحالية، وأول 3 على المنصة.', d:['اختار أي لعبة من الأزرار فوق تشوف ترتيب المشاركين فيها، والأعلى نقاط فوق.','وجوه كل لعبة هتلاقي كاس 🏆 يفتحلك نفس الترتيب.','الترتيب بيتحدّث تلقائي.'], s:'.gsg-chips'},
+  {v:'game-achievements', ch:'الترتيب والإنجازات', ico:'🏅', t:'إنجازاتك', x:'مستواك وأوسمتك: المفتوحة والمقفولة. الأوسمة بتتحسب من جوايز الألعاب في كشف حسابك.', s:'.gx-hero'},
+  /* ===== الإعدادات ===== */
+  {v:'settings', ch:'الإعدادات', ico:'🎵', t:'الصوت والموسيقى', x:'شغّل موسيقى الخلفية أو اقفلها، وظبط مستوى الصوت.', s:'.settings-row'},
+  {v:'settings', ch:'الإعدادات', ico:'🔐', t:'قفل الحساب', x:'اختار طريقة قفل حسابك: PIN أو نمط أو بصمة أو وجهك. شاشة القفل بتظهر لما تدوس على كارت حسابك في تسجيل الدخول.', s:'[data-action="upin-setup"]'},
+  {v:'settings', ch:'الإعدادات', ico:'📄', t:'تصدير رحلتك', x:'نزّل رحلتك كاملة كملف PDF تحتفظ بيه.', s:'[data-action="export-pdf"]'},
+  {v:'settings', ch:'الإعدادات', ico:'📮', t:'الإبلاغ عن مشكلة', x:'لو واجهت مشكلة في الموقع اكتبها هنا والمنظمين يعالجوها بأسرع وقت.', s:'[data-action="submit-report"]'},
+  /* ===== المزيد ===== */
+  {v:'capabilities', ch:'المزيد', ico:'✨', t:'باقي الأقسام', x:'كل خانة هنا بتتفتح بالضغط عليها، ولو قسم مقفول مؤقتًا هتلاقي علامة 🔒. هنفتح كل قسم ونشرحه.', s:'.cap-tile', all:true},
+  {v:'capabilities', ch:'المزيد', ico:'🎡', t:'عجلة الحظ', x:'لفّة واحدة كل يوم، وبتكسب نقاط على فيزتك.', d:['الجوايز: 5 أو 10 أو 15 أو 20 نقطة، وفيه خانات «حظ أوفر» بصفر.','النقاط بتتضاف لفيزتك كنقاط ألعاب (مش نقاط حضور).','لو لفّيت النهاردة ارجع بكرة.','المنظمين هما اللي بيفتحوا العجلة، فلو شفت «لسه مفيش عجلة» يبقى لسه ما اتفتحتش.'], s:'.cap-tile[data-page="wheel"]'},
+  {v:'structure', ch:'المزيد', ico:'👥', t:'هيكلة الاجتماع', x:'مين القيادات ومين في كل أسرة.', d:['القيادات فوق بالأسماء والصور.','لكل أسرة لون وعنوان وأعضاء.','دوس على اسم الأسرة أو «عرض كل أعضاء الأسرة» تشوف الكل.'], s:['.ms-banner','.ms-canvas']},
+  {v:'contests', ch:'المزيد', ico:'🏆', t:'المسابقات', x:'مسابقات بيفتحها المنظمين وبجوايز نقاط.', d:['كل مسابقة ليها وصف وجايزة.','«اشترك دلوقتي» مرة واحدة وبعدها مفيش رجوع.','لو اتقفل الاشتراك مش هتقدر تشترك، ولو كسبت بتظهرلك رسالة مبروك والجايزة بتتضاف.'], s:['[data-ct="join"]','.ct-card','.opinion-hero']},
+  {v:'askfather', ch:'المزيد', ico:'⛪', t:'اسأل أبونا: إرسال سؤال', x:'اكتب سؤالك واختار يوصل باسمك أو «مجهول».', d:['«باسمي» أبونا بيشوف اسمك، و«من غير اسم» بيظهر مجهول والإجابة بتوصلك هنا في التطبيق.','تقدر تعلّم السؤال إنه محتاج متابعة شخصية.','بعد الإرسال بيظهرلك إشعار تأكيد.'], s:['.af-who','.af-tabs']},
+  {v:'askfather', ch:'المزيد', ico:'📬', t:'اسأل أبونا: متابعة الردود', x:'تاب «أسئلتي» بيورّيك حالة كل سؤال.', d:['⏳ مستني الرد، أو ✅ اتجاوب وبتشوف رد أبونا.','تقدر تسحب سؤال لسه ما اتجاوبش.','تاب «أجوبة للجميع» فيه الأسئلة اللي أبونا قرر ينشرها.'], s:'.af-tabs'},
+  {v:'bdaygreet', ch:'المزيد', ico:'🎂', t:'أعياد الميلاد', x:'شوف مين عيد ميلاده الشهر ده واكتبله تهنئة.', d:['التهنئة بتوصل لصاحب العيد يوم ميلاده.','تهانيك إنت بتتفتح يوم عيدك وبتفضل محفوظة عندك حتى بعد الشهر.','لو مفيش حد عيده الشهر ده بتشوف رسالة بسيطة.'], s:['.opinion-hero','.card']},
+  {v:'book', ch:'المزيد', ico:'🎟️', t:'احجز الآن', x:'احجز مكانك في الأمسيات والرحلات.', d:['اختار الفعالية وادوس «احجز مكانك».','لو فيه عربون: «ادفع العربون» من الفيزا، أو «احجز وادفع كاش».','لو المكان خلص: «ضيفني في قايمة الانتظار» وبيتحدد رقمك.','حجوزاتك وتذكرتك بتلاقيها في «حجوزاتي».','لو شفت «الحجز مقفول» يبقى المنظمين قافلينه حاليًا.'], s:['.bk-mine','[data-bk]','.back-title']},
+  {v:'retreat', ch:'خلوة فردية', ico:'🕊️', t:'خلوة فردية: الصفحة', x:'وقت هادي مع الإنجيل. اللي بتكتبه هنا ليك إنت بس.', d:['فوق بتشوف حالتك النهارده: خلصت، أو ميعادك جه، أو لسه.','أربع أرقام: أيام متتالية، خلوات موجّهة، أصحاحات مقروءة، آيات محفوظة.'], s:['.rt-hero','.rt-stats']},
+  {v:'retreat', ch:'خلوة فردية', ico:'🙏', t:'خلوة موجّهة', x:'ابدأ بزرار «ابدأ خلوة موجّهة»، وهتتمشى معاك خطوة بخطوة.', d:['١ صلاة: دقيقة وإطلب إرشاد الروح القدس.','٢ قراءة: اقرأ ببطء وكرّر الآية اللي لمستك.','٣ تأمل: ربنا بيقولي إيه؟ وإيه اللي محتاج أغيّره؟','٤ التزام: خطوة عملية واحدة تعملها النهارده.'], s:['.rt-main-cta','.rt-tl']},
+  {v:'retreat', ch:'خلوة فردية', ico:'📖', t:'الكتاب المقدس', x:'العهد القديم والعهد الجديد في مكان واحد.', d:['اقرأ أي أصحاح، وهيتعلّم مقروء.','تقدر تحفظ آية تعجبك وترجعلها بعدين.'], s:'.rt-bible-card'},
+  {v:'retreat', ch:'خلوة فردية', ico:'⏰', t:'التذكير اليومي', x:'فعّل التذكير واختار الميعاد.', d:['بيطلع التنبيه لما الموقع يكون مفتوح.','عشان يرن والموقع مقفول، ادوس «ضيفه للتقويم» وهيضاف لتقويم موبايلك.','«جرّب التذكير» تتأكد إنه شغّال.'], s:'#kh-rem'},
+  {v:'retreat', ch:'خلوة فردية', ico:'📝', t:'ملاحظاتي', x:'اكتب الآية وتأمّلك والخطوة اللي هتلتزم بيها، وادوس «حفظ الملاحظات».', d:['بيتسجل وقت آخر حفظ تحت الزرار.','الملاحظات خاصة بيك.'], s:['#retreat-note']},
+  {k:'outro'}
+];
+const TOUR = {on:false, i:0, dir:1, auto:true, voice:false, hasVoice:false, timer:null, tok:0, saved:null, el:null, last:'', toc:false};
+const TR_REAL = ()=>TOUR_STEPS.filter(x=>!x.k).length;
+const trv = v=> typeof v==='function' ? v() : v;
+const _vcNote = ()=>{ try{ return visaCreated(state.pid) ? 'عندك فيزا فعلاً — ده شرح الخطوات للي لسه بينشئ فيزته. ' : ''; }catch(e){ return ''; } };
+function tourVoice(){ try{ return speechSynthesis.getVoices().find(v=>/^ar/i.test(v.lang)) || null; }catch(e){ return null; } }
+function tourClear(){ clearTimeout(TOUR.timer); TOUR.timer = null; try{ speechSynthesis.cancel(); }catch(e){} }
+function tourSpeak(txt, onend){
+  try{ const v = tourVoice(); if(!v) return false; const u = new SpeechSynthesisUtterance(txt); u.voice = v; u.lang = v.lang;
+    if(onend){ u.onend = onend; u.onerror = onend; } speechSynthesis.speak(u); return true; }catch(e){ return false; }
+}
+function startSiteTour(){
+  if(TOUR.on || !state.pid) return;
+  window.__tourOn = true; TOUR.on = true; TOUR.i = 0; TOUR.dir = 1; TOUR.auto = true; TOUR.toc = false;
+  TOUR.saved = {view:state.view, dayId:state.dayId, sessionId:state.sessionId, lbTab:state.lbTab, hist:state.history.slice(), visaTab:state.visaTab, shopTab:state.shopTab, roomCatKey:state.roomCatKey};
+  TOUR.hasVoice = !!tourVoice(); TOUR.voice = TOUR.hasVoice;
+  const ui = document.createElement('div'); ui.id = 'tour-ui';
+  ui.innerHTML = '<div class="tr-block"></div><div class="tr-dim"></div><div class="tr-spot"></div><div class="tr-top"><i></i></div><div class="tr-pop"></div>';
+  document.body.appendChild(ui);
+  ui.querySelector('.tr-pop').addEventListener('click', e=>{
+    const b = e.target.closest('[data-t]'); if(!b) return; const a = b.dataset.t;
+    if(a==='next') tourGo(TOUR.i+1, 1); else if(a==='prev') tourGo(TOUR.i-1, -1);
+    else if(a==='close') tourEnd(); else if(a==='again') tourGo(0, 1);
+    else if(a==='toc'){ TOUR.toc = true; tourClear(); tourRenderToc(); }
+    else if(a==='back'){ TOUR.toc = false; tourShow(TOUR.i, true); }
+    else if(a==='jump'){ TOUR.toc = false; tourGo(parseInt(b.dataset.i,10)||1, 1); }
+    else if(a==='auto'){ TOUR.auto = !TOUR.auto; b.innerHTML = TOUR.auto ? TR_ICO.pause : TR_ICO.play; if(TOUR.auto) tourArm(TOUR.i, TOUR.tok); else { tourClear(); const bi = ui.querySelector('.tr-bar i'); if(bi){ bi.style.transition = 'none'; } } }
+    else if(a==='voice'){ TOUR.voice = !TOUR.voice; b.classList.toggle('off', !TOUR.voice); if(!TOUR.voice) try{ speechSynthesis.cancel(); }catch(e){} else tourArm(TOUR.i, TOUR.tok); }
+  });
+  window.addEventListener('keydown', tourKey);
+  TOUR.poll = setInterval(tourTrack, 250);
+  tourShow(0);
+}
+function tourKey(e){ if(!TOUR.on) return; if(e.key==='Escape') tourEnd(); else if(e.key==='ArrowLeft') tourGo(TOUR.i+1,1); else if(e.key==='ArrowRight') tourGo(TOUR.i-1,-1); }
+function tourGo(i, dir){
+  if(i<0) i = 0; if(i>=TOUR_STEPS.length) return tourEnd();
+  TOUR.dir = dir || 1; TOUR.auto = true; tourShow(i);
+}
+function tourEnd(){
+  if(!TOUR.on) return;
+  tourClear(); clearInterval(TOUR.poll); window.removeEventListener('keydown', tourKey);
+  TOUR.on = false; window.__tourOn = false; TOUR.el = null;
+  const ui = document.getElementById('tour-ui');
+  if(ui){ ui.classList.add('end'); setTimeout(()=>ui.remove(), 280); }
+  const sv = TOUR.saved;
+  if(sv){ state.history = sv.hist; Object.assign(state, {view:sv.view, dayId:sv.dayId, sessionId:sv.sessionId, lbTab:sv.lbTab, visaTab:sv.visaTab, shopTab:sv.shopTab, roomCatKey:sv.roomCatKey}); try{ render(); }catch(e){} }
+}
+const TR_ICO = {
+  pause:'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>',
+  play:'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
+  prev:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  next:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  voice:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+  list:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>'
+};
+const TR_MOCK = {
+  split:'<div class="tm tm-split"><div class="tm-b"><span>⭐</span><b>نقاط الحضور</b><small>في ملفك وترتيبك</small></div><div class="tm-mid"><i>⇄</i><small>إيداع / سحب<br>اختياري</small></div><div class="tm-b g"><span>💳</span><b>رصيد الفيزا</b><small>للألعاب والمتجر</small></div></div>',
+  pin:'<div class="tm tm-card"><div class="tm-stripe"></div><div class="tm-sig"><span>CVV</span><b><u></u><u></u><u></u></b></div><small>ظهر البطاقة · 3 أرقام</small></div>',
+  type:'<div class="tm tm-type"><div class="tm-opt coin">🪙 تحدي بكوين</div><div class="tm-opt free">🆓 تحدي مجاني</div></div>',
+  private:'<div class="tm tm-private"><div class="tm-pbtn">🔒 غرفة خاصة</div><div class="tm-field">اكتب كلمة سر للغرفة <i></i></div></div>',
+  swipe:'<div class="tm tm-swipe"><span class="tm-knob">›››</span><b>اسحب للتأكيد</b></div>',
+  chip:'<div class="tm tm-chip"><div class="tm-ph">📱<small>صاحبك</small></div><div class="tm-cd"><i class="tm-dot"></i><small>الشريحة الصفراء</small></div><div class="tm-ph">📷<small>انت</small></div></div>',
+  tags:'<div class="tm tm-tags"><span>🔒 محمية</span><span>🔓 مفتوحة</span><span>🆓 مجاني</span><span class="g">🪙 بكوين</span></div>'
+};
+function tourSteps(st){ return {t:trv(st.t), x:trv(st.x), d:trv(st.d)||[]}; }
+function tourFind(st){
+  const sels = Array.isArray(st.s) ? st.s : [st.s];
+  for(const sel of sels){
+    if(!sel) continue;
+    let els = [...document.querySelectorAll(sel)];
+    if(st.t2) els = els.filter(e=>(e.innerText||'').includes(st.t2));
+    els = els.filter(e=>{ const r = e.getBoundingClientRect(); return r.width>20 && r.height>16; });
+    if(els.length) return st.all ? els : [els[0]];
+  }
+  return null;
+}
+function tourRect(els){
+  let l=1e9,t=1e9,r=-1e9,b=-1e9;
+  els.forEach(e=>{ const q = e.getBoundingClientRect(); l=Math.min(l,q.left); t=Math.min(t,q.top); r=Math.max(r,q.right); b=Math.max(b,q.bottom); });
+  l = Math.max(l, 6); r = Math.min(r, innerWidth-6);
+  return {left:l, top:t, right:r, bottom:b, width:r-l, height:b-t};
+}
+function tourChapters(){
+  const out = []; TOUR_STEPS.forEach((st,i)=>{ if(st.ch && !out.some(c=>c.ch===st.ch)) out.push({ch:st.ch, i, ico:st.ico}); }); return out;
+}
+function tourRenderToc(){
+  const ui = document.getElementById('tour-ui'); if(!ui) return;
+  const pop = ui.querySelector('.tr-pop'), cur = TOUR_STEPS[TOUR.i].ch;
+  pop.className = 'tr-pop center toc'; pop.dataset.place = '';
+  pop.innerHTML = `<div class="tr-t tr-c" style="margin-bottom:12px">فهرس الجولة</div><div class="tr-tocl">${tourChapters().map(c=>`<button type="button" data-t="jump" data-i="${c.i}" class="${c.ch===cur?'on':''}"><span>${c.ico}</span>${c.ch}</button>`).join('')}</div><button type="button" class="tr-link tr-c" data-t="back" style="display:block;width:100%;margin-top:10px">رجوع</button>`;
+  ui.classList.add('nospot'); ui.querySelector('.tr-spot').style.opacity = '0'; TOUR.last = ''; tourTrack(true);
+}
+function tourPop(st, i){
+  const n = TOUR_STEPS.length;
+  if(st.k==='intro') return `<div class="tr-hero"><div class="tr-logo">🎬</div></div>
+    <div class="tr-t tr-c">جولة في اجتماع جامعة</div>
+    <div class="tr-b tr-c">هنلف الموقع كله مع بعض وأنا أشرحلك كل قسم بالتفصيل: الحضور، الألعاب، الغرف، والفيزا من أول شرائها لحد التحويل والاستلام.</div>
+    <div class="tr-chips"><span>⏱ حوالي 8 دقايق</span><span>📑 فهرس للتنقل</span>${TOUR.hasVoice?'<span>🎙 بالصوت</span>':''}</div>
+    <button type="button" class="tr-primary tr-full" data-t="next">ابدأ الجولة</button>
+    <button type="button" class="tr-link tr-c" data-t="close">مش دلوقتي</button>`;
+  if(st.k==='outro') return `<div class="tr-hero"><div class="tr-logo ok">✓</div></div>
+    <div class="tr-t tr-c">خلصنا! 🎉</div>
+    <div class="tr-b tr-c">لو احتجت شرح أي خانة دوس على زرار "؟" اللي فوق. وتقدر تعيد الجولة أو تروح لأي قسم من «اشرح الآن».</div>
+    <button type="button" class="tr-primary tr-full" data-t="close">تمام، يلا نبدأ</button>
+    <button type="button" class="tr-link tr-c" data-t="toc">فهرس الجولة</button>
+    <button type="button" class="tr-link tr-c" data-t="again">إعادة الجولة</button>`;
+  const q = tourSteps(st), idx = TOUR_STEPS.slice(0,i+1).filter(x=>!x.k).length;
+  return `<i class="tr-arrow"></i>
+    <div class="tr-meta"><span class="tr-chap">${st.ch}</span><span class="tr-n"><bdi>${idx} / ${TR_REAL()}</bdi></span></div>
+    <div class="tr-row"><span class="tr-ic">${st.ico}</span><div class="tr-t">${q.t}</div></div>
+    <div class="tr-scroll"><div class="tr-b">${q.x}</div>${st.mock?TR_MOCK[st.mock]:''}${q.d.length?`<ul class="tr-ul">${q.d.map(x=>`<li>${x}</li>`).join('')}</ul>`:''}</div>
+    <div class="tr-bar"><i></i></div>
+    <div class="tr-foot">
+      <button type="button" class="tr-ib" data-t="toc" aria-label="الفهرس">${TR_ICO.list}</button>
+      ${TOUR.hasVoice?`<button type="button" class="tr-ib${TOUR.voice?'':' off'}" data-t="voice" aria-label="الصوت">${TR_ICO.voice}</button>`:''}
+      <span class="tr-sp"></span>
+      <button type="button" class="tr-ib" data-t="auto" aria-label="تشغيل/إيقاف">${TOUR.auto?TR_ICO.pause:TR_ICO.play}</button>
+      <button type="button" class="tr-ib" data-t="prev" aria-label="السابق">${TR_ICO.prev}</button>
+      <button type="button" class="tr-primary" data-t="next">التالي ${TR_ICO.next}</button>
+    </div>
+    <button type="button" class="tr-x" data-t="close" aria-label="إنهاء">✕</button>`;
+}
+function tourShow(i, keep){
+  const ui = document.getElementById('tour-ui'); if(!ui || !TOUR.on) return;
+  tourClear(); TOUR.i = i; const tok = ++TOUR.tok, st = TOUR_STEPS[i];
+  ui.classList.add('leaving');
+  const pageChange = !!(st.v && state.view !== st.v);
+  if(pageChange){ try{ go(st.v); }catch(e){} }
+  if(st.pre){ try{ st.pre(); if(!pageChange) render(); }catch(e){} }
+  setTimeout(()=>{
+    if(tok!==TOUR.tok || !TOUR.on) return;
+    if(st.v && state.view !== st.v){ const nx = i + (TOUR.dir||1); if(nx>0 && nx<TOUR_STEPS.length) return tourShow(nx); return tourEnd(); } /* خانة مقفولة — نعدّيها */
+    const pop = ui.querySelector('.tr-pop'); pop.className = 'tr-pop' + (st.k ? ' center' : (st.ctr ? ' wide' : '')); pop.innerHTML = tourPop(st, i);
+    ui.querySelector('.tr-top i').style.width = (i/(TOUR_STEPS.length-1)*100)+'%';
+    const els = (st.s && !st.ctr) ? tourFind(st) : null; TOUR.el = els;
+    if(els){
+      const e0 = els[0], big = e0.getBoundingClientRect().height > innerHeight*.5;
+      try{ e0.scrollIntoView({block: big?'start':'center', inline:'nearest'}); }catch(e){}
+    }
+    setTimeout(()=>{
+      if(tok!==TOUR.tok || !TOUR.on) return;
+      TOUR.last = ''; tourTrack(true);
+      ui.classList.remove('leaving');
+      tourArm(i, tok);
+    }, els ? 190 : 40);
+  }, pageChange ? 760 : (st.pre ? 520 : 300));
+}
+function tourArm(i, tok){
+  const ui = document.getElementById('tour-ui'); if(!ui || !TOUR.on) return;
+  const st = TOUR_STEPS[i]; if(st.k || !TOUR.auto || TOUR.toc) return;
+  const q = tourSteps(st), spoken = q.t+'. '+q.x+' '+q.d.join('. ');
+  const bi = ui.querySelector('.tr-bar i'); const dur = Math.max(7000, spoken.length*72);
+  if(bi){ bi.style.transition = 'none'; bi.style.width = '0'; void bi.offsetWidth; bi.style.transition = 'width '+dur+'ms linear'; bi.style.width = '100%'; }
+  const sc = ui.querySelector('.tr-scroll');
+  if(sc){ sc.scrollTop = 0; const mx = sc.scrollHeight - sc.clientHeight;
+    if(mx>8){ let man = false; ['touchstart','wheel','pointerdown'].forEach(ev=>sc.addEventListener(ev, ()=>{ man = true; }, {once:true, passive:true}));
+      const t0 = performance.now(), tot = dur*.7, step = t=>{ if(man || tok!==TOUR.tok || !TOUR.on || !TOUR.auto) return; const k = Math.min(1,(t-t0)/tot); sc.scrollTop = mx*k; if(k<1) requestAnimationFrame(step); };
+      setTimeout(()=>requestAnimationFrame(step), dur*.12); } }
+  const nxt = ()=>{ if(tok===TOUR.tok && TOUR.on && TOUR.auto) tourGo(i+1, 1); };
+  clearTimeout(TOUR.timer);
+  if(TOUR.voice && tourSpeak(spoken, ()=>{ clearTimeout(TOUR.timer); TOUR.timer = setTimeout(nxt, 1000); })) TOUR.timer = setTimeout(nxt, dur+9000);
+  else TOUR.timer = setTimeout(nxt, dur);
+}
+/* بيحط التظليل والكارت على العنصر ويتابعه لو اتحرك */
+function tourTrack(force){
+  const ui = document.getElementById('tour-ui'); if(!ui || !TOUR.on) return;
+  const st = TOUR_STEPS[TOUR.i], pop = ui.querySelector('.tr-pop'), spot = ui.querySelector('.tr-spot');
+  const vw = innerWidth, vh = innerHeight, m = 12;
+  let els = TOUR.el;
+  if(els && els.some(e=>!e.isConnected)){ els = (st.s && !st.ctr) ? tourFind(st) : null; TOUR.el = els; }
+  if(!els || TOUR.toc){
+    ui.classList.add('nospot'); spot.style.opacity = '0';
+    const pw = pop.offsetWidth, ph = pop.offsetHeight;
+    pop.style.left = Math.max(m,(vw-pw)/2)+'px'; pop.style.top = Math.max(m,(vh-ph)/2)+'px';
+    return;
+  }
+  const r = tourRect(els), pad = 8, key = [r.left,r.top,r.width,r.height,pop.offsetHeight].map(Math.round).join(',');
+  if(!force && key===TOUR.last) return; TOUR.last = key;
+  ui.classList.remove('nospot');
+  let rad = 16; try{ const br = parseFloat(getComputedStyle(els[0]).borderTopLeftRadius); if(br>0 && !els[1]) rad = br + pad; }catch(e){}
+  Object.assign(spot.style, {opacity:'1', left:(r.left-pad)+'px', top:(r.top-pad)+'px', width:(r.width+pad*2)+'px', height:(r.height+pad*2)+'px', borderRadius:rad+'px'});
+  const pw = pop.offsetWidth, ph = pop.offsetHeight, gap = 16;
+  const below = vh - (r.bottom+pad), above = r.top - pad;
+  let top, place;
+  if(below >= ph+gap+m){ top = r.bottom+pad+gap; place = 'below'; }
+  else if(above >= ph+gap+m){ top = r.top-pad-gap-ph; place = 'above'; }
+  else { place = 'over'; top = (r.top+r.height/2 < vh/2) ? vh-ph-m-8 : m+8; }
+  const left = Math.min(Math.max(r.left+r.width/2-pw/2, m), vw-pw-m);
+  pop.style.left = left+'px'; pop.style.top = top+'px';
+  pop.dataset.place = place;
+  const ar = pop.querySelector('.tr-arrow');
+  if(ar && place!=='over'){ ar.style.display = 'block'; ar.style.left = Math.min(Math.max(r.left+r.width/2-left-7, 20), pw-34)+'px'; } else if(ar){ ar.style.display = 'none'; }
+}
+try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
 const PG_SEEN_KEY = 'glv-pg-seen';
 function pgSeenGet(){ try{ return JSON.parse(localStorage.getItem(PG_SEEN_KEY)||'{}')||{}; }catch(e){ return {}; } }
 function pgSeenSet(v){ try{ const o = pgSeenGet(); o[v] = 1; localStorage.setItem(PG_SEEN_KEY, JSON.stringify(o)); }catch(e){} }
 function pgHelpTick(){
   let b = document.getElementById('pg-help');
   const v = state.view, g = PAGE_GUIDES[v];
-  const hide = !g || !state.pid || document.getElementById('pg-guide') || document.querySelector('.modal-overlay, #gsg-modal, #gsg-cup[style*="flex"]');
+  const hide = !g || !state.pid || v==='profile' || document.getElementById('tour-ui') || document.getElementById('pg-guide') || document.querySelector('.modal-overlay, #gsg-modal, #gsg-cup[style*="flex"]');
   if(hide){ if(b) b.style.display = 'none'; return; }
   if(!b){
     b = document.createElement('button'); b.id = 'pg-help'; b.type = 'button'; b.setAttribute('aria-label','شرح الخانة'); b.innerHTML = '<span>؟</span>';
@@ -15264,12 +15619,13 @@ function showPageGuide(view){
     ${g.tip?`<div class="gg-note pg-tip">💡 ${g.tip}</div>`:''}
     <div class="gg-label">اضغط على أي بند تعرف تفاصيله</div>
     <div class="gg-list">${items}</div>
-    <div class="gg-actions"><button type="button" class="btn btn-primary" id="pg-ok" style="width:100%">فهمت</button></div>
+    <div class="gg-actions"><button type="button" class="btn btn-primary" id="pg-ok" style="width:100%">فهمت</button><button type="button" class="btn btn-ghost" id="pg-tour" style="width:100%;margin-top:8px">🎬 اشرح لي الموقع كله</button></div>
   </div>`;
   document.body.appendChild(o);
   const close = ()=>{ const c = o.querySelector('.pg-card'); if(c) c.classList.add('out'); o.style.opacity = '0'; o.style.transition = 'opacity .2s'; setTimeout(()=>o.remove(), 210); };
   o.addEventListener('click', e=>{ if(e.target===o) close(); });
   o.querySelector('#pg-ok').addEventListener('click', close);
+  o.querySelector('#pg-tour').addEventListener('click', ()=>{ o.remove(); startSiteTour(); });
 }
 async function gsAdd(pid, amt){
   try{
@@ -30276,31 +30632,6 @@ function renderOpinionPage(){
 }
 
 /* ============================= RENDER: DIGITAL PASS PAGE ============================= */
-/* ============================= RENDER: STAY / FOOD PAGE ============================= */
-function renderStayPage(){
-  const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const lg = logisticsOf(p.id);
-  const hasStay = lg.room || lg.roommate || lg.mealTimes || lg.foodLocation;
-  const rows = [
-    {ico:'🛏️', lab:'رقم الغرفة', val:lg.room},
-    {ico:'🧑‍🤝‍🧑', lab:'اسم زميل الغرفة', val:lg.roommate},
-    {ico:'🍽️', lab:'مواعيد الوجبات', val:lg.mealTimes},
-    {ico:'📍', lab:'مكان الأكل', val:lg.foodLocation},
-  ];
-  const rowsHtml = rows.map(r=>`
-    <div class="info-row">
-      <span class="info-ico">${r.ico}</span>
-      <div class="info-body"><div class="info-lab">${r.lab}</div><div class="info-val">${r.val?escapeHtml(r.val):'—'}</div></div>
-    </div>`).join('');
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">الإقامة والأكل</div>
-    </div>
-    ${hasStay ? `<div class="card">${rowsHtml}</div>` : `<div class="empty-note">🏨 مفيش بيانات إقامة متاحة ليك في هذا الاجتماع</div>`}
-  `;
-}
-
 /* ============================= RENDER: KIT PAGE ============================= */
 function renderKitPage(){
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
@@ -30325,39 +30656,6 @@ function renderKitPage(){
       <span style="color:var(--text-muted);font-size:12.5px;"> من ${KIT_ITEMS.length} حاجات استلمتها</span>
     </div>
     <div class="kit-grid">${items}</div>
-  `;
-}
-
-/* ============================= RENDER: TRANSPORT PAGE ============================= */
-const TRIP_STATUS_LABELS = {waiting:'لم تتحرك بعد ⏳', moving:'في الطريق 🚌', arrived:'وصلت ✅'};
-function renderTransportPage(){
-  const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  const lg = logisticsOf(p.id);
-  const hasBus = lg.busNumber || lg.gatherPoint || lg.departTime || lg.supervisor;
-  const rows = [
-    {ico:'📍', lab:'مكان التجمع', val:lg.gatherPoint},
-    {ico:'⏰', lab:'ميعاد التحرك', val:lg.departTime},
-    {ico:'🚌', lab:'رقم الأتوبيس', val:lg.busNumber},
-    {ico:'🧑‍💼', lab:'المشرف المسؤول', val:lg.supervisor},
-  ];
-  const rowsHtml = rows.map(r=>`
-    <div class="info-row">
-      <span class="info-ico">${r.ico}</span>
-      <div class="info-body"><div class="info-lab">${r.lab}</div><div class="info-val">${r.val?escapeHtml(r.val):'—'}</div></div>
-    </div>`).join('');
-  return `
-    <div class="back-row">
-      <button class="icon-btn" data-action="back">${ICO.back}</button>
-      <div class="back-title">المواصلات</div>
-    </div>
-    ${hasBus ? `
-      <div class="card transport-status-card">
-        <div class="ts-ico">🚌</div>
-        <div class="ts-lab">حالة الرحلة</div>
-        <div class="ts-status">${TRIP_STATUS_LABELS[lg.tripStatus]||'لم تُحدد بعد'}</div>
-      </div>
-      <div class="card">${rowsHtml}</div>
-    ` : `<div class="empty-note">🚌 مفيش بيانات مواصلات متاحة ليك في هذا الاجتماع</div>`}
   `;
 }
 
@@ -31792,7 +32090,7 @@ function renderAdminSiblingNav(){
 function renderAdmin(){
   if(!state.adminUnlocked) return renderAdminLock();
   if(state.clsOnly) return renderClsOnlyPage();
-  if(!state.adminHub && ['sessions','pulse','questions','logistics','pointcodes'].includes(state.adminTab)) state.adminHub = true;
+  if(!state.adminHub && ['sessions','pulse','questions','pointcodes'].includes(state.adminTab)) state.adminHub = true;
   if(state.adminHub) return renderAdminHub();
   const tab = state.adminTab;
   let body = '';
@@ -32491,9 +32789,7 @@ function render(){
   else if(state.view==='room-battleship') html = renderRoomBs();
   else if(state.view==='settings') html = renderSettingsPage();
   else if(state.view==='attendance' || state.view==='attendance-scan') html = featureLockedForMe('attendance') ? renderMaintenancePage('الحضور','✅') : (state.view==='attendance' ? renderAttendancePage() : renderAttendanceScanPage());
-  else if(state.view==='stay') html = renderStayPage();
   else if(state.view==='kit') html = renderKitPage();
-  else if(state.view==='transport') html = renderTransportPage();
   else if(state.view==='retreat') html = featureLockedForMe('retreat') ? renderMaintenancePage('خلوة فردية','✝️') : renderRetreatPage();
   else if(state.view==='timeline') html = renderTimeline();
   else if(state.view==='admin') html = renderAdmin();
@@ -33279,7 +33575,7 @@ function stopAmbient(){
 function updateAmbientForView(){
   const extra = state.pid ? myExtra(state.pid) : {};
   if(!state.pid || !extra.ambient || extra.dataSaver){ stopAmbient(); return; }
-  if(!['profile','me','session','compare','timeline','badges','quests','dna','share','settings','stay','kit','transport','retreat'].includes(state.view)){ stopAmbient(); return; }
+  if(!['profile','me','session','compare','timeline','badges','quests','dna','share','settings','kit','retreat'].includes(state.view)){ stopAmbient(); return; }
   startAmbient('calm');
   setAmbientMood('calm');
 }
@@ -35549,6 +35845,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-achievements'){ state.friendTile = null; state.achFilter='all'; go('game-achievements'); achRefresh(false); }
   else if(action==='open-gs'){ state.friendTile = null; state.gsLimit = 30; state._gsSeen = false; state.gsGame = 'all'; go('game-leaderboard'); gsRefresh(); }
   else if(action==='gs-game'){ state.gsGame = el.dataset.g || 'all'; state.gsLimit = 30; state._gsSeen = false; state._gsChipScroll = true; render(); }
+  else if(action==='start-tour'){ startSiteTour(); }
   else if(action==='gs-more'){ state.gsLimit = (state.gsLimit||30)+30; render(); }
   else if(action==='gs-refresh'){ gsRefresh(); showToast('جاري التحديث…'); }
   else if(action==='gs-rebuild'){ if(state.adminUnlocked){ showToast('جاري إعادة الحساب من كل السجلات…'); gsRefresh({rebuild:true}).then(()=>showToast('تم تحديث الترتيب')); } }
@@ -38364,16 +38661,10 @@ async function doAdminUnlock(){
 
 async function doSaveLogistics(pid){
   const g = id => document.getElementById(id);
-  const room = g('lg-room-'+pid), roommate = g('lg-roommate-'+pid), meals = g('lg-meals-'+pid), food = g('lg-food-'+pid),
-        gather = g('lg-gather-'+pid), depart = g('lg-depart-'+pid), bus = g('lg-bus-'+pid), sup = g('lg-super-'+pid), status = g('lg-status-'+pid);
-  if(!room) return;
+  if(!KIT_ITEMS.some(it=>g('lg-kit-'+it.key+'-'+pid))) return;
   const kit = {};
   KIT_ITEMS.forEach(it=>{ const cb = g('lg-kit-'+it.key+'-'+pid); kit[it.key] = !!(cb && cb.checked); });
-  LOGISTICS[pid] = {
-    room: room.value.trim(), roommate: roommate.value.trim(), mealTimes: meals.value.trim(), foodLocation: food.value.trim(),
-    gatherPoint: gather.value.trim(), departTime: depart.value.trim(), busNumber: bus.value.trim(), supervisor: sup.value.trim(),
-    tripStatus: status.value, kit,
-  };
+  LOGISTICS[pid] = { kit };
   await saveLogistics(LOGISTICS);
   state.editingLogisticsId = null;
   showToast('اتحفظت بيانات المشارك');
