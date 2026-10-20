@@ -6462,6 +6462,33 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
 
   /* start + result screens */
 
+
+  .faw-rules-btn{display:inline-flex; align-items:center; gap:8px; padding:9px 18px; border-radius:99px; cursor:pointer; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:var(--gold);
+    background:color-mix(in srgb, var(--gold) 12%, var(--surface)); border:1.5px solid color-mix(in srgb, var(--gold) 50%, var(--border)); transition:transform .15s, box-shadow .2s;}
+  .faw-rules-btn:active{transform:scale(.95);} .faw-rules-btn span{font-size:16px;}
+  .faw-topics .faw-topic:nth-child(even):last-child{grid-column:1 / -1;}
+  .faw-rm{position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; padding:18px;}
+  .faw-rm-bg{position:absolute; inset:0; background:rgba(5,6,20,.72); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); animation:fawRmBg .25s ease-out both;}
+  .faw-rm-card{position:relative; width:100%; max-width:420px; max-height:100%; overflow-y:auto; box-sizing:border-box; padding:22px 16px 16px; border-radius:26px; text-align:center;
+    background:linear-gradient(165deg,var(--surface),var(--bg-2)); border:1.5px solid color-mix(in srgb, var(--gold) 45%, var(--border));
+    box-shadow:0 24px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset; display:flex; flex-direction:column; gap:10px;
+    animation:fawRmCard .5s cubic-bezier(.2,1.25,.4,1) both;}
+  .faw-rm-glow{position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:radial-gradient(90% 40% at 50% 0%, rgba(244,183,64,.22), transparent 70%);}
+  .faw-rm-x{position:absolute; top:10px; left:10px; width:32px; height:32px; border-radius:50%; border:1px solid var(--border); background:var(--surface-2); color:var(--text-muted); cursor:pointer; font-size:14px;}
+  .faw-rm-ico{position:relative; font-size:42px; line-height:1; animation:fawRmIco .7s .15s cubic-bezier(.2,1.5,.4,1) both;}
+  .faw-rm-title{position:relative; font-family:'Cairo',sans-serif; font-weight:900; font-size:19px; color:var(--text); margin-bottom:2px;}
+  .faw-rm-item{position:relative; display:flex; align-items:center; gap:12px; text-align:right; padding:10px 12px; border-radius:14px; background:var(--surface); border:1px solid var(--border);
+    animation:fawRmItem .45s var(--d,.1s) cubic-bezier(.2,.9,.3,1) both;}
+  .faw-rm-item>b{flex:0 0 auto; width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:19px; background:color-mix(in srgb, var(--gold) 15%, transparent);}
+  .faw-rm-item h4{margin:0 0 2px; font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:var(--gold);}
+  .faw-rm-item p{margin:0; font-family:'Cairo',sans-serif; font-weight:600; font-size:12.5px; line-height:1.7; color:var(--text-muted);}
+  .faw-rm .faw-cta{margin-top:6px; animation:fawRmItem .45s .5s both;}
+  .faw-rm.out .faw-rm-bg{animation:fawRmBgOut .25s ease-in forwards;} .faw-rm.out .faw-rm-card{animation:fawRmCardOut .25s ease-in forwards;}
+  @keyframes fawRmBg{from{opacity:0;} to{opacity:1;}} @keyframes fawRmBgOut{to{opacity:0;}}
+  @keyframes fawRmCard{from{opacity:0; transform:translateY(40px) scale(.86);} to{opacity:1; transform:none;}}
+  @keyframes fawRmCardOut{to{opacity:0; transform:translateY(24px) scale(.92);}}
+  @keyframes fawRmIco{from{opacity:0; transform:scale(.3) rotate(-25deg);} to{opacity:1; transform:none;}}
+  @keyframes fawRmItem{from{opacity:0; transform:translateX(22px);} to{opacity:1; transform:none;}}
   /* مستويات + مواضيع */
   .faw-sec-h{width:100%; display:flex; align-items:center; justify-content:space-between; margin-top:4px; font-family:'Cairo',sans-serif; font-size:13.5px; color:var(--text);}
   .faw-sec-h b{font-weight:900;} .faw-sec-h span{font-weight:700; font-size:11.5px; color:var(--text-muted);}
@@ -22830,6 +22857,33 @@ function fawStarsHtml(n, max){
   let h=''; for(let i=1;i<=(max||3);i++) h += `<i class="${i<=n?'on':''}">★</i>`;
   return h;
 }
+function fawShowRules(){
+  const ov = document.getElementById('faw-overlay'); if(!ov || document.getElementById('faw-rules-modal')) return;
+  const items = [
+    ['⏱️','الوقت والصعوبة','الوقت بيقل من 25 لـ 17 ثانية، والأسئلة بتصعب كل ما المستوى يعلى.'],
+    ['✅','النقط','كل إجابة صح بتجيب نقط وبتزيد مع المستوى، وفيه زيادة نقطة لو جاوبت بسرعة.'],
+    ['💡','التلميح','بيساعدك، بس نقطة السؤال بتبقى '+FAW_CFG.hinted+' بس.'],
+    ['⭐','النجوم','7 صح = نجمة • 9 صح = نجمتين • 10 صح = 3 نجوم ومكافأة.'],
+    ['🔓','فتح المستويات','لازم تجاوب '+FAW_CFG.pass+' صح على الأقل عشان المستوى اللي بعده يتفتح.']
+  ].map((r,i)=>`<div class="faw-rm-item" style="--d:${.12+i*.07}s"><b>${r[0]}</b><div><h4>${r[1]}</h4><p>${r[2]}</p></div></div>`).join('');
+  const m = document.createElement('div');
+  m.id = 'faw-rules-modal'; m.className = 'faw-rm';
+  m.innerHTML = `<div class="faw-rm-bg" data-action="faw-rules-close"></div>
+    <div class="faw-rm-card" role="dialog" aria-label="قواعد اللعبة">
+      <div class="faw-rm-glow"></div>
+      <button type="button" class="faw-rm-x" data-action="faw-rules-close" aria-label="إغلاق">✕</button>
+      <div class="faw-rm-ico">📜</div>
+      <div class="faw-rm-title">قواعد اللعبة</div>
+      ${items}
+      <button type="button" class="btn btn-primary faw-cta" data-action="faw-rules-close">فهمت، يلا نلعب 🚀</button>
+    </div>`;
+  ov.appendChild(m);
+  try{ SND.click(); }catch(e){}
+}
+function fawHideRules(){
+  const m = document.getElementById('faw-rules-modal'); if(!m) return;
+  m.classList.add('out'); setTimeout(()=>{ if(m.parentNode) m.remove(); }, 260);
+}
 function fawStartHtml(){
   const st = state.pid ? myGameStats(state.pid) : {};
   const best = st.fawBest ? `أفضل جولة ليك: ${st.fawBest} نقطة` : 'أول مرة تلعب اللعبة دي 🎉';
@@ -22852,6 +22906,7 @@ function fawStartHtml(){
     <div class="faw-start">
       <div class="faw-start-ico">🧩</div>
       <div class="faw-start-title">فوازير</div>
+      <button type="button" class="faw-rules-btn" data-action="faw-rules"><span>📜</span> قواعد اللعبة والنقط</button>
       <div class="faw-start-sub">${FAW_BANK.length} فزورة في الكتاب المقدس والطقس الكنسي والعقيدة والقديسين والشهداء. كل مستوى ${FAW_CFG.perRound} أسئلة، جاوب ${FAW_CFG.pass} صح على الأقل عشان تفتح المستوى اللي بعده.</div>
       <div class="faw-sec-h"><b>🏁 المستويات</b><span>⭐ ${totalStars} / ${FAW_LEVELS.length*3}</span></div>
       <div class="faw-lvls">${lvls}</div>
@@ -22860,12 +22915,6 @@ function fawStartHtml(){
         <button type="button" class="faw-topic all" data-action="faw-start" data-cat="all"><span>🎲</span><b>كل المواضيع</b><small>مختلط</small></button>
         ${topics}
       </div>
-      <ul class="faw-rules">
-        <li><b>⏱️</b><span>الوقت بيقل (من 25 لـ 17 ثانية) والأسئلة بتصعب كل ما المستوى يعلى</span></li>
-        <li><b>✅</b><span>الإجابة الصح بتجيب نقط (بتزيد مع المستوى)، و+${FAW_CFG.fastBonus} لو جاوبت بسرعة</span></li>
-        <li><b>💡</b><span>التلميح بيساعدك، بس نقط السؤال بتبقى ${FAW_CFG.hinted}</span></li>
-        <li><b>⭐</b><span>${FAW_CFG.pass} صح = نجمة، 9 = نجمتين، 10 = 3 نجوم + مكافأة</span></li>
-      </ul>
       <div class="hint">${best}</div>
     </div>`;
 }
@@ -36587,6 +36636,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='faw-close' || action==='faw-exit'){ closeFawazeerGame(); }
   else if(action==='faw-start'){ fawInit(el.dataset.lvl ? {lvl:parseInt(el.dataset.lvl,10)} : {cat:el.dataset.cat||'all'}); fawRender(); fawStartTimer(); try{ SND.click(); }catch(_){} }
   else if(action==='faw-reset'){ fawInit(state.fawLast); fawRender(); fawStartTimer(); try{ SND.click(); }catch(_){} }
+  else if(action==='faw-rules'){ fawShowRules(); }
+  else if(action==='faw-rules-close'){ fawHideRules(); }
   else if(action==='faw-menu'){ fawStopTimer(); state.faw = null; fawRender(); try{ SND.click(); }catch(_){} }
   else if(action==='faw-pick'){ fawReveal(parseInt(el.dataset.idx,10)); }
   else if(action==='faw-hint'){ fawHint(); }
