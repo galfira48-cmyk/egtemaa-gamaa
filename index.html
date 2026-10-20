@@ -6461,6 +6461,28 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .faw-hintbtn:disabled{opacity:.55;}
 
   /* start + result screens */
+
+  /* مستويات + مواضيع */
+  .faw-sec-h{width:100%; display:flex; align-items:center; justify-content:space-between; margin-top:4px; font-family:'Cairo',sans-serif; font-size:13.5px; color:var(--text);}
+  .faw-sec-h b{font-weight:900;} .faw-sec-h span{font-weight:700; font-size:11.5px; color:var(--text-muted);}
+  .faw-lvls{width:100%; display:grid; grid-template-columns:repeat(5,1fr); gap:8px;}
+  .faw-lv{display:flex; flex-direction:column; align-items:center; gap:2px; padding:9px 2px 8px; border-radius:14px; cursor:pointer; font-family:'Cairo',sans-serif;
+    background:linear-gradient(165deg,var(--surface),var(--surface-2)); border:1.5px solid var(--border); color:var(--text); transition:transform .15s, border-color .2s;}
+  .faw-lv:not(:disabled):active{transform:scale(.95);}
+  .faw-lv.done{border-color:color-mix(in srgb, var(--gold) 55%, var(--border));}
+  .faw-lv.locked{opacity:.45; cursor:not-allowed;}
+  .faw-lv-n{font-size:22px; line-height:1.2;}
+  .faw-lv-t{font-weight:800; font-size:10.5px;} .faw-lv-s{font-weight:600; font-size:10px; color:var(--text-muted);}
+  .faw-lv-stars, .faw-over-stars{display:flex; gap:1px; direction:ltr; font-size:12px; line-height:1;}
+  .faw-lv-stars i, .faw-over-stars i{font-style:normal; color:var(--surface-2); -webkit-text-stroke:1px var(--border);}
+  .faw-lv-stars i.on, .faw-over-stars i.on{color:var(--gold); -webkit-text-stroke:0;}
+  .faw-over-stars{font-size:32px; gap:6px; justify-content:center;}
+  .faw-topics{width:100%; display:grid; grid-template-columns:repeat(2,1fr); gap:8px;}
+  .faw-topic{display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:14px; cursor:pointer; text-align:right; font-family:'Cairo',sans-serif;
+    background:var(--surface); border:1.5px solid var(--border); color:var(--text);}
+  .faw-topic:active{transform:scale(.97);}
+  .faw-topic span{font-size:20px;} .faw-topic b{flex:1; font-weight:800; font-size:12.5px;} .faw-topic small{font-size:10px; color:var(--text-muted); font-weight:700;}
+  .faw-topic.all{grid-column:1 / -1; border-color:color-mix(in srgb, var(--gold) 45%, var(--border));}
   .faw-start, .faw-over{display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center; padding:18px 6px; animation:fawQ .4s ease-out both;}
   .faw-start-ico, .faw-over-ico{font-size:54px; line-height:1; filter:drop-shadow(0 6px 18px rgba(244,183,64,.4));}
   .faw-start-title, .faw-over-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:21px; color:var(--text);}
@@ -16181,6 +16203,7 @@ const GAME_CATEGORIES = [
   {key:'board', label:'ألعاب الطاولة الكلاسيكية', icon:'🎲', color:'linear-gradient(145deg,#7C4A2A,#2b1608)'},
   {key:'skill', label:'تحديات السرعة والمهارة', icon:'⚡', color:'linear-gradient(145deg,#FFD93D,#C23B3B)'},
   {key:'mind',  label:'ذكاء وأسئلة', icon:'🧠', color:'linear-gradient(145deg,#9B8CFF,#3FDCC9)'},
+  {key:'focus', label:'ذاكرة وتركيز', icon:'🧩', color:'linear-gradient(145deg,#3FDCC9,#4FACFE)'},
   {key:'cards', label:'ورق وحظ', icon:'🃏', color:'linear-gradient(145deg,#FF6B6B,#FFE066)'},
   {key:'party', label:'تحديات جماعية', icon:'🎉', color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
 ];
@@ -16188,9 +16211,9 @@ const GAME_CATEGORY_OF = {
   xo:'board', connect4:'board', domino:'board', ludo:'board', chess:'board', checkers:'board', tmm:'board', backgammon:'board', snakes:'board',
   crossmath:'mind',
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
-  memory:'mind', who:'mind', revword:'mind', blocky:'mind', cube:'mind', numguess:'mind', math:'mind', millionaire:'mind', fawazeer:'mind', bus:'mind', rollpaint:'mind', simon:'mind',
+  memory:'focus', who:'mind', revword:'mind', blocky:'focus', cube:'focus', numguess:'mind', math:'mind', millionaire:'mind', fawazeer:'mind', bus:'mind', rollpaint:'focus', simon:'focus',
   colorcards:'cards', rps:'cards',
-  quiz:'party', mystery:'party', emojibible:'party', proverb:'party', stoptimer:'skill', uniqans:'party', fahmeen:'party', placemem:'mind', sqorder:'mind', fazzura:'party', drawguess:'party', battleship:'board', khatfa:'party',
+  quiz:'party', mystery:'party', emojibible:'party', proverb:'party', stoptimer:'skill', uniqans:'party', fahmeen:'party', placemem:'focus', sqorder:'focus', fazzura:'party', drawguess:'party', battleship:'board', khatfa:'party',
 };
 /* rectangular category cards — tap one to open the games inside it */
 /* تحديث لحظي: لو الأدمن قفل/فتح لعبة، الشاشة بتتحدّث عند اللاعبين من غير ريفرش */
@@ -16227,7 +16250,7 @@ function ghUpdatingHtml(list){
     <div class="ghu-row">${tiles}</div>
   </section>`;
 }
-const GH_CAT_ACCENT = {board:'214,150,92', skill:'255,190,60', mind:'120,170,255', cards:'255,107,107', party:'176,124,255', more:'79,172,254'};
+const GH_CAT_ACCENT = {board:'214,150,92', skill:'255,190,60', mind:'120,170,255', focus:'63,220,201', cards:'255,107,107', party:'176,124,255', more:'79,172,254'};
 function ghCatListHtml(list, catAction){
   const known = new Set(Object.keys(GAME_CATEGORY_OF));
   const extra = list.some(g=> g && !known.has(g.id));
@@ -16276,7 +16299,7 @@ const GAMES_CATALOG = [
   {id:'blocky', icon:'🧩', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkY4Nzg3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRTAzMTMxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJiIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZFMDY2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjU5RjAwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNzRDMEZDIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTk3MUMyIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOENFOTlBIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMkY5RTQ0Ii8+PC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8ZyBzdHJva2U9InJnYmEoMCwwLDAsLjI1KSIgc3Ryb2tlLXdpZHRoPSIxLjUiPgo8cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIzOCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9InVybCgjYSkiLz4KPHJlY3QgeD0iNTIiIHk9IjEwIiB3aWR0aD0iMzgiIGhlaWdodD0iMzgiIHJ4PSI5IiBmaWxsPSJ1cmwoI2IpIi8+CjxyZWN0IHg9IjEwIiB5PSI1MiIgd2lkdGg9IjM4IiBoZWlnaHQ9IjM4IiByeD0iOSIgZmlsbD0idXJsKCNjKSIvPgo8cmVjdCB4PSI1MiIgeT0iNTIiIHdpZHRoPSIzOCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9InVybCgjZCkiLz48L2c+CjxnIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsLjU1KSI+PHJlY3QgeD0iMTYiIHk9IjE2IiB3aWR0aD0iMTYiIGhlaWdodD0iNyIgcng9IjMuNSIvPjxyZWN0IHg9IjU4IiB5PSIxNiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIzLjUiLz48cmVjdCB4PSIxNiIgeT0iNTgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiByeD0iMy41Ii8+PHJlY3QgeD0iNTgiIHk9IjU4IiB3aWR0aD0iMTYiIGhlaWdodD0iNyIgcng9IjMuNSIvPjwvZz4KPHBhdGggZD0iTTUwIDMwbDQgMTEgMTEgNC0xMSA0LTQgMTEtNC0xMS0xMS00IDExLTR6IiBmaWxsPSIjZmZmIiBzdHJva2U9IiNCMTk3RkMiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==', title:'بلوكي بلاست', sub:'لوحة 8×8 — فجّر الصفوف والأعمدة، كومبو ومستويات وتراجع وتبديل قطع', color:'linear-gradient(145deg,#6C4DFF,#1d1b4d)'},
   {id:'cube', icon:'🧊', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImNzIiBjeD0iNTAlIiBjeT0iNTAlIiByPSI1MCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDAiIHN0b3Atb3BhY2l0eT0iLjM1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDAwIiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50PjwvZGVmcz48ZWxsaXBzZSBjeD0iNTAiIGN5PSI5NSIgcng9IjMwIiByeT0iNC42IiBmaWxsPSJ1cmwoI2NzKSIvPjxwb2x5Z29uIHBvaW50cz0iNTAuMDAsMTAuMDAgODUuMDcsMzAuMjUgODUuMDcsNzAuNzUgNTAuMDAsOTEuMDAgMTQuOTMsNzAuNzUgMTQuOTMsMzAuMjUiIGZpbGw9IiMxNTE1MWIiIHN0cm9rZT0iIzE1MTUxYiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PGcgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZT0icmdiYSgwLDAsMCwuMjUpIj48cG9seWdvbiBwb2ludHM9IjUwLjAwLDExLjIxIDU5LjU5LDE2Ljc1IDUwLjAwLDIyLjI4IDQwLjQxLDE2Ljc1IiBmaWxsPSIjZjVmNWYyIi8+PHBvbHlnb24gcG9pbnRzPSIzOC4zMSwxNy45NiA0Ny45MCwyMy41MCAzOC4zMSwyOS4wMyAyOC43MiwyMy41MCIgZmlsbD0iI2ZmOGExZiIvPjxwb2x5Z29uIHBvaW50cz0iMjYuNjIsMjQuNzEgMzYuMjAsMzAuMjUgMjYuNjIsMzUuNzggMTcuMDMsMzAuMjUiIGZpbGw9IiNmZmQ2MGEiLz48cG9seWdvbiBwb2ludHM9IjYxLjY5LDE3Ljk3IDcxLjI4LDIzLjUwIDYxLjY5LDI5LjAzIDUyLjEwLDIzLjUwIiBmaWxsPSIjMWY2ZmUwIi8+PHBvbHlnb24gcG9pbnRzPSI1MC4wMCwyNC43MiA1OS41OSwzMC4yNSA1MC4wMCwzNS43OCA0MC40MSwzMC4yNSIgZmlsbD0iI2Y1ZjVmMiIvPjxwb2x5Z29uIHBvaW50cz0iMzguMzEsMzEuNDYgNDcuOTAsMzcuMDAgMzguMzEsNDIuNTMgMjguNzIsMzcuMDAiIGZpbGw9IiNlODM0M2IiLz48cG9seWdvbiBwb2ludHM9IjczLjM4LDI0LjcxIDgyLjk3LDMwLjI1IDczLjM4LDM1Ljc5IDYzLjgwLDMwLjI1IiBmaWxsPSIjMWZiODVhIi8+PHBvbHlnb24gcG9pbnRzPSI2MS42OSwzMS40NiA3MS4yOCwzNy4wMCA2MS42OSw0Mi41NCA1Mi4xMCwzNy4wMCIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iNTAuMDAsMzguMjEgNTkuNTksNDMuNzUgNTAuMDAsNDkuMjkgNDAuNDEsNDMuNzUiIGZpbGw9IiNmNWY1ZjIiLz48cG9seWdvbiBwb2ludHM9IjE1Ljk4LDMyLjA3IDI1LjU3LDM3LjYxIDI1LjU3LDQ4LjY4IDE1Ljk4LDQzLjE0IiBmaWxsPSIjMWZiODVhIi8+PHBvbHlnb24gcG9pbnRzPSIxNS45OCw0NS41NyAyNS41Nyw1MS4xMSAyNS41Nyw2Mi4xOCAxNS45OCw1Ni42NCIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iMTUuOTgsNTkuMDcgMjUuNTcsNjQuNjEgMjUuNTcsNzUuNjggMTUuOTgsNzAuMTQiIGZpbGw9IiMxZmI4NWEiLz48cG9seWdvbiBwb2ludHM9IjI3LjY3LDM4LjgyIDM3LjI2LDQ0LjM2IDM3LjI2LDU1LjQzIDI3LjY3LDQ5Ljg5IiBmaWxsPSIjZmY4YTFmIi8+PHBvbHlnb24gcG9pbnRzPSIyNy42Nyw1Mi4zMiAzNy4yNiw1Ny44NiAzNy4yNiw2OC45MyAyNy42Nyw2My4zOSIgZmlsbD0iIzFmYjg1YSIvPjxwb2x5Z29uIHBvaW50cz0iMjcuNjcsNjUuODIgMzcuMjYsNzEuMzYgMzcuMjYsODIuNDMgMjcuNjcsNzYuODkiIGZpbGw9IiNlODM0M2IiLz48cG9seWdvbiBwb2ludHM9IjM5LjM2LDQ1LjU3IDQ4Ljk1LDUxLjExIDQ4Ljk1LDYyLjE4IDM5LjM2LDU2LjY0IiBmaWxsPSIjZmZkNjBhIi8+PHBvbHlnb24gcG9pbnRzPSIzOS4zNiw1OS4wNyA0OC45NSw2NC42MSA0OC45NSw3NS42OCAzOS4zNiw3MC4xNCIgZmlsbD0iI2ZmZDYwYSIvPjxwb2x5Z29uIHBvaW50cz0iMzkuMzYsNzIuNTcgNDguOTUsNzguMTEgNDguOTUsODkuMTggMzkuMzYsODMuNjQiIGZpbGw9IiNlODM0M2IiLz48cG9seWdvbiBwb2ludHM9IjUxLjA1LDUxLjExIDYwLjY0LDQ1LjU3IDYwLjY0LDU2LjY0IDUxLjA1LDYyLjE4IiBmaWxsPSIjZmY4YTFmIi8+PHBvbHlnb24gcG9pbnRzPSI1MS4wNSw2NC42MSA2MC42NCw1OS4wNyA2MC42NCw3MC4xNCA1MS4wNSw3NS42OCIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iNTEuMDUsNzguMTEgNjAuNjQsNzIuNTcgNjAuNjQsODMuNjQgNTEuMDUsODkuMTgiIGZpbGw9IiMxZmI4NWEiLz48cG9seWdvbiBwb2ludHM9IjYyLjc0LDQ0LjM2IDcyLjMzLDM4LjgyIDcyLjMzLDQ5Ljg5IDYyLjc0LDU1LjQzIiBmaWxsPSIjZmZkNjBhIi8+PHBvbHlnb24gcG9pbnRzPSI2Mi43NCw1Ny44NiA3Mi4zMyw1Mi4zMiA3Mi4zMyw2My4zOSA2Mi43NCw2OC45MyIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iNjIuNzQsNzEuMzYgNzIuMzMsNjUuODIgNzIuMzMsNzYuODkgNjIuNzQsODIuNDMiIGZpbGw9IiMxZmI4NWEiLz48cG9seWdvbiBwb2ludHM9Ijc0LjQzLDM3LjYxIDg0LjAyLDMyLjA3IDg0LjAyLDQzLjE0IDc0LjQzLDQ4LjY4IiBmaWxsPSIjZTgzNDNiIi8+PHBvbHlnb24gcG9pbnRzPSI3NC40Myw1MS4xMSA4NC4wMiw0NS41NyA4NC4wMiw1Ni42NCA3NC40Myw2Mi4xOCIgZmlsbD0iI2ZmOGExZiIvPjxwb2x5Z29uIHBvaW50cz0iNzQuNDMsNjQuNjEgODQuMDIsNTkuMDcgODQuMDIsNzAuMTQgNzQuNDMsNzUuNjgiIGZpbGw9IiMxZjZmZTAiLz48L2c+PC9zdmc+', title:'مكعب روبيك', sub:'اضغط مرتين عشان يتخلط، وبعدين لف الطبقات بإصبعك لحد ما كل وش يبقى لون واحد — أسرع وقت بيتسجّل', color:'linear-gradient(145deg,#4FACFE,#6C4DFF)'},
   {id:'millionaire', icon:'👑', title:'من سيربح المليون', sub:'أسئلة مسيحية بنفس نظام السلم والمساعدات الثلاثة', color:'linear-gradient(145deg,#1b2a6b,#0a0c28)'},
-  {id:'fawazeer', icon:'🧩', title:'فوازير', sub:'فوازير دينية مسيحية — اتحدى معلوماتك وحل الفوازير قبل ما الوقت يخلص', color:'linear-gradient(145deg,#6A3FB5,#F4B740)'},
+  {id:'fawazeer', icon:'🧩', title:'فوازير', sub:'10 مستويات ومئات الأسئلة: كتاب مقدس، طقس، عقيدة، قديسين وشهداء', color:'linear-gradient(145deg,#6A3FB5,#F4B740)'},
   {id:'rollpaint', icon:'🎨', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJyZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmN2Q5NSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2QyM2Y1YyIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0ic2ciIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM0ZDVjNzMiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMzNDQxNGYiLz48L2xpbmVhckdyYWRpZW50Pgo8cmFkaWFsR3JhZGllbnQgaWQ9ImJnIiBjeD0iLjMzIiBjeT0iLjMiIHI9Ii44Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmYiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI2U4ZWFlZSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzlhYTFhZCIvPjwvcmFkaWFsR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNoIiB4PSItMzAlIiB5PSItMzAlIiB3aWR0aD0iMTYwJSIgaGVpZ2h0PSIxNzAlIj48ZmVEcm9wU2hhZG93IGR4PSIwIiBkeT0iMyIgc3RkRGV2aWF0aW9uPSIyLjIiIGZsb29kLWNvbG9yPSIjMDAwIiBmbG9vZC1vcGFjaXR5PSIuMzUiLz48L2ZpbHRlcj48L2RlZnM+CjxyZWN0IHg9IjUiIHk9IjUiIHdpZHRoPSI5MCIgaGVpZ2h0PSI5MCIgcng9IjIyIiBmaWxsPSIjZmRmMWNmIi8+CjxnIGZpbHRlcj0idXJsKCNzaCkiPgo8cmVjdCB4PSIxNCIgeT0iMTYiIHdpZHRoPSIyMyIgaGVpZ2h0PSIyMyIgcng9IjQiIGZpbGw9InVybCgjcmcpIi8+PHJlY3QgeD0iMzkiIHk9IjE2IiB3aWR0aD0iMjMiIGhlaWdodD0iMjMiIHJ4PSI0IiBmaWxsPSJ1cmwoI3JnKSIvPjxyZWN0IHg9IjY0IiB5PSIxNiIgd2lkdGg9IjIzIiBoZWlnaHQ9IjIzIiByeD0iNCIgZmlsbD0idXJsKCNzZykiLz4KPHJlY3QgeD0iMTQiIHk9IjQxIiB3aWR0aD0iMjMiIGhlaWdodD0iMjMiIHJ4PSI0IiBmaWxsPSJ1cmwoI3NnKSIvPjxyZWN0IHg9IjM5IiB5PSI0MSIgd2lkdGg9IjIzIiBoZWlnaHQ9IjIzIiByeD0iNCIgZmlsbD0idXJsKCNyZykiLz48cmVjdCB4PSI2NCIgeT0iNDEiIHdpZHRoPSIyMyIgaGVpZ2h0PSIyMyIgcng9IjQiIGZpbGw9InVybCgjc2cpIi8+CjxyZWN0IHg9IjE0IiB5PSI2NiIgd2lkdGg9IjIzIiBoZWlnaHQ9IjIxIiByeD0iNCIgZmlsbD0idXJsKCNzZykiLz48cmVjdCB4PSIzOSIgeT0iNjYiIHdpZHRoPSIyMyIgaGVpZ2h0PSIyMSIgcng9IjQiIGZpbGw9InVybCgjcmcpIi8+PHJlY3QgeD0iNjQiIHk9IjY2IiB3aWR0aD0iMjMiIGhlaWdodD0iMjEiIHJ4PSI0IiBmaWxsPSJ1cmwoI3NnKSIvPjwvZz4KPGVsbGlwc2UgY3g9IjUzIiBjeT0iODUiIHJ4PSI5IiByeT0iMy4yIiBmaWxsPSIjMDAwIiBvcGFjaXR5PSIuMjUiLz48Y2lyY2xlIGN4PSI1MSIgY3k9Ijc3IiByPSI5LjUiIGZpbGw9InVybCgjYmcpIi8+PGVsbGlwc2UgY3g9IjQ3LjUiIGN5PSI3MyIgcng9IjMuMyIgcnk9IjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii44NSIvPjwvc3ZnPg==', title:'لوّن الأرضية', sub:'اسحب الكورة — بتزلق لحد الحيطة وتلوّن كل بلاطة تعدّي عليها', color:'linear-gradient(145deg,#fdf1cf,#f4c9a0)'},
   {id:'simon', icon:'🎵', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz4KPGNsaXBQYXRoIGlkPSJjIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0MCIvPjwvY2xpcFBhdGg+CjxsaW5lYXJHcmFkaWVudCBpZD0iYiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzQ2ZGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBlYTVlMCIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzkzZTM1YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzViYWUyZSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0ieSIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZDM1YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2YyYTQxMyIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iciIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmOGE3ZSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2U4NDczZiIvPjwvbGluZWFyR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0iaCIgY3g9Ii41IiBjeT0iLjQiIHI9Ii43Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMyYTM3M2YiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNDFiMjAiLz48L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KPGVsbGlwc2UgY3g9IjU1IiBjeT0iNTgiIHJ4PSI0NSIgcnk9IjQzIiBmaWxsPSJyZ2JhKDAsMCwwLC4yOCkiLz4KPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDYiIGZpbGw9IiMxYzI1MjkiIHN0cm9rZT0iIzBkMTMxNyIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxnIGNsaXAtcGF0aD0idXJsKCNjKSI+PHJlY3QgeD0iMTAiIHk9IjEwIiB3aWR0aD0iMzkiIGhlaWdodD0iMzkiIGZpbGw9InVybCgjYikiLz48cmVjdCB4PSI1MSIgeT0iMTAiIHdpZHRoPSIzOSIgaGVpZ2h0PSIzOSIgZmlsbD0idXJsKCNnKSIvPjxyZWN0IHg9IjEwIiB5PSI1MSIgd2lkdGg9IjM5IiBoZWlnaHQ9IjM5IiBmaWxsPSJ1cmwoI3kpIi8+PHJlY3QgeD0iNTEiIHk9IjUxIiB3aWR0aD0iMzkiIGhlaWdodD0iMzkiIGZpbGw9InVybCgjcikiLz48L2c+CjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwuNDIpIiBzdHJva2Utd2lkdGg9IjIuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48cGF0aCBkPSJNMTggMzQgQTMzIDMzIDAgMCAxIDM0IDE4Ii8+PHBhdGggZD0iTTY2IDE4IEEzMyAzMyAwIDAgMSA4MiAzNCIvPjxwYXRoIGQ9Ik0xOCA2NiBBMzMgMzMgMCAwIDAgMzQgODIiLz48cGF0aCBkPSJNNjYgODIgQTMzIDMzIDAgMCAwIDgyIDY2Ii8+PC9nPgo8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIxNyIgZmlsbD0idXJsKCNoKSIgc3Ryb2tlPSIjMGQxMzE3IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTQ0IDUyIGw0IDQgbDggLTkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIG9wYWNpdHk9Ii45MiIvPjwvc3ZnPg==', title:'سايمن', sub:'شوف تتابع الألوان والأصوات وكرره بنفس الترتيب — كل جولة أصعب من اللي قبلها', color:'linear-gradient(145deg,#3d6c92,#1b3146)'},
   {id:'chess', icon:'♟️', logo:'chess-logo.png', title:'الشطرنج', sub:'شطرنج كامل بكل القواعد ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#3a3a3a,#0c0c0c)'},
@@ -16311,7 +16334,7 @@ const GH_SOLO_SUB = {
   cube:'اضغط مرتين عشان المكعب يتخلط، واسحب على أي وش عشان تلفّ طبقة (واسحب بره المكعب عشان تدوّره) — التايمر بيبدأ مع أول حركة، ولما كل وش يبقى لون واحد تكسب نقط',
   blocky:'لوحة 8×8 — اسحب البلوكات وفجّر الصفوف والأعمدة، كومبو بيضاعف النقط، مستويات بتصعب، وتراجع وتبديل قطع لما تتزنق.',
   millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 15 ثانية للسؤال، وكمّلهم كلهم واكسب 300 نقطة',
-  fawazeer:'10 فوازير دينية مسيحية بتبدأ سهلة وبتصعب، 25 ثانية للفزورة وتلميح لو اتلخبطت — جاوب صح واكسب نقط ومكافأة للجولة الكاملة',
+  fawazeer:'10 مستويات بتتفتح بالتدريج ومئات الأسئلة (كتاب مقدس، طقس، عقيدة، قديسين، شهداء) — جاوب 7 من 10 صح عشان تعدّي، وتدريب حر في أي موضوع.',
   chess:'شطرنج كامل بكل القواعد — كش ملك، تبييت، الأسر بالمرور، ترقية البيدق',
   checkers:'أسر إجباري ومتسلسل، وتتويج القطعة لما توصل آخر الصف',
   backgammon:'زهرين، بار، وخروج القطع — اللعبة الشرقية الكلاسيكية',
@@ -22280,8 +22303,23 @@ function doMilWalkAway(){
 
 /* ============================= GAMES: فوازير (فوازير دينية مسيحية) ============================= */
 /* إعدادات اللعبة: غيّر الأرقام هنا لو عايز تعدّل عدد الفوازير أو الوقت أو النقط */
-const FAW_CFG = { perRound:10, mix:[4,4,2], sec:25, base:3, hinted:1, fastBonus:1, fastLeft:15, perfect:5 };
-const FAW_CATS = { p:['🧑','شخصيات'], e:['✨','أحداث وقصص'], c:['⛪','الكنيسة والطقوس'], b:['📖','الكتاب المقدس'] };
+const FAW_CFG = { perRound:10, mix:[4,4,2], sec:25, base:3, hinted:1, fastBonus:1, fastLeft:15, perfect:5, pass:7 };
+/* المستويات: mix = [سهل، متوسط، صعب] — الوقت بيقل والنقط بتزيد كل ما المستوى يعلى. عشان تفتح المستوى اللي بعده لازم تجاوب 7 من 10 صح */
+const FAW_LEVELS = [
+  {n:1,  name:'مبتدئ',  ico:'🌱', mix:[8,2,0],  sec:25},
+  {n:2,  name:'متعلّم',  ico:'📘', mix:[6,4,0],  sec:25},
+  {n:3,  name:'نشيط',   ico:'🕯️', mix:[5,4,1],  sec:24},
+  {n:4,  name:'مجتهد',  ico:'⭐', mix:[4,5,1],  sec:23},
+  {n:5,  name:'متقدّم',  ico:'🔥', mix:[3,5,2],  sec:22},
+  {n:6,  name:'ماهر',   ico:'🎯', mix:[2,5,3],  sec:21},
+  {n:7,  name:'خبير',   ico:'🏅', mix:[1,5,4],  sec:20},
+  {n:8,  name:'معلّم',   ico:'📜', mix:[0,5,5],  sec:19},
+  {n:9,  name:'حكيم',   ico:'💎', mix:[0,4,6],  sec:18},
+  {n:10, name:'أستاذ',   ico:'👑', mix:[0,2,8],  sec:17}
+];
+function fawLvlCfg(n){ return FAW_LEVELS[(n|0)-1] || null; }
+function fawBase(n){ return FAW_CFG.base + Math.floor(((n|0)>0 ? (n|0)-1 : 0)/3); }
+const FAW_CATS = { b:['📖','الكتاب المقدس'], c:['⛪','الطقس الكنسي'], d:['✝️','العقيدة'], s:['🕊️','القديسين'], m:['🩸','الشهداء'], p:['🧑','شخصيات'], e:['✨','أحداث وقصص'] };
 /* كل فزورة: [التصنيف، الصعوبة 1-3، الفزورة، الإجابة الصح، [3 إجابات غلط]، تلميح، معلومة بتظهر بعد الإجابة] */
 const FAW_BANK = [
   ['p',1,'أنا أول إنسان خلقه الله، وسمّيت كل الحيوانات بأسماء، وعشت في جنة عدن. مين أنا؟','آدم',['نوح','هابيل','شيث'],'اتخلقت من تراب الأرض','خلق الله آدم من تراب الأرض وأعطاه أن يسمّي الحيوانات (سفر التكوين).'],
@@ -22380,7 +22418,272 @@ const FAW_BANK = [
   ['b',1,'إيه اسم سفر الصلوات والتسابيح اللي كتب أغلبه داود النبي؟','المزامير',['الأمثال','نشيد الأناشيد','الجامعة'],'فيه 150 مزمورًا','سفر المزامير هو كتاب صلوات الكنيسة وتسابيحها.'],
   ['b',2,'أي مزمور بيبدأ بعبارة: "الرب راعيّ فلا يعوزني شيء"؟','المزمور 23',['المزمور 1','المزمور 51','المزمور 91'],'فيه عبارة: إن سرت في وادي ظل الموت لا أخاف شرًّا','المزمور 23 من أشهر مزامير داود، عن الراعي الصالح.'],
   ['b',2,'إيه الوصية العظمى في الناموس كما قال المسيح؟','تحب الرب إلهك من كل قلبك',['لا تقتل','أكرم أباك وأمك','اذكر يوم السبت'],'قال بعدها: والثانية مثلها','قال المسيح: "تحب الرب إلهك من كل قلبك ونفسك وفكرك، وتحب قريبك كنفسك".'],
-  ['b',3,'مين كاتب سفر الرؤيا؟','يوحنا الحبيب',['بولس','بطرس','لوقا'],'كان منفيًا في جزيرة بطمس','كتب يوحنا الحبيب سفر الرؤيا وهو منفي في جزيرة بطمس.']
+  ['b',3,'مين كاتب سفر الرؤيا؟','يوحنا الحبيب',['بولس','بطرس','لوقا'],'كان منفيًا في جزيرة بطمس','كتب يوحنا الحبيب سفر الرؤيا وهو منفي في جزيرة بطمس.'],
+  /* ===== إضافات: أسئلة جديدة ===== */
+  ['b',1,'كم عدد تلاميذ المسيح الاثني عشر؟','12 تلميذًا',['7 تلاميذ','10 تلاميذ','70 تلميذًا'],'عدد أسباط إسرائيل نفسه','اختار المسيح اثني عشر تلميذًا ليكونوا معه، وسمّاهم رسلًا.'],
+  ['b',1,'فين اتولد السيد المسيح؟','بيت لحم',['الناصرة','أورشليم','كفرناحوم'],'مدينة داود','وُلد المسيح في بيت لحم اليهودية كما تنبأ ميخا النبي.'],
+  ['b',1,'مين اللي عمّد السيد المسيح في نهر الأردن؟','يوحنا المعمدان',['بطرس','يوحنا الحبيب','يعقوب'],'كان بيأكل جراد وعسل بري','عمّد يوحنا المعمدان المسيح، وظهر الآب والروح القدس في هيئة حمامة.'],
+  ['b',1,'إيه أول معجزة عملها السيد المسيح؟','تحويل الماء إلى خمر',['شفاء الأعمى','إشباع الجموع','إقامة لعازر'],'حصلت في عرس','حدثت المعجزة في عرس قانا الجليل (يوحنا 2).'],
+  ['b',1,'اشبع السيد المسيح 5000 رجل بكام رغيف وكام سمكة؟','5 أرغفة وسمكتين',['7 أرغفة وسمكة','3 أرغفة و5 سمكات','12 رغيفًا وسمكتين'],'الولد الصغير هو اللي قدّمها','أخذ المسيح خمسة أرغفة وسمكتين وبارك، فأكل الجميع وفضل 12 قفة.'],
+  ['b',1,'مين اللي قتل أخوه في أول جريمة قتل في التاريخ؟','قايين',['لامك','عيسو','يعقوب'],'كان فلّاحًا','قتل قايين أخاه هابيل حسدًا (تكوين 4).'],
+  ['b',1,'صام السيد المسيح كام يوم في البرية؟','40 يومًا',['7 أيام','30 يومًا','3 أيام'],'بعد العماد مباشرة','صام المسيح أربعين يومًا وأربعين ليلة ثم جُرّب من إبليس.'],
+  ['b',1,'مين من التلاميذ أنكر المسيح 3 مرات قبل صياح الديك؟','بطرس',['يهوذا','توما','يعقوب'],'بكى بكاءً مرًّا بعدها','أنكر بطرس سيده ثلاث مرات ثم بكى، ورده المسيح بعد القيامة.'],
+  ['b',1,'مين سلّم المسيح بثلاثين من الفضة؟','يهوذا الإسخريوطي',['بطرس','قيافا','بيلاطس'],'كان أمين الصندوق','سلّم يهوذا المسيح لرؤساء الكهنة بثلاثين من الفضة.'],
+  ['b',1,'كام وصية في الوصايا العشر؟','10 وصايا',['7 وصايا','12 وصية','5 وصايا'],'كتبها الله على لوحين','أعطى الله موسى الوصايا العشر على جبل سيناء.'],
+  ['b',1,'كام سفر في العهد القديم؟','39 سفرًا',['27 سفرًا','46 سفرًا','66 سفرًا'],'عدد أسفار العهد الجديد 27','العهد القديم 39 سفرًا حسب الترتيب المتعارف عليه.'],
+  ['b',1,'مين الإنجيلي اللي كتب إنجيل وسفر أعمال الرسل؟','لوقا',['مرقس','متى','يوحنا'],'كان طبيبًا','كتب لوقا الطبيب الإنجيل وسفر الأعمال لصديقه ثاوفيلس.'],
+  ['b',1,'كام عدد الأناجيل؟','4 أناجيل',['3 أناجيل','5 أناجيل','12 إنجيلًا'],'متى ومرقس ولوقا ويوحنا','الأناجيل الأربعة: متى ومرقس ولوقا ويوحنا.'],
+  ['b',1,'مين اللي أقامه المسيح بعد ما مات أربعة أيام؟','لعازر',['ابن أرملة نايين','ابنة يايرس','طابيثا'],'أختاه مرثا ومريم','أقام المسيح لعازر من القبر بعد 4 أيام (يوحنا 11).'],
+  ['b',1,'إيه الهدايا اللي قدمها المجوس للطفل يسوع؟','ذهب ولبان ومر',['ذهب وفضة وحرير','خبز وخمر وزيت','لبان وعسل وتمر'],'ثلاث هدايا','قدّم المجوس ذهبًا ولبانًا ومرًا (متى 2).'],
+  ['b',1,'الله خلق العالم في كام يوم قبل ما يستريح؟','6 أيام',['7 أيام','3 أيام','10 أيام'],'استراح في اليوم السابع','خلق الله العالم في ستة أيام واستراح في اليوم السابع.'],
+  ['b',1,'اسم زوجة إبراهيم أبو الآباء؟','سارة',['رفقة','راحيل','ليئة'],'ولدت إسحق وهي عجوز','كانت سارة زوجة إبراهيم، وولدت إسحق في شيخوختها.'],
+  ['b',1,'كام ابن كان ليعقوب؟','12 ابنًا',['7 أبناء','10 أبناء','3 أبناء'],'منهم خرجت أسباط إسرائيل','لـ يعقوب (إسرائيل) اثنا عشر ابنًا، منهم أسباط إسرائيل.'],
+  ['b',1,'أي نهر عمّد فيه المسيح؟','نهر الأردن',['نهر النيل','نهر الفرات','نهر دجلة'],'بيصب في البحر الميت','اعتمد المسيح في نهر الأردن على يد يوحنا.'],
+  ['b',1,'فين اتصلب السيد المسيح؟','الجلجثة',['جبل الزيتون','جبل سيناء','جبل تابور'],'اسمها معناه "موضع الجمجمة"','صُلب المسيح على الجلجثة خارج أورشليم.'],
+  ['b',1,'كام يوم بعد الصلب قام السيد المسيح؟','في اليوم الثالث',['في اليوم السابع','بعد أسبوعين','في نفس اليوم'],'فجر الأحد','قام المسيح من الأموات في اليوم الثالث كما سبق وأخبر.'],
+  ['b',1,'مين أول واحد شاف المسيح بعد القيامة؟','مريم المجدلية',['بطرس','يوحنا','توما'],'كانت عند القبر فجرًا','ظهر المسيح أولًا لمريم المجدلية (يوحنا 20).'],
+  ['b',1,'إيه آخر ضربة من ضربات مصر العشر؟','موت الأبكار',['الظلمة','البَرَد','الجراد'],'بعدها خرج الشعب من مصر','كانت الضربة العاشرة موت أبكار المصريين، وعيد الفصح تذكار العبور.'],
+  ['b',2,'على أي جبل أخذ موسى الوصايا العشر؟','جبل سيناء',['جبل الكرمل','جبل صهيون','جبل نبو'],'حوريب اسم آخر له','أعطى الله الوصايا لموسى على جبل سيناء (حوريب).'],
+  ['b',2,'في أي رسالة جاءت الآية "الله محبة"؟','رسالة يوحنا الأولى',['رسالة رومية','رسالة يعقوب','رسالة غلاطية'],'كتبها يوحنا الحبيب','وردت "الله محبة" في 1 يوحنا 4: 8 و16.'],
+  ['b',2,'كم عدد ثمار الروح القدس في غلاطية 5؟','9 ثمار',['7 ثمار','12 ثمرة','5 ثمار'],'أولها المحبة','ثمر الروح: محبة، فرح، سلام، طول أناة، لطف، صلاح، إيمان، وداعة، تعفف.'],
+  ['b',2,'كم رسالة كتبها القديس بولس حسب تقليد الكنيسة (مع العبرانيين)؟','14 رسالة',['7 رسائل','21 رسالة','10 رسائل'],'أولها رومية وآخرها العبرانيين','تعدّ الكنيسة 14 رسالة لبولس الرسول.'],
+  ['b',2,'كام رسالة جامعة (كاثوليكون) في العهد الجديد؟','7 رسائل',['4 رسائل','14 رسالة','3 رسائل'],'يعقوب وبطرس ويوحنا ويهوذا','الكاثوليكون: يعقوب، 1-2 بطرس، 1-2-3 يوحنا، ويهوذا.'],
+  ['b',2,'أي سفر مش من أسفار موسى الخمسة؟','يشوع',['التكوين','اللاويين','التثنية'],'بيحكي عن دخول أرض الموعد','أسفار موسى: التكوين، الخروج، اللاويين، العدد، التثنية.'],
+  ['b',2,'كام مزمور في سفر المزامير؟','150 مزمورًا',['100 مزمور','120 مزمورًا','200 مزمور'],'كتب داود أغلبها','يحتوي سفر المزامير على 150 مزمورًا.'],
+  ['b',2,'أطول مزمور هو المزمور رقم كام؟','119',['23','51','150'],'مقسّم على حروف الأبجدية العبرية','المزمور 119 أطول مزامير الكتاب، وهو عن شريعة الرب.'],
+  ['b',2,'مين رأى السلم اللي طرفه على الأرض والآخر في السماء؟','يعقوب',['إبراهيم','موسى','يوسف'],'سمّى المكان بيت إيل','رأى يعقوب السلم والملائكة صاعدة ونازلة وهو هارب من عيسو.'],
+  ['b',2,'إيه اللي حصل يوم الخمسين؟','حلول الروح القدس على التلاميذ',['صعود المسيح','قيامة المسيح','ميلاد المسيح'],'ظهرت ألسنة كأنها من نار','حلّ الروح القدس على التلاميذ في العلية يوم الخمسين (أعمال 2).'],
+  ['b',2,'مثل الابن الضال مكتوب في أي إنجيل؟','لوقا',['متى','مرقس','يوحنا'],'الإصحاح 15','يرد مثل الابن الضال في لوقا 15.'],
+  ['b',2,'مثل السامري الصالح مكتوب في أي إنجيل؟','لوقا',['يوحنا','متى','مرقس'],'قاله المسيح ردًّا على سؤال "من هو قريبي؟"','يرد مثل السامري الصالح في لوقا 10.'],
+  ['b',2,'في أي إنجيل جاءت عبارة "أنا هو الطريق والحق والحياة"؟','يوحنا',['متى','مرقس','لوقا'],'إنجيل التعاليم عن الأقنوم الإلهي','قالها المسيح لتلاميذه في يوحنا 14: 6.'],
+  ['b',2,'كام سنة قضى بنو إسرائيل في البرية؟','40 سنة',['12 سنة','7 سنوات','70 سنة'],'حتى مات جيل الشك','تاه بنو إسرائيل في البرية أربعين سنة قبل دخول كنعان.'],
+  ['b',2,'مين أول ملك على إسرائيل؟','شاول',['داود','سليمان','صموئيل'],'من سبط بنيامين','مسح صموئيل شاول أولَ ملك على إسرائيل.'],
+  ['b',2,'أي إنجيل هو الأقصر؟','مرقس',['متى','لوقا','يوحنا'],'كتبه تلميذ بطرس','إنجيل مرقس هو الأقصر بين الأناجيل الأربعة.'],
+  ['b',2,'مين الملك اللي أمر بقتل أطفال بيت لحم؟','هيرودس الكبير',['بيلاطس','نبوخذنصر','هيرودس أنتيباس'],'كان خايف على ملكه','أمر هيرودس بقتل أطفال بيت لحم، فهرب يوسف والعذراء بالطفل إلى مصر.'],
+  ['b',2,'اسم أم يوحنا المعمدان؟','أليصابات',['حنة','مريم','مرثا'],'قريبة العذراء مريم','كانت أليصابات زوجة زكريا الكاهن وقريبة العذراء.'],
+  ['b',2,'أي تلميذ شك في قيامة المسيح حتى يلمس جراحه؟','توما',['فيلبس','متى','أندراوس'],'قال: ربي وإلهي','شك توما ثم آمن وقال للمسيح: ربي وإلهي.'],
+  ['b',2,'مين التلميذ اللي كان جابي ضرائب؟','متى',['لوقا','يعقوب','مرقس'],'كان اسمه لاوي','دعاه المسيح وهو جالس عند مكان الجباية فتبعه.'],
+  ['b',2,'مين اللي اتخلف مكان يهوذا في الاثني عشر؟','متياس',['برنابا','بولس','سيلا'],'اختاروه بالقرعة','اختار الرسل متياس بالقرعة ليحلّ محل يهوذا (أعمال 1).'],
+  ['b',2,'مين الأخوان اللي كانوا صيادين وتبعوا المسيح وأحدهم بطرس؟','بطرس وأندراوس',['يعقوب ويوحنا','فيلبس وبرثولماوس','متى وتوما'],'كانوا على بحر الجليل','دعا المسيح الأخوين سمعان (بطرس) وأندراوس وهما يلقيان الشبكة.'],
+  ['b',3,'مين الأب الروحي اللي لقبه "ابن الوعظ" في سفر الأعمال؟','برنابا',['سيلا','تيموثاوس','أبلوس'],'كان رفيق بولس في الرحلة الأولى','برنابا معناها ابن الوعظ (أو التعزية) (أعمال 4: 36).'],
+  ['b',3,'مين الرجل اللي أخذه الله بدون ما يموت قبل إيليا؟','أخنوخ',['نوح','لامك','ملكي صادق'],'سار مع الله','نُقل أخنوخ إلى السماء دون أن يرى الموت (تكوين 5: 24).'],
+  ['b',3,'مين أول أممي (من غير اليهود) آمن ودخل الكنيسة في سفر الأعمال؟','كرنيليوس قائد المئة',['ليديا','الخصي الحبشي','تيطس'],'جاء له بطرس في قيصرية','أرسل الله بطرس لكرنيليوس فآمن هو وأهل بيته (أعمال 10).'],
+  ['b',3,'مين زوجة أكيلا المذكورة مع بولس في كورنثوس؟','بريسكلا',['ليديا','فيبي','دوركاس'],'كانوا يصنعون الخيام','كان أكيلا وبريسكلا يعملان في صناعة الخيام مع بولس.'],
+  ['b',3,'مين كتب رسالة إلى فليمون عن العبد أنسيمس؟','بولس',['بطرس','يعقوب','يهوذا'],'أقصر رسائله','كتب بولس إلى فليمون يطلب قبول عبده الهارب أنسيمس كأخ.'],
+  ['b',3,'الفتية الثلاثة في أتون النار كان اسم أحدهم "عزريا". إيه اسمه البابلي؟','عبدنغو',['شدرخ','ميشخ','بلطشاصر'],'ثلاثة أسماء بابلية','أسماؤهم البابلية: شدرخ وميشخ وعبدنغو (دانيال 3).'],
+  ['b',3,'مين النبي اللي أتى لداود بعد خطيته مع بثشبع؟','ناثان',['صموئيل','جاد','إيليا'],'استخدم مثل النعجة الوحيدة','وبّخ ناثان النبي داود بمثل النعجة الوحيدة فتاب داود (مزمور 51).'],
+  ['b',3,'المزمور 51 (ارحمني يا الله) كتبه داود بعد أي حدث؟','خطيته مع بثشبع',['قتل جليات','مسحه ملكًا','هروبه من شاول'],'مزمور التوبة','كتب داود المزمور 51 توبةً بعد سقطته مع بثشبع.'],
+  ['b',3,'في أي سفر نجد "إن كان إنسان يظن أنه قائم فلينظر أن لا يسقط"؟','كورنثوس الأولى',['رومية','غلاطية','أفسس'],'رسالة عن تصحيح مشاكل الكنيسة في كورنثوس','وردت في 1 كورنثوس 10: 12.'],
+  ['b',3,'أي سفر يُسمّى "سفر الأيام" ويضم أخبار ملوك يهوذا؟','أخبار الأيام',['القضاة','العدد','الجامعة'],'له جزءان','سفرا أخبار الأيام يسردان تاريخ الأمة وملوك يهوذا.'],
+  ['b',3,'كام عدد عبارات "أنا هو" الرمزية في إنجيل يوحنا (الخبز، النور، الباب…)؟','7 عبارات',['3 عبارات','12 عبارة','5 عبارات'],'الخبز والنور والباب والراعي…','سبع عبارات: الخبز، النور، الباب، الراعي، القيامة والحياة، الطريق والحق، الكرمة.'],
+  ['c',1,'كام سر في الكنيسة؟','7 أسرار',['3 أسرار','5 أسرار','12 سرًّا'],'المعمودية والميرون والتوبة…','أسرار الكنيسة السبعة: المعمودية، الميرون، الإفخارستيا، التوبة، مسحة المرضى، الزيجة، الكهنوت.'],
+  ['c',1,'أي سر بنتولد فيه ولادة جديدة بالماء والروح؟','المعمودية',['الميرون','التوبة','الزيجة'],'بنغطس فيها ثلاث مرات','المعمودية هي الولادة الجديدة بالماء والروح (يوحنا 3).'],
+  ['c',1,'إيه اسم الإناء اللي بيتحرق فيه البخور؟','المجمرة',['الكأس','الصينية','الشمعدان'],'ريحتها حلوة','المجمرة هي الإناء الذي يوضع فيه الفحم والبخور.'],
+  ['c',1,'إيه اسم الكتاب اللي بنصلي منه صلوات الساعات (باكر، الثالثة…)؟','الأجبية',['السنكسار','القطمارس','الخولاجي'],'كتاب الصلوات اليومية','الأجبية كتاب الصلوات اليومية السبع للكنيسة.'],
+  ['c',1,'كام قداس عندنا في الكنيسة القبطية؟','3 قداسات',['2 قداس','5 قداسات','7 قداسات'],'الباسيلي والغريغوري والكيرلسي','القداسات الثلاثة: الباسيلي والغريغوري والكيرلسي.'],
+  ['c',1,'إيه المقصود بصوم الأربعاء والجمعة؟','صوم أسبوعي طول السنة',['صوم خاص بالكهنة','صوم رمضان','صوم لمرة في السنة'],'ما عدا فترة الخمسين','تصوم الكنيسة الأربعاء والجمعة أسبوعيًا إلا في الخمسين المقدسة.'],
+  ['c',1,'إيه معنى "كيرياليسون"؟','يا رب ارحم',['المجد لله','ليكن كذلك','سبحوا الرب'],'كلمة يونانية','كيرياليسون: يا رب ارحم، وتتكرر في الصلوات.'],
+  ['c',1,'مين رئيس الكنيسة القبطية الأرثوذكسية؟','البابا (البطريرك)',['المطران','القمص','الشماس'],'كرسيه كرسي مرقس الرسول','يرأس الكنيسة القبطية البابا بطريرك الإسكندرية.'],
+  ['c',1,'تاريخ عيد الميلاد في الكنيسة القبطية؟','7 يناير (29 كيهك)',['25 ديسمبر','1 يناير','19 يناير'],'بعد صوم الميلاد','تحتفل الكنيسة القبطية بالميلاد يوم 29 كيهك الموافق 7 يناير.'],
+  ['c',1,'عيد الغطاس تذكار إيه؟','عماد السيد المسيح',['ميلاده','قيامته','صعوده'],'ويُسمّى أيضًا الظهور الإلهي','يحتفل بعماد المسيح، وفيه ظهر الثالوث القدوس.'],
+  ['c',1,'أحد الشعانين تذكار إيه؟','دخول المسيح أورشليم',['القيامة','الميلاد','الصلب'],'الجموع حملت سعف النخل','الشعانين تذكار دخول المسيح أورشليم راكبًا جحشًا وسط هتاف الجموع.'],
+  ['c',1,'أسبوع الآلام اسمه إيه؟','أسبوع البصخة',['أسبوع الميلاد','أسبوع الغطاس','أسبوع الرسل'],'بيبدأ بعد أحد الشعانين','البصخة المقدسة هي الأسبوع الأخير قبل القيامة.'],
+  ['c',1,'الخبز والخمر في القداس بيتحولوا إلى إيه؟','جسد المسيح ودمه',['رموز فقط','بركة','زيت مقدس'],'السر الإلهي في القداس','نؤمن بتحول الخبز والخمر إلى جسد المسيح ودمه الحقيقيين.'],
+  ['c',1,'البخور في الكنيسة بيرمز لإيه؟','صلوات القديسين وصعود الصلاة',['الحزن','الموت','الصوم'],'رؤيا 8','صعد دخان البخور مع صلوات القديسين (رؤيا 8: 4).'],
+  ['c',1,'إيه اللون اللي بيمثل الحزن في البصخة عادة؟','الأسود',['الأبيض','الأخضر','الذهبي'],'ستر الهيكل يتغير','يُلبس الأسود في البصخة حزنًا على آلام المسيح.'],
+  ['c',1,'الشماس في الكنيسة بيكون في إيه؟','خدمة المذبح والقراءات',['الصلاة بدل الكاهن','التعليم فقط','إدارة الدير'],'أول درجات الكهنوت','يخدم الشماس في الهيكل ويقرأ الفصول ويرتل.'],
+  ['c',1,'إيه المكان اللي نسمع فيه العظة والتعليم في الكنيسة؟','الصحن',['الهيكل','المعمودية','المذبح'],'الجزء اللي فيه المصلين','يقف الشعب في صحن الكنيسة ويستمع للعظة.'],
+  ['c',1,'الأيقونة في الكنيسة هي…؟','صورة مقدسة نكرّمها',['إله','وثن','زينة فقط'],'للقديسين والسيد المسيح','نكرم الأيقونة تذكارًا للقديس ولا نعبدها.'],
+  ['c',1,'الشموع في الكنيسة ترمز لإيه؟','النور (المسيح نور العالم)',['الدفء','الاحتفال فقط','الوقت'],'قال: أنا هو نور العالم','تشير الشموع إلى المسيح نور العالم وإلى صلاتنا.'],
+  ['c',2,'كام صلاة في الأجبية؟','7 صلوات',['3 صلوات','5 صلوات','12 صلاة'],'من باكر حتى نصف الليل','الصلوات: باكر، الثالثة، السادسة، التاسعة، الغروب، النوم، نصف الليل.'],
+  ['c',2,'الصوم الكبير كام يومًا في الكنيسة القبطية؟','55 يومًا',['40 يومًا','30 يومًا','70 يومًا'],'مع أسبوع الاستعداد وأسبوع الآلام','الصوم الكبير 55 يومًا: 40 صومًا + أسبوع تمهيدي + أسبوع الآلام.'],
+  ['c',2,'صوم الميلاد كام يومًا؟','43 يومًا',['40 يومًا','15 يومًا','55 يومًا'],'من 25 هاتور إلى 29 كيهك','يبدأ من 25 هاتور وينتهي عشية الميلاد في 28 كيهك، ومدته 43 يومًا.'],
+  ['c',2,'صوم العذراء مريم بيستمر كام يومًا؟','15 يومًا',['3 أيام','40 يومًا','7 أيام'],'من 1 إلى 15 مسرى','يصوم الأقباط 15 يومًا من 1 مسرى حتى عيد نياحة العذراء 16 مسرى.'],
+  ['c',2,'صوم نينوى مدته كام يوم؟','3 أيام',['40 يومًا','15 يومًا','7 أيام'],'تذكار توبة أهل نينوى','يصوم الأقباط ثلاثة أيام (بعوث نينوى) على مثال توبة أهل نينوى.'],
+  ['c',2,'الأعياد السيدية الكبرى كام عيد؟','7 أعياد',['3 أعياد','12 عيدًا','5 أعياد'],'البشارة والميلاد والغطاس…','السيدية الكبرى: البشارة، الميلاد، الغطاس، الشعانين، القيامة، الصعود، العنصرة.'],
+  ['c',2,'عيد الصعود بيكون بعد القيامة بكام يوم؟','40 يومًا',['10 أيام','50 يومًا','7 أيام'],'كان يظهر لتلاميذه وهو بينهم','يصعد المسيح إلى السماء بعد القيامة بأربعين يومًا.'],
+  ['c',2,'العنصرة (عيد الخمسين) بتكون بعد القيامة بكام يوم؟','50 يومًا',['40 يومًا','70 يومًا','7 أيام'],'سُمّي عيد العنصرة','حلّ الروح القدس بعد القيامة بخمسين يومًا فسُمّي الخمسين.'],
+  ['c',2,'درجات الكهنوت في الكنيسة القبطية؟','أسقف وقس وشماس',['بابا ومطران وقس','قمص وراهب وشماس','أسقف وراهب وبابا'],'ثلاث درجات رئيسية','الدرجات الكهنوتية: الأسقفية والقسيسية والشموسية.'],
+  ['c',2,'السر اللي بيمسح فيه الكاهن المعمَّد بزيت مقدس بعد المعمودية؟','الميرون',['التوبة','الزيجة','مسحة المرضى'],'نأخذ فيه موهبة الروح القدس','سر الميرون (التثبيت) به يمسح المعمّد بزيت الميرون المقدس.'],
+  ['c',2,'إيه اسم السر اللي بنعترف فيه بخطايانا للكاهن؟','سر التوبة والاعتراف',['سر الزيجة','سر الميرون','سر الكهنوت'],'الكاهن بيقول لنا: الله يحلّك','في سر التوبة نعترف ونأخذ الحل بسلطان الكهنوت.'],
+  ['c',2,'إيه الكتاب الكنسي اللي فيه قراءات الأيام (فصول الكتاب)؟','القطمارس',['الأجبية','الخولاجي','السنكسار'],'قراءات القداس','القطمارس كتاب فصول القراءات في الكنيسة.'],
+  ['c',2,'كتاب السنكسار بيحتوي على إيه؟','سير القديسين وتذكاراتهم',['صلوات الكهنة','ألحان القداس','قراءات الأناجيل'],'بيتقرأ أثناء القداس','السنكسار كتاب يحوي سير القديسين وتذكارات الأيام.'],
+  ['c',2,'إيه معنى التريصاجيون؟','التقديسات الثلاثة (قدوس الله…)',['صلاة الشكر','صلاة الغروب','قانون الإيمان'],'تقال في كل صلاة تقريبًا','التريصاجيون: قدوس الله قدوس القوي قدوس الحي الذي لا يموت.'],
+  ['c',2,'مين اللي بيقرأ فصول الكتاب أثناء القداس غالبًا؟','الشماس',['الأسقف فقط','الراهب','الأمين'],'خدمته في المذبح','يقرأ الشماس الفصول من الرسائل والإبركسيس.'],
+  ['c',2,'إيه اسم المكان المرتفع اللي بتتقرأ منه القراءات؟','المنجلية',['الهيكل','الحنية','المعمودية'],'نقف أمامها وقت الإنجيل','المنجلية منصة صغيرة تُقرأ منها الفصول والإنجيل.'],
+  ['c',2,'إيه اسم أول جزء من القداس؟','قداس الموعوظين',['قداس المؤمنين','قداس الراقدين','قداس العمّاد'],'قبل ما يخرج غير المعمّدين','القداس: الموعوظين (القراءات والعظة) ثم المؤمنين (الذبيحة).'],
+  ['c',2,'السر اللي بيربط الرجل والمرأة في الكنيسة؟','سر الزيجة',['سر الميرون','سر الكهنوت','سر التوبة'],'يُصلّى فيه بالإكليل','سر الزيجة يربط الزوجين بنعمة الله في كنيسته.'],
+  ['c',2,'إيه اسم الصلاة التي بتصلّي بها الكنيسة في منتصف الليل وفيها التسبحة؟','تسبحة نصف الليل',['صلاة الغروب','صلاة باكر','صلاة النوم'],'بتنتظر مجيء العريس','تسبحة نصف الليل تقال استعدادًا لمجيء العريس السماوي.'],
+  ['c',2,'سر مسحة المرضى بيكون فيه إيه؟','زيت القنديل وصلاة الكاهن',['الماء المقدس','الميرون','البخور'],'يعقوب 5: 14','في المسحة يصلي الكهنة ويمسحون المريض بزيت القنديل (يعقوب 5).'],
+  ['c',2,'خميس العهد تذكار إيه؟','العشاء الأخير وغسل الأرجل',['الصلب','القيامة','الصعود'],'قبل الجمعة العظيمة','في خميس العهد أسس المسيح سر الإفخارستيا وغسل أرجل تلاميذه.'],
+  ['c',2,'الجمعة العظيمة تذكار إيه؟','صلب المسيح ودفنه',['قيامته','ميلاده','عماده'],'يوم الحزن العظيم','الجمعة العظيمة يوم صلب المسيح وموته.'],
+  ['c',2,'سبت النور يكون قبل أي عيد؟','عيد القيامة',['الميلاد','الغطاس','الصعود'],'احتفال يسبق الأحد','سبت النور هو سبت الفرح الذي يسبق عيد القيامة.'],
+  ['c',2,'مين اللي بيقدّم الذبيحة المقدسة في القداس؟','الكاهن (الأسقف أو القس)',['الشماس','المرنم','الأمين'],'من درجة الكهنوت','يقدم الكاهن الذبيحة الإلهية ويحول الخبز والخمر بالصلاة والروح القدس.'],
+  ['c',2,'إيه اسم الكأس والصينية؟','الأواني المقدسة',['الأجبية','الخولاجي','المنجلية'],'بيتحط عليها الخبز والخمر','الكأس والصينية من الأواني المقدسة المستخدمة على المذبح.'],
+  ['c',3,'إيه معنى الميطانية؟','سجود وتوبة',['صلاة الشكر','بركة','صلاة الغروب'],'كلمة يونانية','الميطانية (سجدة) تعبير عن التوبة والخضوع.'],
+  ['c',3,'إيه الكتاب اللي فيه صلوات القداس والأسرار الكهنوتية؟','الخولاجي',['القطمارس','السنكسار','الأجبية'],'الكاهن بيستخدمه','الخولاجي كتاب الصلوات الكهنوتية للقداس والأسرار.'],
+  ['c',3,'الثيؤطوكيات إيه؟','تسابيح للعذراء مريم',['تسابيح للشهداء','تسابيح للملائكة','تسابيح للرسل'],'تتقال أيام الأسبوع','الثيؤطوكيات تسابيح للعذراء والدة الإله، تُقال على أيام الأسبوع.'],
+  ['c',3,'الذكصولوجيات هي؟','تسابيح تمجيد للقديسين',['قراءات من الأناجيل','طلبات للمرضى','صلوات الراحة'],'جزء من التسبحة','الذكصولوجيات: تسابيح تمدح القديسين والأعياد.'],
+  ['c',3,'إيه اسم القداس المنسوب للقديس غريغوريوس الناطق بالإلهيات؟','القداس الغريغوري',['القداس الباسيلي','القداس الكيرلسي','القداس الإنجيلي'],'موجه للابن','القداس الغريغوري موجه للابن، وهو من تسبيح غريغوريوس.'],
+  ['c',3,'أصل القداس الكيرلسي إلى أي قديس ينسب؟','مرقس الرسول (ثم القديس كيرلس)',['أثناسيوس','أنطونيوس','يوحنا ذهبي الفم'],'أقدم القداسات','يُنسب القداس الكيرلسي إلى مرقس الرسول وصاغه القديس كيرلس الكبير.'],
+  ['c',3,'إيه معنى "أوشيّة" في الصلاة؟','طلبة أو دعاء (من اليونانية)',['حمد وشكر','قراءة فصل','تلاوة قانون'],'أوشية الراقدين مثلًا','الأوشية طلبة لأجل موضوع معين كالمرضى والراقدين.'],
+  ['c',3,'اسم الستار اللي بيفصل الهيكل عن الصحن؟','حجاب الهيكل (ستر الهيكل)',['المنجلية','المذبح','الأيقونسطاس'],'اتشق وقت الصلب','حجاب الهيكل يرمز لحجاب الهيكل القديم الذي انشق عند الصلب.'],
+  ['c',3,'في أي يوم تقام صلاة اللقان؟','خميس العهد',['جمعة الصلبوت','سبت النور','أحد الشعانين'],'تذكار غسل الأرجل','يقام اللقان في خميس العهد على مثال غسل المسيح أرجل التلاميذ.'],
+  ['c',3,'إيه اسم كتاب الألحان والتسابيح الخاصة بالأسبوع المقدس؟','كتاب البصخة',['الأجبية','السنكسار','الخولاجي'],'كتاب الأسبوع الأخير','كتاب البصخة فيه صلوات وقراءات أسبوع الآلام.'],
+  ['d',1,'كام أقنوم في الثالوث القدوس؟','3 أقانيم',['2 أقنوم','4 أقانيم','أقنوم واحد'],'الآب والابن والروح القدس','نؤمن بإله واحد في ثلاثة أقانيم متساوين في الجوهر.'],
+  ['d',1,'مين هو الأقنوم الثاني في الثالوث القدوس؟','الابن (الكلمة)',['الآب','الروح القدس','الملاك'],'تجسّد من العذراء','الابن الكلمة هو الأقنوم الثاني الذي تجسّد من العذراء مريم.'],
+  ['d',1,'مين اللي تجسّد من الثالوث القدوس؟','الابن الكلمة',['الآب','الروح القدس','الثلاثة معًا'],'وُلد من العذراء مريم','تجسّد الأقنوم الثاني، الابن، دون انفصال عن الآب والروح القدس.'],
+  ['d',1,'الروح القدس ظهر على المسيح في المعمودية في شكل إيه؟','حمامة',['نار','سحابة','نسر'],'استقر عليه','ظهر الروح القدس بهيئة جسمية مثل حمامة عند عماد المسيح.'],
+  ['d',1,'إيه معنى كلمة "تجسد"؟','الله ظهر في الجسد',['الله صار ملاكًا','الإنسان صار إلهًا','الروح صار جسدًا'],'تجسد = اتخذ جسدًا','التجسد: اتحاد اللاهوت بالناسوت في المسيح.'],
+  ['d',1,'نؤمن بإيه في طبيعة السيد المسيح؟','إله كامل وإنسان كامل',['إله فقط','إنسان فقط','نصف إله ونصف إنسان'],'اتحاد اللاهوت والناسوت','المسيح إله كامل وإنسان كامل متحدان بغير اختلاط ولا امتزاج.'],
+  ['d',1,'قانون الإيمان بيبدأ بإيه؟','بالحقيقة نؤمن بإله واحد',['نؤمن بالمسيح','أبانا الذي','قدوس الله'],'بيتقال في كل قداس','يبدأ قانون الإيمان بالحقيقة نؤمن بإله واحد، الله الآب.'],
+  ['d',1,'إيه صفات الكنيسة في قانون الإيمان؟','واحدة جامعة مقدسة رسولية',['عالمية فقط','قومية وجامعة','مقدسة ومحلية'],'أربع صفات','نؤمن بكنيسة واحدة جامعة مقدسة رسولية.'],
+  ['d',1,'القيامة حصلت في اليوم الـ…؟','الثالث',['الأول','السابع','الأربعين'],'قال المسيح: أقوم في اليوم الثالث','قام المسيح من الأموات في اليوم الثالث حسب الكتب.'],
+  ['d',1,'السيد المسيح صُلب لأجل إيه؟','فداء البشرية من الخطية',['إظهار قوته','معاقبة اليهود','تعليم الصبر'],'فدانا بدمه','مات المسيح فدية عن خطايا العالم كله.'],
+  ['d',1,'مين هو "الفادي" في المسيحية؟','السيد المسيح',['الملاك ميخائيل','يوحنا المعمدان','الروح القدس'],'مات على الصليب','الفادي هو السيد المسيح الذي افتدانا بدمه.'],
+  ['d',1,'إيه معنى كلمة "المخلّص"؟','اللي بيخلّص من الخطية',['اللي بيعلّم','اللي بيشفي فقط','اللي بيحكم'],'معنى اسم يسوع','المخلص هو من يخلّص شعبه من خطاياهم (متى 1: 21).'],
+  ['d',1,'نؤمن إن الله…؟','واحد في ثلاثة أقانيم',['ثلاثة آلهة','إله واحد بلا أقانيم','إلهان'],'التثليث والتوحيد','نؤمن بإله واحد مثلث الأقانيم.'],
+  ['d',1,'الروح القدس هو الأقنوم الـ…؟','الثالث',['الأول','الثاني','الرابع'],'حلّ على التلاميذ يوم الخمسين','الروح القدس هو الأقنوم الثالث في الثالوث.'],
+  ['d',1,'المعمودية سر لازم يتعمل كام مرة؟','مرة واحدة',['كل سنة','مرتين','كل عيد'],'ولادة جديدة','المعمودية سر لا يتكرر لأن الولادة تكون مرة واحدة.'],
+  ['d',2,'مجمع نيقية انعقد سنة كام؟','325م',['451م','431م','381م'],'في عهد الإمبراطور قسطنطين','انعقد مجمع نيقية سنة 325م وأقرّ ألوهية المسيح.'],
+  ['d',2,'كام أب حضر مجمع نيقية؟','318 أبًا',['150 أبًا','200 أبًا','70 أبًا'],'يُسمّى مجمع الـ…','حضر المجمع 318 أسقفًا.'],
+  ['d',2,'مجمع نيقية اتعقد علشان يرد على هرطقة مين؟','أريوس',['نسطور','أوطاخي','مقدونيوس'],'أنكر ألوهية الابن','أنكر أريوس ألوهية الابن فأدانه مجمع نيقية.'],
+  ['d',2,'مين الشماس الشاب اللي دافع عن الإيمان في نيقية وصار بابا؟','أثناسيوس',['أنطونيوس','كيرلس','ديسقوروس'],'لقبه الرسولي','دافع أثناسيوس عن ألوهية المسيح وصار بابا الإسكندرية.'],
+  ['d',2,'مجمع أفسس سنة 431 رد على هرطقة مين؟','نسطور',['أريوس','أوطاخي','مقدونيوس'],'رفض أن العذراء والدة الإله','أدان مجمع أفسس نسطور وأقرّ لقب العذراء والدة الإله.'],
+  ['d',2,'إيه اللقب اللي أقره مجمع أفسس للعذراء مريم؟','والدة الإله (ثيؤطوكوس)',['أم النور','أم المسيح فقط','سيدة الملائكة'],'كلمة يونانية','أكّد مجمع أفسس أن العذراء مريم والدة الإله.'],
+  ['d',2,'إيه معنى كلمة "أرثوذكسية"؟','الإيمان المستقيم',['الإيمان الجديد','الكنيسة العالمية','التقليد'],'من اليونانية','أرثوذكسية: الإيمان المستقيم (أرثو = مستقيم، دوكسا = رأي).'],
+  ['d',2,'مين اللي قاد الدفاع عن الإيمان في مجمع أفسس؟','البابا كيرلس الكبير',['البابا أثناسيوس','البابا ديسقوروس','القديس باسيليوس'],'لقبه عمود الدين','ترأس البابا كيرلس مجمع أفسس سنة 431م.'],
+  ['d',2,'الروح القدس منبثق من…؟','الآب',['الابن فقط','الآب والابن','العذراء'],'جزء من قانون الإيمان','نؤمن بالروح القدس المنبثق من الآب.'],
+  ['d',2,'إيه معنى الفداء؟','دفع ثمن خطايانا بدم المسيح',['تعليم الشريعة','نجاة من المرض','بركة الله'],'افتدانا بدمه الكريم','الفداء: خلاص الإنسان من العقوبة بدم المسيح.'],
+  ['d',2,'نؤمن بأن العذراء مريم دائمة…؟','البتولية',['الصوم','العطاء','السفر'],'قبل الولادة وبعدها','نؤمن أن العذراء بقيت بتولًا قبل الميلاد وأثناءه وبعده.'],
+  ['d',2,'إيه معنى القيامة العامة؟','قيامة جميع الأموات في اليوم الأخير',['قيامة المسيح','قيامة لعازر','قيامة الأطفال'],'عند المجيء الثاني','نؤمن بقيامة الأموات وحياة الدهر الآتي.'],
+  ['d',2,'إيه رأي الكتاب عن الإيمان بدون أعمال؟','ميت',['كافٍ للخلاص','أفضل من الأعمال','غير مهم'],'رسالة يعقوب','"الإيمان بدون أعمال ميت" (يعقوب 2: 26).'],
+  ['d',2,'نصلّي للقديسين لأنهم…؟','أحياء في المسيح ويشفعون فينا',['آلهة','أنبياء جدد','بدلاء الله'],'الشفاعة ليست عبادة','نطلب شفاعة القديسين كأعضاء حية في جسد المسيح.'],
+  ['d',2,'إيه المقصود بـ"الأقنوم"؟','شخص إلهي له خاصية وهو في الجوهر الواحد',['إله منفصل','ملاك','قديس'],'مصطلح لاهوتي','الأقنوم يعني الشخص الإلهي المتميز في الجوهر الواحد.'],
+  ['d',2,'إيه معنى "اللاهوت" و"الناسوت"؟','الطبيعة الإلهية والطبيعة البشرية',['الإيمان والعمل','الآب والابن','الجسد والروح'],'اتحدا في المسيح','اللاهوت: الطبيعة الإلهية، والناسوت: الطبيعة البشرية.'],
+  ['d',2,'متى يأتي المسيح في مجيئه الثاني؟','لا أحد يعلم اليوم والساعة',['بعد ألف سنة','في سنة معينة','يوم الجمعة'],'قال المسيح: ولا الملائكة','لا يعلم اليوم والساعة إلا الآب وحده (متى 24: 36).'],
+  ['d',2,'إيه هرطقة سابليوس؟','إن الآب والابن والروح القدس مجرد ظهورات لشخص واحد',['إن المسيح إنسان','إن الروح القدس مخلوق','إن العذراء إلهة'],'سُمّيت المودالية','قال سابليوس إن الأقانيم أشكال ظهور لله الواحد.'],
+  ['d',2,'الشفاعة الكفارية تكون لـ…؟','السيد المسيح وحده',['العذراء','القديسين','الملائكة'],'ذبيحة الصليب','الكفارة عمل المسيح وحده، أما شفاعة القديسين فهي طلب صلاة.'],
+  ['d',3,'مجمع القسطنطينية 381م أضاف إيه لقانون الإيمان؟','ألوهية الروح القدس',['ميلاد العذراء','قيامة المسيح','أسرار الكنيسة'],'ردًّا على مقدونيوس','أكمل مجمع القسطنطينية قانون الإيمان بتأكيد ألوهية الروح القدس.'],
+  ['d',3,'الكنيسة القبطية بتقول إن طبيعة المسيح…؟','طبيعة واحدة متحدة من اللاهوت والناسوت',['طبيعتان منفصلتان','طبيعة إلهية فقط','طبيعة بشرية فقط'],'ميافيزيتية','طبيعة واحدة للإله المتجسد "من طبيعتين" بغير انفصال.'],
+  ['d',3,'مجمع خلقيدونية اتعقد سنة؟','451م',['325م','381م','431م'],'قررت الكنيسة القبطية عدم قبول قراراته','انعقد خلقيدونية سنة 451م وانقسمت الكنائس بسبب صيغة الطبيعتين.'],
+  ['d',3,'مين هو بابا الإسكندرية في مجمع خلقيدونية؟','البابا ديسقوروس',['أثناسيوس','كيرلس','ثاوفيلس'],'اتنفى بعد المجمع','نُفي البابا ديسقوروس بعد خلقيدونية إلى غانغرا.'],
+  ['d',3,'الخطية الجدّية هي؟','الميل للخطية الموروث من آدم',['خطية القتل','خطية الكذب','العصيان على الوالدين'],'نتحرر منها بالمعمودية','الخطية الجدية هي ميل الطبيعة البشرية للسقوط بعد خطية آدم.'],
+  ['d',3,'إيه معنى "الاتحاد الأقنومي"؟','اتحاد اللاهوت والناسوت في أقنوم واحد',['اتحاد الآب والابن','اتحاد الإنسان بالله','اتحاد الكنائس'],'اتحاد حقيقي','في المسيح اتحد اللاهوت بالناسوت اتحادًا حقيقيًا بلا انفصال.'],
+  ['d',3,'مين اللي قال "من لم تكن الكنيسة أمه فليس الله أباه"؟','القديس كيبريانوس',['القديس أثناسيوس','القديس أنطونيوس','القديس مرقس'],'أسقف قرطاجة','هذه المقولة منسوبة إلى القديس كيبريانوس أسقف قرطاجة.'],
+  ['d',3,'إيه المصطلح اللي معناه "اتحاد اللاهوت بالناسوت بغير اختلاط ولا امتزاج ولا تغيير"؟','الاتحاد الأقنومي',['التشتت','التبرير','التقديس'],'من القداس الإلهي','نردد في القداس: "اتحد لاهوته بناسوته بغير اختلاط ولا امتزاج ولا تغيير".'],
+  ['d',3,'الهرطقة اللي قالت إن للمسيح طبيعتين منفصلتين شخصين؟','النسطورية',['الأريوسية','السابيلية','المونوفيزيتية'],'أدانها مجمع أفسس','فصل نسطور بين الإنسان يسوع والكلمة، فأدانه مجمع أفسس.'],
+  ['d',3,'القانون النيقاوي القسطنطيني ينتهي بكلمة؟','آمين',['هلليلويا','كيرياليسون','أوصنا'],'بعد "وننتظر قيامة الأموات"','ينتهي قانون الإيمان بـ"آمين" بعد حياة الدهر الآتي.'],
+  ['s',1,'مين هو مؤسس الكنيسة القبطية ورسولها؟','القديس مرقس الرسول',['القديس بطرس','القديس بولس','القديس أثناسيوس'],'كتب إنجيلًا','مرقس الرسول بشّر بمصر وأسس كنيسة الإسكندرية.'],
+  ['s',1,'مين هو "أبو الرهبان"؟','الأنبا أنطونيوس',['الأنبا بولا','الأنبا باخوميوس','الأنبا مقار'],'عاش 105 سنين','لُقّب الأنبا أنطونيوس بأبي الرهبان وهو أول من نظّم الرهبنة الفردية.'],
+  ['s',1,'مين هو "أول السواح"؟','الأنبا بولا',['الأنبا أنطونيوس','الأنبا شنودة','الأنبا بيشوي'],'عاش في مغارة قرب البحر الأحمر','سُمّي الأنبا بولا أول السواح لأنه عاش في البرية متوحدًا.'],
+  ['s',1,'مين هو حامي الإيمان الأرثوذكسي في نيقية؟','البابا أثناسيوس الرسولي',['البابا كيرلس','البابا ديسقوروس','البابا بطرس'],'نُفي خمس مرات','دافع أثناسيوس عن الإيمان فسُمّي حامي الإيمان.'],
+  ['s',1,'مين هو "عمود الدين"؟','البابا كيرلس الكبير',['البابا أثناسيوس','البابا ديسقوروس','البابا ثاوفيلس'],'ترأس مجمع أفسس','لقب البابا كيرلس الكبير بعمود الدين.'],
+  ['s',1,'القديس مارجرجس بيتقال عنه…؟','شهيد وقديس',['راهب','نبي','أسقف'],'رُوي أنه قتل التنين','مارجرجس شهيد عظيم قاسى كثيرًا من أجل إيمانه.'],
+  ['s',1,'اسم القديس اللي كان خطيب العذراء ومربي السيد المسيح؟','يوسف النجار',['زكريا','نيقوديموس','سمعان الشيخ'],'كان نجارًا','يوسف النجار هو خطيب العذراء ورفيقها في الهروب إلى مصر.'],
+  ['s',1,'القديسة العذراء مريم لقبها في الكنيسة؟','والدة الإله',['ملكة الأنبياء','أم الشهداء','سيدة الرسل'],'أكده مجمع أفسس','العذراء مريم هي والدة الإله وأم النور.'],
+  ['s',1,'القديس الأنبا بيشوي لقبه؟','حبيب ربنا يسوع',['أبو الرهبان','ناطق بالإلهيات','عمود الدين'],'ديره في وادي النطرون','لُقّب الأنبا بيشوي بالكامل بالقديس العظيم الأنبا بيشوي حبيب ربنا يسوع.'],
+  ['s',2,'مين الأنبا اللي ارتبط بحكاية الغراب اللي بيجيب له خبز؟','الأنبا بولا',['الأنبا أنطونيوس','الأنبا شنودة','الأنبا مقار'],'عاش على النخلة والعين','كان غراب يأتي للأنبا بولا نصف خبزة يوميًا، ويأتي بخبزة كاملة يوم زيارة الأنبا أنطونيوس.'],
+  ['s',2,'مين هو "أبو الشركة" في الرهبنة؟','الأنبا باخوميوس',['الأنبا أنطونيوس','الأنبا مقار','الأنبا بيشوي'],'أسس نظام الأديرة الجماعية','أسس الأنبا باخوميوس نظام الرهبنة الشركية.'],
+  ['s',2,'مين هو القديس اللي اسمه معناه "رئيس المتوحدين"؟','الأنبا شنودة',['الأنبا بيشوي','الأنبا مقار','الأنبا بولا'],'الدير الأبيض باسمه','لقّب الأنبا شنودة بـ"رئيس المتوحدين" وله الدير الأبيض في سوهاج.'],
+  ['s',2,'القديس يوحنا ذهبي الفم كان لقبه لأنه…؟','فصيح اللسان في الوعظ',['كان غنيًا بالذهب','يلبس ثيابًا ذهبية','كان صائغًا'],'كلامه عذب كالذهب','لقّب بذهبي الفم لعذوبة وعظه وفصاحته.'],
+  ['s',2,'القديس باسيليوس الكبير مشهور بـ…؟','القداس الباسيلي',['القداس الغريغوري','القداس الكيرلسي','الأجبية'],'أسقف قيصرية الكبادوك','يُنسب إليه القداس الباسيلي الأكثر استخدامًا.'],
+  ['s',2,'القديس مارجرجس ولد في…؟','كبادوكيا',['مصر','روما','دمشق'],'في آسيا الصغرى','وُلد مارجرجس في كبادوكيا (تركيا حاليًا) ثم استشهد في فلسطين.'],
+  ['s',2,'القديس سمعان الخراز مشهور بـ…؟','نقل جبل المقطم',['كتابة الإنجيل','بناء الكنيسة','الاستشهاد'],'في عهد المعز لدين الله','صلى سمعان الخراز مع الشعب فانتقل جبل المقطم بعد صلاة عظيمة.'],
+  ['s',2,'القديس موسى الأسود كان قبل توبته…؟','لصًّا',['كاهنًا','تاجرًا','جنديًا'],'كان قاسيًا','كان موسى الأسود لصًّا ثم تاب وأصبح راهبًا ناسكًا.'],
+  ['s',2,'القديسة مريم المصرية كانت قبل توبتها…؟','خاطئة تابت وعاشت في البرية',['راهبة','ملكة','أسيرة'],'تابت أمام الأيقونة','تابت مريم المصرية وعاشت في برية الأردن 47 سنة.'],
+  ['s',2,'القديس الأنبا أنطونيوس بدأ حياته الرهبانية بعد سماع إيه؟','"اذهب بع كل ما لك"',['"أحبوا أعداءكم"','"أبانا الذي"','"الله محبة"'],'قراءة في الكنيسة','سمع الأنبا أنطونيوس إنجيل الشاب الغني فباع كل ما له.'],
+  ['s',2,'دير الأنبا أنطونيوس بالقرب من أي بحر؟','البحر الأحمر',['البحر المتوسط','البحر الميت','بحيرة قارون'],'جبل القلزم','يقع دير الأنبا أنطونيوس بالصحراء الشرقية قرب البحر الأحمر.'],
+  ['s',2,'وادي النطرون اتشهر بإيه؟','أديرة الرهبان',['الشاطئ','الصيد','الزراعة'],'دير أبو مقار والسريان','وادي النطرون موطن أديرة الأنبا مقار والبراموس والسريان.'],
+  ['s',2,'القديس الأنبا مقار الكبير ارتبط بإيه؟','وادي النطرون (البرية الجوانية)',['سيناء','الأقصر','أسوان'],'تلميذ الأنبا أنطونيوس','عاش الأنبا مقار في برية شيهيت (وادي النطرون).'],
+  ['s',2,'مين البابا رقم 117 في تاريخ كرسي مرقس؟','البابا شنوده الثالث',['البابا كيرلس السادس','البابا تواضروس الثاني','البابا ديسقوروس'],'أسقف التعليم سابقًا','البابا شنوده الثالث هو البابا رقم 117.'],
+  ['s',2,'مين البابا رقم 118؟','البابا تواضروس الثاني',['البابا شنوده الثالث','البابا كيرلس السادس','البابا يوساب'],'بعد البابا شنوده الثالث','البابا تواضروس الثاني هو البابا الـ118 لكرسي مرقس.'],
+  ['s',2,'القديس الأنبا بيشوي ارتبط بحكاية إيه؟','غسل قدمي السيد المسيح (ظهور له متنكرًا)',['نقل جبل','تحويل الماء','إقامة ميت'],'ظهر له المسيح في هيئة غريب','يُروى أن المسيح ظهر للأنبا بيشوي في هيئة غريب فحمله على كتفه.'],
+  ['s',2,'القديس أنطونيوس ارتبط بمعركة مع…؟','الشياطين والتجارب',['اللصوص','الإمبراطور','الوحوش'],'ظهرت عليه في صور مخيفة','حارب الأنبا أنطونيوس التجارب الشيطانية بالصلاة والصوم.'],
+  ['s',2,'القديس يوحنا الحبيب لقبه الحبيب لأنه…؟','اتكأ على صدر المسيح وأحبه المسيح',['كان أصغر الرسل','كان غنيًا','كان نبيًا'],'في العشاء الأخير','لقب يوحنا بالحبيب لأنه كان التلميذ الذي أحبه يسوع.'],
+  ['s',3,'القديس بطرس خاتم الشهداء كان…؟','بابا الإسكندرية رقم 17',['بطريرك أنطاكية','راهب','قس'],'استشهد سنة 311م','كان البابا بطرس خاتم الشهداء آخر بابا استشهد في العصر الروماني.'],
+  ['s',3,'القديس يحنس القصير مشهور بـ…؟','طاعته لأبيه الروحي',['صومه','فقره','سفره'],'غرس عصا يابسة','أطاع يحنس القصير أبيه وسقى عصا يابسة فأثمرت.'],
+  ['s',3,'القديس أرسانيوس لُقّب بـ…؟','معلم أولاد الملوك',['أبو الفقراء','حامي الإيمان','رئيس الرهبان'],'ترك القصر وعاش راهبًا','كان أرسانيوس معلمًا لأبناء الإمبراطور ثم ترك كل شيء للرهبنة.'],
+  ['s',3,'مين البابا اللي أعيد في عهده جسد مرقس الرسول من البندقية؟','البابا كيرلس السادس',['البابا شنوده','البابا يؤانس','البابا ديمتريوس'],'سنة 1968','أعيدت رفات القديس مرقس سنة 1968 في عهد البابا كيرلس السادس.'],
+  ['s',3,'القديس ديديموس الضرير كان…؟','عالمًا ضريرًا وناظر مدرسة الإسكندرية',['راهبًا','حاكمًا','شماسًا'],'تعلّم بالسماع','كان ديديموس ضريرًا ومن أعظم مدرسي مدرسة الإسكندرية اللاهوتية.'],
+  ['s',3,'أوريجانوس مشهور في الكنيسة كـ…؟','عالم لاهوتي من مدرسة الإسكندرية',['راهب','شهيد','أسقف روما'],'له كتابات تفسيرية كثيرة','أوريجانوس من علماء مدرسة الإسكندرية اللاهوتية.'],
+  ['s',3,'القديس الأنبا موسى الأسود اشتهر بعد توبته بـ…؟','الوداعة والتواضع',['القتال','الغنى','العلم'],'تحول من العنف','تاب الأنبا موسى فاشتهر بالوداعة والخضوع.'],
+  ['s',3,'القديس العظيم الأنبا باخوميوس كان في شبابه…؟','جنديًا',['راعيًا','طبيبًا','كاهنًا'],'قبل الرهبنة','خدم باخوميوس جنديًا في الجيش الروماني قبل الرهبنة.'],
+  ['s',3,'الأنبا إبرام أسقف الفيوم والجيزة اشتهر بإيه؟','محبة الفقراء والعطاء',['الكتابة','الحرب','التجارة'],'لقبه أبو الفقراء','اشتهر الأنبا إبرام بمحبة الفقراء والصدقة وبركة صلواته.'],
+  ['s',3,'مين القديس اللي لقبه "الناطق بالإلهيات"؟','غريغوريوس النزينزي',['باسيليوس','أثناسيوس','كيرلس'],'صديق باسيليوس','لُقّب غريغوريوس بالناطق بالإلهيات لعمق تعليمه اللاهوتي.'],
+  ['m',1,'مين الإمبراطور اللي اضطهد المسيحيين اضطهادًا كبيرًا سنة 303م؟','دقلديانوس',['قسطنطين','هيرودس','نيرون'],'بدأ التقويم القبطي بتاريخ جلوسه','اضطهد دقلديانوس المسيحيين، ويبدأ التقويم القبطي من سنة 284م (عصر الشهداء).'],
+  ['m',1,'إيه اسم التقويم القبطي الآخر؟','تقويم الشهداء',['تقويم الميلاد','تقويم القيامة','تقويم الرسل'],'يبدأ سنة 284م','يُسمّى التقويم القبطي تقويم الشهداء.'],
+  ['m',1,'يوحنا المعمدان استشهد بـ…؟','قطع رأسه',['الرجم','الصلب','الحرق'],'بسبب هيرودس وهيروديا','قطع هيرودس رأس يوحنا المعمدان بطلب هيروديا وابنتها.'],
+  ['m',1,'القديس مارجرجس بيرسم في الأيقونة وهو…؟','راكب حصان وبيقتل تنين',['راكب جمل','واقف في بحر','حاملًا صليبًا'],'رمز للانتصار على الشر','يُصوَّر مارجرجس راكبًا حصانًا يطعن تنينًا رمزًا لانتصاره على الشيطان.'],
+  ['m',1,'القديس مارمينا العجايبي بيرسم بين…؟','جملين',['أسدين','حصانين','نخلتين'],'دير في مريوط','تُصوَّر أيقونة مارمينا بين جملين، وفق تقليد نقل جسده.'],
+  ['m',1,'في أي عام استشهد 21 مصريًا قبطيًا في ليبيا؟','2015',['2011','2005','2020'],'اعتُبروا شهداء الكنيسة','استشهد 21 قبطيًا في فبراير 2015 وأقرّت الكنيسة تذكارهم.'],
+  ['m',1,'الشهداء بيحتفل بيهم الكنيسة في شهر…؟','توت (عيد النيروز)',['بابه','هاتور','كيهك'],'بداية السنة القبطية','يبدأ التقويم القبطي بعيد النيروز تذكارًا للشهداء.'],
+  ['m',1,'القديسة دميانة تحتفل بيها الكنيسة يوم…؟','13 طوبة',['29 كيهك','7 يناير','1 توت'],'شهر طوبة','يحتفل الأقباط بعيد القديسة دميانة يوم 13 طوبة.'],
+  ['m',2,'القديس مرقس الرسول استشهد في…؟','الإسكندرية',['القاهرة','أورشليم','روما'],'جرّوه في الشوارع بالحبال','استشهد مرقس الرسول في الإسكندرية سنة 68م.'],
+  ['m',2,'مين من الرسل اتصلب منكّس الرأس؟','بطرس',['بولس','أندراوس','يعقوب'],'في روما','طلب بطرس أن يُصلب منكسًا لأنه لا يستحق أن يُصلب كسيده.'],
+  ['m',2,'مين الرسول اللي قُطع رأسه في روما؟','بولس',['بطرس','أندراوس','يوحنا'],'كان مواطنًا رومانيًا','قُطع رأس بولس الرسول في روما بأمر نيرون، لأنه مواطن روماني.'],
+  ['m',2,'أول رسول استشهد من الاثني عشر؟','يعقوب بن زبدي',['بطرس','متى','يوحنا'],'أخو يوحنا','قتله هيرودس أغريبا بالسيف (أعمال 12).'],
+  ['m',2,'القديسة دميانة كانت ومعها…؟','40 عذراء',['12 عذراء','7 عذارى','100 عذراء'],'في البرلس','استشهدت القديسة دميانة مع أربعين عذراء في عهد دقلديانوس.'],
+  ['m',2,'مين القديس اللي سُمّي "أبو سيفين"؟','مرقوريوس',['مارجرجس','مارمينا','أبانوب'],'عنده سيفان','يُلقّب القديس مرقوريوس بأبي سيفين لأنه كان يحمل سيفين.'],
+  ['m',2,'مين الشهيد الطفل من نهيسا اللي استشهد وعمره 12 سنة؟','أبانوب',['كيرياكوس','مارمينا','أبو سيفين'],'ذهب بنفسه وأعلن إيمانه','استشهد أبانوب النهيسي وهو صغير في عهد دقلديانوس.'],
+  ['m',2,'مارمينا العجايبي كان في الأصل…؟','جنديًا',['راهبًا','تاجرًا','ملكًا'],'ترك الجيش وسكن البرية','كان مارمينا جنديًا رومانيًا ترك الخدمة وعاش ناسكًا ثم استشهد.'],
+  ['m',2,'مين القديسة اللي عذبوها بالعجلة (الكسّارة) وكانت من الإسكندرية؟','القديسة كاترين',['القديسة بربارة','القديسة دميانة','القديسة مارينا'],'فيلسوفة','عُذبت القديسة كاترين بالعجلة، وتُعرف بالعالمة الحكيمة.'],
+  ['m',2,'القديسة بربارة استشهدت على يد…؟','أبيها',['أخيها','زوجها','الملك مباشرة'],'كان وثنيًا','قيل إن أبيها هو من قتلها بعد أن حبسها ثم سلمها للوالي.'],
+  ['m',2,'مين الأم اللي رأت ابنها الطفل يتعذب وثبتّه؟','القديسة يوليطة',['القديسة دميانة','القديسة بربارة','القديسة تكلا'],'وابنها كيرياكوس','استشهدت يوليطة مع ابنها كيرياكوس الطفل.'],
+  ['m',2,'اسم اللص التائب المصلوب مع المسيح في التقليد الكنسي؟','ديماس',['برأبا','أنسيمس','حنانيا'],'وعده المسيح بالفردوس','يسمّيه التقليد الكنسي ديماس (اللص اليمين).'],
+  ['m',3,'الفيلق الطيبي كان من…؟','جنود مسيحيين من صعيد مصر',['فرسان من روما','بحّارة','كهنة'],'قائدهم موريس','كان الفيلق الطيبي من جنود مسيحيين من طيبة رفضوا السجود للأوثان.'],
+  ['m',3,'مين قائد الفيلق الطيبي؟','موريس (ماوريكيوس)',['جرجس','مرقوريوس','تادرس'],'قتلهم مكسيميانوس','قاد موريس الفيلق الطيبي، ورفض هو وجنوده تقديم الذبيحة للأوثان.'],
+  ['m',3,'الأمير تادرس المشرقي كان…؟','قائدًا عسكريًا',['راهبًا','طبيبًا','فنانًا'],'يصوَّر راكب حصان','كان تادرس المشرقي قائدًا استشهد في عهد ليكينيوس.'],
+  ['m',3,'الأربعون شهيدًا في سبسطية استشهدوا بـ…؟','التجميد في بحيرة',['الحرق','الرجم','السيف'],'وقفوا في الشتاء','عُرّي الأربعون جنديًا وتُركوا في بحيرة متجمدة لأنهم رفضوا إنكار المسيح.'],
+  ['m',3,'القديس أندراوس استشهد على صليب على شكل…؟','X',['T','+','L'],'يُسمّى صليب أندراوس','صُلب أندراوس الرسول على صليب مائل على شكل X.'],
+  ['m',3,'مين هو الإمبراطور اللي بدأ أول اضطهاد عام للمسيحيين سنة 64م؟','نيرون',['دقلديانوس','تراجان','ديسيوس'],'بعد حريق روما','اضطهد نيرون المسيحيين بعد حريق روما واتهمهم به.'],
+  ['m',3,'اضطهاد ديسيوس كان في سنة تقريبًا؟','250م',['64م','303م','180م'],'بين نيرون ودقلديانوس','اضطهد ديسيوس المسيحيين سنة 250م وسقط كثيرون.'],
+  ['m',3,'القديس بولس الرسول كان قبل الإيمان…؟','مضطهدًا للكنيسة',['صيادًا','جابي ضرائب','نجارًا'],'حضر رجم استفانوس','كان شاول مضطهدًا قبل أن يصير بولس رسول الأمم.'],
+  ['p',1,'أنا اللي ضحكت لما سمعت إني هولد وأنا عجوزة، وولدت إسحق. مين أنا؟','سارة',['رفقة','حنة','ليئة'],'زوجة إبراهيم','ضحكت سارة لما سمعت الوعد، ثم ولدت إسحق في شيخوختها.'],
+  ['p',1,'اتعمل لي قميص ملوّن وحسدني إخواتي. مين أنا؟','يوسف',['بنيامين','يهوذا','يعقوب'],'ابن راحيل','أحب يعقوب يوسف وصنع له قميصًا ملونًا فحسده إخوته.'],
+  ['p',1,'أنا اللي كنت راعي غنم وسمعت صوت الله من عليقة مشتعلة ولم تحترق. مين أنا؟','موسى',['هارون','يشوع','كالب'],'كنت في أرض مديان','كلّم الله موسى من العليقة وأرسله لتحرير شعبه من فرعون.'],
+  ['p',1,'قلت للرب: "هأنذا فأرسلني" بعد ما شفت مجده في الهيكل. مين أنا؟','إشعياء',['إرميا','حزقيال','ميخا'],'رأيت سرافيم بتسبح قدوس قدوس','رأى إشعياء مجد الرب وسمع السرافيم يسبحون قدوس قدوس قدوس.'],
+  ['p',1,'أنا الملاك اللي بشّر العذراء بميلاد المسيح. مين أنا؟','جبرائيل',['ميخائيل','روفائيل','سوريال'],'أرسلني الله إلى الناصرة','أرسل الله الملاك جبرائيل ليبشر العذراء مريم بميلاد المخلص.'],
+  ['p',1,'أنا اللي رأيت السيد المسيح وعرفته من كلمة "مريم". مين أنا؟','مريم المجدلية',['مرثا','حنة','سالومي'],'كنت بالبكاء عند القبر','ظهر المسيح لمريم المجدلية فعرفته حين ناداها باسمها.'],
+  ['p',1,'كنت جابي ضرائب قصير القامة وطلعت على شجرة جميز لأشوف المسيح. مين أنا؟','زكا',['متى','نيقوديموس','لعازر'],'نزل المسيح عند بيتي','دعا المسيح زكا العشار فتاب ورد أربعة أضعاف.'],
+  ['p',1,'قلت للمسيح: "ربي وإلهي" بعد ما لمست جراحه. مين أنا؟','توما',['فيلبس','نثنائيل','متى'],'ما كنتش موجود أول مرة ظهر فيها','شك توما ثم آمن واعترف بألوهية المسيح.'],
+  ['p',1,'أنا الأخ الأكبر اللي زعل من أبي لما رجع أخي الضال. مين أنا؟','الابن الأكبر',['إسحق','عيسو','قايين'],'من مثل في لوقا 15','غضب الابن الأكبر من فرح أبيه بعودة الابن الضال.'],
+  ['p',2,'كنت أمًّا صلّيت في بيت الرب وطلبت ابنًا، وسمّيته "صموئيل". مين أنا؟','حنة',['سارة','راحيل','نعمي'],'كانت عاقرًا','صلّت حنة بدموع في بيت الرب فرزقها الله صموئيل.'],
+  ['p',2,'كنت قاضيًا ونبيًا وسمعت صوت الرب وأنا طفل في الهيكل. مين أنا؟','صموئيل',['إيلي','شاول','داود'],'كان الكاهن عالي بيربيني','دُعي صموئيل وهو صبي: صموئيل صموئيل.'],
+  ['p',2,'أنا اللي كنت أكرز بالمسيح بعد ما كنت بضطهد الكنيسة، رأيت نورًا على طريق دمشق. مين أنا؟','شاول (بولس)',['بطرس','برنابا','أبولس'],'أعمى ثلاثة أيام','اهتدى شاول الطرسوسي بنور على طريق دمشق وصار بولس رسول الأمم.'],
+  ['p',2,'أنا ابن لـ زكريا وأليصابات وأول رسول لقدوم المسيح. مين أنا؟','يوحنا المعمدان',['يعقوب','يوحنا الحبيب','إيليا'],'صوت صارخ في البرية','كان يوحنا المعمدان السابق للمسيح، المنادي بالتوبة.'],
+  ['p',2,'قال لي الرب: "اذهب واغسل في الأردن سبع مرات" فبرئت من برصي. مين أنا؟','نعمان السرياني',['جيحزي','إليشع','حزقيا'],'كنت قائد جيش آرام','شفي نعمان من البرص بعد أن اغتسل سبع مرات بأمر إليشع.'],
+  ['p',2,'أنا المرأة اللي مسحت قدمي المسيح بطيب ومسحتهما بشعر رأسي. مين أنا؟','مريم أخت لعازر',['مرثا','حنة','السامرية'],'كنت بجلس عند قدميه أسمع','مسحت مريم قدمي يسوع بالطيب الغالي وجلست عند قدميه تسمع كلامه.'],
+  ['p',2,'قالوا لي: "أنت بطرس وعلى هذه الصخرة أبني كنيستي". مين أنا؟','سمعان بطرس',['أندراوس','يعقوب','يوحنا'],'اعترفت بأن المسيح ابن الله الحي','قال المسيح لبطرس بعد اعترافه: أنت بطرس وعلى هذه الصخرة أبني كنيستي.'],
+  ['p',2,'أنا تلميذ المسيح الحبيب، كتبت إنجيلًا وثلاث رسائل وسفر الرؤيا. مين أنا؟','يوحنا',['بطرس','متى','لوقا'],'اتكأ على صدر المسيح','كتب يوحنا الحبيب الإنجيل والرسائل الثلاث والرؤيا.'],
+  ['p',3,'أنا اللي اتبعت لأعمّد الخصي الحبشي بعد ما فسّرت له سفر إشعياء. مين أنا؟','فيلبس المبشر',['بطرس','برنابا','تيموثاوس'],'كنت أحد الشمامسة السبعة','شرح فيلبس لخصي الحبشة نبوة إشعياء وعمّده (أعمال 8).'],
+  ['p',3,'أنا الشاب اللي نام وقت عظة بولس وسقط من الطابق الثالث فمات. مين أنا؟','افتيخوس',['تيطس','تيموثاوس','أبفراس'],'كنت في ترواس','أقام بولس افتيخوس الذي سقط من الكوة في ترواس (أعمال 20).'],
+  ['p',3,'أنا الملك اللي رأى يد تكتب على الحائط: "منا منا تقيل وفرسين". مين أنا؟','بيلشاصر',['نبوخذنصر','داريوس','كورش'],'في بابل وبدأت الوليمة','رأى الملك بيلشاصر الكتابة على الحائط ففسرها دانيال.'],
+  ['p',3,'أنا قائد الجيش اللي طلبت من المسيح يشفي غلامي وقلت: "لست مستحقًا". مين أنا؟','قائد المئة',['بيلاطس','كرنيليوس','يايرس'],'قال: قل كلمة فقط فيبرأ','مدح المسيح إيمان قائد المئة العظيم (متى 8).'],
+  ['e',1,'إيه اللي حصل لجدران أريحا؟','سقطت بعد أن لفّ الشعب حولها وهتفوا',['احترقت','غرقت','هدمها الزلزال في الليل'],'سار الكهنة والتابوت','سقطت أسوار أريحا بعد أن طاف حولها الشعب سبعة أيام وهتفوا.'],
+  ['e',1,'إيه قصة برج بابل؟','الناس حاولوا يبنوا برجًا للسماء فبلبل الله ألسنتهم',['الله أمرهم يبنوا الهيكل','بنوا سفينة','حفروا بئرًا'],'تكوين 11','بلبل الله ألسنة البشر حين أرادوا الشهرة بالبرج.'],
+  ['e',1,'إيه الآية العظيمة اللي حصلت في الطوفان؟','قوس قزح كعلامة عهد',['نزول المن','عمود النار','الحية النحاسية'],'بعد خروج نوح','جعل الله قوس قزح علامة عهد ألا يُهلك العالم بالطوفان ثانية.'],
+  ['e',1,'إيه اللي عبره بنو إسرائيل بأمر الله؟','البحر الأحمر',['نهر النيل','البحر الميت','بحيرة طبرية'],'ضرب موسى البحر بعصاه','انشق البحر لبني إسرائيل وعبروه على اليابسة.'],
+  ['e',1,'إيه اللي حصل لما صرخ المسيح "لعازر هلم خارجًا"؟','قام لعازر من القبر',['سقط القبر','نزل ملاك','حدث زلزال'],'كان ميت 4 أيام','أقام المسيح لعازر وهو ملفوف بالأكفان.'],
+  ['e',1,'إيه آية المسيح الأولى في قانا الجليل؟','تحويل الماء إلى خمر',['شفاء الأبرص','إقامة ابنة يايرس','إسكات العاصفة'],'بطلب من العذراء','حوّل المسيح الماء إلى خمر في عرس قانا الجليل.'],
+  ['e',1,'اتصلب المسيح بين…؟','لصين',['كاهنين','تلميذين','جنديين'],'أحدهما تاب','صُلب المسيح بين لصين، تاب أحدهما فوعده بالفردوس.'],
+  ['e',1,'اللص التائب سمعه المسيح يقول إيه؟','"اذكرني يا رب متى جئت في ملكوتك"',['"أنا مظلوم"','"ارحمني يا الله"','"أنا بريء"'],'قال له المسيح: اليوم تكون معي في الفردوس','وعد المسيح اللص التائب بالفردوس (لوقا 23: 42-43).'],
+  ['e',2,'الضربة التي حلّت بمصر وكانت ظلمة كثيفة هي رقم كام؟','التاسعة',['الأولى','الخامسة','الثانية'],'قبل موت الأبكار','كانت الضربة التاسعة ظلمة كثيفة ثلاثة أيام.'],
+  ['e',2,'كام ضربة ضرب بها الله مصر؟','10 ضربات',['7 ضربات','12 ضربة','5 ضربات'],'آخرها موت الأبكار','عشر ضربات أُصيبت بها مصر حتى أطلق فرعون الشعب.'],
+  ['e',2,'إيه الأكل اللي أطعم به الله شعبه في البرية؟','المن والسلوى',['خبز وسمك','عسل وجراد','تمر وزيت'],'نزل من السماء كل يوم','أطعم الله شعبه المن والسلوى طوال أربعين سنة.'],
+  ['e',2,'فين حصلت أول تجربة للمسيح من إبليس؟','في البرية',['في الهيكل','في الناصرة','على الجبل'],'بعد ما صام 40 يومًا','جرّب إبليس المسيح بعد الصوم في البرية بثلاث تجارب.'],
+  ['e',2,'كام تجربة جرّب إبليس بيها المسيح؟','3 تجارب',['2 تجربة','7 تجارب','5 تجارب'],'تحويل الحجارة لخبز','تجربة الخبز، وتجربة الهيكل، وتجربة السجود له.'],
+  ['e',2,'مين اللي انقذ الله على يده شعب إسرائيل من الجوع في مصر بعد ما فسّر حلم فرعون؟','يوسف',['موسى','هارون','دانيال'],'سبع بقرات سمان وسبع عجاف','فسّر يوسف حلم فرعون وأدار مصر في سني الشبع والجوع.'],
+  ['e',2,'مين اللي حلم بتمثال كبير رأسه من ذهب؟','نبوخذنصر',['بيلشاصر','داريوس','كورش'],'فسّر الحلم دانيال','فسّر دانيال حلم نبوخذنصر عن التمثال والممالك الأربع.'],
+  ['e',2,'مين اللي حاول يقتل داود بسبب الغيرة؟','شاول',['أبشالوم','جليات','يوآب'],'رماه بحربة مرتين','طارد الملك شاول داود حسدًا وغيرة.'],
+  ['e',2,'إيه اللي حدث يوم الخمسين لتلاميذ المسيح؟','تكلموا بألسنة وحلّ الروح القدس',['انتصر الجيش الروماني','نزل مَنّ','سقط ثلج'],'مكان العلية','حلّ الروح القدس على التلاميذ وتكلموا بألسنة.'],
+  ['e',2,'مين اللي عمل الحية النحاسية بأمر الله في البرية؟','موسى',['هارون','يشوع','كالب'],'رمز للصلب','رفع موسى حية نحاسية فمن نظر إليها شُفي، وهي رمز للمسيح المصلوب.'],
+  ['e',2,'في أي مكان جرت معجزة تحويل الماء إلى خمر؟','قانا الجليل',['كفرناحوم','بيت عنيا','أريحا'],'عرس','تمت المعجزة في قانا الجليل (يوحنا 2).'],
+  ['e',3,'اسم الجبل اللي حدث عليه تجلي المسيح (حسب التقليد)؟','جبل تابور',['جبل الزيتون','جبل سيناء','جبل الكرمل'],'ظهر معه موسى وإيليا','التقليد يحدد جبل تابور مكانًا لتجلي المسيح.'],
+  ['e',3,'مين شاهد التجلي مع المسيح من التلاميذ؟','بطرس ويعقوب ويوحنا',['بطرس وأندراوس ومتى','توما ويوحنا ويهوذا','فيلبس وبطرس ومرقس'],'التلاميذ الثلاثة المقربون','أخذ المسيح بطرس ويعقوب ويوحنا على الجبل (متى 17).'],
+  ['e',3,'كام قفة فضلت بعد إشباع الخمسة آلاف؟','12 قفة',['7 قفف','5 قفف','3 قفف'],'بعدد التلاميذ','فضل 12 قفة من الكسر بعد إشباع 5000 رجل.'],
+  ['e',3,'كام قفة فضلت بعد إشباع الأربعة آلاف؟','7 قفف',['12 قفة','5 قفف','3 قفف'],'أقل من الأولى','بعد إشباع الأربعة آلاف فضل سبع قفف من الكسر.'],
+  ['e',3,'في أي ليلة صلّى المسيح في جثسيماني؟','ليلة الخميس',['ليلة السبت','ليلة الأحد','ليلة الجمعة'],'قبل القبض عليه','صلّى المسيح في بستان جثسيماني ليلة الخميس قبل القبض عليه.'],
 ].map(r=>({cat:r[0], d:r[1], q:r[2], a:r[3], w:r[4], h:r[5], x:r[6]}));
 
 let fawTick = null, fawAnimKey = null;
@@ -22393,27 +22696,52 @@ function fawShuffle(a){
 function fawUsedKey(){ return 'glavera-faw-used-'+(state.pid||'guest'); }
 function fawUsedGet(){ try{ const o = JSON.parse(localStorage.getItem(fawUsedKey())||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
 function fawUsedSet(o){ try{ localStorage.setItem(fawUsedKey(), JSON.stringify(o)); }catch(e){} }
-function fawBuildRound(){
-  const used = fawUsedGet(), round = [];
+/* progress: نجوم كل مستوى (محفوظة على الجهاز لكل لاعب) */
+function fawProgKey(){ return 'glavera-faw-prog-'+(state.pid||'guest'); }
+function fawProgGet(){ try{ const o = JSON.parse(localStorage.getItem(fawProgKey())||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
+function fawProgSet(o){ try{ localStorage.setItem(fawProgKey(), JSON.stringify(o)); }catch(e){} }
+function fawStarsOf(n){ const o = fawProgGet(); return +o[n]||0; }
+function fawUnlocked(n){ return n<=1 || fawStarsOf(n-1)>0; }
+function fawStarsFor(correct, total){ return correct>=total ? 3 : (correct>=total-1 ? 2 : (correct>=FAW_CFG.pass ? 1 : 0)); }
+/* mix = [سهل،متوسط،صعب]، cat = تصنيف معين أو null للكل */
+function fawBuildRound(mix, cat){
+  mix = mix || FAW_CFG.mix;
+  const used = fawUsedGet(), round = [], chosen = new Set();
+  const inPool = b => !cat || b.cat===cat;
   [1,2,3].forEach((d,ti)=>{
-    const need = FAW_CFG.mix[ti];
-    const idxs = []; FAW_BANK.forEach((b,i)=>{ if(b.d===d) idxs.push(i); });
+    const need = mix[ti]; if(!need) return;
+    const idxs = []; FAW_BANK.forEach((b,i)=>{ if(b.d===d && inPool(b)) idxs.push(i); });
     let u = Array.isArray(used[d]) ? used[d] : [];
     let rem = idxs.filter(i=>!u.includes(i));
-    if(rem.length < need){ u = []; rem = idxs.slice(); }
+    if(rem.length < need){ u = u.filter(i=>!idxs.includes(i)); rem = idxs.slice(); }
     const pick = fawShuffle(rem).slice(0, need);
     used[d] = u.concat(pick);
-    pick.forEach(i=>{
-      const b = FAW_BANK[i], opts = fawShuffle([b.a].concat(b.w));
-      round.push({ cat:b.cat, d:b.d, q:b.q, h:b.h, x:b.x, o:opts, c:opts.indexOf(b.a) });
-    });
+    pick.forEach(i=>chosen.add(i));
+  });
+  /* لو القسم المختار مفيهوش أسئلة كفاية في درجة صعوبة، نكمّل من أي درجة تانية في نفس القسم */
+  const total = mix.reduce((a,b)=>a+b,0);
+  if(chosen.size < total){
+    const extra = []; FAW_BANK.forEach((b,i)=>{ if(inPool(b) && !chosen.has(i)) extra.push(i); });
+    fawShuffle(extra).slice(0, total-chosen.size).forEach(i=>chosen.add(i));
+  }
+  Array.from(chosen).sort((x,y)=>FAW_BANK[x].d-FAW_BANK[y].d).forEach(i=>{
+    const b = FAW_BANK[i], opts = fawShuffle([b.a].concat(b.w));
+    round.push({ cat:b.cat, d:b.d, q:b.q, h:b.h, x:b.x, o:opts, c:opts.indexOf(b.a) });
   });
   fawUsedSet(used);
   return round;
 }
-function fawInit(){
+/* cfg: {lvl:1..10} لمستوى، أو {cat:'b'} لتدريب حر في قسم، أو {cat:'all'} لتدريب مختلط */
+function fawInit(cfg){
   fawStopTimer(); fawAnimKey = null;
-  state.faw = { i:0, round:fawBuildRound(), left:FAW_CFG.sec, picked:null, revealed:false, hint:false, score:0, correct:0, res:[], lastPts:0, finished:false, earned:0, bonus:0 };
+  cfg = cfg || state.fawLast || {lvl:1};
+  state.fawLast = cfg;
+  const lv = cfg.lvl ? fawLvlCfg(cfg.lvl) : null;
+  const mix = lv ? lv.mix : FAW_CFG.mix;
+  const cat = (!lv && cfg.cat && cfg.cat!=='all') ? cfg.cat : null;
+  const sec = lv ? lv.sec : FAW_CFG.sec;
+  const round = fawBuildRound(mix, cat);
+  state.faw = { lvl: lv ? lv.n : 0, cat: cat, sec:sec, base:fawBase(lv ? lv.n : 0), i:0, round:round, left:sec, picked:null, revealed:false, hint:false, score:0, correct:0, res:[], lastPts:0, finished:false, earned:0, bonus:0, stars:0, passed:false };
 }
 function fawStopTimer(){ if(fawTick){ clearInterval(fawTick); fawTick = null; } }
 function fawStartTimer(){
@@ -22424,7 +22752,7 @@ function fawStartTimer(){
     g.left--;
     const t = document.getElementById('faw-time'), b = document.getElementById('faw-bar');
     if(t){ t.textContent = '⏱️ '+Math.max(0,g.left)+' ث'; t.classList.toggle('warn', g.left<=5); }
-    if(b){ b.style.width = Math.max(0, g.left/FAW_CFG.sec*100)+'%'; b.classList.toggle('warn', g.left<=5); }
+    if(b){ b.style.width = Math.max(0, g.left/g.sec*100)+'%'; b.classList.toggle('warn', g.left<=5); }
     if(g.left<=0){ fawStopTimer(); fawReveal(null); }
   }, 1000);
 }
@@ -22457,7 +22785,7 @@ function fawReveal(idx){
   g.picked = (idx===null || isNaN(idx)) ? null : idx;
   g.revealed = true;
   if(g.picked!==null && g.picked===q.c){
-    const pts = g.hint ? FAW_CFG.hinted : FAW_CFG.base + (g.left>=FAW_CFG.fastLeft ? FAW_CFG.fastBonus : 0);
+    const pts = g.hint ? FAW_CFG.hinted : g.base + (g.left>=g.sec-10 ? FAW_CFG.fastBonus : 0);
     g.lastPts = pts; g.score += pts; g.correct++; g.res.push('ok');
     try{ SND.cheer(); }catch(e){}
   } else {
@@ -22475,7 +22803,7 @@ function fawHint(){
 function fawNext(){
   const g = state.faw; if(!g || g.finished || !g.revealed) return;
   if(g.i >= g.round.length-1){ fawFinish(); return; }
-  g.i++; g.left = FAW_CFG.sec; g.picked = null; g.revealed = false; g.hint = false; g.lastPts = 0;
+  g.i++; g.left = g.sec; g.picked = null; g.revealed = false; g.hint = false; g.lastPts = 0;
   fawRender(); fawStartTimer();
   try{ SND.click(); }catch(e){}
 }
@@ -22483,31 +22811,61 @@ function fawFinish(){
   const g = state.faw; if(!g || g.finished) return;
   fawStopTimer();
   g.finished = true;
-  g.bonus = (g.correct===g.round.length) ? FAW_CFG.perfect : 0;
+  g.bonus = (g.correct===g.round.length) ? (FAW_CFG.perfect + g.lvl) : 0;
   g.earned = g.score + g.bonus;
+  if(g.lvl){
+    g.stars = fawStarsFor(g.correct, g.round.length);
+    g.passed = g.stars>0;
+    const o = fawProgGet();
+    if(g.stars > (+o[g.lvl]||0)){ o[g.lvl] = g.stars; fawProgSet(o); }
+  }
   fawSaveBest(g);
-  if(g.earned>0) awardSoloGamePoints(g.earned, 'فوازير مسيحية: حليت '+g.correct+' من '+g.round.length+' 🧩');
+  if(g.earned>0) awardSoloGamePoints(g.earned, (g.lvl ? 'فوازير - المستوى '+g.lvl+': ' : 'فوازير: ')+'حليت '+g.correct+' من '+g.round.length+' 🧩');
   fawRender();
 }
 function fawTopHtml(act){
   return `<div class="faw-top"><button type="button" class="icon-btn faw-back" data-action="${act}" aria-label="رجوع">${ICO.back}</button><div class="faw-title">🧩 فوازير</div><div class="faw-gap"></div></div>`;
 }
+function fawStarsHtml(n, max){
+  let h=''; for(let i=1;i<=(max||3);i++) h += `<i class="${i<=n?'on':''}">★</i>`;
+  return h;
+}
 function fawStartHtml(){
   const st = state.pid ? myGameStats(state.pid) : {};
   const best = st.fawBest ? `أفضل جولة ليك: ${st.fawBest} نقطة` : 'أول مرة تلعب اللعبة دي 🎉';
-  const maxPts = FAW_CFG.perRound*(FAW_CFG.base+FAW_CFG.fastBonus)+FAW_CFG.perfect;
+  const prog = fawProgGet();
+  const totalStars = FAW_LEVELS.reduce((a,l)=>a+(+prog[l.n]||0),0);
+  const lvls = FAW_LEVELS.map(l=>{
+    const stars = +prog[l.n]||0, open = fawUnlocked(l.n);
+    return `<button type="button" class="faw-lv${open?'':' locked'}${stars?' done':''}" data-action="faw-start" data-lvl="${l.n}" ${open?'':'disabled'}>
+      <span class="faw-lv-n">${open ? l.ico : '🔒'}</span>
+      <span class="faw-lv-t">المستوى ${l.n}</span>
+      <span class="faw-lv-s">${l.name}</span>
+      <span class="faw-lv-stars">${fawStarsHtml(stars)}</span>
+    </button>`;
+  }).join('');
+  const topics = Object.keys(FAW_CATS).map(k=>{
+    const n = FAW_BANK.filter(b=>b.cat===k).length;
+    return `<button type="button" class="faw-topic" data-action="faw-start" data-cat="${k}"><span>${FAW_CATS[k][0]}</span><b>${FAW_CATS[k][1]}</b><small>${n} سؤال</small></button>`;
+  }).join('');
   return `
     <div class="faw-start">
       <div class="faw-start-ico">🧩</div>
       <div class="faw-start-title">فوازير</div>
-      <div class="faw-start-sub">${FAW_CFG.perRound} فوازير دينية مسيحية، من شخصيات الكتاب المقدس وقصصه لحد الكنيسة وطقوسها. بتبدأ سهلة وبتصعب كل ما تتقدم.</div>
+      <div class="faw-start-sub">${FAW_BANK.length} فزورة في الكتاب المقدس والطقس الكنسي والعقيدة والقديسين والشهداء. كل مستوى ${FAW_CFG.perRound} أسئلة، جاوب ${FAW_CFG.pass} صح على الأقل عشان تفتح المستوى اللي بعده.</div>
+      <div class="faw-sec-h"><b>🏁 المستويات</b><span>⭐ ${totalStars} / ${FAW_LEVELS.length*3}</span></div>
+      <div class="faw-lvls">${lvls}</div>
+      <div class="faw-sec-h"><b>📚 تدريب حر حسب الموضوع</b><span>من غير فتح مستويات</span></div>
+      <div class="faw-topics">
+        <button type="button" class="faw-topic all" data-action="faw-start" data-cat="all"><span>🎲</span><b>كل المواضيع</b><small>مختلط</small></button>
+        ${topics}
+      </div>
       <ul class="faw-rules">
-        <li><b>⏱️</b><span>${FAW_CFG.sec} ثانية لكل فزورة</span></li>
-        <li><b>✅</b><span>الإجابة الصح = ${FAW_CFG.base} نقط، و+${FAW_CFG.fastBonus} لو جاوبت بسرعة</span></li>
-        <li><b>💡</b><span>التلميح بيساعدك، بس نقط الفزورة بتبقى ${FAW_CFG.hinted}</span></li>
-        <li><b>🏅</b><span>لو جاوبت الـ${FAW_CFG.perRound} صح تاخد +${FAW_CFG.perfect} مكافأة (أقصى نتيجة ${maxPts} نقطة)</span></li>
+        <li><b>⏱️</b><span>الوقت بيقل (من 25 لـ 17 ثانية) والأسئلة بتصعب كل ما المستوى يعلى</span></li>
+        <li><b>✅</b><span>الإجابة الصح بتجيب نقط (بتزيد مع المستوى)، و+${FAW_CFG.fastBonus} لو جاوبت بسرعة</span></li>
+        <li><b>💡</b><span>التلميح بيساعدك، بس نقط السؤال بتبقى ${FAW_CFG.hinted}</span></li>
+        <li><b>⭐</b><span>${FAW_CFG.pass} صح = نجمة، 9 = نجمتين، 10 = 3 نجوم + مكافأة</span></li>
       </ul>
-      <button type="button" class="btn btn-primary faw-cta" data-action="faw-start">🚀 ابدأ الفوازير</button>
       <div class="hint">${best}</div>
     </div>`;
 }
@@ -22541,10 +22899,11 @@ function fawPlayHtml(g){
     <div class="faw-segs">${segs}</div>
     <div class="faw-stats">
       <span class="faw-chip">${cat[0]} ${cat[1]}</span>
+      ${g.lvl ? `<span class="faw-chip">🏁 مستوى ${g.lvl}</span>` : ''}
       <span class="faw-chip faw-chip-n">فزورة ${g.i+1} / ${n}</span>
       <span class="faw-chip faw-chip-pts">🏆 ${g.score}</span>
     </div>
-    ${g.revealed ? '' : `<div class="faw-timerrow"><div class="faw-timer"><i id="faw-bar" class="${warn.trim()}" style="width:${Math.max(0,g.left/FAW_CFG.sec*100)}%"></i></div><span class="faw-time${warn}" id="faw-time">⏱️ ${Math.max(0,g.left)} ث</span></div>`}
+    ${g.revealed ? '' : `<div class="faw-timerrow"><div class="faw-timer"><i id="faw-bar" class="${warn.trim()}" style="width:${Math.max(0,g.left/g.sec*100)}%"></i></div><span class="faw-time${warn}" id="faw-time">⏱️ ${Math.max(0,g.left)} ث</span></div>`}
     <div class="faw-q${fresh?' fresh':''}"><div class="faw-q-tag">🧩 فزورة</div><div class="faw-q-t">${escapeHtml(q.q)}</div></div>
     ${hintBox}
     <div class="faw-opts">${opts}</div>
@@ -22552,14 +22911,19 @@ function fawPlayHtml(g){
     <div class="faw-actions">${actions}</div>`;
 }
 function fawOverHtml(g){
-  const n = g.round.length, perfect = g.bonus>0;
-  const ico = perfect ? '👑' : (g.correct>=7 ? '🏆' : (g.correct>=4 ? '👏' : '📖'));
-  const title = perfect ? 'ممتاز! حليت كل الفوازير' : (g.correct>=7 ? 'شاطر جدًا!' : (g.correct>=4 ? 'كويس، كمّل وهتتحسن' : 'محتاج مراجعة بسيطة، جرّب تاني'));
+  const n = g.round.length, perfect = g.bonus>0, lv = g.lvl>0;
+  const lost = lv && !g.passed;
+  const ico = lost ? '📖' : (perfect ? '👑' : (g.correct>=7 ? '🏆' : (g.correct>=4 ? '👏' : '📖')));
+  const title = lost ? `محتاج ${FAW_CFG.pass} صح عشان تعدّي المستوى — جرّب تاني!` : (perfect ? 'ممتاز! حليت كل الفوازير' : (g.correct>=7 ? 'شاطر جدًا!' : (g.correct>=4 ? 'كويس، كمّل وهتتحسن' : 'محتاج مراجعة بسيطة، جرّب تاني')));
   const segs = g.round.map((_,k)=>`<i class="faw-seg ${g.res[k]==='ok'?'ok':'bad'}"></i>`).join('');
+  const lastLvl = lv && g.lvl>=FAW_LEVELS.length;
+  const nextBtn = (lv && g.passed && !lastLvl) ? `<button type="button" class="btn btn-primary faw-cta" data-action="faw-start" data-lvl="${g.lvl+1}">المستوى ${g.lvl+1} ◀</button>` : '';
   return `
     <div class="faw-over">
       <div class="faw-over-ico">${ico}</div>
       <div class="faw-over-title">${title}</div>
+      ${lv ? `<div class="faw-over-stars">${fawStarsHtml(g.stars)}</div>` : ''}
+      ${lastLvl && g.passed ? '<div class="hint">🎓 خلصت كل المستويات، مبروك يا أستاذ!</div>' : ''}
       <div class="faw-segs" style="width:100%">${segs}</div>
       <div class="faw-sum">
         <div><span>الإجابات الصح</span><b>${g.correct} من ${n}</b></div>
@@ -22567,7 +22931,9 @@ function fawOverHtml(g){
         ${perfect ? `<div><span>مكافأة الجولة الكاملة 🏅</span><b>+${g.bonus}</b></div>` : ''}
         <div class="tot"><span>إجمالي النقط</span><b>🏆 ${g.earned}</b></div>
       </div>
-      <button type="button" class="btn btn-primary faw-cta" data-action="faw-reset">🔄 جولة جديدة</button>
+      ${nextBtn}
+      <button type="button" class="btn ${nextBtn?'btn-outline':'btn-primary'} faw-cta" data-action="faw-reset">🔄 ${lv ? 'إعادة المستوى' : 'جولة جديدة'}</button>
+      <button type="button" class="btn btn-outline faw-cta" data-action="faw-menu">📋 قائمة المستويات</button>
       <button type="button" class="btn btn-outline faw-cta" data-action="faw-exit">خروج</button>
     </div>`;
 }
@@ -36219,7 +36585,9 @@ document.addEventListener('click', (e)=>{
   else if(action==='mil-phone'){ doMilPhone(); }
   else if(action==='mil-walk'){ doMilWalkAway(); }
   else if(action==='faw-close' || action==='faw-exit'){ closeFawazeerGame(); }
-  else if(action==='faw-start' || action==='faw-reset'){ fawInit(); fawRender(); fawStartTimer(); try{ SND.click(); }catch(_){} }
+  else if(action==='faw-start'){ fawInit(el.dataset.lvl ? {lvl:parseInt(el.dataset.lvl,10)} : {cat:el.dataset.cat||'all'}); fawRender(); fawStartTimer(); try{ SND.click(); }catch(_){} }
+  else if(action==='faw-reset'){ fawInit(state.fawLast); fawRender(); fawStartTimer(); try{ SND.click(); }catch(_){} }
+  else if(action==='faw-menu'){ fawStopTimer(); state.faw = null; fawRender(); try{ SND.click(); }catch(_){} }
   else if(action==='faw-pick'){ fawReveal(parseInt(el.dataset.idx,10)); }
   else if(action==='faw-hint'){ fawHint(); }
   else if(action==='faw-next'){ fawNext(); }
