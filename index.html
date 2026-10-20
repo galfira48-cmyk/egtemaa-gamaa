@@ -6519,6 +6519,50 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .faw-go{position:absolute; left:12px; top:-8px; z-index:2; padding:3px 12px; border-radius:99px; font-weight:900; font-size:11px; color:#2b1a00; background:linear-gradient(145deg,var(--gold),var(--gold-2)); animation:fawBob 1.4s ease-in-out infinite;}
   @keyframes fawBob{0%,100%{transform:translateY(0);} 50%{transform:translateY(-3px);}}
   @keyframes fawStepIn{from{opacity:0; transform:translateX(24px);} to{opacity:1; transform:none;}}
+
+  /* خانة المستويات في القائمة */
+  .faw-entry{position:relative; overflow:hidden; display:flex; align-items:center; gap:12px; width:100%; padding:14px 14px; border-radius:20px; cursor:pointer; text-align:right; font-family:'Cairo',sans-serif; color:var(--text);
+    background:linear-gradient(135deg, color-mix(in srgb,var(--gold) 22%,var(--surface)), var(--surface-2)); border:1.5px solid color-mix(in srgb,var(--gold) 55%,var(--border)); box-shadow:0 10px 28px rgba(244,183,64,.14); transition:transform .15s;}
+  .faw-entry::after{content:''; position:absolute; top:0; bottom:0; width:60px; left:-80px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent); transform:skewX(-20deg); animation:fawShine 3.2s ease-in-out infinite;}
+  @keyframes fawShine{0%,60%{left:-80px;} 100%{left:120%;}}
+  .faw-entry:active{transform:scale(.97);}
+  .faw-entry-ico{flex:0 0 auto; width:54px; height:54px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px; background:color-mix(in srgb,var(--gold) 20%,transparent);}
+  .faw-entry-body{flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;} .faw-entry-body b{font-weight:900; font-size:16px;} .faw-entry-body small{font-weight:700; font-size:11.5px; color:var(--text-muted);}
+  .faw-entry-bar{height:6px; border-radius:99px; background:var(--surface-2); overflow:hidden; margin-top:3px;} .faw-entry-bar i{display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,var(--gold),var(--gold-2));}
+  .faw-entry-meta{display:flex; flex-direction:column; align-items:center; gap:1px;} .faw-entry-meta b{font-weight:900; font-size:15px; color:var(--gold);} .faw-entry-meta small{font-weight:700; font-size:10.5px; color:var(--text-muted);}
+  .faw-entry-go{font-size:16px; color:var(--gold);}
+  /* شاشة المستويات: خريطة طريق */
+  .faw-body.lv{flex:none; min-height:auto;}
+  .faw-levels{display:flex; flex-direction:column; width:100%;}
+  .faw-map{position:relative; width:100%; overflow:hidden; border-radius:22px; background:radial-gradient(120% 40% at 50% 0%, rgba(244,183,64,.14), transparent 70%), linear-gradient(180deg,var(--surface-2),var(--surface) 55%,var(--bg-2));
+    border:1px solid var(--border);}
+  .faw-road{position:absolute; inset:0; width:100%; height:100%;}
+  .faw-road path{fill:none; stroke-linecap:round; vector-effect:non-scaling-stroke;}
+  .faw-road-bg{stroke:var(--border); stroke-width:10; stroke-dasharray:1 16;}
+  .faw-road-gold{stroke:var(--gold); stroke-width:6; filter:drop-shadow(0 0 6px rgba(244,183,64,.7)); stroke-dasharray:1200; stroke-dashoffset:1200; animation:fawDraw 1.4s .2s ease-out forwards;}
+  @keyframes fawDraw{to{stroke-dashoffset:0;}}
+  .faw-deco{position:absolute; font-style:normal; font-size:20px; opacity:.28; animation:fawFloat 5s ease-in-out infinite; pointer-events:none;}
+  @keyframes fawFloat{0%,100%{transform:translateY(0);} 50%{transform:translateY(-9px);}}
+  .faw-mn{position:absolute; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:3px; padding:0; border:0; background:none; cursor:pointer; font-family:'Cairo',sans-serif; color:var(--text);
+    animation:fawMnIn .5s calc(var(--i)*.07s) cubic-bezier(.2,1.4,.4,1) both;}
+  @keyframes fawMnIn{from{opacity:0; transform:translate(-50%,-50%) scale(.3);} to{opacity:1; transform:translate(-50%,-50%) scale(1);}}
+  .faw-mn-c{width:62px; height:62px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:900; background:var(--surface-2); border:3px solid var(--border); color:var(--text-muted);
+    box-shadow:0 6px 16px rgba(0,0,0,.35); transition:transform .2s, border-color .2s;}
+  .faw-mn.done .faw-mn-c{background:linear-gradient(145deg,var(--gold),var(--gold-2)); border-color:#fff3; color:#2b1a00;}
+  .faw-mn.cur .faw-mn-c{border-color:var(--gold); background:color-mix(in srgb,var(--gold) 20%,var(--surface-2)); color:var(--text); animation:fawPing 1.8s ease-out infinite;}
+  .faw-mn.locked .faw-mn-c{opacity:.6; font-size:21px;}
+  .faw-mn.sel .faw-mn-c{transform:scale(1.18); border-color:#fff;}
+  .faw-mn.crown .faw-mn-c{width:76px; height:76px; font-size:36px;}
+  .faw-mn-s{display:flex; gap:1px; direction:ltr; font-size:12px; line-height:1; min-height:12px;} .faw-mn-s i{font-style:normal; color:var(--surface-2); -webkit-text-stroke:1px var(--border);} .faw-mn-s i.on{color:var(--gold); -webkit-text-stroke:0;}
+  .faw-mn-n{font-weight:800; font-size:10.5px; padding:2px 9px; border-radius:99px; background:rgba(0,0,0,.35); color:var(--text);}
+  .faw-pv{position:sticky; bottom:0; z-index:5; margin-top:12px; display:flex; flex-direction:column; gap:9px; padding:13px 14px 14px; border-radius:20px; background:linear-gradient(165deg,var(--surface),var(--bg-2));
+    border:1.5px solid color-mix(in srgb,var(--gold) 45%,var(--border)); box-shadow:0 -10px 30px rgba(0,0,0,.4);}
+  .faw-pv.pop{animation:fawPop .3s cubic-bezier(.2,1.3,.4,1);} @keyframes fawPop{from{transform:translateY(8px) scale(.97); opacity:.6;} to{transform:none; opacity:1;}}
+  .faw-pv-top{display:flex; align-items:center; gap:10px;} .faw-pv-ico{font-size:28px;} .faw-pv-t{flex:1; display:flex; flex-direction:column; gap:2px; font-family:'Cairo',sans-serif;}
+  .faw-pv-t b{font-weight:900; font-size:15px;} .faw-pv-t em{font-style:normal; font-weight:700; font-size:11px; color:var(--gold);}
+  .faw-pv-meta{display:flex; flex-wrap:wrap; gap:6px 14px; font-family:'Cairo',sans-serif; font-weight:700; font-size:11.5px; color:var(--text-muted);}
+  .faw-pb{display:flex; gap:3px; height:6px; width:100%;} .faw-pb i{display:block; border-radius:99px; min-width:0;} .faw-pb .e{background:#5FE0A4;} .faw-pb .m{background:#F4B740;} .faw-pb .h{background:#FF6B6B;} .faw-pb i[style*="flex:0"]{display:none;}
+  .faw-card-st{display:flex; gap:1px; direction:ltr; font-size:16px; line-height:1;} .faw-card-st i{font-style:normal; color:var(--surface-2); -webkit-text-stroke:1px var(--border);} .faw-card-st i.on{color:var(--gold); -webkit-text-stroke:0;}
   /* مستويات + مواضيع */
   .faw-sec-h{width:100%; display:flex; align-items:center; justify-content:space-between; margin-top:4px; font-family:'Cairo',sans-serif; font-size:13.5px; color:var(--text);}
   .faw-sec-h b{font-weight:900;} .faw-sec-h span{font-weight:700; font-size:11.5px; color:var(--text-muted);}
@@ -22814,7 +22858,7 @@ function fawStartTimer(){
   }, 1000);
 }
 function openFawazeerGame(){
-  fawStopTimer(); fawAnimKey = null; state.faw = null;
+  fawStopTimer(); fawAnimKey = null; state.faw = null; state.fawScreen = null; state.fawSel = null;
   const old = document.getElementById('faw-overlay'); if(old) old.remove();
   const ov = document.createElement('div');
   ov.id = 'faw-overlay'; ov.className = 'faw-overlay';
@@ -22880,8 +22924,58 @@ function fawFinish(){
   if(g.earned>0) awardSoloGamePoints(g.earned, (g.lvl ? 'فوازير - المستوى '+g.lvl+': ' : 'فوازير: ')+'حليت '+g.correct+' من '+g.round.length+' 🧩');
   fawRender();
 }
-function fawTopHtml(act){
-  return `<div class="faw-top"><button type="button" class="icon-btn faw-back" data-action="${act}" aria-label="رجوع">${ICO.back}</button><div class="faw-title">🧩 فوازير</div><div class="faw-gap"></div></div>`;
+function fawTopHtml(act, title){
+  return `<div class="faw-top"><button type="button" class="icon-btn faw-back" data-action="${act}" aria-label="رجوع">${ICO.back}</button><div class="faw-title">${title||'🧩 فوازير'}</div><div class="faw-gap"></div></div>`;
+}
+const FAW_TAGS = n => n<=2 ? 'سهل' : (n<=4 ? 'متوسط' : (n<=6 ? 'صعب' : (n<=8 ? 'صعب جدًا' : 'تحدّي الأساتذة')));
+function fawPreviewHtml(n){
+  const l = fawLvlCfg(n); if(!l) return '';
+  const prog = fawProgGet(), stars = +prog[n]||0, open = fawUnlocked(n);
+  return `<div class="faw-pv-top"><span class="faw-pv-ico">${open ? l.ico : '🔒'}</span><div class="faw-pv-t"><b>المستوى ${l.n} · ${l.name}</b><em>${FAW_TAGS(l.n)}</em></div><span class="faw-card-st">${fawStarsHtml(stars)}</span></div>
+    <span class="faw-pb"><i class="e" style="flex:${l.mix[0]}"></i><i class="m" style="flex:${l.mix[1]}"></i><i class="h" style="flex:${l.mix[2]}"></i></span>
+    <div class="faw-pv-meta"><span>⏱️ ${l.sec} ث لكل سؤال</span><span>🏆 ${fawBase(l.n)} نقط للإجابة</span><span>🎯 ${FAW_CFG.pass}/10 للنجاح</span></div>
+    ${open ? `<button type="button" class="btn btn-primary faw-cta" data-action="faw-start" data-lvl="${l.n}">${stars ? '🔄 العب المستوى تاني' : '🚀 ابدأ المستوى'} ${l.n}</button>`
+           : `<button type="button" class="btn btn-outline faw-cta" disabled>🔒 خلّص المستوى ${l.n-1} الأول</button>`}`;
+}
+function fawLevelsHtml(){
+  const prog = fawProgGet(), N = FAW_LEVELS.length, STEP = 104, H = N*STEP + 70;
+  const curN = (FAW_LEVELS.find(l=>fawUnlocked(l.n) && !(+prog[l.n]||0)) || {}).n || 0;
+  const xs = [50,78,50,22,50,78,50,22,50,50];
+  const pts = FAW_LEVELS.map((l,i)=>({ x:xs[i%xs.length], y:H - 56 - i*STEP }));
+  const vb = y => (y/H*1000).toFixed(1);
+  const seg = (A,B)=>{ const my = (A.y+B.y)/2; return `C ${A.x} ${vb(my)}, ${B.x} ${vb(my)}, ${B.x} ${vb(B.y)}`; };
+  let full = `M ${pts[0].x} ${vb(pts[0].y)}`, gold = full, goldTo = 0;
+  for(let i=1;i<N;i++){ full += ' '+seg(pts[i-1],pts[i]); }
+  FAW_LEVELS.forEach((l,i)=>{ if(i>0 && fawUnlocked(l.n)) { gold += ' '+seg(pts[i-1],pts[i]); goldTo = i; } });
+  const sel = state.fawSel || curN || 1; state.fawSel = sel;
+  const nodes = FAW_LEVELS.map((l,i)=>{
+    const st = +prog[l.n]||0, open = fawUnlocked(l.n), cur = l.n===curN;
+    const cls = (st?' done':'') + (cur?' cur':'') + (open?'':' locked') + (l.n===sel?' sel':'') + (l.n===N?' crown':'');
+    return `<button type="button" class="faw-mn${cls}" style="left:${pts[i].x}%; top:${pts[i].y}px; --i:${i}" data-action="faw-lvl-pick" data-lvl="${l.n}">
+      <span class="faw-mn-c">${open ? (l.n===N ? '👑' : (st ? l.n : l.ico)) : '🔒'}</span>
+      <span class="faw-mn-s">${open ? fawStarsHtml(st) : ''}</span>
+      <span class="faw-mn-n">${l.n===N ? 'القمة' : 'مستوى '+l.n}</span>
+    </button>`;
+  }).join('');
+  const deco = ['☁️','✨','🕊️','✝️','🌿','⭐'].map((e,i)=>`<i class="faw-deco" style="top:${(i*17+8)%90}%; ${i%2?'left':'right'}:${4+(i*7)%10}%; animation-delay:${i*.7}s">${e}</i>`).join('');
+  return `<div class="faw-levels">
+    <div class="faw-map" style="height:${H}px">
+      ${deco}
+      <svg class="faw-road" viewBox="0 0 100 1000" preserveAspectRatio="none" aria-hidden="true">
+        <path d="${full}" class="faw-road-bg"/>
+        <path d="${gold}" class="faw-road-gold"/>
+      </svg>
+      ${nodes}
+    </div>
+    <div class="faw-pv" id="faw-pv">${fawPreviewHtml(sel)}</div>
+  </div>`;
+}
+function fawPickLevel(n){
+  state.fawSel = n;
+  document.querySelectorAll('.faw-mn').forEach(b=>b.classList.toggle('sel', +b.dataset.lvl===n));
+  const pv = document.getElementById('faw-pv');
+  if(pv){ pv.innerHTML = fawPreviewHtml(n); pv.classList.remove('pop'); void pv.offsetWidth; pv.classList.add('pop'); }
+  try{ SND.click(); }catch(e){}
 }
 function fawStarsHtml(n, max){
   let h=''; for(let i=1;i<=(max||3);i++) h += `<i class="${i<=n?'on':''}">★</i>`;
@@ -22919,22 +23013,19 @@ function fawStartHtml(){
   const best = st.fawBest ? `أفضل جولة ليك: ${st.fawBest} نقطة` : 'أول مرة تلعب اللعبة دي 🎉';
   const prog = fawProgGet();
   const totalStars = FAW_LEVELS.reduce((a,l)=>a+(+prog[l.n]||0),0);
+  const doneN = FAW_LEVELS.filter(l=>+prog[l.n]>0).length;
   const curN = (FAW_LEVELS.find(l=>fawUnlocked(l.n) && !(+prog[l.n]||0)) || {}).n || 0;
-  const lvls = FAW_LEVELS.map((l,idx)=>{
-    const stars = +prog[l.n]||0, open = fawUnlocked(l.n), cur = l.n===curN;
-    const tag = l.n<=2 ? 'سهل' : (l.n<=4 ? 'متوسط' : (l.n<=6 ? 'صعب' : (l.n<=8 ? 'صعب جدًا' : 'تحدّي الأساتذة')));
-    const bar = `<span class="faw-pb"><i class="e" style="flex:${l.mix[0]}"></i><i class="m" style="flex:${l.mix[1]}"></i><i class="h" style="flex:${l.mix[2]}"></i></span>`;
-    const state = stars ? ' done' : (cur ? ' cur' : '');
-    return `<button type="button" class="faw-step${open?'':' locked'}${state}" style="--i:${idx}" data-action="faw-start" data-lvl="${l.n}" ${open?'':'disabled'}>
-      <span class="faw-node">${open ? (stars ? l.n : l.ico) : '🔒'}</span>
-      <span class="faw-card">
-        <span class="faw-card-top"><b>المستوى ${l.n} · ${l.name}</b><em>${tag}</em></span>
-        ${bar}
-        <span class="faw-card-meta"><span>⏱️ ${l.sec} ث</span><span>🏆 ${fawBase(l.n)} نقط</span>${open ? `<span class="faw-card-st">${fawStarsHtml(stars)}</span>` : '<span class="faw-card-st lock">اكسب المستوى اللي قبله</span>'}</span>
+  const curL = curN ? fawLvlCfg(curN) : null;
+  const lvls = `<button type="button" class="faw-entry" data-action="faw-levels">
+      <span class="faw-entry-ico">🏁</span>
+      <span class="faw-entry-body">
+        <b>المستويات</b>
+        <small>${curL ? `هتكمل من: المستوى ${curL.n} · ${curL.name}` : '🎓 خلصت كل المستويات!'}</small>
+        <span class="faw-entry-bar"><i style="width:${doneN*10}%"></i></span>
       </span>
-      ${cur ? '<span class="faw-go">ابدأ ◀</span>' : ''}
+      <span class="faw-entry-meta"><b>${doneN}/${FAW_LEVELS.length}</b><small>⭐ ${totalStars}</small></span>
+      <span class="faw-entry-go">◀</span>
     </button>`;
-  }).join('');
   const topics = Object.keys(FAW_CATS).map(k=>{
     const n = FAW_BANK.filter(b=>b.cat===k).length;
     return `<button type="button" class="faw-topic" data-action="faw-start" data-cat="${k}"><span>${FAW_CATS[k][0]}</span><b>${FAW_CATS[k][1]}</b><small>${n} سؤال</small></button>`;
@@ -22945,8 +23036,7 @@ function fawStartHtml(){
       <div class="faw-start-title">فوازير</div>
       <button type="button" class="faw-rules-btn" data-action="faw-rules"><span>📜</span> قواعد اللعبة والنقط</button>
       <div class="faw-start-sub">${FAW_BANK.length} فزورة في الكتاب المقدس والطقس الكنسي والعقيدة والقديسين والشهداء. كل مستوى ${FAW_CFG.perRound} أسئلة، جاوب ${FAW_CFG.pass} صح على الأقل عشان تفتح المستوى اللي بعده.</div>
-      <div class="faw-sec-h"><b>🏁 المستويات</b><span>⭐ ${totalStars} / ${FAW_LEVELS.length*3}</span></div>
-      <div class="faw-path">${lvls}</div>
+      ${lvls}
       <div class="faw-sec-h"><b>📚 تدريب حر حسب الموضوع</b><span>من غير فتح مستويات</span></div>
       <div class="faw-topics">
         <button type="button" class="faw-topic all" data-action="faw-start" data-cat="all"><span>🎲</span><b>كل المواضيع</b><small>مختلط</small></button>
@@ -23027,10 +23117,13 @@ function fawRender(){
   const shell = document.getElementById('faw-shell'); if(!shell) return;
   const g = state.faw;
   let top, body;
-  if(!g){ top = fawTopHtml('faw-exit'); body = fawStartHtml(); }
+  const lvScr = !g && state.fawScreen==='levels';
+  if(lvScr){ top = fawTopHtml('faw-levels-back','🏁 المستويات'); body = fawLevelsHtml(); }
+  else if(!g){ top = fawTopHtml('faw-exit'); body = fawStartHtml(); }
   else if(g.finished){ top = fawTopHtml('faw-exit'); body = fawOverHtml(g); }
   else { top = fawTopHtml('faw-close'); body = fawPlayHtml(g); }
-  shell.innerHTML = top + `<div class="faw-body">${body}</div>`;
+  shell.innerHTML = top + `<div class="faw-body${lvScr?' lv':''}">${body}</div>`;
+  if(lvScr){ const c = shell.querySelector('.faw-mn.cur') || shell.querySelector('.faw-mn.sel'); if(c) requestAnimationFrame(()=>{ try{ c.scrollIntoView({block:'center'}); }catch(e){} }); }
   const b = shell.querySelector('.faw-body'); if(b && g && !g.finished && !g.revealed) { /* keep scroll at top for a new riddle */ shell.scrollTop = 0; }
 }
 
@@ -36675,7 +36768,10 @@ document.addEventListener('click', (e)=>{
   else if(action==='faw-reset'){ fawInit(state.fawLast); fawRender(); fawStartTimer(); try{ SND.click(); }catch(_){} }
   else if(action==='faw-rules'){ fawShowRules(); }
   else if(action==='faw-rules-close'){ fawHideRules(); }
-  else if(action==='faw-menu'){ fawStopTimer(); state.faw = null; fawRender(); try{ SND.click(); }catch(_){} }
+  else if(action==='faw-levels'){ state.fawScreen = 'levels'; state.fawSel = null; fawRender(); try{ SND.click(); }catch(_){} }
+  else if(action==='faw-levels-back'){ state.fawScreen = null; fawRender(); try{ SND.back(); }catch(_){} }
+  else if(action==='faw-lvl-pick'){ fawPickLevel(parseInt(el.dataset.lvl,10)); }
+  else if(action==='faw-menu'){ fawStopTimer(); state.faw = null; state.fawScreen = (state.fawLast && state.fawLast.lvl) ? 'levels' : null; state.fawSel = (state.fawLast && state.fawLast.lvl) || null; fawRender(); try{ SND.click(); }catch(_){} }
   else if(action==='faw-pick'){ fawReveal(parseInt(el.dataset.idx,10)); }
   else if(action==='faw-hint'){ fawHint(); }
   else if(action==='faw-next'){ fawNext(); }
