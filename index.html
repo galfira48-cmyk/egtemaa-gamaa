@@ -6380,6 +6380,104 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
     .bwl-card th{font-size:11px;} .bwl-card .bwl-lbl{width:48px; font-size:11px;} .bwl-m{height:20px;} .bwl-m span{font-size:12.5px; line-height:20px;} .bwl-t{font-size:15px; height:22px; line-height:22px;}
   }
 
+  /* ============================= GAMES: فوازير (فوازير دينية مسيحية) ============================= */
+  .faw-overlay{position:fixed; inset:0; z-index:9500; overflow:hidden; direction:rtl;
+    background:linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);}
+  .faw-overlay::before{content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:radial-gradient(120% 55% at 50% 0%, rgba(244,183,64,.12), transparent 62%);}
+  .faw-shell{position:relative; z-index:1; height:100%; width:100%; max-width:560px; margin:0 auto; box-sizing:border-box;
+    padding:calc(env(safe-area-inset-top,0px) + 10px) 14px calc(env(safe-area-inset-bottom,0px) + 16px);
+    display:flex; flex-direction:column; gap:12px; overflow-y:auto; -webkit-overflow-scrolling:touch; animation:fawIn .3s ease-out;}
+  @keyframes fawIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .faw-top{display:flex; align-items:center; gap:10px; flex-shrink:0; padding-bottom:8px; border-bottom:1px solid var(--border);}
+  .icon-btn.faw-back{background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:var(--radius-sm);}
+  .faw-title{flex:1; text-align:center; font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; color:var(--gold); letter-spacing:.3px;}
+  .faw-gap{width:44px; flex-shrink:0;} /* مكان زر ترتيب اللعبة 🏆 اللي بيطلع فوق الشمال */
+  .faw-body{display:flex; flex-direction:column; gap:12px; flex:1; min-height:0;}
+
+  /* progress segments */
+  .faw-segs{display:flex; gap:5px; width:100%;}
+  .faw-seg{flex:1; height:6px; border-radius:99px; background:var(--surface-2); border:1px solid var(--border); box-sizing:border-box; transition:background .3s, border-color .3s;}
+  .faw-seg.cur{background:color-mix(in srgb, var(--gold) 55%, transparent); border-color:var(--gold);}
+  .faw-seg.ok{background:var(--good); border-color:var(--good);}
+  .faw-seg.bad{background:var(--danger); border-color:var(--danger);}
+
+  .faw-stats{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .faw-chip{display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:99px; background:var(--surface); border:1px solid var(--border);
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:12px; color:var(--text-muted);}
+  .faw-chip-n{margin-inline-start:auto;}
+  .faw-chip-pts{color:var(--gold); border-color:color-mix(in srgb, var(--gold) 45%, var(--border));}
+
+  .faw-timerrow{display:flex; align-items:center; gap:10px;}
+  .faw-timer{flex:1; height:8px; border-radius:99px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden;}
+  .faw-timer i{display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,var(--gold),var(--gold-2)); transition:width 1s linear, background .3s;}
+  .faw-timer i.warn{background:linear-gradient(90deg,var(--danger),#ff9f43);}
+  .faw-time{font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:var(--text); min-width:58px; text-align:left; direction:rtl;}
+  .faw-time.warn{color:var(--danger); animation:fawPulse .8s ease-in-out infinite;}
+  @keyframes fawPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.08);}}
+
+  .faw-q{position:relative; background:linear-gradient(165deg,var(--surface),var(--surface-2)); border:1.5px solid var(--border); border-radius:20px; padding:18px 16px 20px; text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);}
+  .faw-q::before{content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:linear-gradient(180deg, rgba(244,183,64,.08), transparent 55%);}
+  .faw-q.fresh{animation:fawQ .45s ease-out both;}
+  @keyframes fawQ{from{opacity:0; transform:translateY(10px) scale(.98);} to{opacity:1; transform:none;}}
+  .faw-q-tag{position:relative; display:inline-block; margin-bottom:10px; padding:3px 12px; border-radius:99px; background:color-mix(in srgb, var(--gold) 16%, transparent);
+    color:var(--gold); font-family:'Cairo',sans-serif; font-weight:800; font-size:11.5px; letter-spacing:.3px;}
+  .faw-q-t{position:relative; font-family:'Cairo',sans-serif; font-weight:700; font-size:17px; line-height:1.95; color:var(--text);}
+
+  .faw-hint{background:color-mix(in srgb, var(--gold) 10%, transparent); border:1.5px dashed color-mix(in srgb, var(--gold) 60%, transparent); border-radius:14px;
+    padding:10px 14px; color:var(--gold-2); font-family:'Cairo',sans-serif; font-weight:700; font-size:13.5px; line-height:1.7; text-align:center; animation:fawQ .35s ease-out both;}
+
+  .faw-opts{display:flex; flex-direction:column; gap:9px;}
+  .faw-opt{display:flex; align-items:center; gap:11px; width:100%; text-align:right; padding:12px 13px; background:linear-gradient(165deg,var(--surface),var(--surface-2));
+    border:1.5px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:'Cairo',sans-serif; font-weight:700; font-size:15px; line-height:1.5;
+    cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .12s, border-color .2s, background .2s, opacity .25s;}
+  .faw-opt:disabled{color:var(--text); cursor:default;}
+  .faw-opt:not(:disabled):active{transform:scale(.98); background:var(--surface-2);}
+  .faw-opt .k{flex:0 0 auto; width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; background:var(--surface-2);
+    border:1px solid var(--border); color:var(--gold); font-weight:900; font-size:14px;}
+  .faw-opt .t{flex:1; min-width:0;}
+  .faw-opt.fresh{animation:fawOpt .35s ease-out both;}
+  .faw-opt.fresh:nth-child(1){animation-delay:.05s;} .faw-opt.fresh:nth-child(2){animation-delay:.12s;}
+  .faw-opt.fresh:nth-child(3){animation-delay:.19s;} .faw-opt.fresh:nth-child(4){animation-delay:.26s;}
+  @keyframes fawOpt{from{opacity:0; transform:translateX(14px);} to{opacity:1; transform:none;}}
+  .faw-opt.correct{border-color:var(--good); background:rgba(95,224,164,.13);}
+  .faw-opt.correct .k{background:var(--good); color:#0a2e1f; border-color:transparent;}
+  .faw-opt.wrong{border-color:var(--danger); background:rgba(255,107,107,.13); animation:fawShake .4s ease;}
+  .faw-opt.wrong .k{background:var(--danger); color:#3a0a0a; border-color:transparent;}
+  .faw-opt.dim{opacity:.45;}
+  @keyframes fawShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);}}
+
+  .faw-exp{border-radius:14px; padding:12px 14px; border:1.5px solid var(--border); background:var(--surface); animation:fawQ .35s ease-out both;}
+  .faw-exp.ok{border-color:var(--good); background:rgba(95,224,164,.09);}
+  .faw-exp.bad{border-color:var(--danger); background:rgba(255,107,107,.08);}
+  .faw-exp-h{font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; color:var(--text); margin-bottom:4px;}
+  .faw-exp-t{font-family:'Cairo',sans-serif; font-weight:600; font-size:13px; line-height:1.8; color:var(--text-muted);}
+  .faw-exp-t b{color:var(--gold); font-weight:800;}
+
+  .faw-actions{display:flex; flex-direction:column; gap:8px; margin-top:auto; padding-top:4px;}
+  .faw-cta{width:100%;}
+  .faw-hintbtn:disabled{opacity:.55;}
+
+  /* start + result screens */
+  .faw-start, .faw-over{display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center; padding:18px 6px; animation:fawQ .4s ease-out both;}
+  .faw-start-ico, .faw-over-ico{font-size:54px; line-height:1; filter:drop-shadow(0 6px 18px rgba(244,183,64,.4));}
+  .faw-start-title, .faw-over-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:21px; color:var(--text);}
+  .faw-start-sub{font-family:'Cairo',sans-serif; font-weight:600; font-size:13.5px; line-height:1.8; color:var(--text-muted); max-width:380px;}
+  .faw-rules{list-style:none; margin:0; padding:0; width:100%; display:flex; flex-direction:column; gap:8px;}
+  .faw-rules li{display:flex; align-items:center; gap:10px; text-align:right; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:9px 12px;
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:13px; color:var(--text-muted); line-height:1.6;}
+  .faw-rules li b{flex:0 0 auto; width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px;
+    background:color-mix(in srgb, var(--gold) 14%, transparent);}
+  .faw-sum{width:100%; display:flex; flex-direction:column; gap:8px;}
+  .faw-sum>div{display:flex; justify-content:space-between; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 14px;
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:13.5px; color:var(--text-muted);}
+  .faw-sum>div b{color:var(--text); font-weight:900;}
+  .faw-sum>div.tot{border-color:color-mix(in srgb, var(--gold) 55%, var(--border)); background:color-mix(in srgb, var(--gold) 10%, transparent);}
+  .faw-sum>div.tot b{color:var(--gold); font-size:16px;}
+  @media (prefers-reduced-motion:reduce){ .faw-shell,.faw-q,.faw-opt,.faw-exp,.faw-hint,.faw-start,.faw-over,.faw-time{animation:none !important;} }
+
   /* ============================= GAMES: من سيربح المليون (أسئلة مسيحية) — بنفس هوية ألوان التطبيق ============================= */
   .mil-overlay{position:fixed; inset:0; z-index:9500; overflow:hidden;
     background:linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);}
@@ -15022,6 +15120,7 @@ const GS = {ready:false, loading:false, data:{}, at:0};
 const GSG_KEY = 'glavera-game-score-by';
 const GSG = {data:{}};
 const GSG_DEFS = [
+  ['fawazeer',/فوازير/],
   ['xo',/إكس أو/],['connect4',/كونكت/],['ludo',/لودو/],['billiards',/البلياردو/],['darts',/النشان/],['bowling',/البولينج/],
   ['millionaire',/المليون|الجايزة الكبرى/],['blocky',/بلوكي/],['stack',/^برج\s|طابق/],['cube',/روبيك|مكعب/],
   ['math',/الرياضيات|جاوبت صح/],['numguess',/الرقم صح|تخمين/],['reflex',/أسرع واحد/],
@@ -15127,7 +15226,7 @@ function renderGsGameView(){
 }
 
 /* ===== كاس الترتيب جوه كل لعبة ===== */
-const GSG_OVERLAY_GAME = {'bil-overlay':'billiards','blk-overlay':'blocky','stk-overlay':'stack','cube-overlay':'cube','drt-overlay':'darts','bwl-overlay':'bowling','mil-overlay':'millionaire','cm-ov':'crossmath','wh-ov':'who','cc-ov':'colorcards','rpt-ov':'rollpaint','sim-ov':'simon','rw-ov':'revword'};
+const GSG_OVERLAY_GAME = {'bil-overlay':'billiards','blk-overlay':'blocky','stk-overlay':'stack','cube-overlay':'cube','drt-overlay':'darts','bwl-overlay':'bowling','mil-overlay':'millionaire','faw-overlay':'fawazeer','cm-ov':'crossmath','wh-ov':'who','cc-ov':'colorcards','rpt-ov':'rollpaint','sim-ov':'simon','rw-ov':'revword'};
 function gsgCurrentGame(){
   try{
     for(const id in GSG_OVERLAY_GAME){ if(document.getElementById(id)) return GSG_OVERLAY_GAME[id]; }
@@ -16089,7 +16188,7 @@ const GAME_CATEGORY_OF = {
   xo:'board', connect4:'board', domino:'board', ludo:'board', chess:'board', checkers:'board', tmm:'board', backgammon:'board', snakes:'board',
   crossmath:'mind',
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
-  memory:'mind', who:'mind', revword:'mind', blocky:'mind', cube:'mind', numguess:'mind', math:'mind', millionaire:'mind', bus:'mind', rollpaint:'mind', simon:'mind',
+  memory:'mind', who:'mind', revword:'mind', blocky:'mind', cube:'mind', numguess:'mind', math:'mind', millionaire:'mind', fawazeer:'mind', bus:'mind', rollpaint:'mind', simon:'mind',
   colorcards:'cards', rps:'cards',
   quiz:'party', mystery:'party', emojibible:'party', proverb:'party', stoptimer:'skill', uniqans:'party', fahmeen:'party', placemem:'mind', sqorder:'mind', fazzura:'party', drawguess:'party', battleship:'board', khatfa:'party',
 };
@@ -16177,6 +16276,7 @@ const GAMES_CATALOG = [
   {id:'blocky', icon:'🧩', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkY4Nzg3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRTAzMTMxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJiIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZFMDY2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjU5RjAwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNzRDMEZDIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTk3MUMyIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOENFOTlBIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMkY5RTQ0Ii8+PC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8ZyBzdHJva2U9InJnYmEoMCwwLDAsLjI1KSIgc3Ryb2tlLXdpZHRoPSIxLjUiPgo8cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIzOCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9InVybCgjYSkiLz4KPHJlY3QgeD0iNTIiIHk9IjEwIiB3aWR0aD0iMzgiIGhlaWdodD0iMzgiIHJ4PSI5IiBmaWxsPSJ1cmwoI2IpIi8+CjxyZWN0IHg9IjEwIiB5PSI1MiIgd2lkdGg9IjM4IiBoZWlnaHQ9IjM4IiByeD0iOSIgZmlsbD0idXJsKCNjKSIvPgo8cmVjdCB4PSI1MiIgeT0iNTIiIHdpZHRoPSIzOCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9InVybCgjZCkiLz48L2c+CjxnIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsLjU1KSI+PHJlY3QgeD0iMTYiIHk9IjE2IiB3aWR0aD0iMTYiIGhlaWdodD0iNyIgcng9IjMuNSIvPjxyZWN0IHg9IjU4IiB5PSIxNiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIzLjUiLz48cmVjdCB4PSIxNiIgeT0iNTgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiByeD0iMy41Ii8+PHJlY3QgeD0iNTgiIHk9IjU4IiB3aWR0aD0iMTYiIGhlaWdodD0iNyIgcng9IjMuNSIvPjwvZz4KPHBhdGggZD0iTTUwIDMwbDQgMTEgMTEgNC0xMSA0LTQgMTEtNC0xMS0xMS00IDExLTR6IiBmaWxsPSIjZmZmIiBzdHJva2U9IiNCMTk3RkMiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==', title:'بلوكي بلاست', sub:'لوحة 8×8 — فجّر الصفوف والأعمدة، كومبو ومستويات وتراجع وتبديل قطع', color:'linear-gradient(145deg,#6C4DFF,#1d1b4d)'},
   {id:'cube', icon:'🧊', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImNzIiBjeD0iNTAlIiBjeT0iNTAlIiByPSI1MCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDAiIHN0b3Atb3BhY2l0eT0iLjM1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDAwIiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50PjwvZGVmcz48ZWxsaXBzZSBjeD0iNTAiIGN5PSI5NSIgcng9IjMwIiByeT0iNC42IiBmaWxsPSJ1cmwoI2NzKSIvPjxwb2x5Z29uIHBvaW50cz0iNTAuMDAsMTAuMDAgODUuMDcsMzAuMjUgODUuMDcsNzAuNzUgNTAuMDAsOTEuMDAgMTQuOTMsNzAuNzUgMTQuOTMsMzAuMjUiIGZpbGw9IiMxNTE1MWIiIHN0cm9rZT0iIzE1MTUxYiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PGcgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZT0icmdiYSgwLDAsMCwuMjUpIj48cG9seWdvbiBwb2ludHM9IjUwLjAwLDExLjIxIDU5LjU5LDE2Ljc1IDUwLjAwLDIyLjI4IDQwLjQxLDE2Ljc1IiBmaWxsPSIjZjVmNWYyIi8+PHBvbHlnb24gcG9pbnRzPSIzOC4zMSwxNy45NiA0Ny45MCwyMy41MCAzOC4zMSwyOS4wMyAyOC43MiwyMy41MCIgZmlsbD0iI2ZmOGExZiIvPjxwb2x5Z29uIHBvaW50cz0iMjYuNjIsMjQuNzEgMzYuMjAsMzAuMjUgMjYuNjIsMzUuNzggMTcuMDMsMzAuMjUiIGZpbGw9IiNmZmQ2MGEiLz48cG9seWdvbiBwb2ludHM9IjYxLjY5LDE3Ljk3IDcxLjI4LDIzLjUwIDYxLjY5LDI5LjAzIDUyLjEwLDIzLjUwIiBmaWxsPSIjMWY2ZmUwIi8+PHBvbHlnb24gcG9pbnRzPSI1MC4wMCwyNC43MiA1OS41OSwzMC4yNSA1MC4wMCwzNS43OCA0MC40MSwzMC4yNSIgZmlsbD0iI2Y1ZjVmMiIvPjxwb2x5Z29uIHBvaW50cz0iMzguMzEsMzEuNDYgNDcuOTAsMzcuMDAgMzguMzEsNDIuNTMgMjguNzIsMzcuMDAiIGZpbGw9IiNlODM0M2IiLz48cG9seWdvbiBwb2ludHM9IjczLjM4LDI0LjcxIDgyLjk3LDMwLjI1IDczLjM4LDM1Ljc5IDYzLjgwLDMwLjI1IiBmaWxsPSIjMWZiODVhIi8+PHBvbHlnb24gcG9pbnRzPSI2MS42OSwzMS40NiA3MS4yOCwzNy4wMCA2MS42OSw0Mi41NCA1Mi4xMCwzNy4wMCIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iNTAuMDAsMzguMjEgNTkuNTksNDMuNzUgNTAuMDAsNDkuMjkgNDAuNDEsNDMuNzUiIGZpbGw9IiNmNWY1ZjIiLz48cG9seWdvbiBwb2ludHM9IjE1Ljk4LDMyLjA3IDI1LjU3LDM3LjYxIDI1LjU3LDQ4LjY4IDE1Ljk4LDQzLjE0IiBmaWxsPSIjMWZiODVhIi8+PHBvbHlnb24gcG9pbnRzPSIxNS45OCw0NS41NyAyNS41Nyw1MS4xMSAyNS41Nyw2Mi4xOCAxNS45OCw1Ni42NCIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iMTUuOTgsNTkuMDcgMjUuNTcsNjQuNjEgMjUuNTcsNzUuNjggMTUuOTgsNzAuMTQiIGZpbGw9IiMxZmI4NWEiLz48cG9seWdvbiBwb2ludHM9IjI3LjY3LDM4LjgyIDM3LjI2LDQ0LjM2IDM3LjI2LDU1LjQzIDI3LjY3LDQ5Ljg5IiBmaWxsPSIjZmY4YTFmIi8+PHBvbHlnb24gcG9pbnRzPSIyNy42Nyw1Mi4zMiAzNy4yNiw1Ny44NiAzNy4yNiw2OC45MyAyNy42Nyw2My4zOSIgZmlsbD0iIzFmYjg1YSIvPjxwb2x5Z29uIHBvaW50cz0iMjcuNjcsNjUuODIgMzcuMjYsNzEuMzYgMzcuMjYsODIuNDMgMjcuNjcsNzYuODkiIGZpbGw9IiNlODM0M2IiLz48cG9seWdvbiBwb2ludHM9IjM5LjM2LDQ1LjU3IDQ4Ljk1LDUxLjExIDQ4Ljk1LDYyLjE4IDM5LjM2LDU2LjY0IiBmaWxsPSIjZmZkNjBhIi8+PHBvbHlnb24gcG9pbnRzPSIzOS4zNiw1OS4wNyA0OC45NSw2NC42MSA0OC45NSw3NS42OCAzOS4zNiw3MC4xNCIgZmlsbD0iI2ZmZDYwYSIvPjxwb2x5Z29uIHBvaW50cz0iMzkuMzYsNzIuNTcgNDguOTUsNzguMTEgNDguOTUsODkuMTggMzkuMzYsODMuNjQiIGZpbGw9IiNlODM0M2IiLz48cG9seWdvbiBwb2ludHM9IjUxLjA1LDUxLjExIDYwLjY0LDQ1LjU3IDYwLjY0LDU2LjY0IDUxLjA1LDYyLjE4IiBmaWxsPSIjZmY4YTFmIi8+PHBvbHlnb24gcG9pbnRzPSI1MS4wNSw2NC42MSA2MC42NCw1OS4wNyA2MC42NCw3MC4xNCA1MS4wNSw3NS42OCIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iNTEuMDUsNzguMTEgNjAuNjQsNzIuNTcgNjAuNjQsODMuNjQgNTEuMDUsODkuMTgiIGZpbGw9IiMxZmI4NWEiLz48cG9seWdvbiBwb2ludHM9IjYyLjc0LDQ0LjM2IDcyLjMzLDM4LjgyIDcyLjMzLDQ5Ljg5IDYyLjc0LDU1LjQzIiBmaWxsPSIjZmZkNjBhIi8+PHBvbHlnb24gcG9pbnRzPSI2Mi43NCw1Ny44NiA3Mi4zMyw1Mi4zMiA3Mi4zMyw2My4zOSA2Mi43NCw2OC45MyIgZmlsbD0iI2U4MzQzYiIvPjxwb2x5Z29uIHBvaW50cz0iNjIuNzQsNzEuMzYgNzIuMzMsNjUuODIgNzIuMzMsNzYuODkgNjIuNzQsODIuNDMiIGZpbGw9IiMxZmI4NWEiLz48cG9seWdvbiBwb2ludHM9Ijc0LjQzLDM3LjYxIDg0LjAyLDMyLjA3IDg0LjAyLDQzLjE0IDc0LjQzLDQ4LjY4IiBmaWxsPSIjZTgzNDNiIi8+PHBvbHlnb24gcG9pbnRzPSI3NC40Myw1MS4xMSA4NC4wMiw0NS41NyA4NC4wMiw1Ni42NCA3NC40Myw2Mi4xOCIgZmlsbD0iI2ZmOGExZiIvPjxwb2x5Z29uIHBvaW50cz0iNzQuNDMsNjQuNjEgODQuMDIsNTkuMDcgODQuMDIsNzAuMTQgNzQuNDMsNzUuNjgiIGZpbGw9IiMxZjZmZTAiLz48L2c+PC9zdmc+', title:'مكعب روبيك', sub:'اضغط مرتين عشان يتخلط، وبعدين لف الطبقات بإصبعك لحد ما كل وش يبقى لون واحد — أسرع وقت بيتسجّل', color:'linear-gradient(145deg,#4FACFE,#6C4DFF)'},
   {id:'millionaire', icon:'👑', title:'من سيربح المليون', sub:'أسئلة مسيحية بنفس نظام السلم والمساعدات الثلاثة', color:'linear-gradient(145deg,#1b2a6b,#0a0c28)'},
+  {id:'fawazeer', icon:'🧩', title:'فوازير', sub:'فوازير دينية مسيحية — اتحدى معلوماتك وحل الفوازير قبل ما الوقت يخلص', color:'linear-gradient(145deg,#6A3FB5,#F4B740)'},
   {id:'rollpaint', icon:'🎨', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJyZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmN2Q5NSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2QyM2Y1YyIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0ic2ciIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM0ZDVjNzMiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMzNDQxNGYiLz48L2xpbmVhckdyYWRpZW50Pgo8cmFkaWFsR3JhZGllbnQgaWQ9ImJnIiBjeD0iLjMzIiBjeT0iLjMiIHI9Ii44Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmYiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI2U4ZWFlZSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzlhYTFhZCIvPjwvcmFkaWFsR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNoIiB4PSItMzAlIiB5PSItMzAlIiB3aWR0aD0iMTYwJSIgaGVpZ2h0PSIxNzAlIj48ZmVEcm9wU2hhZG93IGR4PSIwIiBkeT0iMyIgc3RkRGV2aWF0aW9uPSIyLjIiIGZsb29kLWNvbG9yPSIjMDAwIiBmbG9vZC1vcGFjaXR5PSIuMzUiLz48L2ZpbHRlcj48L2RlZnM+CjxyZWN0IHg9IjUiIHk9IjUiIHdpZHRoPSI5MCIgaGVpZ2h0PSI5MCIgcng9IjIyIiBmaWxsPSIjZmRmMWNmIi8+CjxnIGZpbHRlcj0idXJsKCNzaCkiPgo8cmVjdCB4PSIxNCIgeT0iMTYiIHdpZHRoPSIyMyIgaGVpZ2h0PSIyMyIgcng9IjQiIGZpbGw9InVybCgjcmcpIi8+PHJlY3QgeD0iMzkiIHk9IjE2IiB3aWR0aD0iMjMiIGhlaWdodD0iMjMiIHJ4PSI0IiBmaWxsPSJ1cmwoI3JnKSIvPjxyZWN0IHg9IjY0IiB5PSIxNiIgd2lkdGg9IjIzIiBoZWlnaHQ9IjIzIiByeD0iNCIgZmlsbD0idXJsKCNzZykiLz4KPHJlY3QgeD0iMTQiIHk9IjQxIiB3aWR0aD0iMjMiIGhlaWdodD0iMjMiIHJ4PSI0IiBmaWxsPSJ1cmwoI3NnKSIvPjxyZWN0IHg9IjM5IiB5PSI0MSIgd2lkdGg9IjIzIiBoZWlnaHQ9IjIzIiByeD0iNCIgZmlsbD0idXJsKCNyZykiLz48cmVjdCB4PSI2NCIgeT0iNDEiIHdpZHRoPSIyMyIgaGVpZ2h0PSIyMyIgcng9IjQiIGZpbGw9InVybCgjc2cpIi8+CjxyZWN0IHg9IjE0IiB5PSI2NiIgd2lkdGg9IjIzIiBoZWlnaHQ9IjIxIiByeD0iNCIgZmlsbD0idXJsKCNzZykiLz48cmVjdCB4PSIzOSIgeT0iNjYiIHdpZHRoPSIyMyIgaGVpZ2h0PSIyMSIgcng9IjQiIGZpbGw9InVybCgjcmcpIi8+PHJlY3QgeD0iNjQiIHk9IjY2IiB3aWR0aD0iMjMiIGhlaWdodD0iMjEiIHJ4PSI0IiBmaWxsPSJ1cmwoI3NnKSIvPjwvZz4KPGVsbGlwc2UgY3g9IjUzIiBjeT0iODUiIHJ4PSI5IiByeT0iMy4yIiBmaWxsPSIjMDAwIiBvcGFjaXR5PSIuMjUiLz48Y2lyY2xlIGN4PSI1MSIgY3k9Ijc3IiByPSI5LjUiIGZpbGw9InVybCgjYmcpIi8+PGVsbGlwc2UgY3g9IjQ3LjUiIGN5PSI3MyIgcng9IjMuMyIgcnk9IjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii44NSIvPjwvc3ZnPg==', title:'لوّن الأرضية', sub:'اسحب الكورة — بتزلق لحد الحيطة وتلوّن كل بلاطة تعدّي عليها', color:'linear-gradient(145deg,#fdf1cf,#f4c9a0)'},
   {id:'simon', icon:'🎵', logo:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz4KPGNsaXBQYXRoIGlkPSJjIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0MCIvPjwvY2xpcFBhdGg+CjxsaW5lYXJHcmFkaWVudCBpZD0iYiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzQ2ZGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBlYTVlMCIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzkzZTM1YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzViYWUyZSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0ieSIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZDM1YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2YyYTQxMyIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iciIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmOGE3ZSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2U4NDczZiIvPjwvbGluZWFyR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0iaCIgY3g9Ii41IiBjeT0iLjQiIHI9Ii43Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMyYTM3M2YiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNDFiMjAiLz48L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KPGVsbGlwc2UgY3g9IjU1IiBjeT0iNTgiIHJ4PSI0NSIgcnk9IjQzIiBmaWxsPSJyZ2JhKDAsMCwwLC4yOCkiLz4KPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDYiIGZpbGw9IiMxYzI1MjkiIHN0cm9rZT0iIzBkMTMxNyIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxnIGNsaXAtcGF0aD0idXJsKCNjKSI+PHJlY3QgeD0iMTAiIHk9IjEwIiB3aWR0aD0iMzkiIGhlaWdodD0iMzkiIGZpbGw9InVybCgjYikiLz48cmVjdCB4PSI1MSIgeT0iMTAiIHdpZHRoPSIzOSIgaGVpZ2h0PSIzOSIgZmlsbD0idXJsKCNnKSIvPjxyZWN0IHg9IjEwIiB5PSI1MSIgd2lkdGg9IjM5IiBoZWlnaHQ9IjM5IiBmaWxsPSJ1cmwoI3kpIi8+PHJlY3QgeD0iNTEiIHk9IjUxIiB3aWR0aD0iMzkiIGhlaWdodD0iMzkiIGZpbGw9InVybCgjcikiLz48L2c+CjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwuNDIpIiBzdHJva2Utd2lkdGg9IjIuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48cGF0aCBkPSJNMTggMzQgQTMzIDMzIDAgMCAxIDM0IDE4Ii8+PHBhdGggZD0iTTY2IDE4IEEzMyAzMyAwIDAgMSA4MiAzNCIvPjxwYXRoIGQ9Ik0xOCA2NiBBMzMgMzMgMCAwIDAgMzQgODIiLz48cGF0aCBkPSJNNjYgODIgQTMzIDMzIDAgMCAwIDgyIDY2Ii8+PC9nPgo8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIxNyIgZmlsbD0idXJsKCNoKSIgc3Ryb2tlPSIjMGQxMzE3IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTQ0IDUyIGw0IDQgbDggLTkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIG9wYWNpdHk9Ii45MiIvPjwvc3ZnPg==', title:'سايمن', sub:'شوف تتابع الألوان والأصوات وكرره بنفس الترتيب — كل جولة أصعب من اللي قبلها', color:'linear-gradient(145deg,#3d6c92,#1b3146)'},
   {id:'chess', icon:'♟️', logo:'chess-logo.png', title:'الشطرنج', sub:'شطرنج كامل بكل القواعد ضد الجهاز أو صديقك على نفس الموبايل', color:'linear-gradient(145deg,#3a3a3a,#0c0c0c)'},
@@ -16211,6 +16311,7 @@ const GH_SOLO_SUB = {
   cube:'اضغط مرتين عشان المكعب يتخلط، واسحب على أي وش عشان تلفّ طبقة (واسحب بره المكعب عشان تدوّره) — التايمر بيبدأ مع أول حركة، ولما كل وش يبقى لون واحد تكسب نقط',
   blocky:'لوحة 8×8 — اسحب البلوكات وفجّر الصفوف والأعمدة، كومبو بيضاعف النقط، مستويات بتصعب، وتراجع وتبديل قطع لما تتزنق.',
   millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 15 ثانية للسؤال، وكمّلهم كلهم واكسب 300 نقطة',
+  fawazeer:'10 فوازير دينية مسيحية بتبدأ سهلة وبتصعب، 25 ثانية للفزورة وتلميح لو اتلخبطت — جاوب صح واكسب نقط ومكافأة للجولة الكاملة',
   chess:'شطرنج كامل بكل القواعد — كش ملك، تبييت، الأسر بالمرور، ترقية البيدق',
   checkers:'أسر إجباري ومتسلسل، وتتويج القطعة لما توصل آخر الصف',
   backgammon:'زهرين، بار، وخروج القطع — اللعبة الشرقية الكلاسيكية',
@@ -22175,6 +22276,310 @@ function doMilWalkAway(){
   saveMilBestIfNeeded(g);
   if(g.earnedPoints>0) awardSoloGamePoints(g.earnedPoints, 'خد نقطه وطلع من من سيربح المليون 🚪');
   milRenderShell();
+}
+
+/* ============================= GAMES: فوازير (فوازير دينية مسيحية) ============================= */
+/* إعدادات اللعبة: غيّر الأرقام هنا لو عايز تعدّل عدد الفوازير أو الوقت أو النقط */
+const FAW_CFG = { perRound:10, mix:[4,4,2], sec:25, base:3, hinted:1, fastBonus:1, fastLeft:15, perfect:5 };
+const FAW_CATS = { p:['🧑','شخصيات'], e:['✨','أحداث وقصص'], c:['⛪','الكنيسة والطقوس'], b:['📖','الكتاب المقدس'] };
+/* كل فزورة: [التصنيف، الصعوبة 1-3، الفزورة، الإجابة الصح، [3 إجابات غلط]، تلميح، معلومة بتظهر بعد الإجابة] */
+const FAW_BANK = [
+  ['p',1,'أنا أول إنسان خلقه الله، وسمّيت كل الحيوانات بأسماء، وعشت في جنة عدن. مين أنا؟','آدم',['نوح','هابيل','شيث'],'اتخلقت من تراب الأرض','خلق الله آدم من تراب الأرض وأعطاه أن يسمّي الحيوانات (سفر التكوين).'],
+  ['p',1,'بنيت فُلكًا كبيرًا بأمر الله، ونجّاني أنا وأسرتي من الطوفان. مين أنا؟','نوح',['إبراهيم','موسى','لامك'],'علامة العهد بعد الطوفان كانت قوس قزح','بنى نوح الفلك ودخل فيه هو وأسرته والحيوانات، وبعد الطوفان وضع الله قوس قزح علامة عهد.'],
+  ['p',1,'سمعت صوت الله يقول لي: اترك أرضك وعشيرتك واذهب إلى الأرض التي أريك. ويُلقّبوني "أبو الآباء". مين أنا؟','إبراهيم',['إسحق','يعقوب','لوط'],'كان اسمي قبل كده أبرام','دعا الله أبرام وغيّر اسمه إلى إبراهيم، أبو الآباء.'],
+  ['p',1,'باعني إخواتي بعشرين من الفضة، وبقيت بعدها حاكم على مصر. مين أنا؟','يوسف',['بنيامين','يهوذا','رأوبين'],'كان عندي قميص ملوّن، وحلمت بالسنابل والكواكب','باعه إخوته للإسماعيليين، ورفعه الله حتى صار الثاني بعد فرعون في مصر.'],
+  ['p',1,'وضعتني أمي في سفط وسط البردي على نهر النيل، وتربّيت في بيت فرعون. مين أنا؟','موسى',['هارون','يشوع','صموئيل'],'قدت شعب الله وخرجت بيهم من مصر','نجا موسى طفلاً من أمر فرعون بقتل الأطفال، وربّته ابنة فرعون.'],
+  ['p',1,'غلبت الجبار جليات بخمسة حجارة ومقلاع. مين أنا؟','داود',['شمشون','جدعون','شاول'],'كنت راعي غنم وكتبت المزامير','غلب داود الصغير جليات باسم الرب، ثم صار ملكًا على إسرائيل.'],
+  ['p',2,'كانت قوتي في شعري، وخانتني دليلة. مين أنا؟','شمشون',['جدعون','يشوع','إيليا'],'كنت من القضاة، ونذيرًا للرب من بطن أمي','كان شمشون نذيرًا لله، فلما قُصّ شعره فقد قوته.'],
+  ['p',2,'طلبت من الله قلبًا فهيمًا لأحكم شعبه، وبنيت له الهيكل. مين أنا؟','سليمان',['داود','حزقيا','يوشيا'],'جاءت ملكة سبأ لتسمع حكمتي','طلب سليمان الحكمة فأعطاه الله حكمة وغنى، وبنى الهيكل في أورشليم.'],
+  ['p',2,'رموني في جُبّ الأسود لأني كنت أصلي لإلهي، لكن الله سدّ أفواه الأسود. مين أنا؟','دانيال',['إرميا','حزقيال','إشعياء'],'كنت من الوزراء في بابل','نجا دانيال من جب الأسود بملاك الرب لأنه وُجد بريئًا أمام الله.'],
+  ['p',2,'ابتلعني حوت كبير، وبقيت في بطنه ثلاثة أيام قبل ما أكرز لأهل نينوى. مين أنا؟','يونان',['إيليا','عاموس','هوشع'],'هربت من الله في سفينة متجهة إلى ترشيش','أقام الله حوتًا ابتلع يونان، وصارت أيامه الثلاثة رمزًا لقيامة المسيح.'],
+  ['p',2,'اترفعت إلى السماء في مركبة نارية بعد ما عبرت نهر الأردن. مين أنا؟','إيليا',['إليشع','موسى','يشوع'],'سبق وأنزلت نارًا من السماء على جبل الكرمل','صعد إيليا بمركبة نارية، وخلفه تلميذه إليشع.'],
+  ['p',2,'أنا نبية وقاضية، قدت شعب إسرائيل مع باراق وكنت أجلس تحت نخلة. مين أنا؟','دبورة',['راعوث','أستير','حنة'],'اسمي معناه "نحلة"','كانت دبورة قاضية ونبية، وذهب معها باراق للحرب فانتصر شعب الله.'],
+  ['p',2,'ملكة شجاعة قلت: "إذا هلكت هلكت"، وأنقذت شعبي من مؤامرة هامان. مين أنا؟','أستير',['راعوث','دبورة','يهوديت'],'كنت ملكة في بلاد فارس','عرّضت أستير حياتها وكشفت مؤامرة هامان، فنجا شعبها.'],
+  ['p',2,'قلت لحماتي: "شعبك شعبي وإلهك إلهي". مين أنا؟','راعوث',['أستير','نعمي','حنة'],'صرت من أجداد داود وأجداد المسيح','تبعت راعوث حماتها نعمي إلى بيت لحم وتزوجت بوعز، وجاء من نسلها داود ثم المسيح.'],
+  ['p',2,'بعت بكوريتي بطبق عدس. مين أنا؟','عيسو',['يعقوب','إسماعيل','لاوي'],'كنت أخو يعقوب التوأم، وصيّادًا ماهرًا','استهان عيسو ببكوريته وباعها ليعقوب بطبق عدس.'],
+  ['p',2,'حلمت بسلّم منصوب على الأرض ورأسه يمس السماء، والملائكة صاعدة ونازلة عليه. مين أنا؟','يعقوب',['إبراهيم','يوسف','دانيال'],'سمّاني الله بعد كده "إسرائيل"','رأى يعقوب هذا الحلم في بيت إيل وهو هارب من أخيه عيسو.'],
+  ['p',3,'أنا ملك رأيت يدًا تكتب على الحائط: منا منا تقيل وفرسين. مين أنا؟','بيلشاصر',['نبوخذنصر','داريوس','كورش'],'فسّر الكتابة النبي دانيال','رأى بيلشاصر الكتابة في وليمة عظيمة، وفسّرها دانيال.'],
+  ['p',3,'أنا ملك بنيت تمثالاً من ذهب وأمرت الناس بالسجود له، وألقيت الفتية الثلاثة في الأتون. مين أنا؟','نبوخذنصر',['بيلشاصر','داريوس','أحشويرش'],'كنت ملك بابل','ألقى نبوخذنصر حنانيا وميشائيل وعزريا في أتون النار، فنجّاهم الله.'],
+  ['p',3,'صنعت العجل الذهبي لما تأخّر موسى على الجبل. مين أنا؟','هارون',['يشوع','كالب','لاوي'],'كنت أخو موسى ورئيس الكهنة','صنع هارون العجل الذهبي بطلب الشعب لما تأخر موسى على جبل سيناء.'],
+  ['p',2,'كنا ثلاثة فتية، رفضنا السجود للتمثال الذهبي فرموا بينا في أتون النار. أسماؤنا؟','حنانيا وميشائيل وعزريا',['دانيال وإرميا وحزقيال','إيليا وإليشع ويونان','يشوع وكالب وجدعون'],'كان معنا رابع في وسط النار','نجا الفتية الثلاثة من الأتون، ورأى الملك معهم رابعًا في وسط النار.'],
+  ['p',1,'أنا الملاك اللي بشّر العذراء مريم بميلاد المخلّص. مين أنا؟','جبرائيل',['ميخائيل','روفائيل','سوريال'],'بشّرت زكريا قبل كده بميلاد يوحنا','أرسل الله الملاك جبرائيل إلى مريم في الناصرة ليبشّرها.'],
+  ['p',1,'أنا اللي عمّدت الرب يسوع في نهر الأردن. مين أنا؟','يوحنا المعمدان',['بطرس','يوحنا الحبيب','أندراوس'],'كان طعامي جرادًا وعسلاً بريًّا','يوحنا المعمدان هو السابق الذي أعدّ الطريق للمسيح.'],
+  ['p',1,'صياد سمك تركت شبكتي وتبعت المسيح، وسمّاني "صخرة". مين أنا؟','بطرس',['أندراوس','يعقوب','متى'],'أنكرت المسيح ثلاث مرات ثم رجعت له بدموع','لقّب المسيح سمعان بـ"صفا"، أي صخرة، وهو بطرس الرسول.'],
+  ['p',1,'كنت جابي ضرايب، دعاني المسيح فتبعته وكتبت إنجيلاً. مين أنا؟','متى',['مرقس','لوقا','يوحنا'],'اسمي التاني كان لاوي','متى العشار صار أحد الاثني عشر، وإنجيله هو الأول ترتيبًا في العهد الجديد.'],
+  ['p',2,'أنا طبيب كتبت إنجيلاً وسفر أعمال الرسل، ورافقت بولس في رحلاته. مين أنا؟','لوقا',['مرقس','تيموثاوس','برنابا'],'كتبت لشخص اسمه ثاوفيلس','كتب القديس لوقا الطبيب إنجيله وسفر أعمال الرسل.'],
+  ['p',2,'كنت أضطهد المسيحيين، وظهر لي المسيح في الطريق إلى دمشق فصرت رسولاً. مين أنا؟','بولس (شاول)',['برنابا','سيلا','أبلوس'],'كان اسمي قبل الإيمان شاول','تحوّل شاول الطرسوسي إلى بولس رسول الأمم بعد ظهور المسيح له.'],
+  ['p',2,'ما صدّقت قيامة الرب إلا لما لمست جروحه. مين أنا؟','توما',['فيلبس','نثنائيل','يعقوب'],'قلت له بعدها: ربي وإلهي','قال توما بعد أن رأى المسيح: "ربي وإلهي".'],
+  ['p',2,'أنا أول شهيد في المسيحية، رجموني بالحجارة وأنا أصلّي لأجل راجميّ. مين أنا؟','استفانوس',['يعقوب','تيموثاوس','برنابا'],'كنت أحد الشمامسة السبعة','استفانوس رئيس الشمامسة وأول الشهداء.'],
+  ['p',2,'كنت رئيس عشّارين قصير القامة، طلعت على شجرة جميز عشان أشوف يسوع. مين أنا؟','زكا',['متى','نيقوديموس','برتيماوس'],'قال لي المسيح: اليوم صار خلاص لهذا البيت','نزل زكا بفرح واستقبل المسيح في بيته وتاب.'],
+  ['p',3,'كنت أجلس عند قدمي يسوع أسمع كلامه، وأختي مرثا كانت مشغولة بالخدمة. مين أنا؟','مريم أخت لعازر',['أليصابات','حنة','مريم المجدلية'],'أخي أقامه المسيح بعد 4 أيام في القبر','مدح المسيح مريم لأنها اختارت النصيب الصالح.'],
+  ['p',2,'أنا أم يوحنا المعمدان، وقريبة العذراء مريم. مين أنا؟','أليصابات',['حنة','مرثا','سارة'],'زوجي كان الكاهن زكريا','حبلت أليصابات بيوحنا في شيخوختها.'],
+  ['p',1,'تلميذ خان معلمه وسلّمه بثلاثين من الفضة. مين أنا؟','يهوذا الإسخريوطي',['توما','بطرس','متى'],'كان معي صندوق الدراهم','سلّم يهوذا المسيح لرؤساء الكهنة بثلاثين من الفضة.'],
+  ['p',3,'نمت أثناء عظة بولس الطويلة فسقطت من الطابق الثالث، فأقامني الله. مين أنا؟','أفتيخوس',['تيموثاوس','سيلا','أبلوس'],'حصل ده في مدينة ترواس','سقط الشاب أفتيخوس من الطاقة فأقامه بولس حيًّا (سفر أعمال الرسل).'],
+  ['p',3,'كنت أعمى قاعد على الطريق عند أريحا، وصرخت: يا ابن داود ارحمني، فشفاني المسيح. مين أنا؟','برتيماوس',['لعازر','زكا','نيقوديموس'],'اسمي معناه "ابن تيماوس"','شفى المسيح برتيماوس الأعمى عند خروجه من أريحا.'],
+  ['p',2,'أقامني المسيح من الموت بعد 4 أيام في القبر. مين أنا؟','لعازر',['ابنة يايرس','ابن أرملة نايين','طابيثا'],'من بيت عنيا، وأختاي مرثا ومريم','أقام المسيح لعازر بعد أربعة أيام قائلاً: "لعازر هلمّ خارجًا".'],
+  ['p',3,'جئت إلى يسوع ليلاً، فقال لي: "يجب أن تولد من فوق". مين أنا؟','نيقوديموس',['زكا','متى','يوسف الرامي'],'كنت من الفريسيين وعضوًا في المجمع','تكلّم المسيح مع نيقوديموس عن الولادة من الماء والروح، وساعد لاحقًا في دفنه.'],
+  ['p',2,'أنا عضو في المجمع، طلبت جسد يسوع من بيلاطس ودفنته في قبر جديد. مين أنا؟','يوسف الرامي',['لعازر','سمعان القيرواني','قيافا'],'القبر كان ملكي أنا','دفن يوسف الرامي ونيقوديموس المسيح في قبر جديد.'],
+  ['p',2,'أنا اللي ساعدت المسيح في حمل صليبه في الطريق إلى الجلجثة. مين أنا؟','سمعان القيرواني',['يوسف الرامي','نيقوديموس','برنابا'],'كنت جاي من القرية','سخّره الجنود ليحمل الصليب، وكان قيروانيًا أي من مدينة قيروان.'],
+  ['p',3,'أنا اللي قلت للمسيح وأنا مصلوب بجانبه: "اذكرني يا رب متى جئت في ملكوتك". مين أنا؟','اللص التائب',['باراباس','قائد المئة','سمعان القيرواني'],'وعدني بالفردوس','وعده المسيح: "اليوم تكون معي في الفردوس".'],
+  ['p',2,'أنا والٍ روماني سألت المسيح: أنت ملك اليهود؟ وغسلت يدي أمام الجمع. مين أنا؟','بيلاطس',['هيرودس','قيافا','قيصر'],'زوجتي أرسلت لي: إياك وذلك البار','حكم بيلاطس البنطي على المسيح مع إعلانه براءته.'],
+  ['p',3,'فقدت النطق لأني ما صدّقت بشارة الملاك بميلاد ابني. مين أنا؟','زكريا',['يوسف النجار','سمعان الشيخ','هارون'],'كتبت على لوح: اسمه يوحنا','سكت زكريا إلى أن وُلد يوحنا وكتب "اسمه يوحنا"، فانفتح فمه.'],
+  ['p',2,'أنا الشيخ اللي حملت الطفل يسوع في الهيكل وقلت: "الآن تطلق عبدك يا سيد بسلام". مين أنا؟','سمعان الشيخ',['زكريا','يوسف النجار','حزقيال'],'وعدني الروح القدس إني ما أرى الموت قبل أن أرى مسيح الرب','قال سمعان الشيخ هذه الكلمات لما رأى المخلّص في الهيكل (إنجيل لوقا).'],
+  ['p',1,'أنا نور العالم، وأنا الراعي الصالح، وأنا الباب. مين أنا؟','يسوع المسيح',['يوحنا المعمدان','موسى','إيليا'],'من أقوال "أنا هو" في إنجيل يوحنا','قال المسيح عن نفسه هذه الأقوال في إنجيل يوحنا.'],
+  ['e',1,'إيه أول معجزة صنعها يسوع في عرس قانا الجليل؟','تحويل الماء إلى خمر',['إشباع الخمسة آلاف','شفاء الأعمى','إقامة لعازر'],'العذراء قالت له: ليس لهم خمر','صنع المسيح أولى معجزاته في قانا الجليل وأظهر مجده.'],
+  ['e',1,'بكم رغيف وسمكة أشبع المسيح الخمسة آلاف رجل؟','5 أرغفة وسمكتان',['7 أرغفة وسمكة','3 أرغفة وسمكتان','12 رغيفًا وسمكة'],'فضل بعدها 12 قفة','أشبع المسيح الجمع، وفضل اثنتا عشرة قفة من الكسر.'],
+  ['e',1,'كم تلميذًا اختار المسيح ليكونوا معه؟','12 تلميذًا',['7 تلاميذ','70 تلميذًا','3 تلاميذ'],'منهم بطرس ويعقوب ويوحنا','اختار المسيح اثني عشر تلميذًا ليكونوا معه.'],
+  ['e',1,'كم يومًا صام المسيح في البرية؟','40 يومًا',['3 أيام','7 أيام','50 يومًا'],'وبعدها جاءه المجرّب','صام المسيح أربعين يومًا وأربعين ليلة، ثم جرّبه إبليس.'],
+  ['e',1,'بعد كم يوم من الصلب قام المسيح من الموت؟','في اليوم الثالث',['في اليوم الأول','في اليوم السابع','بعد أربعين يومًا'],'فجر يوم الأحد','قام المسيح في اليوم الثالث كما قال.'],
+  ['e',1,'كم ضربة ضرب بها الله أرض مصر على يد موسى؟','10 ضربات',['7 ضربات','12 ضربة','3 ضربات'],'آخرها موت الأبكار','خرج الشعب بعد الضربة العاشرة: موت الأبكار.'],
+  ['e',1,'عبر بنو إسرائيل البحر بعد ما انشق قدامهم. اسم البحر؟','البحر الأحمر',['البحر الميت','بحر الجليل','البحر المتوسط'],'عبروا على اليابسة وغرق فرعون وجنوده','شقّ الله البحر الأحمر فعبر شعبه وغرق المصريون.'],
+  ['e',2,'على أي جبل أخذ موسى لوحي الوصايا العشر؟','جبل سيناء',['جبل الكرمل','جبل الزيتون','جبل تابور'],'ظهر الله لموسى في سحابة ونار','أخذ موسى لوحي الشريعة على جبل سيناء (حوريب).'],
+  ['e',2,'مين اللي ظهر مع المسيح على جبل التجلي؟','موسى وإيليا',['آدم ونوح','إبراهيم وداود','يوحنا وإشعياء'],'كان معه ثلاثة تلاميذ: بطرس ويعقوب ويوحنا','ظهر موسى (الناموس) وإيليا (الأنبياء) مع المسيح في التجلي.'],
+  ['e',1,'في أي مدينة وُلد المسيح؟','بيت لحم',['الناصرة','أورشليم','كفرناحوم'],'مدينة داود','وُلد المسيح في بيت لحم اليهودية، وأُضجع في مزود.'],
+  ['e',1,'إيه المدينة اللي عاش فيها المسيح طفولته وشبابه؟','الناصرة',['بيت لحم','قانا','أريحا'],'ولهذا قالوا عنه "يسوع الناصري"','عاش الرب يسوع في الناصرة في الجليل مع العذراء ويوسف.'],
+  ['e',1,'إيه الهدايا اللي قدّمها المجوس للطفل يسوع؟','ذهب ولبان ومر',['ذهب وفضة وبخور','قمح وزيت وخمر','ذهب وياقوت ولؤلؤ'],'الذهب للملك، واللبان للإله، والمر لموته (رمزيًا)','قدّم المجوس ذهبًا ولبانًا ومرًا.'],
+  ['e',1,'هربت العائلة المقدسة من هيرودس إلى أي بلد؟','مصر',['سوريا','قبرص','روما'],'رحلتهم ليها آثار في بلدنا لحد النهاردة','ذهب يوسف ومريم والطفل يسوع إلى مصر، فتحققت نبوة: "من مصر دعوت ابني".'],
+  ['e',2,'كم سنة تاه شعب إسرائيل في البرية؟','40 سنة',['12 سنة','70 سنة','400 سنة'],'كان أكلهم المنّ','تاه الشعب أربعين سنة قبل دخول أرض الموعد.'],
+  ['e',2,'إيه الأكل اللي أنزله الله لشعبه في البرية؟','المنّ والسلوى',['الخبز والسمك','التمر والعسل','العدس والكرنب'],'كان بيظهر كل صباح مع الندى','أطعم الله شعبه بالمنّ صباحًا والسلوى مساءً في البرية.'],
+  ['e',3,'أي مدينة سقطت أسوارها بعد ما لفّ حولها يشوع وشعبه سبعة أيام؟','أريحا',['بابل','سدوم','نينوى'],'لفّوا حولها في اليوم السابع 7 مرات','سقطت أسوار أريحا بأمر الله بعد دوران الشعب والصياح والأبواق.'],
+  ['e',2,'أي مدينة تابت بعد وعظ يونان فأنقذها الله؟','نينوى',['سدوم','أريحا','بابل'],'كانت عاصمة أشور','تاب أهل نينوى بالصوم والرماد فرحمهم الله.'],
+  ['e',2,'مين المدينتان اللي أحرقهما الله بنار وكبريت، بينما نجا لوط وتحوّلت زوجته إلى عمود ملح لما التفتت؟','سدوم وعمورة',['أريحا وعاي','نينوى وبابل','أورشليم وبيت لحم'],'خرج لوط وبناته منها','أنقذ الله لوط وبناته من سدوم وعمورة قبل هلاكهما.'],
+  ['e',1,'أي طائر أرسله نوح فعاد وفي فمه غصن زيتون؟','الحمامة',['الغراب','النسر','الهدهد'],'أرسل قبلها طائرًا آخر ولم يرجع','عادت الحمامة بورقة زيتون، فعرف نوح أن المياه قلّت.'],
+  ['e',1,'مين الأخ اللي قتل أخاه في أول جريمة قتل في التاريخ؟','قايين',['عيسو','يعقوب','لامك'],'قتل أخاه هابيل','قتل قايين هابيل حسدًا، بعد أن قبل الله ذبيحة هابيل.'],
+  ['e',1,'إيه الحيوان اللي كلّم حواء في جنة عدن؟','الحية',['الغراب','الأسد','الحمامة'],'كانت أحيل حيوانات البرية','أغوت الحية حواء فأكلت من الشجرة المنهي عنها.'],
+  ['e',1,'في أي يوم من أيام الخلق خلق الله الإنسان؟','اليوم السادس',['اليوم الأول','اليوم الثالث','اليوم الرابع'],'وفي اليوم السابع استراح','خلق الله الإنسان على صورته في اليوم السادس.'],
+  ['e',2,'مين ابن إبراهيم اللي طلب الله تقدمته ذبيحة ففداه الله بكبش؟','إسحق',['يعقوب','يوسف','إسماعيل'],'حدثت القصة على جبل المريا','أُنقذ إسحق بكبش عُلق في الغابة، وهو رمز لذبيحة المسيح.'],
+  ['e',2,'إيه الشجرة اللي كانت مشتعلة ولا تحترق لما ظهر الله لموسى؟','العليقة',['الزيتونة','الأرزة','التينة'],'ظهر له ملاك الرب في لهيب نار','ظهر الله لموسى في العليقة وأرسله لينقذ شعبه.'],
+  ['e',3,'كم عذراء كانت حكيمة من العشر عذارى في مثل المسيح؟','5 عذارى',['10 عذارى','3 عذارى','7 عذارى'],'والباقي كُنّ جاهلات','خمس عذارى حكيمات أخذن زيتًا في آنيتهن، وخمس جاهلات لم يأخذن.'],
+  ['e',2,'ماذا فعل الأب لما رأى ابنه الضال راجعًا من بعيد؟','ركض واحتضنه وقبّله',['عاقبه أولاً','أغلق الباب في وجهه','طلب منه أن يعمل أجيرًا'],'وبعدها ذبح له العجل المسمّن','مثل الابن الضال يعلّمنا محبة الله الآب وقبوله للتائبين.'],
+  ['e',3,'إيه الحلم اللي رآه فرعون وفسّره يوسف؟','سبع بقرات سمان وسبع عجاف',['سلّم إلى السماء','تمثال من ذهب وفضة','شجرة عظيمة'],'كانت سبع سنين شبع وسبع سنين جوع','فسّر يوسف الحلم بسبع سنين شبع تتبعها سبع سنين جوع.'],
+  ['e',1,'إيه اسم البرج اللي بناه البشر ليصل إلى السماء فبلبل الله ألسنتهم؟','برج بابل',['برج الكرمل','برج أورشليم','برج سلوام'],'كان اللسان واحدًا قبلها','بلبل الله ألسنة البشر فتفرّقوا في الأرض.'],
+  ['c',1,'كم عدد أسرار الكنيسة؟','7 أسرار',['5 أسرار','10 أسرار','12 سرًا'],'منها المعمودية والميرون والتناول','الأسرار السبعة: المعمودية، الميرون، الإفخارستيا، التوبة والاعتراف، مسحة المرضى، الزيجة، الكهنوت.'],
+  ['c',1,'السر اللي بنتناول فيه جسد الرب ودمه اسمه؟','سر الإفخارستيا (التناول)',['سر المعمودية','سر الميرون','سر الزيجة'],'كلمة يونانية معناها "الشكر"','في الإفخارستيا نتناول جسد الرب ودمه الأقدسين لمغفرة الخطايا والحياة الأبدية.'],
+  ['c',1,'السر اللي نولد فيه من الماء والروح ونصير أولاد لله؟','سر المعمودية',['سر التوبة','سر الكهنوت','سر مسحة المرضى'],'اعتمد المسيح في نهر الأردن','بالمعمودية ندخل الكنيسة ونولد ولادة جديدة.'],
+  ['c',2,'السر اللي نُمسح فيه بالزيت المقدس بعد المعمودية لنقبل الروح القدس؟','سر الميرون',['سر الزيجة','سر الاعتراف','سر الإفخارستيا'],'زيت مقدس بيتصنع بطقس خاص','في سر الميرون ننال مسحة الروح القدس بعد المعمودية.'],
+  ['c',2,'مين هو كاروز الديار المصرية، وكاتب إنجيل، ومؤسس كنيسة الإسكندرية؟','مرقس الرسول',['لوقا','متى','بطرس'],'اسمه كمان يوحنا مرقس','القديس مرقس الرسول هو كاروز الديار المصرية، وأسّس الكنيسة في الإسكندرية.'],
+  ['c',1,'مين اللي بنقول عنه "أبو الرهبان"، وترك العالم وعاش في الصحراء؟','الأنبا أنطونيوس',['الأنبا بولا','الأنبا باخوميوس','الأنبا مقار'],'عاش في جبل قريب من البحر الأحمر','يُلقَّب القديس أنطونيوس بـ"أبو الرهبان".'],
+  ['c',2,'مين هو أول السواح، وكان الغراب يجيب له خبزًا كل يوم؟','الأنبا بولا',['الأنبا أنطونيوس','الأنبا مقار','الأنبا شنوده'],'زاره الأنبا أنطونيوس قبل نياحته','عاش الأنبا بولا حياة التوحّد في البرية، وزاره القديس أنطونيوس.'],
+  ['c',2,'على أي جبل صُلب المسيح؟','الجلجثة',['الزيتون','سيناء','تابور'],'معناها "موضع الجمجمة"','صُلب المسيح خارج أورشليم في الجلجثة.'],
+  ['c',1,'العيد اللي بنحتفل فيه بحلول الروح القدس على التلاميذ؟','عيد العنصرة (الخمسين)',['عيد الغطاس','عيد الصعود','عيد البشارة'],'بعد القيامة بخمسين يومًا','حلّ الروح القدس على التلاميذ في العلّية فنطقوا بألسنة.'],
+  ['c',1,'العيد اللي بنحتفل فيه بعماد المسيح في نهر الأردن؟','عيد الغطاس',['عيد الميلاد','عيد النيروز','عيد الختان'],'ظهر فيه الآب والابن والروح القدس','في الغطاس ظهر الثالوث عند عماد المسيح.'],
+  ['c',2,'بنحتفل بعيد الميلاد المجيد في الكنيسة القبطية الأرثوذكسية يوم؟','7 يناير',['25 ديسمبر','1 يناير','19 يناير'],'يوافق 29 كيهك','نحتفل بعيد الميلاد في 29 كيهك الموافق 7 يناير.'],
+  ['c',1,'لما نقول "المسيح قام" بنرد؟','بالحقيقة قام',['هلليلويا','آمين','المجد لله دائمًا'],'تحية فرحة القيامة','تحية القيامة: "المسيح قام... بالحقيقة قام".'],
+  ['c',2,'إيه معنى كلمة "آمين"؟','ليكن كذلك',['المجد لله','ارحمنا','خلّصنا'],'كلمة عبرية','"آمين" كلمة عبرية معناها: ليكن، أو حقًا.'],
+  ['c',2,'إيه معنى كلمة "هلليلويا"؟','سبّحوا الرب',['خلّصنا الآن','ارحمنا يا رب','المجد للآب'],'بتتقال في فرحة الكنيسة','هلليلويا معناها: سبّحوا الرب.'],
+  ['c',2,'إيه معنى كلمة "أوصنا"؟','خلّصنا الآن',['سبّحوا الرب','ليكن كذلك','المجد لله'],'هتفت بها الجموع يوم دخول المسيح أورشليم','هتفت الجموع "أوصنا" يوم الشعانين عند دخول المسيح أورشليم.'],
+  ['c',2,'إيه معنى كلمة "عمانوئيل"؟','الله معنا',['الله يرى','الله يخلّص','ابن الله'],'اسم للمسيح في نبوة إشعياء','عمانوئيل معناها "الله معنا" (إشعياء 7، ومتى 1).'],
+  ['c',2,'إيه معنى اسم "يسوع"؟','المخلّص (الرب يخلّص)',['الملك','الراعي','الكلمة'],'قال الملاك ليوسف: تدعو اسمه يسوع لأنه يخلّص شعبه','اسم يسوع معناه: الرب يخلّص، فهو المخلّص.'],
+  ['c',2,'إيه معنى كلمة "المسيح"؟','الممسوح',['المولود','المصلوب','الراعي'],'كانوا يمسحون الملوك والكهنة بالزيت','المسيح يعني الممسوح، وهو الملك والكاهن والنبي.'],
+  ['c',1,'إيه الصلاة اللي علّمها المسيح لتلاميذه؟','الصلاة الربانية (أبانا الذي في السماوات)',['قانون الإيمان','تسبحة الملائكة','السلام لك يا مريم'],'بتبدأ بكلمة "أبانا"','علّم المسيح تلاميذه هذه الصلاة لما قالوا له: "علّمنا أن نصلي".'],
+  ['b',1,'إيه أول سفر في الكتاب المقدس؟','التكوين',['الخروج','المزامير','متى'],'بيبدأ بـ"في البدء خلق الله السماوات والأرض"','سفر التكوين هو أول أسفار موسى الخمسة.'],
+  ['b',1,'إيه آخر سفر في الكتاب المقدس؟','الرؤيا',['أعمال الرسل','العبرانيين','يهوذا'],'كتبه يوحنا الحبيب','سفر الرؤيا هو آخر أسفار العهد الجديد.'],
+  ['b',2,'كم سفرًا في العهد الجديد؟','27 سفرًا',['21 سفرًا','39 سفرًا','12 سفرًا'],'يبدأ بأربعة أناجيل','العهد الجديد 27 سفرًا، من إنجيل متى إلى سفر الرؤيا.'],
+  ['b',1,'إيه اسم سفر الصلوات والتسابيح اللي كتب أغلبه داود النبي؟','المزامير',['الأمثال','نشيد الأناشيد','الجامعة'],'فيه 150 مزمورًا','سفر المزامير هو كتاب صلوات الكنيسة وتسابيحها.'],
+  ['b',2,'أي مزمور بيبدأ بعبارة: "الرب راعيّ فلا يعوزني شيء"؟','المزمور 23',['المزمور 1','المزمور 51','المزمور 91'],'فيه عبارة: إن سرت في وادي ظل الموت لا أخاف شرًّا','المزمور 23 من أشهر مزامير داود، عن الراعي الصالح.'],
+  ['b',2,'إيه الوصية العظمى في الناموس كما قال المسيح؟','تحب الرب إلهك من كل قلبك',['لا تقتل','أكرم أباك وأمك','اذكر يوم السبت'],'قال بعدها: والثانية مثلها','قال المسيح: "تحب الرب إلهك من كل قلبك ونفسك وفكرك، وتحب قريبك كنفسك".'],
+  ['b',3,'مين كاتب سفر الرؤيا؟','يوحنا الحبيب',['بولس','بطرس','لوقا'],'كان منفيًا في جزيرة بطمس','كتب يوحنا الحبيب سفر الرؤيا وهو منفي في جزيرة بطمس.']
+].map(r=>({cat:r[0], d:r[1], q:r[2], a:r[3], w:r[4], h:r[5], x:r[6]}));
+
+let fawTick = null, fawAnimKey = null;
+function fawShuffle(a){
+  a = a.slice();
+  for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; }
+  return a;
+}
+/* تتبّع الفوازير اللي اتلعبت قبل كده عشان كل جولة تيجي بفوازير جديدة لحد ما البنك يخلص */
+function fawUsedKey(){ return 'glavera-faw-used-'+(state.pid||'guest'); }
+function fawUsedGet(){ try{ const o = JSON.parse(localStorage.getItem(fawUsedKey())||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; } }
+function fawUsedSet(o){ try{ localStorage.setItem(fawUsedKey(), JSON.stringify(o)); }catch(e){} }
+function fawBuildRound(){
+  const used = fawUsedGet(), round = [];
+  [1,2,3].forEach((d,ti)=>{
+    const need = FAW_CFG.mix[ti];
+    const idxs = []; FAW_BANK.forEach((b,i)=>{ if(b.d===d) idxs.push(i); });
+    let u = Array.isArray(used[d]) ? used[d] : [];
+    let rem = idxs.filter(i=>!u.includes(i));
+    if(rem.length < need){ u = []; rem = idxs.slice(); }
+    const pick = fawShuffle(rem).slice(0, need);
+    used[d] = u.concat(pick);
+    pick.forEach(i=>{
+      const b = FAW_BANK[i], opts = fawShuffle([b.a].concat(b.w));
+      round.push({ cat:b.cat, d:b.d, q:b.q, h:b.h, x:b.x, o:opts, c:opts.indexOf(b.a) });
+    });
+  });
+  fawUsedSet(used);
+  return round;
+}
+function fawInit(){
+  fawStopTimer(); fawAnimKey = null;
+  state.faw = { i:0, round:fawBuildRound(), left:FAW_CFG.sec, picked:null, revealed:false, hint:false, score:0, correct:0, res:[], lastPts:0, finished:false, earned:0, bonus:0 };
+}
+function fawStopTimer(){ if(fawTick){ clearInterval(fawTick); fawTick = null; } }
+function fawStartTimer(){
+  fawStopTimer();
+  fawTick = setInterval(()=>{
+    const g = state.faw;
+    if(!g || g.finished || g.revealed || !document.getElementById('faw-overlay')){ fawStopTimer(); return; }
+    g.left--;
+    const t = document.getElementById('faw-time'), b = document.getElementById('faw-bar');
+    if(t){ t.textContent = '⏱️ '+Math.max(0,g.left)+' ث'; t.classList.toggle('warn', g.left<=5); }
+    if(b){ b.style.width = Math.max(0, g.left/FAW_CFG.sec*100)+'%'; b.classList.toggle('warn', g.left<=5); }
+    if(g.left<=0){ fawStopTimer(); fawReveal(null); }
+  }, 1000);
+}
+function openFawazeerGame(){
+  fawStopTimer(); fawAnimKey = null; state.faw = null;
+  const old = document.getElementById('faw-overlay'); if(old) old.remove();
+  const ov = document.createElement('div');
+  ov.id = 'faw-overlay'; ov.className = 'faw-overlay';
+  ov.innerHTML = '<div id="faw-shell" class="faw-shell"></div>';
+  document.body.appendChild(ov);
+  fawRender();
+  try{ SND.click(); }catch(e){}
+}
+function closeFawazeerGame(){
+  fawStopTimer(); state.faw = null;
+  const ov = document.getElementById('faw-overlay'); if(ov) ov.remove();
+  try{ SND.back(); }catch(e){}
+}
+async function fawSaveBest(g){
+  if(!state.pid) return;
+  try{
+    const st = myGameStats(state.pid);
+    if(!st.fawBest || g.earned > st.fawBest){ st.fawBest = g.earned; await saveGameStats(GAME_STATS); }
+  }catch(e){}
+}
+function fawReveal(idx){
+  const g = state.faw; if(!g || g.finished || g.revealed) return;
+  fawStopTimer();
+  const q = g.round[g.i];
+  g.picked = (idx===null || isNaN(idx)) ? null : idx;
+  g.revealed = true;
+  if(g.picked!==null && g.picked===q.c){
+    const pts = g.hint ? FAW_CFG.hinted : FAW_CFG.base + (g.left>=FAW_CFG.fastLeft ? FAW_CFG.fastBonus : 0);
+    g.lastPts = pts; g.score += pts; g.correct++; g.res.push('ok');
+    try{ SND.cheer(); }catch(e){}
+  } else {
+    g.lastPts = 0; g.res.push('bad');
+    try{ SND.error(); vibrate([15,40,15]); }catch(e){}
+  }
+  fawRender();
+}
+function fawHint(){
+  const g = state.faw; if(!g || g.finished || g.revealed || g.hint) return;
+  g.hint = true;
+  try{ SND.whoosh(); }catch(e){}
+  fawRender();
+}
+function fawNext(){
+  const g = state.faw; if(!g || g.finished || !g.revealed) return;
+  if(g.i >= g.round.length-1){ fawFinish(); return; }
+  g.i++; g.left = FAW_CFG.sec; g.picked = null; g.revealed = false; g.hint = false; g.lastPts = 0;
+  fawRender(); fawStartTimer();
+  try{ SND.click(); }catch(e){}
+}
+function fawFinish(){
+  const g = state.faw; if(!g || g.finished) return;
+  fawStopTimer();
+  g.finished = true;
+  g.bonus = (g.correct===g.round.length) ? FAW_CFG.perfect : 0;
+  g.earned = g.score + g.bonus;
+  fawSaveBest(g);
+  if(g.earned>0) awardSoloGamePoints(g.earned, 'فوازير مسيحية: حليت '+g.correct+' من '+g.round.length+' 🧩');
+  fawRender();
+}
+function fawTopHtml(act){
+  return `<div class="faw-top"><button type="button" class="icon-btn faw-back" data-action="${act}" aria-label="رجوع">${ICO.back}</button><div class="faw-title">🧩 فوازير</div><div class="faw-gap"></div></div>`;
+}
+function fawStartHtml(){
+  const st = state.pid ? myGameStats(state.pid) : {};
+  const best = st.fawBest ? `أفضل جولة ليك: ${st.fawBest} نقطة` : 'أول مرة تلعب اللعبة دي 🎉';
+  const maxPts = FAW_CFG.perRound*(FAW_CFG.base+FAW_CFG.fastBonus)+FAW_CFG.perfect;
+  return `
+    <div class="faw-start">
+      <div class="faw-start-ico">🧩</div>
+      <div class="faw-start-title">فوازير</div>
+      <div class="faw-start-sub">${FAW_CFG.perRound} فوازير دينية مسيحية، من شخصيات الكتاب المقدس وقصصه لحد الكنيسة وطقوسها. بتبدأ سهلة وبتصعب كل ما تتقدم.</div>
+      <ul class="faw-rules">
+        <li><b>⏱️</b><span>${FAW_CFG.sec} ثانية لكل فزورة</span></li>
+        <li><b>✅</b><span>الإجابة الصح = ${FAW_CFG.base} نقط، و+${FAW_CFG.fastBonus} لو جاوبت بسرعة</span></li>
+        <li><b>💡</b><span>التلميح بيساعدك، بس نقط الفزورة بتبقى ${FAW_CFG.hinted}</span></li>
+        <li><b>🏅</b><span>لو جاوبت الـ${FAW_CFG.perRound} صح تاخد +${FAW_CFG.perfect} مكافأة (أقصى نتيجة ${maxPts} نقطة)</span></li>
+      </ul>
+      <button type="button" class="btn btn-primary faw-cta" data-action="faw-start">🚀 ابدأ الفوازير</button>
+      <div class="hint">${best}</div>
+    </div>`;
+}
+function fawPlayHtml(g){
+  const q = g.round[g.i], n = g.round.length, cat = FAW_CATS[q.cat] || ['🧩','فزورة'];
+  const labels = ['أ','ب','ج','د'];
+  const fresh = (fawAnimKey !== g.i); if(fresh) fawAnimKey = g.i;
+  const ok = g.revealed && g.picked!==null && g.picked===q.c;
+  const segs = g.round.map((_,k)=>{ const r = g.res[k]; return `<i class="faw-seg ${r==='ok'?'ok':(r==='bad'?'bad':(k===g.i?'cur':''))}"></i>`; }).join('');
+  const opts = q.o.map((t,i)=>{
+    let cls = '', badge = labels[i];
+    if(g.revealed){
+      if(i===q.c){ cls = ' correct'; badge = '✓'; }
+      else if(i===g.picked){ cls = ' wrong'; badge = '✗'; }
+      else cls = ' dim';
+    }
+    return `<button type="button" class="faw-opt${cls}${fresh?' fresh':''}" data-action="faw-pick" data-idx="${i}" ${g.revealed?'disabled':''}><span class="k">${badge}</span><span class="t">${escapeHtml(t)}</span></button>`;
+  }).join('');
+  const head = g.picked===null && g.revealed ? '⏰ خلص الوقت!' : (ok ? `🎉 إجابة صح! +${g.lastPts} نقطة` : '❌ إجابة غلط');
+  const exp = g.revealed ? `
+    <div class="faw-exp ${ok?'ok':'bad'}">
+      <div class="faw-exp-h">${head}</div>
+      <div class="faw-exp-t">الإجابة: <b>${escapeHtml(q.o[q.c])}</b><br>${escapeHtml(q.x)}</div>
+    </div>` : '';
+  const hintBox = (g.hint && !g.revealed) ? `<div class="faw-hint">💡 ${escapeHtml(q.h)}</div>` : '';
+  const actions = g.revealed
+    ? `<button type="button" class="btn btn-primary faw-cta" data-action="faw-next">${g.i>=n-1 ? 'شوف النتيجة 🏆' : 'الفزورة اللي بعدها ◀'}</button>`
+    : `<button type="button" class="btn btn-outline faw-hintbtn" data-action="faw-hint" ${g.hint?'disabled':''}>💡 ${g.hint?'اتفتح التلميح':'تلميح (نقط الفزورة هتبقى '+FAW_CFG.hinted+')'}</button>`;
+  const warn = (!g.revealed && g.left<=5) ? ' warn' : '';
+  return `
+    <div class="faw-segs">${segs}</div>
+    <div class="faw-stats">
+      <span class="faw-chip">${cat[0]} ${cat[1]}</span>
+      <span class="faw-chip faw-chip-n">فزورة ${g.i+1} / ${n}</span>
+      <span class="faw-chip faw-chip-pts">🏆 ${g.score}</span>
+    </div>
+    ${g.revealed ? '' : `<div class="faw-timerrow"><div class="faw-timer"><i id="faw-bar" class="${warn.trim()}" style="width:${Math.max(0,g.left/FAW_CFG.sec*100)}%"></i></div><span class="faw-time${warn}" id="faw-time">⏱️ ${Math.max(0,g.left)} ث</span></div>`}
+    <div class="faw-q${fresh?' fresh':''}"><div class="faw-q-tag">🧩 فزورة</div><div class="faw-q-t">${escapeHtml(q.q)}</div></div>
+    ${hintBox}
+    <div class="faw-opts">${opts}</div>
+    ${exp}
+    <div class="faw-actions">${actions}</div>`;
+}
+function fawOverHtml(g){
+  const n = g.round.length, perfect = g.bonus>0;
+  const ico = perfect ? '👑' : (g.correct>=7 ? '🏆' : (g.correct>=4 ? '👏' : '📖'));
+  const title = perfect ? 'ممتاز! حليت كل الفوازير' : (g.correct>=7 ? 'شاطر جدًا!' : (g.correct>=4 ? 'كويس، كمّل وهتتحسن' : 'محتاج مراجعة بسيطة، جرّب تاني'));
+  const segs = g.round.map((_,k)=>`<i class="faw-seg ${g.res[k]==='ok'?'ok':'bad'}"></i>`).join('');
+  return `
+    <div class="faw-over">
+      <div class="faw-over-ico">${ico}</div>
+      <div class="faw-over-title">${title}</div>
+      <div class="faw-segs" style="width:100%">${segs}</div>
+      <div class="faw-sum">
+        <div><span>الإجابات الصح</span><b>${g.correct} من ${n}</b></div>
+        <div><span>نقط الفوازير</span><b>${g.score}</b></div>
+        ${perfect ? `<div><span>مكافأة الجولة الكاملة 🏅</span><b>+${g.bonus}</b></div>` : ''}
+        <div class="tot"><span>إجمالي النقط</span><b>🏆 ${g.earned}</b></div>
+      </div>
+      <button type="button" class="btn btn-primary faw-cta" data-action="faw-reset">🔄 جولة جديدة</button>
+      <button type="button" class="btn btn-outline faw-cta" data-action="faw-exit">خروج</button>
+    </div>`;
+}
+function fawRender(){
+  const shell = document.getElementById('faw-shell'); if(!shell) return;
+  const g = state.faw;
+  let top, body;
+  if(!g){ top = fawTopHtml('faw-exit'); body = fawStartHtml(); }
+  else if(g.finished){ top = fawTopHtml('faw-exit'); body = fawOverHtml(g); }
+  else { top = fawTopHtml('faw-close'); body = fawPlayHtml(g); }
+  shell.innerHTML = top + `<div class="faw-body">${body}</div>`;
+  const b = shell.querySelector('.faw-body'); if(b && g && !g.finished && !g.revealed) { /* keep scroll at top for a new riddle */ shell.scrollTop = 0; }
 }
 
 /* ============================= GAMES: DOMINO ============================= */
@@ -35761,6 +36166,7 @@ document.addEventListener('click', (e)=>{
     if(gid==='cube'){ openCubeGame(); return; }
     if(gid==='blocky'){ openBlockyGame(); return; }
     if(gid==='millionaire'){ openMillionaireGame(); return; }
+    if(gid==='fawazeer'){ openFawazeerGame(); return; }
     if(gid==='revword'){ openRevWordGame(); return; }
     if(gid==='who'){ openWhoGame(); return; }
     if(gid==='colorcards'){ openColorCardsGame(); return; }
@@ -35812,6 +36218,11 @@ document.addEventListener('click', (e)=>{
   else if(action==='mil-audience'){ doMilAudience(); }
   else if(action==='mil-phone'){ doMilPhone(); }
   else if(action==='mil-walk'){ doMilWalkAway(); }
+  else if(action==='faw-close' || action==='faw-exit'){ closeFawazeerGame(); }
+  else if(action==='faw-start' || action==='faw-reset'){ fawInit(); fawRender(); fawStartTimer(); try{ SND.click(); }catch(_){} }
+  else if(action==='faw-pick'){ fawReveal(parseInt(el.dataset.idx,10)); }
+  else if(action==='faw-hint'){ fawHint(); }
+  else if(action==='faw-next'){ fawNext(); }
   else if(action==='open-room-cat'){ go('game-rooms-cat', {roomCatKey: el.dataset.cat}); }
   else if(action==='open-rooms'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } state.friendTile = null; go('game-rooms'); }
   else if(action==='open-visa'){ openVisaPage(); }
@@ -50359,7 +50770,7 @@ html[data-theme="dark"] body .su-meter.full .msg, html[data-theme="dark"] body .
 (function(){
   if(window.gxExitConfirm) return;
   var EMO = {ludo:'🎲',connect4:'🔴',domino:'🎴',chess:'♟️',checkers:'⚫',colorcards:'🎴',memory:'🧠',rps:'✊',backgammon:'🎲',snakes:'🐍',reflex:'⚡',math:'➗',numguess:'🔢',placemem:'📍',sqorder:'🔲',bus:'🚌',tmm:'🎯',
-    billiards:'🎱',stack:'🧱',cube:'🧊',blocky:'🟦',darts:'🎯',bowling:'🎳',millionaire:'👑',revword:'🔤',who:'🕵️',crossmath:'➕',rollpaint:'🎨',simon:'🎵',quiz:'❓',mystery:'🕵️',emojibible:'😀',proverb:'📜'};
+    billiards:'🎱',stack:'🧱',cube:'🧊',blocky:'🟦',darts:'🎯',bowling:'🎳',millionaire:'👑',fawazeer:'🧩',revword:'🔤',who:'🕵️',crossmath:'➕',rollpaint:'🎨',simon:'🎵',quiz:'❓',mystery:'🕵️',emojibible:'😀',proverb:'📜'};
   var open = null;
   function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function art(g){
@@ -50429,7 +50840,7 @@ html[data-theme="dark"] body .su-meter.full .msg, html[data-theme="dark"] body .
   };
 
   /* ---------- اعتراض أزرار الخروج في كل الألعاب ---------- */
-  var EXIT_ACTIONS = {'billiards-close':'billiards','stack-close':'stack','cube-close':'cube','blk-close':'blocky','darts-close':'darts','bowling-close':'bowling','mil-close':'millionaire'};
+  var EXIT_ACTIONS = {'billiards-close':'billiards','stack-close':'stack','cube-close':'cube','blk-close':'blocky','darts-close':'darts','bowling-close':'bowling','mil-close':'millionaire','faw-close':'fawazeer'};
   var bypass = false;
   document.addEventListener('click', function(e){
     if(bypass || e.isTrusted===false) return;
