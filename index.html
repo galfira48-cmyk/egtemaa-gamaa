@@ -15707,7 +15707,7 @@ const TOUR_STEPS = [
   {v:'visa-history', ch:'الفيزا', ico:'🔎', t:'فلترة العمليات', x:'فلتر كشفك بالفترة (اليوم، آخر 7 أيام، آخر 30 يوم) وبنوع العملية: وارد، صادر، تحويلات، مشتريات، ألعاب. وتقدر تنزّله كملف Excel.', s:'.vst-chip'},
   /* ===== الاقتصاد والاستثمار ===== */
   {v:'eco', ch:'الاقتصاد والاستثمار', ico:'📊', t:'إيه هو الاقتصاد والاستثمار؟', x:'قسم بتشغّل فيه نقاط فيزتك بدل ما تفضل واقفة. بتفتحه من صفحة الفيزا بزرار «الاستثمار والاقتصاد». النقاط هنا هي نقاط الفيزا (نقاط الألعاب)، ومالهاش علاقة بنقاط الحضور.', d:['ثروتك الكلية = رصيد الفيزا + التوفير + الودائع + قيمة أسهمك.','كل عملية بتخصم أو بترجّع من فيزتك فعلاً وبتظهر في كشف الحساب.','العمليات الحساسة (إيداع، وديعة، شراء) بتطلب الرقم السري.','المنظمين ممكن يقفلوا القسم مؤقتًا، ساعتها هتشوف علامة 🔒.'], s:['#eco-net','.back-title'], pos:'below'},
-  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🗂️', t:'التابات الخمسة', x:'محفظتي، السوق، المستشار، أعمال، المدينة. بتتنقل بينهم من الشريط ده.', d:['💰 محفظتي: توفير وودائع وهدف.','📈 السوق: أسهم.','🧠 المستشار: تحليل ذكي لمحفظتك.','🏢 أعمال: شركات وخدمات.','🏙️ المدينة: وظايف وقروض وترتيب الموسم.'], s:['[data-eco="tab"]'], all:true},
+  {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🗂️', t:'الأقسام الستة', x:'تحت كارت الثروة شريط فيه ستة أقسام، بتتنقل بينهم بضغطة.', d:['🏠 الرئيسية: مهامك، صحة محفظتك، توزيع ثروتك ومواعيدك.','💰 فلوسي: توفير وودائع وهدف وقرض وبنك الاجتماع.','📈 الأسهم: السوق والأخبار وقائمة المراقبة.','🧠 المستشار: تحليل ومحاكاة وتحديات وسؤال اليوم.','🏢 أعمال: شركات وخدمات ومزادات.','🏙️ المدينة: وظايف وصندوق العطاء وترتيب الموسم.'], s:['.eco-nav'], all:true},
   {v:'eco', ch:'الاقتصاد والاستثمار', ico:'💰', t:'حساب التوفير', x:'ودّع نقاط من فيزتك في التوفير وخدها بفايدة أسبوعية يحددها المنظمين (مكتوبة فوق الخانة).', d:['اكتب المبلغ وادوس «إيداع» (بيطلب الرقم السري).','«سحب» بيرجّع النقاط لفيزتك في أي وقت.','الفايدة بتتحسب على رصيد التوفير.'], s:['#e-a'], pre:()=>{ setTimeout(()=>{ try{ const b=document.querySelector('[data-eco="tab"][data-v="w"]'); b&&b.click(); }catch(e){} },900); }},
   {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🔐', t:'الودائع المقفولة', x:'اقفل مبلغ لمدة أسبوع أو شهر بفايدة أعلى. الحد الأدنى 10 نقاط.', d:['النقاط بتتقفل لحد انتهاء المدة ومينفعش تسحبها قبلها.','لما المدة تخلص بيظهر زرار «استلم» وبتاخد أصل المبلغ + الفايدة.','فايدة الشهر أعلى من فايدة الأسبوع.'], s:['#e-d']},
   {v:'eco', ch:'الاقتصاد والاستثمار', ico:'🎯', t:'هدفي وحاسبة التوفير والادخار التلقائي', x:'حدد هدف بالنقاط وشوف نسبة وصولك له، وجرّب الحاسبة قبل ما تقرر.', d:['اكتب اسم الهدف والمبلغ المطلوب وادوس «حفظ الهدف».','الادخار التلقائي: مبلغ أسبوعي (5 نقاط أو أكتر) بيتحول من الفيزا للتوفير لو رصيدك يسمح.','الحاسبة بتوريك ربحك المركّب بعد عدد أسابيع تختاره.'], s:['#g-n','#sm-a']},
@@ -47007,13 +47007,223 @@ load(true);
 (function(){
 const K='glv-eco',W=6048e5,H=36e5,T=()=>Date.now(),fl=Math.floor;
 const ST=[{id:'g',n:'🎮 ألعاب الاجتماع',b:100,s:1},{id:'c',n:'🛍️ متجر الشوب',b:60,s:2.3},{id:'t',n:'🚌 رحلات وفعاليات',b:150,s:3.7},{id:'m',n:'🎬 ميديا واستوديو',b:80,s:5.1}];
-let anim=false,lastNet=0,lastP={},E={},U={},LB={},A={},tab='w',ok=false,tx=[],nt=false;const BD=[{k:'sv',n:'🐜 مدّخر ذكي',c:()=>U.sav>=100},{k:'in',n:'📈 مستثمر',c:()=>Object.keys(U.hold).length>=1},{k:'dv',n:'🧩 محفظة متنوعة',c:()=>Object.keys(U.hold).length>=3},{k:'pt',n:'🔒 مستثمر صبور',c:()=>(U.pdone||0)>=1},{k:'cr',n:'🏅 ثقة عالية',c:()=>U.cr>=80},{k:'co',n:'🏢 صاحب شركة',c:()=>(E.cos||[]).some(c=>c.own===pid())}];
+let anim=false,lastNet=0,lastP={},E={},U={},LB={},A={},tab='h',ok=false,tx=[],nt=false;const BD=[{k:'sv',n:'🐜 مدّخر ذكي',c:()=>U.sav>=100},{k:'in',n:'📈 مستثمر',c:()=>Object.keys(U.hold).length>=1},{k:'dv',n:'🧩 محفظة متنوعة',c:()=>Object.keys(U.hold).length>=3},{k:'pt',n:'🔒 مستثمر صبور',c:()=>(U.pdone||0)>=1},{k:'cr',n:'🏅 ثقة عالية',c:()=>U.cr>=80},{k:'co',n:'🏢 صاحب شركة',c:()=>(E.cos||[]).some(c=>c.own===pid())}];
 const sty=document.createElement('style');sty.textContent='@keyframes ecoUp{from{opacity:0;transform:translateY(12px)}}@keyframes ecoDonut{from{stroke-dasharray:0 188.5}}@keyframes ecoDraw{from{stroke-dashoffset:140}}@keyframes ecoRing{from{stroke-dashoffset:214}}@keyframes ecoFlashG{0%{background:rgba(34,197,94,.5)}100%{background:transparent}}@keyframes ecoFlashR{0%{background:rgba(239,68,68,.5)}100%{background:transparent}}@keyframes ecoCoin{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(540deg)}}@keyframes ecoPop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}.eco-in>*{animation:ecoUp .4s ease both}.eco-in>*:nth-child(2){animation-delay:.06s}.eco-in>*:nth-child(3){animation-delay:.12s}.eco-in>*:nth-child(n+4){animation-delay:.18s}.eco-sp polyline{stroke-dasharray:140;animation:ecoDraw .9s ease both}.eco-c{position:fixed;z-index:99999;pointer-events:none;font-size:22px;animation:ecoCoin 1.1s ease-out forwards}@media(prefers-reduced-motion:reduce){.eco-in>*,.eco-sp polyline,.eco-c{animation:none!important}}';document.head.appendChild(sty);
+const sty2=document.createElement('style');sty2.textContent=`
+.eco2{--ec:var(--gold);padding-bottom:28px}
+.eco2[data-t=w]{--ec:var(--good)}
+.eco2[data-t=m]{--ec:var(--violet)}
+.eco2[data-t=i]{--ec:#6AB0FF}
+.eco2[data-t=b]{--ec:var(--coral)}
+.eco2[data-t=c]{--ec:var(--teal)}
+.eco-top{padding:16px 0 8px}
+.eco-sub{font-size:12px;color:var(--text-muted);margin-top:1px}
+.eco-hero{margin:6px 0 4px;padding:18px 18px 16px;border-radius:26px;background:radial-gradient(120% 90% at 100% 0%,rgba(244,183,64,.16),transparent 55%),linear-gradient(170deg,var(--surface-2),var(--surface));border:1px solid var(--border);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.eco-hrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.eco-k{font-size:13px;color:var(--text-muted);font-weight:700;margin-inline-end:auto}
+.eco-wk{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px}
+.eco-wk.up{background:rgba(95,224,164,.14);color:var(--good)}
+.eco-wk.dn{background:rgba(255,107,107,.14);color:var(--danger)}
+.eco-adm{appearance:none;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);font:inherit;font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:99px;cursor:pointer}
+.eco-adm.on{background:var(--gold);color:#221900;border-color:transparent}
+.eco-num{display:flex;align-items:baseline;gap:8px;margin:6px 0 14px;font-family:'Cairo',sans-serif;font-weight:900;font-size:46px;line-height:1.05;font-variant-numeric:tabular-nums}
+.eco-num small{font-size:15px;font-weight:700;color:var(--text-muted)}
+.eco-bar{display:flex;gap:3px;height:14px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.07)}
+.eco-bar i{display:block;min-width:6px;border-radius:99px}
+.eco-leg{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;margin-top:12px}
+.eco-lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-muted)}
+.eco-lg i{width:9px;height:9px;border-radius:3px;flex:none}
+.eco-lg b{margin-inline-start:auto;color:var(--text);font-weight:800;font-variant-numeric:tabular-nums}
+.eco-lg.z{opacity:.45}
+.eco-lv{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--border);font-size:12.5px}
+.eco-lv>span{font-weight:800;white-space:nowrap}
+.eco-xp{flex:1;height:6px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden}
+.eco-xp i{display:block;height:100%;background:var(--gold);border-radius:9px}
+.eco-lv small{color:var(--text-muted);white-space:nowrap;font-size:11px}
+.eco-nav{position:sticky;top:6px;z-index:6;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:3px;padding:5px;margin:10px 0 6px;border-radius:20px;background:var(--bg-2);background:color-mix(in srgb,var(--bg-2) 90%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--border)}
+.eco-nb{appearance:none;border:0;background:transparent;font-family:'Cairo',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;padding:6px 1px;border-radius:15px;color:var(--text-muted);font-size:11px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.eco-nb .i{font-size:19px;line-height:1;opacity:.75;filter:grayscale(.5)}
+.eco-nb.on{background:var(--ec);color:#1a1300}
+.eco-nb.on .i{opacity:1;filter:none}
+.eco-nb:focus-visible,.eco-adm:focus-visible{outline:2px solid var(--ec);outline-offset:1px}
+.eco2 [style*="--ecoc"]>b:first-child{display:block;font-size:14.5px;font-weight:800;margin-bottom:2px}
+.eco2 .btn{border-radius:12px!important;box-shadow:none!important;font-weight:800}
+.eco2 .btn-primary{background:var(--ec)!important;color:#1a1300!important}
+.eco2 .btn-ghost{background:transparent!important;border:1px solid var(--border)!important}
+.eco2 .field{padding:11px 14px;border-radius:12px;font-size:14px}
+.eco2 [style*="space-between"]>.btn{width:auto;flex:none;padding:7px 14px!important}
+.eco-hero{position:relative}
+.eco-spk{position:absolute;left:16px;top:50px;width:42%;height:46px;pointer-events:none}
+.eco-ins{display:flex;align-items:center;gap:11px;margin:10px 0 4px;padding:11px 12px;border-radius:16px;background:linear-gradient(100deg,color-mix(in srgb,var(--ec) 20%,transparent),transparent 80%),var(--ecs,var(--surface));border:1px solid color-mix(in srgb,var(--ec) 40%,transparent)}
+.eco-ins.s1{border-color:var(--danger)}
+.eco-ins .ico{font-size:22px;flex:none}
+.eco-ins>div{flex:1;font-size:13px;font-weight:700;line-height:1.5}
+.eco-ins small{display:block;font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:1px}
+.eco-ins button{appearance:none;border:0;font:inherit;font-weight:800;font-size:12px;padding:8px 14px;border-radius:12px;background:var(--ec);color:#1a1300;cursor:pointer;flex:none}
+.eco-qg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 2px}
+.eco-qa{appearance:none;border:1px solid var(--ecb,var(--border));background:var(--ecs,var(--surface));color:var(--text);font:inherit;font-size:12px;font-weight:800;border-radius:16px;padding:11px 4px 9px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.eco-qa span{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;font-size:19px;background:color-mix(in srgb,var(--ec) 22%,transparent)}
+.eco-qa:active,.eco-nb:active{transform:scale(.96)}
+.eco-tk{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin:10px 0 2px;padding-bottom:4px;scrollbar-width:none}
+.eco-tk::-webkit-scrollbar{display:none}
+.eco-t{flex:none;scroll-snap-align:start;min-width:132px;padding:10px 12px;border-radius:14px;background:var(--ecs,var(--surface));border:1px solid var(--ecb,var(--border));display:flex;flex-direction:column;gap:2px;font-size:12px}
+.eco-t b{font-size:20px;font-family:'Cairo',sans-serif;font-variant-numeric:tabular-nums}
+.eco-t em{font-style:normal;font-weight:800;font-size:11.5px}
+.eco-t em.up{color:var(--good)}.eco-t em.dn{color:var(--danger)}
+.eco-skel{display:grid;gap:10px;margin-top:10px}
+.eco-skel i{display:block;height:92px;border-radius:18px;background:linear-gradient(100deg,rgba(255,255,255,.04) 30%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.04) 70%) var(--surface);background-size:200% 100%;animation:ecoSh 1.2s linear infinite}
+@keyframes ecoSh{to{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){.eco-skel i{animation:none}}
+.eco2[data-skin=glass]{--ecs:rgba(255,255,255,.065);--ecb:rgba(255,255,255,.16);--ecr:20px}
+.eco2[data-skin=glass] [style*="--ecoc"]{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.eco2[data-skin=glass] .eco-hero{background:radial-gradient(90% 120% at 0% 0%,rgba(63,220,201,.28),transparent 60%),radial-gradient(90% 120% at 100% 100%,rgba(155,140,255,.34),transparent 60%),rgba(255,255,255,.05);border-color:rgba(255,255,255,.2)}
+.eco2[data-skin=luxe]{--ecs:#14110a;--ecb:rgba(244,183,64,.32);--ecr:10px}
+.eco2[data-skin=luxe][data-t]{--ec:var(--gold)}
+.eco2[data-skin=luxe] .eco-hero{background:linear-gradient(160deg,#1d1708,#0b0905);border-color:rgba(244,183,64,.5);border-radius:14px}
+.eco2[data-skin=luxe] .eco-num span{background:linear-gradient(180deg,#FFE9B0,#F4B740);-webkit-background-clip:text;background-clip:text;color:transparent}
+.eco2[data-skin=neon]{--ecs:#0a0f22;--ecb:rgba(63,220,201,.35);--ecr:14px}
+.eco2[data-skin=neon][data-t]{--ec:#3FDCC9}
+.eco2[data-skin=neon] [style*="--ecoc"]{box-shadow:0 0 18px -6px rgba(63,220,201,.45)}
+.eco2[data-skin=neon] .eco-hero{background:linear-gradient(140deg,#071a2b,#1a0b33);border-color:rgba(255,80,200,.5);box-shadow:0 0 26px -8px rgba(255,80,200,.55)}
+.eco2[data-skin=neon] .eco-num span{color:#7CFFF1;text-shadow:0 0 18px rgba(63,220,201,.7)}
+.eco2[data-skin=emerald]{--ecs:#0c211d;--ecb:rgba(74,222,154,.28);--ecr:18px}
+.eco2[data-skin=emerald][data-t]{--ec:#4ADE9A}
+.eco2[data-skin=emerald] .eco-hero{background:linear-gradient(160deg,#0f3a2f,#08181a);border-color:rgba(74,222,154,.4)}
+`;document.head.appendChild(sty2);
+
+const sty3=document.createElement('style');sty3.textContent=`
+/* ===== هيكل التنقل: شريط رئيسي + قائمة فرعية لكل خانة ===== */
+.eco-stk{position:sticky;top:6px;z-index:6;margin:10px 0 6px}
+.eco-stk .eco-nav{position:relative;top:auto;margin:0;z-index:auto;--n:6}
+.eco-sent{display:block;height:0}
+.eco-nb{position:relative;z-index:1;min-height:50px;transition:color .3s,transform .15s}
+.eco-nb .i{transition:transform .35s cubic-bezier(.3,1.6,.5,1),opacity .3s,filter .3s}
+.eco-nb.on .i{transform:translateY(-1px) scale(1.18)}
+.eco-nb.on{background:transparent}
+.eco-ni{position:absolute;z-index:0;top:5px;bottom:5px;inset-inline-start:5px;width:calc((100% - 10px - (var(--n) - 1)*3px)/var(--n));border-radius:15px;background:var(--ec);box-shadow:0 8px 18px -8px var(--ec);transform:translateX(calc(var(--i,0)*(100% + 3px)*-1));transition:transform .45s cubic-bezier(.3,1.3,.5,1),background .35s,opacity .25s}
+.eco-ni.off{opacity:0}
+.eco-sn{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:6px;padding:5px;border-radius:18px;background:var(--bg-2);background:color-mix(in srgb,var(--bg-2) 90%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--border);-webkit-overflow-scrolling:touch}
+.eco-sn::-webkit-scrollbar{display:none}
+.eco-sb{position:relative;appearance:none;flex:1 0 auto;justify-content:center;display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;border:1px solid transparent;background:transparent;color:var(--text-muted);font-family:'Cairo',sans-serif;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:background .3s,color .3s,border-color .3s,transform .15s}
+.eco-sb span{font-size:15px;line-height:1}
+.eco-sb.on{background:color-mix(in srgb,var(--ec) 20%,transparent);border-color:color-mix(in srgb,var(--ec) 70%,transparent);color:var(--text)}
+.eco-sb:active,.eco-hx:active{transform:scale(.95)}
+.eco-sb:focus-visible,.eco-hx:focus-visible{outline:2px solid var(--ec);outline-offset:1px}
+.eco2.nv .eco-sb.on{animation:ecoChip .4s cubic-bezier(.3,1.5,.5,1)}
+.eco-dot{position:absolute;top:5px;inset-inline-end:7px;width:8px;height:8px;border-radius:50%;background:var(--danger);animation:ecoPulse 1.8s infinite}
+.eco-nb .eco-dot{top:5px;inset-inline-end:calc(50% - 20px)}
+/* ===== رأس كل خانة ===== */
+.eco-ph{display:flex;align-items:center;gap:12px;margin:12px 2px 8px}
+.eco-pi{flex:none;width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:24px;background:linear-gradient(145deg,color-mix(in srgb,var(--ec) 36%,transparent),color-mix(in srgb,var(--ec) 8%,transparent));border:1px solid color-mix(in srgb,var(--ec) 45%,transparent)}
+.eco2.nv .eco-pi{animation:ecoPop .5s ease both}
+.eco-pt b{display:block;font-size:17px;font-weight:900;font-family:'Cairo',sans-serif}
+.eco-pt small{display:block;font-size:12px;color:var(--text-muted);margin-top:1px}
+.eco-kps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 4px}
+.eco-kp{padding:9px 10px;border-radius:14px;background:var(--ecs,var(--surface));border:1px solid var(--ecb,var(--border));display:flex;flex-direction:column;gap:1px;min-width:0}
+.eco-kp span{font-size:11px;color:var(--text-muted);font-weight:700}
+.eco-kp b{font-family:'Cairo',sans-serif;font-size:19px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--ec);line-height:1.2}
+.eco-kp small{font-size:10.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ===== الكارت الرئيسي قابل للطي ===== */
+.eco-hx{appearance:none;border:0;background:transparent;color:var(--text-muted);font:inherit;font-size:11.5px;font-weight:800;display:flex;align-items:center;gap:7px;margin:10px auto 0;padding:5px 12px;border-radius:99px;cursor:pointer;transition:transform .15s}
+.eco-hx i{width:7px;height:7px;border-inline-end:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);transition:transform .4s cubic-bezier(.3,1.4,.5,1)}
+.eco-hero.open .eco-hx i{transform:rotate(-135deg) translate(-2px,-2px)}
+.eco-hd{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .45s cubic-bezier(.2,.8,.2,1),opacity .35s}
+.eco-hero.open .eco-hd{grid-template-rows:1fr;opacity:1}
+.eco-hdi{overflow:hidden;min-height:0}
+.eco-hero:not(.open) .eco-num{margin-bottom:12px}
+
+/* ===== بانر كل خانة ===== */
+.eco-bn{position:relative;overflow:hidden;margin:12px 0 10px;padding:18px 16px 14px;border-radius:24px;background:radial-gradient(120% 90% at 100% 0%,color-mix(in srgb,var(--b1) 22%,transparent),transparent 60%),radial-gradient(90% 80% at 0% 100%,color-mix(in srgb,var(--b2) 16%,transparent),transparent 65%),linear-gradient(165deg,#181c4a,#0d1030);border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 14px 30px -18px var(--b1)}
+.eco-bn::before{content:'';position:absolute;inset-inline:0;top:0;height:3px;background:linear-gradient(90deg,var(--b1),var(--b2))}
+.eco-bl{display:none}
+.eco-bw{position:absolute;inset-inline-start:14px;top:14px;font-size:58px;line-height:1;opacity:.1;pointer-events:none;animation:ecoSpin 10s ease-in-out infinite}
+.eco-bt{position:relative;margin-bottom:14px}
+.eco-bt b{display:block;font-family:'Cairo',sans-serif;font-size:25px;font-weight:900;color:#fff;letter-spacing:.2px}
+.eco-bt small{display:block;font-size:12.5px;color:rgba(255,255,255,.62);margin-top:3px}
+.eco-bn .eco-kps{position:relative;margin:0;gap:8px}
+.eco-bn .eco-kp{position:relative;overflow:hidden;padding:10px 10px 9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px}
+.eco-bn .eco-kp::before{content:'';position:absolute;inset-inline:10px;top:0;height:2px;border-radius:0 0 4px 4px;background:var(--b1)}
+.eco-bn .eco-kp span{color:rgba(255,255,255,.6)}
+.eco-bn .eco-kp b{color:#fff;font-size:21px}
+.eco-bn .eco-kp small{color:var(--b1);font-weight:700}
+.eco2.nv .eco-bn{animation:ecoBn .5s cubic-bezier(.2,.8,.2,1) both}
+.eco2.nv .eco-kp{animation:ecoPop .55s ease both}
+.eco2.nv .eco-kp:nth-child(2){animation-delay:.08s}.eco2.nv .eco-kp:nth-child(3){animation-delay:.16s}
+.eco-sh{display:flex;align-items:center;gap:10px;margin:8px 2px 2px}
+.eco-sh span{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-size:18px;background:rgba(255,255,255,.06);border:1px solid color-mix(in srgb,var(--ec) 55%,transparent)}
+.eco-sh b{display:block;font-size:15px;font-weight:900}
+.eco-sh small{display:block;font-size:11.5px;color:var(--text-muted)}
+.eco2.nv .eco-sh{animation:ecoUp .4s ease both}
+
+.eco-bn{background:radial-gradient(70% 90% at 12% 20%,color-mix(in srgb,var(--b1) 26%,transparent),transparent 70%),radial-gradient(80% 90% at 100% 100%,color-mix(in srgb,var(--b2) 20%,transparent),transparent 65%),linear-gradient(165deg,#1a1e50,#0c0f2e)}
+.eco-bn::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(rgba(255,255,255,.09) 1px,transparent 1.2px) 0 0/13px 13px;-webkit-mask-image:linear-gradient(100deg,#000,transparent 70%);mask-image:linear-gradient(100deg,#000,transparent 70%)}
+.eco-ar{position:absolute;inset-inline-end:auto;left:6px;top:8px;width:150px;height:94px;pointer-events:none;overflow:visible;filter:drop-shadow(0 6px 14px color-mix(in srgb,var(--b1) 45%,transparent))}
+.eco-bt{max-width:calc(100% - 150px);min-height:78px}
+.eco-bt b{font-size:26px}
+.ar-up{transform-box:fill-box;transform-origin:50% 100%;animation:arUp 2.4s ease-in-out infinite alternate}
+.ar-pulse{transform-box:fill-box;transform-origin:center;animation:arPulse 2.2s ease-in-out infinite}
+.ar-ring{transform-box:fill-box;transform-origin:center;animation:arRing 2.4s ease-out infinite}
+.ar-float{animation:ecoFloat 4.5s ease-in-out infinite}
+.ar-bob{animation:arBob 3s ease-in-out infinite}
+.ar-tw{animation:arTw 2.4s ease-in-out infinite}
+.ar-draw{stroke-dasharray:240;stroke-dashoffset:240;animation:arDraw 3.4s ease-in-out infinite}
+@keyframes arUp{from{transform:scaleY(.55)}to{transform:scaleY(1)}}
+@keyframes arPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+@keyframes arRing{from{transform:scale(.6);opacity:.9}to{transform:scale(1.6);opacity:0}}
+@keyframes arBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes arTw{0%,100%{opacity:.2}50%{opacity:1}}
+@keyframes arDraw{0%{stroke-dashoffset:240}60%,100%{stroke-dashoffset:0}}
+@media(prefers-reduced-motion:reduce){.ar-up,.ar-pulse,.ar-ring,.ar-float,.ar-bob,.ar-tw,.ar-draw{animation:none!important;stroke-dashoffset:0}}
+/* هوية كل خانة في الكروت */
+.eco2 [style*="--ecoc"]{position:relative;overflow:hidden}
+.eco2 [style*="--ecoc"]::after{content:'';position:absolute;pointer-events:none;inset-inline-end:-34px;top:-34px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,var(--ec),transparent 68%);opacity:.07}
+.eco2[data-t=m] [style*="--ecoc"]::after{inset:0;width:auto;height:auto;border-radius:0;background:repeating-linear-gradient(-45deg,var(--ec) 0 1px,transparent 1px 14px);opacity:.04}
+.eco2[data-t=i] [style*="--ecoc"]::after{background:conic-gradient(from 90deg,var(--ec),transparent 40%,var(--ec));opacity:.1;border-radius:0 0 0 100%}
+.eco2[data-t=b] [style*="--ecoc"]::after{width:90px;height:90px;border-radius:22px;transform:rotate(25deg);background:linear-gradient(135deg,var(--ec),transparent 70%);opacity:.16}
+.eco2[data-t=c] [style*="--ecoc"]::after{inset:auto;bottom:-30px;top:auto;width:150px;height:70px;border-radius:50% 50% 0 0;background:linear-gradient(0deg,var(--ec),transparent);opacity:.14}
+@keyframes ecoFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(18px,14px)}}
+@keyframes ecoSpin{0%,100%{transform:rotate(-12deg) scale(1)}50%{transform:rotate(-4deg) scale(1.1)}}
+@keyframes ecoBn{from{opacity:0;transform:scale(.96) translateY(10px)}}
+/* ===== حركة المحتوى ===== */
+@keyframes ecoSlide{from{opacity:0;transform:translateX(var(--sx,0px))}}
+@keyframes ecoChip{0%{transform:scale(.88)}100%{transform:scale(1)}}
+@keyframes ecoPulse{0%{box-shadow:0 0 0 0 rgba(255,107,107,.65)}70%{box-shadow:0 0 0 7px rgba(255,107,107,0)}100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}}
+@keyframes ecoGrow{from{transform:scaleX(0)}}
+.eco-body{min-height:55vh}
+.eco-body.eco-in{animation:ecoSlide .38s cubic-bezier(.2,.8,.2,1) both}
+.eco-fill{transform-origin:100% 50%}
+.eco2.nv .eco-fill{animation:ecoGrow .9s cubic-bezier(.2,.8,.2,1) .15s both}
+.eco2 [style*="--ecoc"]{transition:transform .22s,box-shadow .25s,border-color .25s}
+@media(hover:hover){.eco2 [style*="--ecoc"]:hover{transform:translateY(-2px);box-shadow:0 12px 26px -16px var(--ec)}}
+.eco-qa,.eco-t,.eco-ins{transition:transform .2s,box-shadow .25s}
+@media(hover:hover){.eco-qa:hover,.eco-t:hover{transform:translateY(-2px);box-shadow:0 10px 22px -14px var(--ec)}}
+@media(prefers-reduced-motion:reduce){.eco-ni,.eco-hd,.eco-hx i,.eco-nb .i{transition:none}.eco-bl,.eco-bw,.eco-dot,.eco-fill,.eco-body.eco-in,.eco2.nv .eco-sb.on,.eco2.nv .eco-pi{animation:none!important}}
+`;document.head.appendChild(sty3);
+const SK=['classic','glass','luxe','neon','emerald'],SKN={classic:'كلاسيك',glass:'زجاجي',luxe:'فاخر',neon:'نيون',emerald:'زمردي'};let skin='classic';try{const s0=localStorage.getItem('glv-eco-skin');if(SK.includes(s0))skin=s0;}catch(e){}
+
+const TABS=[['h','🏠','الرئيسية'],['w','💰','فلوسي'],['m','📈','الأسهم'],['i','🧠','المستشار'],['b','🏢','أعمال'],['c','🏙️','المدينة']];
+const SUBS={
+  h:[['o','🧭','نظرة عامة'],['p','📊','أدائي'],['k','🗓️','تقويمي']],
+  w:[['s','💰','التوفير'],['d','🔐','الودائع'],['g','🎯','الأهداف'],['l','💳','القروض'],['b','🏛️','بنك الاجتماع'],['r','🧾','المصاريف']],
+  m:[['k','📈','السوق'],['a','🔎','التحليل'],['t','🧰','الأدوات']],
+  i:[['a','🧠','المستشار'],['s','🧪','محاكاة'],['r','🛡️','المخاطر'],['q','🎓','تحديات'],['p','📑','التقرير']],
+  b:[['c','🏢','الشركات'],['s','🛠️','الخدمات'],['a','🔨','المزادات']],
+  c:[['j','💼','الوظايف'],['d','🤝','العطاء'],['r','🏆','الترتيب']],
+  a:[['q','🏛️','الطلبات'],['c','🏦','الخزنة'],['r','⚙️','الفوايد'],['n','📰','الأخبار'],['j','💼','وظايف ومشاريع'],['x','🕵️','التدقيق'],['s','✨','تحليلات']]
+};
+let sub={},dir=0,heroPref=null,navPrev=-1;
+try{const sv0=JSON.parse(localStorage.getItem('glv-eco-nav')||'null');if(sv0&&TABS.some(t=>t[0]===sv0.t))tab=sv0.t;if(sv0&&sv0.s&&typeof sv0.s==='object')sub=sv0.s;}catch(e){}
+const saveNav=()=>{try{localStorage.setItem('glv-eco-nav',JSON.stringify({t:tab==='a'?'h':tab,s:sub}));}catch(e){}};
+const curSub=t=>{const L=SUBS[t]||[];return(L.find(x=>x[0]===sub[t])||L[0]||[])[0];};
+
 const fmt=n=>Number(n||0).toLocaleString('en-US');
 const RM=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
 function coins(n){if(RM())return;for(let i=0;i<n;i++){const c=document.createElement('span');c.className='eco-c';c.textContent=i%3?'🪙':'✨';c.style.cssText+='left:50%;top:45%;--x:'+fl((Math.random()-.5)*320)+'px;--y:'+fl(-80-Math.random()*220)+'px;';document.body.appendChild(c);setTimeout(()=>c.remove(),1200);}}
 function cu(){const e=document.getElementById('eco-net');if(!e)return;const to=+e.dataset.v,from=lastNet;lastNet=to;if(from===to||RM())return;const t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/700);e.textContent=fmt(fl(from+(to-from)*(1-Math.pow(1-k,3))));if(k<1&&e.isConnected)requestAnimationFrame(f);})(t0);}
 const LBK='glv-eco-lb',AK='glv-eco-act';
+let fresh=true,loadP=Promise.resolve();
+function snap(){try{localStorage.setItem('glv-eco-snap',JSON.stringify({p:state.pid,U,E,LB,A,tx:(tx||[]).slice(0,30),b:(WALLET||{})[state.pid]||0}));}catch(e){}}
+function restore(){try{const o=JSON.parse(localStorage.getItem('glv-eco-snap')||'null');if(!o||o.p!==state.pid||!o.U||!o.U.hold)return false;U=o.U;E=o.E||{};LB=o.LB||{};A=o.A||{};tx=o.tx||[];if(typeof WALLET==='object'&&WALLET&&WALLET[state.pid]==null)WALLET[state.pid]=o.b;return true;}catch(e){return false;}}
 /* نشاط الموقع الفعلي: كل لعبة/شراء/حضور/تفاعل بيتعدّ ويحرّك سعر السهم المرتبط بيه */
 function bump(k){const d=fl(T()/864e5);upd(AK,o=>{o.d=o.d||{};const x=o.d[d]=o.d[d]||{};x[k]=(x[k]||0)+1;Object.keys(o.d).forEach(y=>{if(d-y>8)delete o.d[y];});});}
 function af(id){const d=fl(T()/864e5),a=A.d||{},n=(a[d]||{})[id]||0;let p=0;for(let i=1;i<=7;i++)p+=(a[d-i]||{})[id]||0;const pg=Math.max(.25,(T()%864e5)/864e5);return Math.max(.85,Math.min(1.25,(n+1)/(Math.max(p/7,2)*pg+1)));}
@@ -47060,10 +47270,10 @@ function sec(title,fn){
 }
 async function load(){
   if(!visaCreated(pid())){go('visa');return;}
-  [U]=await Promise.all([rd(uk()),pullE()]);
+  let wl;[U,,wl]=await Promise.all([rd(uk()),pullE(),loadWallet()]);
   if(E.locked&&!state.adminUnlocked){ok=true;render();return;}
   U.cr=U.cr??50;U.sav=U.sav||0;U.dep=U.dep||[];U.hold=U.hold||{};U.cost=U.cost||{};
-  WALLET=await loadWallet();
+  WALLET=wl;
   if(U.dca&&U.dca.a>0){const wk=fl((T()-U.dca.ts)/W);if(wk>=1){let n=0;for(let i=0;i<Math.min(wk,4);i++){if((WALLET[pid()]||0)<U.dca.a||!(await wal(-U.dca.a,'ادخار تلقائي')))break;n+=U.dca.a;}await sv(u=>{if(n&&!u.sav)u.st=T();u.sav+=n;u.dca.ts+=wk*W;});if(n)showToast('💰 اتحوّل '+n+' نقطة لتوفيرك تلقائيًا');}}
   {const day=fl(T()/864e5);if(!U.ds||U.ds.d<day){const sk=U.ds&&U.ds.d===day-1?Math.min(7,U.ds.n+1):1,g=await take(sk*2,false);if(g>0)await wal(g,'مكافأة يومية');await sv(u=>{u.ds={d:day,n:sk};});showToast('🔥 يوم '+sk+' متتالي'+(g>0?' · مكافأتك '+g+' نقطة':''));if(g>0)coins(12);}}
   for(const id of Object.keys(U.ord||{})){const s=ST.find(x=>x.id===id),q=U.hold[id]||0,o=U.ord[id];if(!s||!q)continue;const p=pr(s,hr(),1),avg=(U.cost[id]||0)/q,hs=o.sl&&p<=avg*(1-o.sl/100),ht=o.tp&&p>=avg*(1+o.tp/100);if(hs||ht){const r=await sellS(id,hs?'وقف خسارة تلقائي':'جني ربح تلقائي');showToast((hs?'🛑 وقف خسارة: اتباع ':'🎯 جني ربح: اتباع ')+s.n+' بـ '+r+' نقطة',hs);if(ht)coins(14);}}
@@ -47071,8 +47281,7 @@ async function load(){
   if(U.sav>0){U.st=U.st||T();const wk=fl((T()-U.st)/W);if(wk>=1){const g=await take(fl(U.sav*E.rate/100)*wk,true);await sv(u=>{u.sav+=g;u.st+=wk*W;});}}
   for(const c of (E.cos||[]).filter(c=>c.own===pid()&&c.cash>0)){const wk=fl((T()-(c.gt||c.ts))/W);if(wk>=1){const g=await take(fl(c.cash*.02)*wk,false);await upd(K,o=>{const x=(o.cos||[]).find(y=>y.id===c.id);if(x){x.cash+=g;x.gt=(x.gt||x.ts)+wk*W;}});}}
   if(U.loan&&T()>U.loan.due&&!U.loan.late)await sv(u=>{u.loan.late=1;u.cr=Math.max(0,u.cr-20);});
-  await pullE();
-  try{const t=await loadVisaTx();tx=t[pid()]||[];}catch(e){tx=[];}
+  {const r2=await Promise.all([pullE(),loadVisaTx().catch(()=>null)]);tx=(r2[1]&&r2[1][pid()])||[];}
   const net=netOf(),sid=fl(T()/(28*864e5));
   if(U.sid!==sid)await sv(u=>{u.sid=sid;u.base=Math.max(net,1);});
   await upd(LBK,o=>{if(o.s!==sid){o.s=sid;o.p={};}o.p=o.p||{};o.p[pid()]={n:((PARTICIPANTS.find(x=>x.id===pid())||{}).name||'مشارك'),r:Math.round((net/U.base-1)*100),d:Math.round((U.hist||[]).reduce((m,x)=>{m.p=Math.max(m.p,x.v);m.d=Math.max(m.d,m.p?(m.p-x.v)/m.p:0);return m;},{p:0,d:0}).d*100)};});
@@ -47082,7 +47291,7 @@ async function load(){
   {const nb=BD.filter(b=>!(U.bd||[]).includes(b.k)&&b.c());if(nb.length){await sv(u=>{u.bd=(u.bd||[]).concat(nb.map(b=>b.k));});showToast('🏆 شارة جديدة: '+nb.map(b=>b.n).join(' '));coins(24);}}
   if(!window.__ecoPrev){window.__ecoPrev={t:U.lv,n:U.lvn,p:U.lvp||{}};}
   if(!U.lv||T()-U.lv>216e5){const pp={};ST.forEach(s=>{pp[s.id]=pr(s,hr(),1);});await sv(u=>{u.lv=T();u.lvn=net;u.lvp=pp;});}
-  ok=true;render();
+  ok=true;snap();render();
 }
 async function reload(){await load();}
 /* أسعار الأسهم: معادلة موحّدة بالساعة (نفس السعر عند كل المشاركين) + تأثير الأخبار لمدة 24 ساعة */
@@ -47102,17 +47311,14 @@ function tips(bal,inv,net){
   if(!t.length)t.push('وضعك كويس. كمّل ادخار منتظم وثبّت جزء في وديعة.');
   return t;
 }
-const C='background:linear-gradient(160deg,rgba(127,127,127,.17),rgba(127,127,127,.07));border:1px solid rgba(127,127,127,.22);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 6px 20px rgba(0,0,0,.12);',R='display:flex;justify-content:space-between;align-items:center;gap:8px;';
+const C='--ecoc:1;background:var(--ecs,var(--surface));border:1px solid var(--ecb,var(--border));border-inline-start:3px solid var(--ec,var(--gold));border-radius:var(--ecr,16px);padding:14px 16px;margin:10px 0;',R='display:flex;justify-content:space-between;align-items:center;gap:8px;';
 const B=(a,l,x,g)=>`<button type="button" class="btn ${g?'btn-ghost':'btn-primary'}" style="padding:8px 12px;font-size:13px;" data-eco="${a}" ${x||''}>${l}</button>`;
 const IN=(id,ph)=>`<input id="${id}" class="field" type="number" inputmode="numeric" min="1" placeholder="${ph}" style="margin:6px 0;">`;
 const TX=(id,ph)=>`<input id="${id}" class="field" type="text" placeholder="${ph}" style="margin:6px 0;">`;
 function tW(bal,inv,net){
   const g=U.goal,gp=g&&g.t?Math.min(100,Math.round(net/g.t*100)):0;
   const deps=U.dep.map((d,i)=>{const done=d.end<=T();return `<div style="${R}margin:6px 0;"><span>🔒 ${d.a} نقطة · فايدة ${d.r}%</span>${done?B('dclaim','استلم','data-i="'+i+'"'):'<span style="font-size:12px;opacity:.7;">باقي '+Math.ceil((d.end-T())/864e5)+' يوم</span>'}</div>`;}).join('');
-  return `<div style="${C}"><b>💰 حساب التوفير</b><div style="font-size:12px;opacity:.75;">فايدة ${E.rate}% أسبوعيًا · رصيدك: <b>${U.sav}</b> نقطة</div>${IN('e-a','المبلغ')}<div style="${R}">${B('sin','إيداع')}${B('sout','سحب','',1)}</div></div>
-  <div style="${C}"><b>🔐 ودائع مقفولة</b><div style="font-size:12px;opacity:.75;">أسبوع بفايدة ${E.d7}% · شهر بفايدة ${E.d30}%</div>${deps}${IN('e-d','مبلغ الوديعة (10 نقاط أو أكتر)')}<div style="${R}">${B('dep','قفل أسبوع','data-d="7"')}${B('dep','قفل شهر','data-d="30"')}</div></div>
-  <div style="${C}"><b>🎯 هدفي</b>${g&&g.t?`<div style="${R}"><span>${esc(g.n)}</span><span>${gp}%</span></div><div style="height:8px;border-radius:8px;background:rgba(127,127,127,.25);overflow:hidden;margin-top:6px;"><div style="height:100%;width:${gp}%;background:#22c55e;"></div></div>`:''}${TX('g-n','اسم الهدف')}${IN('g-t','المطلوب بالنقاط')}${B('goal','حفظ الهدف')}</div>
-  <div style="${C}"><b>💡 نصايح ذكية</b>${tips(bal,inv,net).map(x=>`<div style="margin-top:6px;font-size:13px;">• ${x}</div>`).join('')}</div>`;
+  return [`<div style="${C}"><b>💰 حساب التوفير</b><div style="font-size:12px;opacity:.75;">فايدة ${E.rate}% أسبوعيًا · رصيدك: <b>${U.sav}</b> نقطة</div>${IN('e-a','المبلغ')}<div style="${R}">${B('sin','إيداع')}${B('sout','سحب','',1)}</div></div>`,`<div style="${C}"><b>🔐 ودائع مقفولة</b><div style="font-size:12px;opacity:.75;">أسبوع بفايدة ${E.d7}% · شهر بفايدة ${E.d30}%</div>${deps}${IN('e-d','مبلغ الوديعة (10 نقاط أو أكتر)')}<div style="${R}">${B('dep','قفل أسبوع','data-d="7"')}${B('dep','قفل شهر','data-d="30"')}</div></div>`,`<div style="${C}"><b>🎯 هدفي</b>${g&&g.t?`<div style="${R}"><span>${esc(g.n)}</span><span>${gp}%</span></div><div style="height:8px;border-radius:8px;background:rgba(127,127,127,.25);overflow:hidden;margin-top:6px;"><div class="eco-fill" style="height:100%;width:${gp}%;background:#22c55e;"></div></div>`:''}${TX('g-n','اسم الهدف')}${IN('g-t','المطلوب بالنقاط')}${B('goal','حفظ الهدف')}</div>`,`<div style="${C}"><b>💡 نصايح ذكية</b>${tips(bal,inv,net).map(x=>`<div style="margin-top:6px;font-size:13px;">• ${x}</div>`).join('')}</div>`];
 }
 function tL(){
   const cr=U.cr,rt=cr>=70?3:8,l=U.loan;
@@ -47128,8 +47334,7 @@ function tB(){
     else if(x.st==='sent'&&x.buy===me)b=B('sok','استلمت','data-id="'+x.id+'"');
     if(state.adminUnlocked&&(x.st==='esc'||x.st==='sent'))b+=B('sref','استرجاع','data-id="'+x.id+'"','1');
     return `<div style="${R}margin-top:8px;"><span>${esc(x.t)} · ${x.pr} نقطة<br><small style="opacity:.7;">${st}</small></span><span>${b}</span></div>`;}).join('');
-  return `<div style="${C}"><b>🏢 أسّس شركتك</b><div style="font-size:12px;opacity:.75;">100 سهم: 20 ليك و80 للبيع. رسوم التأسيس 20 نقطة. خزنة الشركة بتنمو 2% أسبوعيًا وبتتوزع أرباح على المساهمين.</div>${TX('c-n','اسم الشركة')}${IN('c-p','سعر السهم (5 أو أكتر)')}${B('ccreate','تأسيس')}</div>${mine?`<div style="${C}">${IN('c-d','مبلغ الأرباح للتوزيع (فاضي = كل الخزنة)')}</div>`:''}${cl}
-  <div style="${C}"><b>🛠️ سوق الخدمات</b><div style="font-size:12px;opacity:.75;">النقاط بتتحجز عند الضمان لحد ما تأكد الاستلام. عمولة 3%.</div>${TX('s-t','الخدمة اللي هتقدمها')}${IN('s-p','السعر')}${B('spost','انشر الخدمة')}${sl}</div>`;
+  return [`<div style="${C}"><b>🏢 أسّس شركتك</b><div style="font-size:12px;opacity:.75;">100 سهم: 20 ليك و80 للبيع. رسوم التأسيس 20 نقطة. خزنة الشركة بتنمو 2% أسبوعيًا وبتتوزع أرباح على المساهمين.</div>${TX('c-n','اسم الشركة')}${IN('c-p','سعر السهم (5 أو أكتر)')}${B('ccreate','تأسيس')}</div>${mine?`<div style="${C}">${IN('c-d','مبلغ الأرباح للتوزيع (فاضي = كل الخزنة)')}</div>`:''}${cl}`,`<div style="${C}"><b>🛠️ سوق الخدمات</b><div style="font-size:12px;opacity:.75;">النقاط بتتحجز عند الضمان لحد ما تأكد الاستلام. عمولة 3%.</div>${TX('s-t','الخدمة اللي هتقدمها')}${IN('s-p','السعر')}${B('spost','انشر الخدمة')}${sl}</div>`];
 }
 function tH(bal,inv,net){
   const vs=ST.map(s=>(U.hold[s.id]||0)*pr(s,hr(),1)).filter(x=>x>0),lk=U.dep.reduce((a,d)=>a+d.a,0);
@@ -47140,15 +47345,15 @@ function tH(bal,inv,net){
   return `<div style="${C}"><div style="${R}"><svg viewBox="0 0 80 80" width="84" height="84"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(127,127,127,.25)" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round" stroke-dasharray="214" stroke-dashoffset="${Math.round(214*(1-sc/100))}" transform="rotate(-90 40 40)" style="${anim?'animation:ecoRing 1.2s ease both':''}"/><text x="40" y="46" text-anchor="middle" font-size="20" font-weight="800" fill="currentColor">${sc}</text></svg><div style="flex:1;"><b>🧠 صحة محفظتك</b><div style="font-size:12px;margin-top:4px;">${sc>=85?'محفظتك متوازنة جدًا، كمّل.':wk}</div>${inv?`<div style="font-size:12px;opacity:.8;margin-top:4px;">اختبار ضغط: لو الأسهم نزلت 20%، ثروتك تبقى ${net-drop} (−${drop}).</div>`:''}</div></div><div style="${R}margin-top:8px;font-size:12px;"><span>${U.ds?'🔥 '+U.ds.n+' يوم متتالي':''}${pc!=null?' · 🏆 أحسن من '+pc+'% من المشاركين':''}</span>${B('card','📤 شارك بطاقتي','','1')}</div>${bd.length?`<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">${bd.map(x=>`<span style="padding:4px 10px;border-radius:12px;background:rgba(127,127,127,.2);font-size:12px;animation:ecoPop .5s ease both;">${x}</span>`).join('')}</div>`:''}</div>`;
 }
 function tT(){
-  const t=[],jb=(E.jobs||[]).find(x=>x.id===U.job),go2=(l,v)=>[l,'tab',v];
-  if(U.dep.some(d=>d.end<=T()))t.push(go2('وديعة جاهزة للاستلام','w'));
+  const t=[],jb=(E.jobs||[]).find(x=>x.id===U.job),go2=(l,v,s)=>[l,'tab',v,s];
+  if(U.dep.some(d=>d.end<=T()))t.push(go2('وديعة جاهزة للاستلام','w','d'));
   if(jb&&T()-U.jt>=W)t.push(['راتبك الأسبوعي جاهز','jpay']);
-  if(!jb&&(E.jobs||[]).length)t.push(go2('فيه وظايف متاحة قدّم عليها','c'));
+  if(!jb&&(E.jobs||[]).length)t.push(go2('فيه وظايف متاحة قدّم عليها','c','j'));
   if(U.loan&&!U.loan.late&&U.loan.due-T()<2*864e5)t.push(['قرضك قرب يستحق: سدّد عشان تقييمك','repay']);
-  if((E.proj||[]).length&&!(E.proj||[]).some(x=>(x.v||{})[pid()]))t.push(go2('صوّت لمشروع صندوق العطاء','c'));
-  if(!U.goal)t.push(go2('حدد هدف ادخار','w'));
-  Object.keys(U.hold).forEach(id=>{if(!(U.ins&&U.ins[id]>T())&&!(U.ord&&U.ord[id]))t.push(go2('سهم '+ST.find(x=>x.id===id).n+' من غير حماية','m'));});
-  return `<div style="${C}"><b>✅ مهامك الذكية</b>${t.slice(0,5).map(x=>`<div style="${R}margin-top:8px;font-size:13px;"><span>${x[0]}</span>${B(x[1],'نفّذ',x[1]==='tab'?'data-v="'+x[2]+'"':'')}</div>`).join('')||'<div style="font-size:13px;margin-top:6px;">كل حاجة تمام 🎉</div>'}</div>`;
+  if((E.proj||[]).length&&!(E.proj||[]).some(x=>(x.v||{})[pid()]))t.push(go2('صوّت لمشروع صندوق العطاء','c','d'));
+  if(!U.goal)t.push(go2('حدد هدف ادخار','w','g'));
+  Object.keys(U.hold).forEach(id=>{if(!(U.ins&&U.ins[id]>T())&&!(U.ord&&U.ord[id]))t.push(go2('سهم '+ST.find(x=>x.id===id).n+' من غير حماية','m','k'));});
+  return `<div style="${C}"><b>✅ مهامك الذكية</b>${t.slice(0,5).map(x=>`<div style="${R}margin-top:8px;font-size:13px;"><span>${x[0]}</span>${B(x[1],'نفّذ',x[1]==='tab'?'data-v="'+x[2]+'"'+(x[3]?' data-s="'+x[3]+'"':''):'')}</div>`).join('')||'<div style="font-size:13px;margin-top:6px;">كل حاجة تمام 🎉</div>'}</div>`;
 }
 function tG(){
   const h=U.hist||[];if(h.length<2)return '';
@@ -47197,9 +47402,20 @@ function tC(){
   const list=jobs.filter(j=>j.id!==U.job).map(j=>`<div style="${R}margin-top:8px;"><span>${esc(j.t)} · ${j.pay} نقطة/أسبوع</span>${B('jtake','قدّم','data-id="'+j.id+'"')}</div>`).join('');
   const pj=(E.proj||[]).map(x=>{const v=Object.keys(x.v||{}).length;return `<div style="${R}margin-top:8px;"><span>${esc(x.t)} · ${v} صوت</span>${B('vote','صوّت','data-id="'+x.id+'"',(x.v||{})[pid()])}</div>`;}).join('');
   const dn=(E.done||[]).slice(-3).reverse().map(d=>`<div style="font-size:12px;opacity:.75;margin-top:4px;">✅ اتموّل: ${esc(d.t)} (${d.a} نقطة)</div>`).join('');
-  return `<div style="${C}"><b>💼 الوظايف</b>${myBox}${list}</div>
-  <div style="${C}"><b>🤝 صندوق العطاء</b><div style="font-size:12px;opacity:.75;">2% من كل الأرباح بتتجمع هنا. الرصيد: <b>${E.charity||0}</b> نقطة. صوّت للمشروع اللي يستاهل التمويل.</div>${pj||'<div style="font-size:12px;opacity:.7;margin-top:6px;">مفيش مشاريع مقترحة لسه.</div>'}${dn}</div>
-  <div style="${C}"><b>🏆 مستثمر الموسم</b><div style="font-size:12px;opacity:.75;">الترتيب بنسبة نمو الثروة خلال 28 يوم، فالمبتدئ ينافس الغني.</div>${Object.values(LB.p||{}).sort((a,b)=>b.r-a.r).slice(0,5).map((x,i)=>`<div style="${R}margin-top:6px;"><span>${['🥇','🥈','🥉','4️⃣','5️⃣'][i]} ${esc(x.n)}</span><b>${x.r>=0?'+':''}${x.r}%</b></div>`).join('')}</div>`;
+  return [`<div style="${C}"><b>💼 الوظايف</b>${myBox}${list}</div>`,`<div style="${C}"><b>🤝 صندوق العطاء</b><div style="font-size:12px;opacity:.75;">2% من كل الأرباح بتتجمع هنا. الرصيد: <b>${E.charity||0}</b> نقطة. صوّت للمشروع اللي يستاهل التمويل.</div>${pj||'<div style="font-size:12px;opacity:.7;margin-top:6px;">مفيش مشاريع مقترحة لسه.</div>'}${dn}</div>`,`<div style="${C}"><b>🏆 مستثمر الموسم</b><div style="font-size:12px;opacity:.75;">الترتيب بنسبة نمو الثروة خلال 28 يوم، فالمبتدئ ينافس الغني.</div>${Object.values(LB.p||{}).sort((a,b)=>b.r-a.r).slice(0,5).map((x,i)=>`<div style="${R}margin-top:6px;"><span>${['🥇','🥈','🥉','4️⃣','5️⃣'][i]} ${esc(x.n)}</span><b>${x.r>=0?'+':''}${x.r}%</b></div>`).join('')}</div>`];
+}
+function tMB(){
+  const p=pid(),mx=E.mbMax||100,v=E.vault||0,all=(E.req||[]).filter(x=>x.p===p).sort((a,b)=>b.ts-a.ts),pend=all.find(x=>x.st==='pending');
+  const stl={pending:['⏳ مستني الموافقة','#f59e0b'],ok:['✅ اتوافق عليه','#22c55e'],no:['❌ اترفض','#ef4444']};
+  const hist=all.slice(0,4).map(x=>{const t=stl[x.st]||stl.pending;return `<div style="${R}margin-top:6px;font-size:12px;"><span>${x.a} نقطة${x.n?' · '+esc(x.n):''}</span><b style="color:${t[1]};">${t[0]}</b></div>`;}).join('');
+  const form=!hasVisa(p)?`<div style="font-size:12px;opacity:.75;margin-top:8px;">محتاج فيزا الأول عشان النقاط تتحوّل عليها.</div>`:pend?`<div style="font-size:12px;opacity:.75;margin-top:8px;">عندك طلب لسه مستني الأدمن.</div>`:IN('mb-a','المبلغ (من 1 لـ '+mx+' نقطة)')+TX('mb-n','السبب (اختياري)')+B('mbask','📨 ابعت الطلب');
+  return `<div style="${C}"><b>🏛️ بنك الاجتماع</b><div style="font-size:12px;opacity:.75;margin-top:4px;">رصيد البنك: <b>${fmt(v)}</b> نقطة. اطلب مبلغ والأدمن يوافق وبيتحوّل على فيزتك.</div>${form}${hist}</div>`;
+}
+function tMBA(){
+  const pend=(E.req||[]).filter(x=>x.st==='pending').sort((a,b)=>a.ts-b.ts);
+  const nm=id=>esc((PARTICIPANTS.find(x=>x.id===id)||{}).name||id);
+  const rows=pend.map(x=>`<div style="${C}margin:8px 0;padding:12px;"><div style="${R}"><b>${nm(x.p)}</b><b>${x.a} نقطة</b></div>${x.n?`<div style="font-size:12px;opacity:.75;margin-top:4px;">${esc(x.n)}</div>`:''}<div style="${R}margin-top:8px;">${B('mbok','✅ موافقة','data-id="'+x.id+'"')}${B('mbno','❌ رفض','data-id="'+x.id+'"','1')}</div></div>`).join('')||'<div style="font-size:12px;opacity:.7;margin-top:6px;">مفيش طلبات دلوقتي.</div>';
+  return `<div style="${C}"><b>🏛️ طلبات بنك الاجتماع (${pend.length})</b><div style="font-size:12px;opacity:.75;margin-top:4px;">الصرف من الخزنة. الرصيد: <b>${fmt(E.vault||0)}</b></div>${rows}${IN('mb-m','الحد الأقصى للطلب (الحالي '+(E.mbMax||100)+')')}${B('mbmax','حفظ الحد')}</div>`;
 }
 function tA(){
   const w=Object.values(WALLET).map(Number).filter(x=>x>0).sort((a,b)=>b-a),tot=w.reduce((a,b)=>a+b,0),top=w.slice(0,Math.max(1,Math.ceil(w.length/10))).reduce((a,b)=>a+b,0),sh=tot?Math.round(top/tot*100):0,v=E.vault||0,s=[];
@@ -47208,35 +47424,133 @@ function tA(){
   if(!s.length)s.push('الاقتصاد متوازن حاليًا.');
   const jb=(E.jobs||[]).map(j=>`<div style="${R}margin-top:6px;"><span>${esc(j.t)} · ${j.pay}</span>${B('jdel','حذف','data-id="'+j.id+'"','1')}</div>`).join('');
   const pj=(E.proj||[]).map(x=>`<div style="${R}margin-top:6px;"><span>${esc(x.t)} · ${Object.keys(x.v||{}).length}</span>${B('pdel','حذف','data-id="'+x.id+'"','1')}</div>`).join('');
-  return `<div style="${C}"><b>🏦 البنك المركزي</b><div style="margin-top:6px;font-size:13px;">إجمالي النقاط في الفيزا: <b>${tot}</b><br>الخزنة: <b>${v}</b> · صندوق العطاء: <b>${E.charity||0}</b><br>أغنى 10%: <b>${sh}%</b></div>${s.map(x=>`<div style="margin-top:6px;font-size:13px;">🤖 ${x}</div>`).join('')}</div>
-  <div style="${C}"><b>⚙️ الفوايد (٪)</b>${IN('a-r','أسبوعية للتوفير (الحالي '+E.rate+')')}${IN('a-7','وديعة أسبوع (الحالي '+E.d7+')')}${IN('a-30','وديعة شهر (الحالي '+E.d30+')')}${B('arate','حفظ')}</div>
-  <div style="${C}"><b>➕ تغذية الخزنة</b>${IN('a-v','عدد النقاط')}${B('avault','إضافة')}</div>
-  <div style="${C}"><b>📰 خبر اقتصادي</b>${TX('n-t','نص الخبر')}<select id="n-s" class="field" style="margin:6px 0;"><option value="*">كل الأسهم</option>${ST.map(s=>`<option value="${s.id}">${s.n}</option>`).join('')}</select><input id="n-p" class="field" type="number" placeholder="التأثير ٪ (مثلًا 15 أو -10)" style="margin:6px 0;">${B('anews','نشر لمدة 24 ساعة')}</div>
-  <div style="${C}"><b>💼 وظيفة جديدة</b>${TX('j-t','اسم الوظيفة')}${IN('j-p','الراتب الأسبوعي')}${B('jadd','إضافة')}${jb}</div>
-  <div style="${C}"><b>🤝 مشروع للتصويت</b>${TX('p-t','اسم المشروع')}${B('padd','إضافة')}${pj}${B('pfund','تمويل المشروع الفائز','','1')}</div>
-  <div style="${C}"><b>🕵️ سجل التدقيق</b>${(E.aud||[]).slice(0,15).map(a=>`<div style="font-size:12px;margin-top:4px;${Math.abs(a.n)>=300?'color:#ef4444;':''}">${Math.abs(a.n)>=300?'⚠️ ':''}${esc((PARTICIPANTS.find(x=>x.id===a.p)||{}).name||a.p)} · ${esc(a.m)} · ${a.n}</div>`).join('')}</div>`;
+  return [tMBA(),`<div style="${C}"><b>🏦 البنك المركزي</b><div style="margin-top:6px;font-size:13px;">إجمالي النقاط في الفيزا: <b>${tot}</b><br>الخزنة: <b>${v}</b> · صندوق العطاء: <b>${E.charity||0}</b><br>أغنى 10%: <b>${sh}%</b></div>${s.map(x=>`<div style="margin-top:6px;font-size:13px;">🤖 ${x}</div>`).join('')}</div>`,`<div style="${C}"><b>⚙️ الفوايد (٪)</b>${IN('a-r','أسبوعية للتوفير (الحالي '+E.rate+')')}${IN('a-7','وديعة أسبوع (الحالي '+E.d7+')')}${IN('a-30','وديعة شهر (الحالي '+E.d30+')')}${B('arate','حفظ')}</div>`,`<div style="${C}"><b>➕ تغذية الخزنة</b>${IN('a-v','عدد النقاط')}${B('avault','إضافة')}</div>`,`<div style="${C}"><b>📰 خبر اقتصادي</b>${TX('n-t','نص الخبر')}<select id="n-s" class="field" style="margin:6px 0;"><option value="*">كل الأسهم</option>${ST.map(s=>`<option value="${s.id}">${s.n}</option>`).join('')}</select><input id="n-p" class="field" type="number" placeholder="التأثير ٪ (مثلًا 15 أو -10)" style="margin:6px 0;">${B('anews','نشر لمدة 24 ساعة')}</div>`,`<div style="${C}"><b>💼 وظيفة جديدة</b>${TX('j-t','اسم الوظيفة')}${IN('j-p','الراتب الأسبوعي')}${B('jadd','إضافة')}${jb}</div>`,`<div style="${C}"><b>🤝 مشروع للتصويت</b>${TX('p-t','اسم المشروع')}${B('padd','إضافة')}${pj}${B('pfund','تمويل المشروع الفائز','','1')}</div>`,`<div style="${C}"><b>🕵️ سجل التدقيق</b>${(E.aud||[]).slice(0,15).map(a=>`<div style="font-size:12px;margin-top:4px;${Math.abs(a.n)>=300?'color:#ef4444;':''}">${Math.abs(a.n)>=300?'⚠️ ':''}${esc((PARTICIPANTS.find(x=>x.id===a.p)||{}).name||a.p)} · ${esc(a.m)} · ${a.n}</div>`).join('')}</div>`];
 }
 const sm=(k,bal,inv,net,lk)=>{try{return window.ecoSmart?ecoSmart[k]({U,E,ST,pr,hr,tx,LB,WALLET,pid:pid(),bal,inv,net,lk,esc,fmt,C,R,B,M:VISA_TX_META,af}):'';}catch(e){return '<div style="'+C+'">تعذّر تحميل التحليل الذكي حاليًا</div>';}};
 const sg=s=>{try{return window.ecoSmart?ecoSmart.sig({U,E,ST,pr,hr},s):'';}catch(e){return '';}};
 const lockBar=()=>`<div style="${C}padding:10px 14px;${E.locked?'border-color:#ef4444;':''}"><div style="${R}"><span style="font-size:13px;">${E.locked?'🔒 القسم مقفول عن المشاركين (إنت شايفه كأدمن)':'🔓 القسم مفتوح للمشاركين'}</span>${B('alock',E.locked?'🔓 فتح':'🔒 قفل','',E.locked?'':'1')}</div></div>`;
 const _rp=function(){
-  const back=`<div class="back-row"><button class="icon-btn" data-action="back">${ICO.back}</button><div class="back-title">الاقتصاد والاستثمار</div></div>`;
-  if(!ok)return back+`<div class="vp-panel" style="text-align:center;">جاري التحميل…</div>`;
-  if(E.locked&&!state.adminUnlocked)return back+`<div style="${C}text-align:center;"><div style="font-size:44px;">🔒</div><b>قسم الاستثمار والاقتصاد مقفول حاليًا</b><div style="font-size:12px;opacity:.75;margin-top:6px;">هيتفتح قريب من المنظمين. استنوا الإعلان!</div></div>`;
+  const top=`<div class="back-row eco-top"><button class="icon-btn" data-action="back">${ICO.back}</button><div><div class="back-title">الاقتصاد والاستثمار</div><div class="eco-sub">نقاط فيزتك بتشتغل لحسابك</div></div></div>`;
+  if(!ok)return `<div class="eco2" data-skin="${skin}" data-t="${tab}">${top}<div class="eco-skel"><i style="height:210px"></i><i style="height:64px"></i><i></i><i></i></div></div>`;
+  if(E.locked&&!state.adminUnlocked)return `<div class="eco2" data-skin="${skin}" data-t="${tab}">${top}<div style="${C}text-align:center;"><div style="font-size:44px;">🔒</div><b>قسم الاستثمار والاقتصاد مقفول حاليًا</b><div style="font-size:12px;opacity:.75;margin-top:6px;">هيتفتح قريب من المنظمين. استنوا الإعلان!</div></div></div>`;
   const bal=WALLET[pid()]||0,inv=ST.reduce((a,s)=>a+(U.hold[s.id]||0)*pr(s,hr(),1),0),lk=U.dep.reduce((a,d)=>a+d.a,0),net=bal+U.sav+lk+inv;
-  const tabs=[['w','💰 محفظتي'],['m','📈 السوق'],['i','🧠 المستشار'],['b','🏢 أعمال'],['c','🏙️ المدينة']].concat(state.adminUnlocked?[['a','🏦 البنك']]:[]);
-  return back+`<div style="${C}background:linear-gradient(135deg,#0f172a,#1e3a8a 55%,#7c3aed);color:#fff;"><div style="font-size:12px;opacity:.85;">إجمالي ثروتك</div><div style="font-size:30px;font-weight:800;"><span id="eco-net" data-v="${net}">${fmt(net)}</span> نقطة</div><div style="${R}font-size:12px;margin-top:6px;"><span>فيزا ${bal}</span><span>توفير ${U.sav}</span><span>ودائع ${lk}</span><span>أسهم ${inv}</span></div></div>
-  ${state.adminUnlocked?lockBar():''}<div style="display:flex;gap:4px;overflow-x:auto;padding:4px;border-radius:18px;background:rgba(127,127,127,.14);margin:6px 0;">${tabs.map(t=>`<button type="button" class="btn ${tab===t[0]?'btn-primary':'btn-ghost'}" style="padding:8px 14px;font-size:13px;white-space:nowrap;border-radius:14px;" data-eco="tab" data-v="${t[0]}">${t[1]}</button>`).join('')}</div>`
-  +'<div class="'+(anim?'eco-in':'')+'">'+(tab==='w'?tH(bal,inv,net)+tO(bal,inv,net)+tX(net)+tT()+tG()+tW(bal,inv,net)+tD()+tS()+tL()+tR():tab==='m'?tM(bal,inv,net):tab==='i'?sm('user',bal,inv,net,lk):tab==='b'?tB():tab==='c'?tC():(state.adminUnlocked?tA()+sm('admin',bal,inv,net,lk):''))+'</div>';
+  const tb=(tab==='a'&&!state.adminUnlocked)?'h':tab;
+  const ctx={U,E,ST,pr,hr,tx,LB,WALLET,pid:pid(),bal,inv,net,lk,esc,fmt,C,R,B,M:VISA_TX_META,af};
+  const S=n=>{try{return window.ecoSmart&&ecoSmart.sec?ecoSmart.sec(ctx,n):'';}catch(e){return '';}};
+  let lv=null;try{lv=window.ecoSmart&&ecoSmart.lvl?ecoSmart.lvl(ctx):null;}catch(e){}
+  const P=[['فيزا',bal,'var(--teal)'],['توفير',U.sav,'var(--good)'],['ودائع',lk,'var(--gold)'],['أسهم',inv,'var(--violet)']];
+  const tot=P.reduce((a,x)=>a+Math.max(0,x[1]),0);
+  const seg=tot>0?P.filter(x=>x[1]>0).map(x=>`<i style="flex:${x[1]};background:${x[2]};"></i>`).join(''):'';
+  const leg=P.map(x=>`<div class="eco-lg${x[1]>0?'':' z'}"><i style="background:${x[2]};"></i><span>${x[0]}</span><b>${fmt(Math.round(x[1]))}</b></div>`).join('');
+  const wk=lv?`<span class="eco-wk ${lv.wk>=0?'up':'dn'}">${lv.wk>=0?'▲':'▼'} ${Math.abs(lv.wk)}% هذا الأسبوع</span>`:'';
+  const dbt=U.loan?`<span class="eco-wk dn">قرض ${fmt(U.loan.a)}</span>`:'';
+  const adm=state.adminUnlocked?`<button type="button" class="eco-adm${tb==='a'?' on':''}" data-eco="tab" data-v="a">🏦 البنك</button>`:'';
+  const tools=`<button type="button" class="eco-adm" data-eco="sk" aria-label="تغيير الستايل">🎨 ${SKN[skin]}</button><button type="button" class="eco-adm" data-eco="rf" aria-label="تحديث">🔄</button>`;
+  const lvl=lv?`<div class="eco-lv"><span>${lv.n}</span><div class="eco-xp"><i style="width:${lv.pg}%;"></i></div><small>${lv.xp} XP${lv.nx?' · التالي '+lv.nx:' · القمة'}</small></div>`:'';
+  const hs=(U.hist||[]).map(x=>x.v);let spk='';
+  if(hs.length>=2){const mn=Math.min(...hs),mx=Math.max(...hs),n=hs.length,pts=hs.map((v,i)=>(i*(120/(n-1))).toFixed(1)+','+(34-(v-mn)/((mx-mn)||1)*30).toFixed(1)),col=hs[n-1]>=hs[0]?'#5FE0A4':'#FF6B6B';spk=`<svg class="eco-spk" viewBox="0 0 120 38" preserveAspectRatio="none" aria-hidden="true"><polygon points="0,38 ${pts.join(' ')} 120,38" fill="${col}" opacity=".13"/><polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;}
+  const heroOpen=heroPref==null?tb==='h':heroPref;
+  const hero=`<div class="eco-hero${heroOpen?' open':''}">${spk}<div class="eco-hrow"><span class="eco-k">إجمالي ثروتك</span>${wk}${dbt}${adm}</div><div class="eco-num"><span id="eco-net" data-v="${net}">${fmt(net)}</span><small>نقطة</small></div><div class="eco-bar">${seg}</div><button type="button" class="eco-hx" data-eco="hero" aria-expanded="${heroOpen}"><span>تفاصيل الثروة</span><i></i></button><div class="eco-hd"><div class="eco-hdi"><div class="eco-leg">${leg}</div>${lvl}<div class="eco-hrow" style="margin-top:12px;">${tools}</div></div></div></div>`;
+  /* المساعد الذكي: بيرتّب اللي محتاج تعمله حسب الأولوية */
+  const ins=[],jb=(E.jobs||[]).find(x=>x.id===U.job);
+  if(U.dep.some(d=>d.end<=T()))ins.push([1,'🔐','عندك وديعة خلصت مدتها: استلم أصلها وفايدتها','w','','d']);
+  if(U.loan&&(U.loan.late||U.loan.due-T()<2*864e5))ins.push([1,'💳',U.loan.late?'قرضك متأخر وتقييمك بينزل: سدّده دلوقتي':'قرضك قرب يستحق: سدّد في الميعاد عشان تقييمك','w','','l']);
+  if(jb&&T()-U.jt>=W)ins.push([1,'💼','راتبك الأسبوعي جاهز للاستلام','c','','j']);
+  if(bal>=100&&!U.sav)ins.push([2,'💰','رصيدك '+fmt(bal)+' نقطة واقف: حوّل جزء للتوفير ياخد فايدة','w','e-a','s']);
+  const unp=Object.keys(U.hold).filter(id=>!(U.ins&&U.ins[id]>T())&&!(U.ord&&U.ord[id]));
+  if(unp.length)ins.push([2,'🛡️',unp.length+' سهم من غير حماية: ضيف وقف خسارة أو تأمين','m','','k']);
+  if(net&&inv/net>.4)ins.push([3,'🧩','أسهمك '+Math.round(inv/net*100)+'% من ثروتك: نوّع على أكتر من سهم','m','','k']);
+  if(!U.goal)ins.push([4,'🎯','حدد هدف ادخار وتابع نسبة وصولك له','w','g-n','g']);
+  if(E.news&&E.news.t&&T()-E.news.ts<864e5)ins.push([4,'📰','فيه خبر اقتصادي شغال دلوقتي وبيأثر على الأسعار','m','','k']);
+  ins.sort((a,b)=>a[0]-b[0]);
+  const t1=ins[0]||[5,'✨','وضعك مستقر. كمّل ادخار منتظم وراقب السوق','m','','k'];
+  const insHtml=`<div class="eco-ins s${t1[0]}"><span class="ico">${t1[1]}</span><div><small>اقتراح ذكي${ins.length>1?' · +'+(ins.length-1)+' كمان':''}</small>${t1[2]}</div><button type="button" data-eco="tab" data-v="${t1[3]}" data-f="${t1[4]}" data-s="${t1[5]||''}">روح</button></div>`;
+  const QA=[['💰','وفّر','w','e-a','s'],['🔐','وديعة','w','e-d','d'],['🎯','هدف','w','g-n','g'],['💳','قرض','w','l-a','l']];
+  const qaHtml=`<div class="eco-qg">${QA.map(q=>`<button type="button" class="eco-qa" data-eco="tab" data-v="${q[2]}" data-f="${q[3]}" data-s="${q[4]||''}"><span>${q[0]}</span>${q[1]}</button>`).join('')}</div>`;
+  const tick=`<div class="eco-tk">${ST.map(s=>{const p=pr(s,hr(),1),p0=pr(s,hr()-24,0),ch=Math.round((p/p0-1)*100);return `<div class="eco-t"><span>${s.n}</span><b>${p}</b><em class="${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'} ${Math.abs(ch)}% اليوم</em></div>`;}).join('')}</div>`;
+  /* نقاط التنبيه على التابات والأقسام الفرعية */
+  const dots={},dt=(t,k)=>{dots[t+'.'+k]=1;dots[t]=1;};
+  if(U.dep.some(d=>d.end<=T()))dt('w','d');
+  if(U.loan&&(U.loan.late||U.loan.due-T()<2*864e5))dt('w','l');
+  if(!U.goal)dt('w','g');
+  if(jb&&T()-U.jt>=W)dt('c','j');else if(!jb&&(E.jobs||[]).length)dt('c','j');
+  if((E.proj||[]).length&&!(E.proj||[]).some(x=>(x.v||{})[pid()]))dt('c','d');
+  if(unp.length)dt('m','k');
+  if(state.adminUnlocked&&(E.req||[]).some(x=>x.st==='pending'))dt('a','q');
+  const ti=TABS.findIndex(t=>t[0]===tb),dd=k=>dots[k]?'<i class="eco-dot"></i>':'';
+  const nav=`<div class="eco-nav" role="tablist" aria-label="أقسام الاقتصاد والاستثمار" style="--n:${TABS.length}"><i class="eco-ni${ti<0?' off':''}" data-i="${ti}" style="--i:${anim&&navPrev>=0?navPrev:Math.max(ti,0)}"></i>${TABS.map(t=>`<button type="button" role="tab" aria-selected="${tb===t[0]}" class="eco-nb${tb===t[0]?' on':''}" data-eco="tab" data-v="${t[0]}"><span class="i">${t[1]}</span><span class="l">${t[2]}</span>${dd(t[0])}</button>`).join('')}</div>`;
+  const SB=SUBS[tb]||[],cs=curSub(tb);
+  const snav=`<div class="eco-sn" role="tablist" aria-label="أقسام فرعية">${SB.map(x=>`<button type="button" role="tab" aria-selected="${cs===x[0]}" class="eco-sb${cs===x[0]?' on':''}" data-eco="sub" data-v="${x[0]}"><span>${x[1]}</span>${x[2]}${dd(tb+'.'+x[0])}</button>`).join('')}</div>`;
+  /* رأس الخانة + مؤشرات سريعة */
+  const kp=(l,v,u)=>`<div class="eco-kp"><span>${l}</span><b class="eco-kv" data-cu="${Math.round(v||0)}">${fmt(Math.round(v||0))}</b>${u?`<small>${u}</small>`:''}</div>`;
+  const PH={
+    h:['🏠','أهلًا بيك','ملخص يومك وخطوتك الجاية',kp('خبرتك',lv?lv.xp:0,'نقطة XP')+kp('شاراتك',(U.bd||[]).length,'شارة')+kp('متتالية',(U.ds||{}).n||0,'يوم')],
+    w:['💰','فلوسي','وفّر، اقفل وديعة، حدد هدف، واستلف بحساب',kp('توفير',U.sav,'نقطة')+kp('ودائع',lk,'نقطة')+kp('فايدة',E.rate,'% أسبوعيًا')],
+    m:['📈','الأسهم','سوق حي بيتحرك كل ساعة: اشتري واتفرّج وحلّل',kp('أسهمك',inv,'نقطة')+kp('مراكزك',Object.keys(U.hold).length,'من '+ST.length)+kp('سقف المخاطرة',Math.round((U.rk||.5)*100),'%')],
+    i:['🧠','المستشار','عقل ماليّ شخصي بيحلل ويحاكي ويقترح',kp('الثقة',U.cr,'من 100')+kp('نسبة الأسهم',net?inv/net*100:0,'%')+kp('الشارات',(U.bd||[]).length,'شارة')],
+    b:['🏢','أعمال','أسّس شركتك، بيع مهارتك، وزايد في المزادات',kp('الشركات',(E.cos||[]).length,'شركة')+kp('خدمات',(E.svc||[]).filter(x=>x.st==='open').length,'متاحة')+kp('مزادات',(E.auc||[]).filter(x=>x.st==='open').length,'شغالة')],
+    c:['🏙️','المدينة','وظايف، عطاء، ومنافسة بين المستثمرين',kp('العطاء',E.charity||0,'نقطة')+kp('وظايف',(E.jobs||[]).length,'متاحة')+kp('منافسين',Object.keys(LB.p||{}).length,'مستثمر')],
+    a:['🏦','لوحة البنك','تحكم الأدمن في الاقتصاد',kp('الخزنة',E.vault||0,'نقطة')+kp('طلبات',(E.req||[]).filter(x=>x.st==='pending').length,'معلّقة')+kp('العطاء',E.charity||0,'نقطة')]
+  };
+  const BG={h:['#FFC857','#7C6CFF'],w:['#34D399','#22D3EE'],m:['#60A5FA','#A78BFA'],i:['#C084FC','#F472B6'],b:['#FBBF24','#FB923C'],c:['#2DD4BF','#60A5FA'],a:['#FBBF24','#F472B6']};
+  const SD={'h.o':'اللي محتاج تعمله دلوقتي','h.p':'صحة محفظتك ونموها','h.k':'مواعيدك المالية','w.s':'حساب بفايدة أسبوعية','w.d':'اقفل نقاطك وخد فايدة أكبر','w.g':'حدد هدف وشوف توقعات ثروتك','w.l':'تقييم ثقتك وقروضك','w.b':'اطلب من بنك الاجتماع','w.r':'فين بتروح نقاطك','m.k':'الأسعار والشراء والبيع','m.a':'نبض السوق وخريطته','m.t':'قارن ووقّت شرائك','i.a':'نصايح مخصصة لمحفظتك','i.s':'جرّب القرار قبل ما تنفذه','i.r':'قيس الخطر واختبر الضغط','i.q':'مهام وأسئلة تتعلم منها','i.p':'تقريرك الأسبوعي','b.c':'أسّس شركة واجمع مساهمين','b.s':'بيع خدماتك بأمان','b.a':'زايد على اللي يعجبك','c.j':'اشتغل واستلم راتب أسبوعي','c.d':'صوّت للمشروع الأحق','c.r':'مين الأعلى نموًا','a.q':'طلبات بنك الاجتماع','a.c':'الخزنة وتغذيتها','a.r':'ظبط الفوايد','a.n':'انشر خبر يحرّك السوق','a.j':'وظايف ومشاريع','a.x':'سجل كل العمليات','a.s':'تحليلات متقدمة'};
+  const sv=(x)=>`<svg class="eco-ar" viewBox="0 0 160 100" aria-hidden="true">${x}</svg>`;
+  const ART={
+    h:sv(`<circle cx="80" cy="50" r="46" fill="none" stroke="var(--b1)" stroke-opacity=".25" stroke-dasharray="2 7"><animateTransform attributeName="transform" type="rotate" from="0 80 50" to="360 80 50" dur="40s" repeatCount="indefinite"/></circle><circle cx="80" cy="50" r="30" fill="none" stroke="var(--b2)" stroke-opacity=".5"/><circle cx="80" cy="50" r="17" fill="var(--b1)" class="ar-pulse"/><g><circle cx="110" cy="50" r="5" fill="var(--b2)"/><animateTransform attributeName="transform" type="rotate" from="0 80 50" to="360 80 50" dur="9s" repeatCount="indefinite"/></g><g><circle cx="80" cy="4" r="3.5" fill="#fff" fill-opacity=".8"/><animateTransform attributeName="transform" type="rotate" from="360 80 50" to="0 80 50" dur="16s" repeatCount="indefinite"/></g>`),
+    w:sv(`<g class="ar-float"><ellipse cx="60" cy="82" rx="30" ry="9" fill="var(--b1)" fill-opacity=".35"/><ellipse cx="60" cy="74" rx="30" ry="9" fill="var(--b1)" fill-opacity=".55"/><ellipse cx="60" cy="66" rx="30" ry="9" fill="var(--b1)" fill-opacity=".8"/><ellipse cx="60" cy="58" rx="30" ry="9" fill="var(--b1)"/><text x="60" y="62" text-anchor="middle" font-size="11" font-weight="900" fill="#0d1030">$</text></g><g class="ar-bob"><circle cx="118" cy="30" r="13" fill="var(--b2)"/><text x="118" y="35" text-anchor="middle" font-size="14" font-weight="900" fill="#0d1030">+</text></g><path d="M96 88 L112 70 L124 78 L148 44" fill="none" stroke="var(--b2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="ar-draw"/>`),
+    m:sv(`<g stroke-linecap="round">${[[14,40,70,30,52,'u'],[36,30,60,22,46,'d'],[58,36,76,28,60,'u'],[80,20,52,14,40,'u'],[102,28,64,18,44,'d'],[124,10,40,6,28,'u']].map((c,i)=>`<line x1="${c[0]+6}" y1="${c[1]-8}" x2="${c[0]+6}" y2="${c[2]+6}" stroke="${c[5]==='u'?'var(--b1)':'var(--b2)'}" stroke-width="2" class="ar-up" style="animation-delay:${i*.25}s"/><rect x="${c[0]}" y="${c[3]}" width="12" height="${c[4]-c[3]+14}" rx="3" fill="${c[5]==='u'?'var(--b1)':'var(--b2)'}" class="ar-up" style="animation-delay:${i*.25}s"/>`).join('')}</g><path d="M6 78 C34 60 50 66 74 44 S116 40 152 10" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="2.5" stroke-linecap="round" class="ar-draw"/>`),
+    i:sv(`<g stroke="var(--b1)" stroke-opacity=".55" stroke-width="1.5"><line x1="30" y1="30" x2="80" y2="20"/><line x1="80" y1="20" x2="128" y2="38"/><line x1="30" y1="30" x2="60" y2="70"/><line x1="80" y1="20" x2="60" y2="70"/><line x1="128" y1="38" x2="100" y2="80"/><line x1="60" y1="70" x2="100" y2="80"/><line x1="80" y1="20" x2="100" y2="80"/></g>${[[30,30,6,0],[80,20,9,.4],[128,38,6,.8],[60,70,7,1.2],[100,80,8,1.6]].map(n=>`<circle cx="${n[0]}" cy="${n[1]}" r="${n[2]}" fill="var(--b${n[3]>.9?2:1})" class="ar-pulse" style="animation-delay:${n[3]}s"/>`).join('')}<circle cx="80" cy="20" r="16" fill="none" stroke="var(--b2)" stroke-opacity=".6" class="ar-ring"/>`),
+    b:sv(`<g>${[[16,50,24],[44,28,26],[74,40,22],[100,18,28],[130,46,20]].map((b,i)=>`<rect x="${b[0]}" y="${100-b[1]-6}" width="${b[2]}" height="${b[1]}" rx="4" fill="${i%2?'var(--b2)':'var(--b1)'}" fill-opacity="${.55+i*.09}" class="ar-up" style="animation-delay:${i*.3}s"/>`).join('')}</g><g fill="#fff" fill-opacity=".75">${[[22,52],[30,52],[22,62],[30,62],[50,34],[58,34],[50,46],[58,46],[106,24],[114,24],[106,36],[114,36],[106,48],[114,48]].map((w,i)=>`<rect x="${w[0]}" y="${w[1]}" width="4" height="5" rx="1" class="ar-tw" style="animation-delay:${(i%5)*.4}s"/>`).join('')}</g><line x1="4" y1="94" x2="156" y2="94" stroke="var(--b1)" stroke-opacity=".5"/>`),
+    c:sv(`<circle cx="124" cy="22" r="11" fill="var(--b2)" fill-opacity=".9" class="ar-pulse"/><g fill="#fff">${[[20,16],[48,10],[90,22],[146,50],[70,8]].map((t,i)=>`<circle cx="${t[0]}" cy="${t[1]}" r="1.6" class="ar-tw" style="animation-delay:${i*.45}s"/>`).join('')}</g><path d="M0 100 V70 h14 V52 h16 V68 h10 V40 h18 V62 h12 V48 h14 V66 h12 V34 h20 V60 h14 V74 h12 V100 Z" fill="var(--b1)" fill-opacity=".45"/><path d="M0 100 V84 h22 V70 h14 V82 h20 V66 h16 V80 h24 V72 h18 V86 h46 V100 Z" fill="var(--b1)" fill-opacity=".85"/>`),
+    a:sv(`<rect x="38" y="14" width="84" height="76" rx="14" fill="none" stroke="var(--b1)" stroke-width="3"/><rect x="48" y="24" width="64" height="56" rx="9" fill="var(--b1)" fill-opacity=".18"/><g><circle cx="80" cy="52" r="17" fill="none" stroke="var(--b2)" stroke-width="3"/><line x1="80" y1="52" x2="80" y2="38" stroke="var(--b1)" stroke-width="3" stroke-linecap="round"/><line x1="80" y1="52" x2="92" y2="58" stroke="var(--b1)" stroke-width="3" stroke-linecap="round"/><animateTransform attributeName="transform" type="rotate" from="0 80 52" to="360 80 52" dur="12s" repeatCount="indefinite"/></g><circle cx="80" cy="52" r="4" fill="#fff"/>`)
+  };
+  const bg=BG[tb]||BG.h,sbc=SB.find(x=>x[0]===cs)||[];
+  const qaW=tb==='w'?qaHtml:'';
+  const ph=PH[tb]?`<div class="eco-bn" style="--b1:${bg[0]};--b2:${bg[1]}"><i class="eco-bl l1"></i><i class="eco-bl l2"></i>${ART[tb]||''}<div class="eco-bt"><b>${PH[tb][1]}</b><small>${PH[tb][2]}</small></div><div class="eco-kps">${PH[tb][3]}</div></div>${qaW}<div class="eco-sh" key="${tb}${cs}"><span>${sbc[1]||''}</span><div><b>${sbc[2]||''}</b><small>${SD[tb+'.'+cs]||''}</small></div></div>`:'';
+  /* محتوى كل قسم فرعي (بيتبني بس لما يتفتح) */
+  const Wt=tW(bal,inv,net),Bt=tB(),Ct=tC(),At=tA();
+  const PG={
+    h:{o:()=>insHtml+tT()+S(['digest']),p:()=>tH(bal,inv,net)+tG()+tX(net),k:()=>S(['calendar'])},
+    w:{s:()=>Wt[0]+tD()+tS(),d:()=>Wt[1],g:()=>Wt[2]+S(['goalp','freedom','fan'])+Wt[3],l:()=>tL(),b:()=>tMB(),r:()=>S(['budget'])+tR()},
+    m:{k:()=>tick+tM(bal,inv,net),a:()=>S(['sentiment','heat','watch']),t:()=>S(['compare','timing'])},
+    i:{a:()=>S(['advisor'])+tO(bal,inv,net),s:()=>S(['whatif','rebal','optim']),r:()=>S(['risk','stress']),q:()=>S(['missions','quiz']),p:()=>S(['report'])},
+    b:{c:()=>Bt[0],s:()=>Bt[1],a:()=>S(['auction'])},
+    c:{j:()=>Ct[0],d:()=>Ct[1],r:()=>Ct[2]+S(['rank'])},
+    a:{q:()=>At[0],c:()=>At[1]+At[3],r:()=>At[2],n:()=>At[4],j:()=>At[5]+At[6],x:()=>At[7],s:()=>sm('admin',bal,inv,net,lk)}
+  };
+  let body='';try{body=((PG[tb]||{})[cs]||(()=>''))();}catch(e){body='<div style="'+C+'">تعذّر تحميل القسم حاليًا</div>';}
+  return `<div class="eco2${anim?' nv':''}" data-skin="${skin}" data-t="${tb}">${top}${hero}${state.adminUnlocked?lockBar():''}<i class="eco-sent"></i><div class="eco-stk">${nav}${snav}</div>${ph}<div class="eco-body${anim?' eco-in':''}" data-s="${cs}" style="--sx:${-dir*26}px">${body}</div></div>`;
 };
 setInterval(()=>{const ae=document.activeElement;if(state.view==='eco'&&ok&&!document.querySelector('.modal-overlay')&&!(ae&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName))&&![...document.querySelectorAll('input.field')].some(i=>i.value))reload();},60000);
-window.renderEcoPage=function(){const h=_rp();anim=false;setTimeout(cu,30);return h;};
+function hap(){}
+function toTop(){const x=document.querySelector('.eco-sent');if(x&&x.getBoundingClientRect().top<0)x.scrollIntoView({block:'start',behavior:RM()?'auto':'smooth'});}
+function navFx(was){
+  const e=document.querySelector('.eco-ni');
+  if(e){const i=+e.dataset.i;if(was)requestAnimationFrame(()=>requestAnimationFrame(()=>e.style.setProperty('--i',Math.max(i,0))));navPrev=i;}
+  if(!was)return;
+  const sn=document.querySelector('.eco-sn'),on=sn&&sn.querySelector('.on');
+  if(sn&&on){const r=on.getBoundingClientRect(),q=sn.getBoundingClientRect();sn.scrollBy({left:(r.left+r.width/2)-(q.left+q.width/2),behavior:'auto'});}
+  if(RM())return;
+  document.querySelectorAll('.eco-kv[data-cu]').forEach(el=>{const to=+el.dataset.cu;if(!to)return;const t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/800);el.textContent=fmt(fl(to*(1-Math.pow(1-k,3))));if(k<1&&el.isConnected)requestAnimationFrame(f);else el.textContent=fmt(to);})(t0);});
+}
+function goSub(v){const L=(SUBS[tab]||[]).map(x=>x[0]),o=L.indexOf(curSub(tab)),n=L.indexOf(v);if(n<0||n===o)return;dir=n>o?1:-1;sub[tab]=v;anim=true;saveNav();render();hap();toTop();}
+window.renderEcoPage=function(){const was=anim,h=_rp();anim=false;dir=0;setTimeout(()=>{cu();navFx(was);},30);return h;};
+/* سحب يمين/شمال داخل المحتوى بيتنقل بين الأقسام الفرعية */
+(function(){let x0=0,y0=0,t0=0,go=false;
+  document.addEventListener('touchstart',e=>{const t=e.target;go=!!(state.view==='eco'&&t.closest&&t.closest('.eco-body')&&!t.closest('input,select,textarea,.eco-tk,.eco-sn')&&!document.querySelector('.modal-overlay'));if(!go)return;const p=e.touches[0];x0=p.clientX;y0=p.clientY;t0=Date.now();},{passive:true});
+  document.addEventListener('touchend',e=>{if(!go)return;go=false;const p=e.changedTouches[0],dx=p.clientX-x0,dy=p.clientY-y0;if(Date.now()-t0>700||Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.5)return;const L=(SUBS[tab]||[]).map(x=>x[0]),i=L.indexOf(curSub(tab)),n=i+(dx>0?1:-1);if(n>=0&&n<L.length)goSub(L[n]);},{passive:true});
+})();
 document.addEventListener('click',async e=>{
   const el=e.target.closest&&e.target.closest('[data-eco]');if(!el)return;
   const a=el.dataset.eco,d=el.dataset,p=pid(),adm=state.adminUnlocked;
   if(E.locked&&!adm&&a!=='open')return showToast('القسم مقفول حاليًا من المنظمين',true);
-  if(a==='open'){ok=false;nt=false;anim=true;go('eco');load();return;}
-  if(a==='tab'){tab=d.v;anim=true;render();return;}
+  if(a==='open'){const had=restore();ok=had;nt=false;anim=true;fresh=!had;go('eco');loadP=load().then(()=>{fresh=true;},()=>{fresh=true;});return;}
+  if(a==='tab'){const L=TABS.map(x=>x[0]),o=L.indexOf(tab),n=L.indexOf(d.v);dir=(o<0||n<0||o===n)?0:(n>o?1:-1);tab=d.v;if(d.s&&(SUBS[tab]||[]).some(x=>x[0]===d.s))sub[tab]=d.s;anim=true;saveNav();render();hap();if(d.f)setTimeout(()=>{const x=document.getElementById(d.f);if(x){x.scrollIntoView({block:'center',behavior:'smooth'});try{x.focus({preventScroll:true});}catch(e){}}},140);else toTop();return;}
+  if(a==='sub'){goSub(d.v);return;}
+  if(a==='hero'){const h=el.closest('.eco-hero');if(h){h.classList.toggle('open');heroPref=h.classList.contains('open');el.setAttribute('aria-expanded',heroPref);hap();}return;}
+  if(a==='sk'){skin=SK[(SK.indexOf(skin)+1)%SK.length];try{localStorage.setItem('glv-eco-skin',skin);}catch(e){}render();return;}
+  if(a==='rf'){await reload();showToast('اتحدّثت البيانات');return;}
+  if(!fresh)await loadP;
   const done=m=>{if(m){showToast(m);coins(10);}return reload();};
   if(a==='sin'){const n=num('e-a');if(n<=0)return showToast('اكتب المبلغ',true);sec('إيداع في التوفير',async()=>{if(await wal(-n,'إيداع توفير')){await sv(u=>{if(!u.sav)u.st=T();u.sav+=n;});done('اتودّع '+n+' نقطة');}});}
   else if(a==='sout'){const n=num('e-a');if(n<=0||n>U.sav)return showToast('المبلغ غير صحيح',true);await sv(u=>{u.sav-=n;});if(await wal(n,'سحب توفير'))done('رجع '+n+' نقطة للفيزا');else done();}
@@ -47298,6 +47612,7 @@ document.addEventListener('click',async e=>{
   else if(a==='qz'){const day=fl(T()/864e5),Q=window.ecoQuiz||[];if(!Q.length||(U.qz&&U.qz.d===day))return;const g=+d.i===Q[day%Q.length].a;await sv(u=>{u.qz={d:day,ok:g};if(g)u.iq=(u.iq||0)+1;});done(g?'إجابة صح! +15 XP 🎓':'إجابة غلط، جرّب بكرة 💡');}
   else if(a==='wl'){await sv(u=>{u.wl=u.wl||{};if(u.wl[d.id])delete u.wl[d.id];else u.wl[d.id]=1;});done();}
   else if(a==='tg'){await sv(u=>{u.tp=d.v;});done();}
+  else if(a==='mbask'){const n=num('mb-a'),mx=E.mbMax||100;if(!hasVisa(p))return showToast('محتاج فيزا الأول',true);if(n<=0||n>mx)return showToast('المبلغ لازم يكون من 1 لـ '+mx,true);let g=false;await upd(K,o=>{o.req=o.req||[];if(o.req.some(x=>x.p===p&&x.st==='pending'))return false;if(n>(o.mbMax||100))return false;o.req.push({id:'r'+T(),p,a:n,n:val('mb-n').slice(0,80),ts:T(),st:'pending'});o.req=o.req.slice(-60);g=true;});done(g?'اتبعت طلبك للأدمن':'عندك طلب لسه مستني');}
   else if(a==='bl'){const n=num('bl-a');if(n<=0)return showToast('اكتب الميزانية الأسبوعية',true);await sv(u=>{u.bl=n;});done('اتحفظت الميزانية');}
   else if(adm){
     if(a==='apol'&&['rate','d7','d30'].includes(d.k))await upd(K,o=>{o[d.k]=Math.max(0,Number(d.v)||0);});
@@ -47306,6 +47621,14 @@ document.addEventListener('click',async e=>{
     else if(a==='acx'){let g=null;await upd(K,o=>{const y=(o.auc||[]).find(z=>z.id===d.id);if(!y||y.st!=='open')return false;y.st='void';g=y.bid?{b:y.bid,a:y.top}:null;});if(g){await adjustSharedNumber('glavera-visa-wallet',g.b,g.a);try{logVisaTx([{pid:g.b,type:'eco_in',amount:g.a,balAfter:0,note:'استرجاع مزاد ملغي'}]);}catch(e){}}}
     else if(a==='arate')await upd(K,o=>{const r=val('a-r'),w=val('a-7'),m=val('a-30');if(r!=='')o.rate=Math.max(0,Number(r));if(w!=='')o.d7=Math.max(0,Number(w));if(m!=='')o.d30=Math.max(0,Number(m));});
     else if(a==='avault'){const n=num('a-v');if(n>0)await give(n);}
+    else if(a==='mbmax'){const n=num('mb-m');if(n<=0)return showToast('اكتب رقم صحيح',true);await upd(K,o=>{o.mbMax=n;});}
+    else if(a==='mbno'){await upd(K,o=>{const q=(o.req||[]).find(x=>x.id===d.id);if(!q||q.st!=='pending')return false;q.st='no';q.ts2=T();});}
+    else if(a==='mbok'){let q=null;await upd(K,o=>{const x=(o.req||[]).find(y=>y.id===d.id);if(!x||x.st!=='pending'||(o.vault||0)<x.a)return false;o.vault-=x.a;x.st='ok';x.ts2=T();q=Object.assign({},x);});
+      if(!q)return showToast('الخزنة مش كفاية أو الطلب اتعالج قبل كده',true);
+      const r=await adjustSharedNumber('glavera-visa-wallet',q.p,q.a);
+      if(r!=='ok'){await upd(K,o=>{o.vault=(o.vault||0)+q.a;const x=(o.req||[]).find(y=>y.id===q.id);if(x)x.st='pending';});return showToast('حصلت مشكلة في التحويل والطلب رجع مستني',true);}
+      try{logVisaTx([{pid:q.p,type:'eco_in',amount:q.a,balAfter:0,note:'بنك الاجتماع'}]);}catch(e){}
+      aud('بنك الاجتماع: '+((PARTICIPANTS.find(x=>x.id===q.p)||{}).name||q.p),-q.a);}
     else if(a==='anews'){const t=val('n-t');if(!t)return;await upd(K,o=>{o.news={t,st:val('n-s'),pct:Math.max(-30,Math.min(30,Number(val('n-p'))||0)),ts:T()};});}
     else if(a==='jadd'){const t=val('j-t'),n=num('j-p');if(!t||n<=0)return;await upd(K,o=>{(o.jobs=o.jobs||[]).push({id:'j'+T(),t,pay:n});});}
     else if(a==='jdel')await upd(K,o=>{o.jobs=(o.jobs||[]).filter(x=>x.id!==d.id);});
@@ -47516,6 +47839,9 @@ function goalp(c){
 }
 document.addEventListener('click',function(e){const el=e.target.closest&&e.target.closest('[data-esub]');if(!el)return;window.__ecoSub=el.dataset.esub;if(typeof render==='function')render();});
 const SEC=[['ov','🏠 نظرة عامة',[cmd,digest,advisor,calendar,quiz]],['mk','📈 السوق',[sentiment,heat,watch,compare,timing]],['pf','💼 المحفظة',[rebal,whatif,risk,stress,optim,freedom]],['pl','🧭 التخطيط',[goalp,fan,budget,missions]],['cm','🤝 المجتمع',[rank,auction,report]]];
+const REG={cmd,digest,advisor,calendar,quiz,sentiment,heat,watch,compare,timing,rebal,whatif,risk,stress,optim,freedom,goalp,fan,budget,missions,rank,auction,report};
+function secOf(c,names){return names.map(function(n){try{return REG[n]?REG[n](c)||'':'';}catch(e){return '';}}).join('');}
+function lvl(c){const U=c.U,xp=(U.bd||[]).length*50+((U.ds||{}).n||0)*10+(U.cr||0)*2+Object.keys(U.hold).length*30+(U.pdone||0)*40+(U.sav>0?60:0)+(U.iq||0)*15,T=[[0,'🌱 مبتدئ'],[100,'📘 متدرب'],[250,'💼 مستثمر'],[450,'🎓 خبير'],[700,'💎 محترف'],[1000,'👑 أسطورة']];let i=0;T.forEach(function(t,j){if(xp>=t[0])i=j;});const nx=T[i+1],pg=nx?Math.round((xp-T[i][0])/(nx[0]-T[i][0])*100):100,h=U.hist||[],td=fl(Date.now()/864e5);let bs=h[0];h.forEach(function(x){if(x.d<=td-7)bs=x;});const wk=bs?Math.round((c.net-bs.v)/Math.max(bs.v,1)*100):0;return{xp:xp,n:T[i][1],nx:nx?nx[1]:'',pg:pg,wk:wk};}
 function userView(c){
   const k=window.__ecoSub||'ov',sc=SEC.find(function(x){return x[0]===k;})||SEC[0];
   return '<div style="display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;">'+SEC.map(function(x){return '<button type="button" data-esub="'+x[0]+'" class="btn '+(x[0]===sc[0]?'btn-primary':'btn-ghost')+'" style="padding:7px 13px;font-size:12px;white-space:nowrap;border-radius:14px;">'+x[1]+'</button>';}).join('')+'</div>'+sc[2].map(function(f){try{return f(c)||'';}catch(e){return '';}}).join('');
@@ -47592,7 +47918,7 @@ function hof(c){
   return card(c,'🏛️ لوحة شرف المستثمرين','<div style="'+sm()+'margin-top:4px;">متوسط النمو <b>'+avg+'%</b> · '+up+' رابح من '+P.length+'</div>'+sec('📈 الأكثر نموًا',best,'r')+sec('🧘 الأكثر ثباتًا (رابحين بأقل هبوط)',calm,'d')+(risky.length?'<div style="'+sm()+'margin-top:10px;">⚠️ أعلى هبوط: '+risky.map(function(x){return c.esc(x.n)+' ('+x.d+'%)';}).join('، ')+'</div>':'')+'<div style="margin-top:10px;"><button type="button" class="btn btn-primary" style="padding:8px 12px;font-size:13px;" onclick="ecoHofShare()">📢 شارك لوحة الشرف</button></div>');
 }
 
-window.ecoSmart={sig,user:userView,admin:function(c){return admin(c)+policy(c)+events(c)+aadmin(c)+(function(){try{return hof(c);}catch(e){return '';}})();}};
+window.ecoSmart={sig,sec:secOf,lvl:lvl,user:userView,admin:function(c){return admin(c)+policy(c)+events(c)+aadmin(c)+(function(){try{return hof(c);}catch(e){return '';}})();}};
 })();
 </script>
 
