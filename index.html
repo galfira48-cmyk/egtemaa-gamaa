@@ -9071,8 +9071,11 @@ const _GC = (function(){
 const _GC_SKIP = /^glavera-active-session-/; /* جلسات الأجهزة لازم تتقرا لايف بس */
 const _FB_TO = {}; /* علامة انتهاء المهلة */
 function _gxOffline(){ return typeof navigator!=='undefined' && navigator.onLine===false; }
+const _GCS = {}; /* مفاتيح اتقرت من كاش الجهاز (ممكن تبقى قديمة) بدل السيرفر */
+window.storageFromCache = function(k){ return !!_GCS[k]; };
 async function _gcRead(key, shared){
   if(_GC_SKIP.test(key)) return null;
+  _GCS[key] = true;
   const c = await _GC.get(key);
   return c===undefined ? null : { key, value:c, shared:!!shared };
 }
@@ -9083,6 +9086,7 @@ window.storage = {
     try{
       const snap = await _fbWithTimeout(_fbDb.ref(_FB_ROOT + '/' + _fbEncodeKey(key)).once('value'), _FB_TO);
       if(snap === _FB_TO) return await _gcRead(key, shared); /* النت بطيء: آخر نسخة محفوظة */
+      _GCS[key] = false;
       if(!snap || !snap.exists()){ if(!_GC_SKIP.test(key)) _GC.del(key); return null; }
       const val = snap.val();
       if(!_GC_SKIP.test(key)) _GC.set(key, val);
@@ -9205,18 +9209,56 @@ async function saveCheers(obj){
   try{ await window.storage.set('glavera-cheers', JSON.stringify(obj), true); }catch(e){}
 }
 async function loadBonus(){
+  let b = {}, stale = false;
   try{
     const r = await window.storage.get('glavera-bonus', true);
-    return r ? JSON.parse(r.value) : {};
-  }catch(e){ return {}; }
+    b = (r && r.value) ? (JSON.parse(r.value) || {}) : {};
+    stale = !!(window.storageFromCache && window.storageFromCache('glavera-bonus'));
+  }catch(e){ stale = true; }
+  if(typeof b!=='object' || b===null) b = {};
+  if(stale){
+    try{ const ps = new Set(); obGet().forEach(function(o){ ps.add(o.pid); }); ps.forEach(function(p){ const d = obDelta(p, 'bon'); if(d) b[p] = (b[p]||0) + d; }); }catch(e){}
+    try{ Object.defineProperty(b, '__stale', { value:true, enumerable:false, configurable:true }); }catch(e){}
+  }
+  return b;
 }
 async function saveBonus(obj){
-  try{ await window.storage.set('glavera-bonus', JSON.stringify(obj), true); }catch(e){}
+  if(obj && obj.__stale){ console.error('saveBonus blocked: bonus came from offline cache'); return false; }
+  try{ const r = await window.storage.set('glavera-bonus', JSON.stringify(obj), true); return !!r; }catch(e){ return false; }
 }
 /* ============================= VISA (فيزا Games) ============================= */
 let WALLET = {}, VISA_CARDS = {};
-async function loadWallet(){ try{ const r = await window.storage.get('glavera-visa-wallet', true); return r?JSON.parse(r.value):{}; }catch(e){ return {}; } }
-async function saveWallet(o){ try{ await window.storage.set('glavera-visa-wallet', JSON.stringify(o), true); }catch(e){} }
+async function loadWallet(){
+  let w = {}, stale = true;
+  for(let i=0; i<3 && stale; i++){
+    try{
+      const r = await window.storage.get('glavera-visa-wallet', true);
+      w = (r && r.value) ? (JSON.parse(r.value) || {}) : {};
+      stale = !!(window.storageFromCache && window.storageFromCache('glavera-visa-wallet'));
+    }catch(e){ stale = true; }
+    if(stale && (i===2 || navigator.onLine===false)) break;
+    if(stale) await new Promise(function(res){ setTimeout(res, 700); });
+  }
+  if(typeof w!=='object' || w===null) w = {};
+  if(stale){
+    try{
+      const ps = new Set();
+      obGet().forEach(function(o){ ps.add(o.pid); });
+      gxOffqLoad().forEach(function(o){ ps.add(o.pid); });
+      ps.forEach(function(p){
+        let d = obDelta(p, 'wal');
+        gxOffqLoad().forEach(function(x){ if(x.pid===p) d += (x.pts||0); });
+        if(d) w[p] = (w[p]||0) + d;
+      });
+    }catch(e){}
+    try{ Object.defineProperty(w, '__stale', { value:true, enumerable:false, configurable:true }); }catch(e){}
+  }
+  return w;
+}
+async function saveWallet(o){
+  if(o && o.__stale){ console.error('saveWallet blocked: wallet came from offline cache'); try{ showToast('الاتصال ضعيف — العملية اتوقفت عشان نقاطك متتأثرش. جرّب تاني.', true); }catch(e){} return false; }
+  try{ const r = await window.storage.set('glavera-visa-wallet', JSON.stringify(o), true); return !!r; }catch(e){ return false; }
+}
 async function loadVisaCards(){ try{ const r = await window.storage.get('glavera-visa-cards', true); return r?JSON.parse(r.value):{}; }catch(e){ return {}; } }
 async function saveVisaCards(o){ try{ await window.storage.set('glavera-visa-cards', JSON.stringify(o), true); }catch(e){} }
 /* ---------- كشف حساب الفيزا الكامل: كل حركة على الرصيد بتتسجل (مفتاح مستقل لكل مشارك + إشعارات لحظية) ---------- */
@@ -10336,6 +10378,7 @@ async function doVisaMove(kind){
   });
 }
 async function executeVisaMove(kind, pid, amt){
+  try{ await obSync(); }catch(e){}
   [WALLET, BONUS] = await Promise.all([loadWallet(), loadBonus()]);
   const bal = WALLET[pid]||0;
   let title, text;
@@ -10351,8 +10394,13 @@ async function executeVisaMove(kind, pid, amt){
     WALLET[pid] = bal - amt; BONUS[pid] = (BONUS[pid]||0) + amt;
     title = 'تم السحب بنجاح'; text = `تم سحب ${amt} نقطة من فيزتك.`;
   }
-  await saveWallet(WALLET); await saveBonus(BONUS);
-  await logVisaTx([{ pid, type:kind, amount:amt, balAfter:(WALLET[pid]||0) }]);
+  if(WALLET.__stale || BONUS.__stale){
+    obPush({ pid, k: kind==='deposit' ? 'vdep' : 'vwd', n: amt });
+    title += ' (أوفلاين)'; text += ' هتتأكد وتتزامن أول ما النت يرجع.';
+  } else {
+    await saveWallet(WALLET); await saveBonus(BONUS);
+    await logVisaTx([{ pid, type:kind, amount:amt, balAfter:(WALLET[pid]||0) }]);
+  }
   vibrate([15,10,25]); render();
   visaMsg('success', title, text, { pos:true, rows:[['العملية', kind==='deposit'?'إيداع':'سحب'],['المبلغ', amt+' نقطة'],['رصيد الفيزا الآن', (WALLET[pid]||0)+' نقطة']] });
 }
@@ -15204,6 +15252,107 @@ async function gxOffqSync(){
 }
 window.addEventListener('online', function(){ setTimeout(gxOffqSync, 1500); });
 setInterval(function(){ try{ gxOffqSync(); }catch(e){} }, 15000);
+
+/* OB-BEGIN ===== عمليات أوفلاين (إيداع/سحب الفيزا + توفير + ودائع): بتتسجّل على الجهاز وبتتنفّذ بمعاملات ذرّية لما النت يرجع ===== */
+function obGet(){ try{ const a = JSON.parse(localStorage.getItem('glv-ob-v1')||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function obSet(a){ try{ localStorage.setItem('glv-ob-v1', JSON.stringify(a)); }catch(e){} }
+function obPush(op){ const a = obGet(); op.id = 'ob'+Date.now()+Math.random().toString(36).slice(2,6); op.ts = Date.now(); a.push(op); obSet(a); obBadge(); return op; }
+function obPatch(id, patch){ const a = obGet(); const o = a.find(function(x){ return x.id===id; }); if(o){ Object.assign(o, patch); obSet(a); } }
+function obRemove(id){ obSet(obGet().filter(function(x){ return x.id!==id; })); obBadge(); }
+function obDef(){ return {
+  vdep:{ wal:{st:2,sg:1}, bon:{st:1,sg:-1} },
+  vwd:{ wal:{st:1,sg:-1}, bon:{st:2,sg:1} },
+  esin:{ wal:{st:1,sg:-1}, eco:{st:2} },
+  esout:{ wal:{st:2,sg:1}, eco:{st:1} },
+  edep:{ wal:{st:1,sg:-1}, eco:{st:2} } }; }
+function obDelta(pid, what){ let d = 0; const D = obDef(); obGet().forEach(function(op){ if(op.pid!==pid) return; const f = (D[op.k]||{})[what]; if(f && !op['s'+f.st]) d += f.sg*(op.n||0); }); return d; }
+function obApplyEco(U, pid){
+  if(!U || typeof U!=='object') return U;
+  const D = obDef();
+  obGet().forEach(function(op){
+    if(op.pid!==pid) return; const f = (D[op.k]||{}).eco; if(!f || op['s'+f.st]) return;
+    const n = op.n||0; U.dep = U.dep||[];
+    if(op.k==='esin'){ if(!U.sav) U.st = op.ts; U.sav = (U.sav||0)+n; }
+    else if(op.k==='esout'){ U.sav = Math.max(0,(U.sav||0)-n); }
+    else if(op.k==='edep'){ U.dep.push({a:n,end:op.ts+(op.days||7)*864e5,r:op.r||0,pend:1}); }
+  });
+  return U;
+}
+async function obUpd(key, fn){
+  let blocked = false;
+  const ap = function(c){ blocked = false; let o = {}; try{ o = c ? JSON.parse(c) : {}; }catch(e){} if(!o || typeof o!=='object') o = {}; if(fn(o, c===null)===false){ blocked = true; return; } return JSON.stringify(o); };
+  try{ if(!window.storage || !window.storage.update) return 'fail'; const r = await window.storage.update(key, ap, true); if(r) return 'ok'; return blocked ? 'short' : 'fail'; }catch(e){ return 'fail'; }
+}
+async function obRun(op){
+  const pid = op.pid, n = op.n|0, D = obDef()[op.k];
+  if(!D || !(n>0)) return 'bad';
+  const stage = async function(st){
+    if(D.wal && D.wal.st===st) return await adjustSharedNumber('glavera-visa-wallet', pid, D.wal.sg*n, D.wal.sg<0?0:undefined);
+    if(D.bon && D.bon.st===st) return await adjustSharedNumber('glavera-bonus', pid, D.bon.sg*n);
+    if(D.eco && D.eco.st===st){
+      return await obUpd('glv-eco-u-'+pid, function(o, isNull){
+        o.cr = o.cr ?? 50; o.sav = o.sav||0; o.dep = o.dep||[]; o.hold = o.hold||{}; o.cost = o.cost||{};
+        if(op.k==='esin'){ if(!o.sav) o.st = Date.now(); o.sav += n; }
+        else if(op.k==='esout'){ if(!isNull && o.sav<n) return false; o.sav = Math.max(0, o.sav-n); }
+        else if(op.k==='edep'){ o.dep.push({a:n,end:Date.now()+(op.days||7)*864e5,r:op.r||0}); }
+      });
+    }
+    return 'ok';
+  };
+  for(const st of [1,2]){
+    if(op['s'+st]) continue;
+    const r = await stage(st);
+    if(r==='short' && st===1) return 'perm';
+    if(r!=='ok') return 'retry';
+    op['s'+st] = true; const pt = {}; pt['s'+st] = true; obPatch(op.id, pt);
+  }
+  return 'done';
+}
+async function obLog(op){
+  let bal = 0; try{ const r = await window.storage.get('glavera-visa-wallet', true); bal = (JSON.parse(r.value)||{})[op.pid]||0; }catch(e){}
+  const L = { vdep:['deposit','إيداع (أوفلاين)'], vwd:['withdraw','سحب (أوفلاين)'], esin:['eco_out','إيداع توفير (أوفلاين)'], esout:['eco_in','سحب توفير (أوفلاين)'], edep:['eco_out','وديعة '+(op.days||7)+' يوم (أوفلاين)'] }[op.k];
+  if(!L) return;
+  try{ await logVisaTx([{ pid:op.pid, type:L[0], amount:op.n, balAfter:bal, note:L[1] }]); }catch(e){}
+}
+function obLabel(op){ return ({ vdep:'إيداع في الفيزا', vwd:'سحب من الفيزا', esin:'إيداع توفير', esout:'سحب توفير', edep:'قفل وديعة' })[op.k] || 'عملية'; }
+async function obSync(){
+  if(window.__obBusy) return;
+  if(!obGet().length) return;
+  if(typeof navigator!=='undefined' && navigator.onLine===false) return;
+  window.__obBusy = true; let ok = 0; const bad = [];
+  try{
+    try{ await gxOffqSync(); }catch(e){} /* الأرباح اللي اتسجّلت أوفلاين الأول عشان الرصيد يكفي */
+    for(const op of obGet()){
+      if(typeof gxOffqLoad==='function' && gxOffqLoad().some(function(x){ return x.pid===op.pid; })) break;
+      const r = await obRun(op);
+      if(r==='retry'){ obPatch(op.id, { tries:(op.tries||0)+1 }); break; }
+      obRemove(op.id);
+      if(r==='done'){ ok++; await obLog(op); } else bad.push(op);
+    }
+  }catch(e){}
+  window.__obBusy = false; obBadge();
+  if(ok){ try{ showToast('✅ اتزامنت '+ok+' عملية كانت أوفلاين'); }catch(e){} }
+  bad.forEach(function(op){ try{ showToast('⚠️ '+obLabel(op)+' ('+op.n+' نقطة) اتلغت: الرصيد مكفاش وقت المزامنة', true); }catch(e){} });
+  if(ok || bad.length){
+    try{ WALLET = await loadWallet(); BONUS = await loadBonus(); }catch(e){}
+    try{ document.dispatchEvent(new CustomEvent('glv-ob-synced')); }catch(e){}
+    try{ render(); }catch(e){}
+  }
+}
+function obBadge(){
+  try{
+    const n = obGet().length; let el = document.getElementById('ob-chip');
+    if(!n){ if(el) el.remove(); return; }
+    if(!el){ el = document.createElement('div'); el.id = 'ob-chip'; el.style.cssText = 'position:fixed;bottom:14px;left:14px;z-index:99999;background:rgba(20,20,30,.92);color:#F4B740;border:1px solid rgba(244,183,64,.5);border-radius:999px;padding:6px 12px;font:700 12px Cairo,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.4);pointer-events:none;'; document.body.appendChild(el); }
+    el.textContent = '⏳ '+n+' عملية بتستنى النت';
+  }catch(e){}
+}
+window.obSync = obSync;
+window.addEventListener('online', function(){ setTimeout(function(){ try{ obSync(); }catch(e){} }, 2000); });
+setInterval(function(){ try{ obSync(); }catch(e){} }, 20000);
+setTimeout(function(){ obBadge(); try{ obSync(); }catch(e){} }, 2500);
+/* OB-END */
+
 /* ===== نقط الألعاب اللي فيها مراحل: بتتجمّع أثناء اللعب وبتتحوّل كلها مرة واحدة لما اللاعب يخرج/ينهي ===== */
 const GX_DEFER_KEY = 'glv-deferred-pts';
 function gxDeferLoad(){ try{ return JSON.parse(localStorage.getItem(GX_DEFER_KEY)||'{}')||{}; }catch(e){ return {}; } }
@@ -47234,7 +47383,9 @@ function af(id){const d=fl(T()/864e5),a=A.d||{},n=(a[d]||{})[id]||0;let p=0;for(
 const pid=()=>state.pid,esc=x=>escapeHtml(x==null?'':x);
 const val=id=>((document.getElementById(id)||{}).value||'').trim(),num=id=>fl(Number(val(id))||0);
 const uk=()=>'glv-eco-u-'+pid(),hr=()=>fl(T()/H);
+let RO=false; /* وضع القراءة فقط: لو بيانات السيرفر متقراتش، مفيش أي كتابة أو خصم */
 async function rd(k){try{const r=await window.storage.get(k,true);return r&&r.value?JSON.parse(r.value):{};}catch(e){return{};}}
+async function rdU(k){for(let i=0;i<3;i++){try{const r=await window.storage.get(k,true);if(!(window.storageFromCache&&window.storageFromCache(k)))return r&&r.value?JSON.parse(r.value):{};}catch(e){}if(navigator.onLine===false)break;await new Promise(f=>setTimeout(f,700));}return null;}
 async function upd(k,fn){
   const ap=c=>{let o={};try{o=c?JSON.parse(c):{};}catch(e){}if(!o||typeof o!=='object')o={};if(fn(o)===false)return;return JSON.stringify(o);};
   try{
@@ -47253,8 +47404,9 @@ async function sellS(id,why){
   await sv(u=>{delete u.hold[id];delete u.cost[id];if(u.ins)delete u.ins[id];if(u.ord)delete u.ord[id];});
   await wal(pay,why||'بيع أسهم');return pay;
 }
-async function sv(fn){fn(U);await upd(uk(),o=>{Object.assign(o,U);});}
+async function sv(fn){if(RO)return false;fn(U);return await upd(uk(),o=>{Object.assign(o,U);});}
 async function wal(d,note){
+  if(RO){showToast('الاتصال ضعيف — العملية متوقفة لحماية نقاطك، جرّب تاني',true);return false;}
   if(d<0&&visaExpired(pid())){showExpiredDialog();return false;}
   const r=await adjustSharedNumber('glavera-visa-wallet',pid(),d,d<0?0:undefined);
   if(r!=='ok'){showToast(r==='short'?'رصيد الفيزا مش كفاية':'حصلت مشكلة، حاول تاني',true);return false;}
@@ -47263,15 +47415,40 @@ async function wal(d,note){
   return true;
 }
 /* الخزنة: كل الفوايد والرواتب بتتدفع منها (سقف طبيعي ضد التضخم) والضريبة 2% بتروح لصندوق العطاء */
-async function take(want,tax){let got=0;await upd(K,o=>{const p=Math.min(Math.max(0,want),o.vault||0);o.vault=(o.vault||0)-p;const t=tax?fl(p*.02):0;o.charity=(o.charity||0)+t;got=p-t;});return got;}
-async function give(n){await upd(K,o=>{o.vault=(o.vault||0)+n;});}
+async function take(want,tax){if(RO)return 0;let got=0;await upd(K,o=>{const p=Math.min(Math.max(0,want),o.vault||0);o.vault=(o.vault||0)-p;const t=tax?fl(p*.02):0;o.charity=(o.charity||0)+t;got=p-t;});return got;}
+async function give(n){if(RO)return;await upd(K,o=>{o.vault=(o.vault||0)+n;});}
 function sec(title,fn){
   showPinEntryModal({title,text:'اكتب الرقم السري (CVV) لتأكيد العملية',onSubmit:async p=>{if(!(await verifyVisaPin(pid(),p)))return false;await fn();return true;}});
 }
+function offAct(a,d){
+  const p=pid();
+  if(visaExpired(p)){showExpiredDialog();return;}
+  const n=a==='dep'?num('e-d'):num('e-a');
+  if(n<=0)return showToast('اكتب المبلغ',true);
+  const bal=WALLET[p]||0,days=+d.d||7,r=days===7?E.d7:E.d30;
+  if(a==='sin'&&n>bal)return showToast('رصيد الفيزا مش كفاية',true);
+  if(a==='dep'){if(n<10)return showToast('أقل وديعة 10 نقاط',true);if(n>bal)return showToast('رصيد الفيزا مش كفاية',true);}
+  if(a==='sout'&&n>U.sav)return showToast('المبلغ غير صحيح',true);
+  sec(a==='sin'?'إيداع في التوفير (أوفلاين)':a==='sout'?'سحب من التوفير (أوفلاين)':'قفل وديعة (أوفلاين)',async()=>{
+    const b2=WALLET[p]||0;
+    obPush({pid:p,k:a==='sin'?'esin':a==='sout'?'esout':'edep',n,days,r});
+    if(a==='sin'){WALLET[p]=b2-n;if(!U.sav)U.st=T();U.sav+=n;}
+    else if(a==='sout'){WALLET[p]=b2+n;U.sav-=n;}
+    else{WALLET[p]=b2-n;U.dep.push({a:n,end:T()+days*864e5,r,pend:1});}
+    snap();showToast('✅ اتسجّلت أوفلاين — هتتأكد أول ما النت يرجع');render();
+  });
+}
 async function load(){
   if(!visaCreated(pid())){go('visa');return;}
-  let wl;[U,,wl]=await Promise.all([rd(uk()),pullE(),loadWallet()]);
+  try{await obSync();}catch(e){}
+  let wl,u0;[u0,,wl]=await Promise.all([rdU(uk()),pullE(),loadWallet()]);
   if(E.locked&&!state.adminUnlocked){ok=true;render();return;}
+  if(u0===null||wl.__stale){
+    RO=true;if(u0!==null){U=u0;try{obApplyEco(U,pid());}catch(e){}}else if(!U||typeof U!=='object')U={};
+    U.cr=U.cr??50;U.sav=U.sav||0;U.dep=U.dep||[];U.hold=U.hold||{};U.cost=U.cost||{};
+    WALLET=wl;ok=true;showToast('📴 وضع أوفلاين — متاح: التوفير والودائع وإيداع/سحب الفيزا. الباقي لما النت يرجع');render();return;
+  }
+  RO=false;U=u0;
   U.cr=U.cr??50;U.sav=U.sav||0;U.dep=U.dep||[];U.hold=U.hold||{};U.cost=U.cost||{};
   WALLET=wl;
   if(U.dca&&U.dca.a>0){const wk=fl((T()-U.dca.ts)/W);if(wk>=1){let n=0;for(let i=0;i<Math.min(wk,4);i++){if((WALLET[pid()]||0)<U.dca.a||!(await wal(-U.dca.a,'ادخار تلقائي')))break;n+=U.dca.a;}await sv(u=>{if(n&&!u.sav)u.st=T();u.sav+=n;u.dca.ts+=wk*W;});if(n)showToast('💰 اتحوّل '+n+' نقطة لتوفيرك تلقائيًا');}}
@@ -47540,6 +47717,7 @@ window.renderEcoPage=function(){const was=anim,h=_rp();anim=false;dir=0;setTimeo
   document.addEventListener('touchstart',e=>{const t=e.target;go=!!(state.view==='eco'&&t.closest&&t.closest('.eco-body')&&!t.closest('input,select,textarea,.eco-tk,.eco-sn')&&!document.querySelector('.modal-overlay'));if(!go)return;const p=e.touches[0];x0=p.clientX;y0=p.clientY;t0=Date.now();},{passive:true});
   document.addEventListener('touchend',e=>{if(!go)return;go=false;const p=e.changedTouches[0],dx=p.clientX-x0,dy=p.clientY-y0;if(Date.now()-t0>700||Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.5)return;const L=(SUBS[tab]||[]).map(x=>x[0]),i=L.indexOf(curSub(tab)),n=i+(dx>0?1:-1);if(n>=0&&n<L.length)goSub(L[n]);},{passive:true});
 })();
+document.addEventListener('glv-ob-synced',()=>{if(state.view==='eco')reload();});
 document.addEventListener('click',async e=>{
   const el=e.target.closest&&e.target.closest('[data-eco]');if(!el)return;
   const a=el.dataset.eco,d=el.dataset,p=pid(),adm=state.adminUnlocked;
@@ -47551,11 +47729,12 @@ document.addEventListener('click',async e=>{
   if(a==='sk'){skin=SK[(SK.indexOf(skin)+1)%SK.length];try{localStorage.setItem('glv-eco-skin',skin);}catch(e){}render();return;}
   if(a==='rf'){await reload();showToast('اتحدّثت البيانات');return;}
   if(!fresh)await loadP;
+  if(RO){if(a==='sin'||a==='sout'||a==='dep')return offAct(a,d);return showToast('العملية دي محتاجة نت (الأسهم، الخزنة، القروض). المتاح أوفلاين: التوفير والودائع وإيداع/سحب الفيزا.',true);}
   const done=m=>{if(m){showToast(m);coins(10);}return reload();};
-  if(a==='sin'){const n=num('e-a');if(n<=0)return showToast('اكتب المبلغ',true);sec('إيداع في التوفير',async()=>{if(await wal(-n,'إيداع توفير')){await sv(u=>{if(!u.sav)u.st=T();u.sav+=n;});done('اتودّع '+n+' نقطة');}});}
-  else if(a==='sout'){const n=num('e-a');if(n<=0||n>U.sav)return showToast('المبلغ غير صحيح',true);await sv(u=>{u.sav-=n;});if(await wal(n,'سحب توفير'))done('رجع '+n+' نقطة للفيزا');else done();}
-  else if(a==='dep'){const n=num('e-d'),days=+d.d;if(n<10)return showToast('أقل وديعة 10 نقاط',true);sec('قفل وديعة',async()=>{if(await wal(-n,'وديعة '+days+' يوم')){await sv(u=>{u.dep.push({a:n,end:T()+days*864e5,r:days===7?E.d7:E.d30});});done('اتقفلت الوديعة');}});}
-  else if(a==='dclaim'){const x=U.dep[+d.i];if(!x||x.end>T())return;const g=await take(fl(x.a*x.r/100),true);await sv(u=>{u.dep.splice(+d.i,1);u.pdone=(u.pdone||0)+1;});await wal(x.a+g,'استلام وديعة');done('استلمت '+(x.a+g)+' نقطة');}
+  if(a==='sin'){const n=num('e-a');if(n<=0)return showToast('اكتب المبلغ',true);sec('إيداع في التوفير',async()=>{if(await wal(-n,'إيداع توفير')){if(!(await sv(u=>{if(!u.sav)u.st=T();u.sav+=n;}))){await wal(n,'استرجاع: تعذّر حفظ التوفير');showToast('تعذّر الحفظ — النقاط رجعت لفيزتك، جرّب تاني',true);return reload();}done('اتودّع '+n+' نقطة');}});}
+  else if(a==='sout'){const n=num('e-a');if(n<=0||n>U.sav)return showToast('المبلغ غير صحيح',true);if(!(await sv(u=>{u.sav-=n;})))return showToast('تعذّر الحفظ — جرّب تاني',true);if(await wal(n,'سحب توفير'))done('رجع '+n+' نقطة للفيزا');else done();}
+  else if(a==='dep'){const n=num('e-d'),days=+d.d;if(n<10)return showToast('أقل وديعة 10 نقاط',true);sec('قفل وديعة',async()=>{if(await wal(-n,'وديعة '+days+' يوم')){if(!(await sv(u=>{u.dep.push({a:n,end:T()+days*864e5,r:days===7?E.d7:E.d30});}))){await wal(n,'استرجاع: تعذّر حفظ الوديعة');showToast('تعذّر حفظ الوديعة — النقاط رجعت لفيزتك، جرّب تاني',true);return reload();}done('اتقفلت الوديعة');}});}
+  else if(a==='dclaim'){const x=U.dep[+d.i];if(!x||x.end>T())return;if(!(await sv(u=>{u.dep.splice(+d.i,1);u.pdone=(u.pdone||0)+1;})))return showToast('تعذّر الحفظ — جرّب تاني',true);const g=await take(fl(x.a*x.r/100),true);await wal(x.a+g,'استلام وديعة');done('استلمت '+(x.a+g)+' نقطة');}
   else if(a==='goal'){const n=val('g-n'),t=num('g-t');if(!n||t<=0)return showToast('اكتب الهدف والمبلغ',true);await sv(u=>{u.goal={n,t};});done('اتحفظ الهدف');}
   else if(a==='buy'){
     const s=ST.find(x=>x.id===d.id),q=+d.q,pc=pr(s,hr(),1),cost=pc*q,fee=Math.max(1,fl(cost*.01)),bal=WALLET[p]||0;
