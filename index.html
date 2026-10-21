@@ -14531,6 +14531,21 @@ function bbGuideOpen(){
   });
   bbGuideRender();
 }
+/* ---------- الوقت الفعلي للخلوة: بيتحسب بس والشاشة ظاهرة وفي تفاعل (لمس/سحب/كتابة) ---------- */
+const KH_IDLE_MS = 60000;
+let khLastAct = 0;
+['pointerdown','touchstart','touchmove','scroll','wheel','keydown','click','input'].forEach(function(ev){
+  document.addEventListener(ev, function(){ khLastAct = Date.now(); }, {passive:true, capture:true});
+});
+setInterval(function(){
+  try{
+    if(document.hidden) return;
+    if(!document.getElementById('bb-guide')) return;      /* الخلوة الموجّهة مفتوحة (والقارئ بيتفتح فوقها) */
+    if(typeof BB==='undefined' || !BB.g || BB.g.finished) return;
+    if(Date.now()-khLastAct > KH_IDLE_MS) return;          /* ساكت من غير تفاعل */
+    BB.g.active = (BB.g.active||0) + 1;
+  }catch(e){}
+}, 1000);
 /* ---------- نقاط الخلوة ---------- */
 const KH_POINTS = 10;          /* الحد الأدنى لنقاط الخلوة الموجّهة (مرة واحدة في اليوم) */
 /* نقاط إضافية حسب مدة الخلوة (بالدقايق → نقاط). مش معروضة للمستخدم. بتتحسب من أعلى شريحة وصلها */
@@ -14560,7 +14575,7 @@ async function bbGuideFinish(){
   const g = BB.g, d = bbData(), l = bibleLast();
   const ref = g.ref || ((l && BIBLE_BOOKS[l.t] && BIBLE_BOOKS[l.t][l.bi]) ? BIBLE_BOOKS[l.t][l.bi][1]+' '+bbAr(l.ch) : '');
   const date = new Date().toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
-  g.secs = Math.round((Date.now()-g.ts)/1000); g.refOut = ref;
+  g.secs = Math.round(g.active||0); g.finished = true; g.refOut = ref;
   d.sess.unshift({ts:Date.now(), ref, q:g.q, refl:g.refl.trim(), commit:g.commit.trim(), secs:g.secs}); if(d.sess.length>60) d.sess.length = 60;
   try{ g.earned = await khAward(g); }catch(e){ g.earned = 0; }
   let t = '🕊 خلوة '+date; if(ref) t += '\n📖 '+ref; if(g.refl.trim()) t += '\n💭 '+g.q+'\n'+g.refl.trim(); if(g.commit.trim()) t += '\n🎯 التزامي: '+g.commit.trim();
