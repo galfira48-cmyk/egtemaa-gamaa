@@ -1702,6 +1702,65 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .rt-bible-card .bd{ font-size:12px; color:var(--text-muted); margin-top:2px; font-weight:600; }
   .rt-bible-card .bc{ margin-inline-start:auto; color:var(--gold-2); display:flex; }
   .rt-bible-card .bc svg{ width:18px; height:18px; }
+
+  /* ================= الخلوة الفردية — تصميم رسمي ================= */
+  .rt-hero, .rt-stats, .rt-main-cta, .rt-bible-card, .rt-rem, .rt-tl, .retreat-note, .rt-rc{ --rt-line: var(--border); --rt-accent: rgba(244,183,64,.55); }
+  @supports (color: color-mix(in srgb, red 10%, blue)){
+    .rt-hero, .rt-stats, .rt-main-cta, .rt-bible-card, .rt-rem, .rt-tl, .retreat-note, .rt-rc{ --rt-accent: color-mix(in srgb, var(--gold) 55%, transparent); }
+  }
+
+  /* الهيرو: لوحة معلومات مرتبة، محاذاة يمين */
+  .rt-hero{ position:relative; display:grid; grid-template-columns:64px 1fr; column-gap:14px; align-items:center; text-align:start;
+    padding:18px 16px; margin-bottom:12px; border-radius:14px; background:var(--surface); border:1px solid var(--rt-line); border-top:3px solid var(--gold); box-shadow:none; }
+  .rt-hero::before{ content:none; }
+  .rt-hero > .rt-bible{ grid-column:1; grid-row:1 / span 3; width:64px; height:64px; margin:0; filter:none; }
+  .rt-hero > .rt-bible svg{ width:64px; height:64px; }
+  .rt-hero .rt-greet{ grid-column:2; font-family:'Cairo',sans-serif; font-size:12.5px; font-weight:600; color:var(--text-muted); margin:0; letter-spacing:0; }
+  .rt-hero h2{ grid-column:2; font-family:'Cairo',sans-serif; font-weight:800; font-size:22px; line-height:1.4; color:var(--text); margin:2px 0 0; }
+  .rt-hero p{ grid-column:1 / -1; max-width:none; margin:14px 0 0; padding-top:12px; border-top:1px solid var(--rt-line); font-family:'Cairo',sans-serif; font-size:13.5px; line-height:1.9; color:var(--text-muted); opacity:1; }
+  .rt-chip{ grid-column:1 / -1; justify-self:start; margin-top:12px; padding:6px 12px; border-radius:8px; font-size:12.5px; font-weight:700; background:transparent; border:1px solid var(--rt-line); }
+
+  /* الإحصائيات: 4 خانات متساوية */
+  .rt-stats{ gap:8px; margin:0 0 12px; padding:0; border:0; }
+  .rt-stat{ padding:12px 4px 10px; border-radius:12px; background:var(--surface); border:1px solid var(--rt-line); }
+  .rt-stat:first-child{ border-inline-start:1px solid var(--rt-line); }
+  .rt-stat b{ font-family:'Cairo',sans-serif; font-weight:800; font-size:20px; color:var(--text); }
+  .rt-stat small{ font-size:10.5px; font-weight:600; margin-top:3px; }
+
+  /* الزرار الرئيسي */
+  .rt-main-cta{ padding:14px 16px; border-radius:14px; gap:14px; background:var(--gold); box-shadow:none; border:0; }
+  .rt-main-cta .bi{ width:48px; height:48px; border-radius:10px; font-size:24px; background:rgba(26,22,51,.12); }
+  .rt-main-cta .bt{ font-family:'Cairo',sans-serif; font-size:16.5px; font-weight:800; }
+  .rt-main-cta .bd{ font-size:12px; font-weight:600; opacity:.8; margin-top:2px; }
+
+  /* الكتاب المقدس */
+  .rt-bible-card{ margin:0 0 12px; padding:14px 16px; border-radius:14px; background:var(--surface); border:1px solid var(--rt-line); box-shadow:none; }
+  .rt-bible-card .bi{ width:48px; height:48px; border-radius:10px; font-size:23px; background:transparent; border:1px solid var(--rt-accent); }
+  .rt-bible-card .bt{ font-family:'Cairo',sans-serif; font-size:16px; font-weight:800; }
+  .rt-bible-card .bd{ font-size:12px; line-height:1.7; }
+
+  /* التذكير */
+  .rt-rem{ margin:0 0 16px; border-radius:14px; background:var(--surface); border:1px solid var(--rt-line); }
+  .rt-rem-top .ri{ border-radius:10px; background:transparent; border:1px solid var(--rt-accent); }
+  .rt-rem-txt .t{ font-family:'Cairo',sans-serif; font-size:14.5px; font-weight:800; }
+
+  /* الخطوات: قائمة مرتبة */
+  .rt-tl{ gap:8px; }
+  .rt-tl::before{ content:none; }
+  .rt-tl .rt-step{ padding:12px 14px; gap:12px; border-radius:12px; background:var(--surface); border:1px solid var(--rt-line); }
+  .rt-tl .rt-step .n{ width:30px; height:30px; border-radius:8px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:800; color:var(--text); background:transparent; border:1px solid var(--rt-accent); box-shadow:none; }
+  .rt-tl .rt-step .t{ font-family:'Cairo',sans-serif; font-size:14px; font-weight:800; }
+  .rt-tl .rt-step .d{ font-size:12.5px; line-height:1.7; }
+
+  /* آخر الخلوات */
+  .rt-rc{ padding:12px 14px; border-radius:12px; background:var(--surface); border:1px solid var(--rt-line); border-inline-start:3px solid var(--gold); }
+  .rt-rc .c{ font-family:'Cairo',sans-serif; font-size:12.5px; line-height:1.8; }
+
+  /* الملاحظات */
+  textarea.retreat-note{ font-family:'Cairo',sans-serif; font-size:14.5px; line-height:1.9; min-height:180px; padding:12px 14px; border-radius:12px; background-image:none; }
+  .rt-saved{ font-size:12px; }
+  .rt-pts{ margin:-4px 0 12px; padding:9px 14px; border-radius:10px; font-family:'Cairo',sans-serif; font-size:12px; font-weight:700; line-height:1.7; color:var(--text-muted); background:var(--surface); border:1px dashed var(--rt-accent, var(--border)); }
+  .rt-pts.got{ color:var(--good); border-style:solid; }
   .modal-overlay.bb-overlay{ align-items:stretch; justify-content:flex-end; padding:0; background:rgba(6,5,20,.78); }
   .bb-sheet{ --bb-fs:19px; width:100%; max-width:560px; margin:0 auto; height:92vh; display:flex; flex-direction:column; background:var(--bg-2); position:relative; overflow:hidden;
     border:1px solid var(--border); border-radius:26px 26px 0 0; box-shadow:0 -20px 50px rgba(0,0,0,.45); animation:bbUp .28s cubic-bezier(.2,1,.3,1); font-family:'Cairo',sans-serif; color:var(--text); }
@@ -14095,6 +14154,7 @@ function renderRetreatPage(){
       <span><div class="bt">ابدأ خلوة موجّهة</div><div class="bd">صلاة ← قراءة ← تأمل ← التزام — خطوة بخطوة</div></span>
       <span class="bc">${ICO.chev}</span>
     </button>
+    <div class="rt-pts ${khClaimedToday()?'got':''}">${khClaimedToday() ? '✅ خدت نقاط خلوة النهارده' : '🎁 نقاط عن كل يوم تخلّص فيه خلوة موجّهة، وبونص لما تواظب أيام متتالية'}</div>
     <button type="button" class="rt-bible-card" data-action="bible-open" aria-label="الكتاب المقدس">
       <span class="bi">📖</span>
       <span><div class="bt">الكتاب المقدس</div><div class="bd">العهد القديم والعهد الجديد — اقرأ بين يدي ربنا</div></span>
@@ -14471,12 +14531,38 @@ function bbGuideOpen(){
   });
   bbGuideRender();
 }
+/* ---------- نقاط الخلوة ---------- */
+const KH_POINTS = 10;          /* الحد الأدنى لنقاط الخلوة الموجّهة (مرة واحدة في اليوم) */
+/* نقاط إضافية حسب مدة الخلوة (بالدقايق → نقاط). مش معروضة للمستخدم. بتتحسب من أعلى شريحة وصلها */
+const KH_TIERS = [[20,25],[10,20],[5,15],[3,12]];
+function khPointsFor(secs){ const m = (secs||0)/60; for(const t of KH_TIERS){ if(m>=t[0]) return t[1]; } return KH_POINTS; }
+const KH_STREAK_EVERY = 7;     /* بونص كل كام يوم متتالي */
+const KH_STREAK_BONUS = 20;    /* قيمة بونص الأيام المتتالية */
+function khClaimedToday(){ try{ const ex = myExtra(state.pid); return !!(ex.questsClaimed && ex.questsClaimed['khalwa_'+bbDayKey(Date.now())]); }catch(e){ return false; } }
+async function khAward(g){
+  if(!state.pid) return 0;
+  if(!(g.refl||'').trim() && !(g.commit||'').trim()) return 0;   /* لازم تكتب تأمّل أو التزام عشان النقاط تتسجل */
+  const ex = myExtra(state.pid); ex.questsClaimed = ex.questsClaimed || {};
+  const day = bbDayKey(Date.now()), key = 'khalwa_'+day;
+  if(ex.questsClaimed[key]) return 0;                              /* خدت نقاط النهارده */
+  ex.questsClaimed[key] = true;
+  let pts = khPointsFor(g.secs), bonus = 0;
+  const st = bbStreak();
+  if(st>0 && st % KH_STREAK_EVERY === 0){ bonus = KH_STREAK_BONUS; ex.questsClaimed['khalwa_streak_'+day] = true; }
+  g.earnedBonus = bonus;
+  BONUS[state.pid] = (BONUS[state.pid]||0) + pts + bonus;
+  await saveBonus(BONUS);
+  try{ pushNotification(state.pid, '🕊 خلوتك النهارده: +'+(pts+bonus)+' نقطة'+(bonus?' (منها '+bonus+' بونص '+bbAr(st)+' أيام متتالية)':''), '🕊'); }catch(e){}
+  try{ SND.coinChime(); goldDustBurst(innerWidth/2, innerHeight/2, 16); }catch(e){}
+  return pts + bonus;
+}
 async function bbGuideFinish(){
   const g = BB.g, d = bbData(), l = bibleLast();
   const ref = g.ref || ((l && BIBLE_BOOKS[l.t] && BIBLE_BOOKS[l.t][l.bi]) ? BIBLE_BOOKS[l.t][l.bi][1]+' '+bbAr(l.ch) : '');
   const date = new Date().toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
   g.secs = Math.round((Date.now()-g.ts)/1000); g.refOut = ref;
   d.sess.unshift({ts:Date.now(), ref, q:g.q, refl:g.refl.trim(), commit:g.commit.trim(), secs:g.secs}); if(d.sess.length>60) d.sess.length = 60;
+  try{ g.earned = await khAward(g); }catch(e){ g.earned = 0; }
   let t = '🕊 خلوة '+date; if(ref) t += '\n📖 '+ref; if(g.refl.trim()) t += '\n💭 '+g.q+'\n'+g.refl.trim(); if(g.commit.trim()) t += '\n🎯 التزامي: '+g.commit.trim();
   await bbAppendNote(t); await bbPersist();
 }
@@ -14494,7 +14580,7 @@ function bbGuideRender(){
   }
   else if(i===2) body = `<div class="bb-gcard"><div class="gi">💭</div><h4>تأمّل</h4><p class="gp">${escapeHtml(g.q)}</p><textarea id="g-refl" class="bb-ta" placeholder="اكتب تأمّلك…">${escapeHtml(g.refl)}</textarea></div>`;
   else if(i===3) body = `<div class="bb-gcard"><div class="gi">🎯</div><h4>التزام</h4><p class="gp">خطوة عملية واحدة هتعملها النهارده.</p><textarea id="g-commit" class="bb-ta" placeholder="أنا هلتزم بأن…">${escapeHtml(g.commit)}</textarea></div>`;
-  else body = `<div class="bb-gcard"><div class="gi">🎉</div><h4>تمّت خلوتك</h4>${g.refOut?`<p class="gp" style="margin-bottom:10px;">📖 ${escapeHtml(g.refOut)}</p>`:''}<div class="bb-g2"><span>🔥 ${bbAr(bbStreak())} يوم متتالي</span><span>⏱ ${bbAr(Math.max(1,Math.round((g.secs||0)/60)))} دقيقة</span></div><p class="gp">«أشكرك يا ربّ على كلمتك. ثبّتني في الخطوة التي التزمت بها، واحفظني في محبتك. آمين.»</p><p class="gp" style="font-size:12px;">اتحفظت في ملاحظاتك وفي سجل خلواتي ✝️</p></div>`;
+  else body = `<div class="bb-gcard"><div class="gi">🎉</div><h4>تمّت خلوتك</h4>${g.refOut?`<p class="gp" style="margin-bottom:10px;">📖 ${escapeHtml(g.refOut)}</p>`:''}<div class="bb-g2"><span>🔥 ${bbAr(bbStreak())} يوم متتالي</span><span>⏱ ${bbAr(Math.max(1,Math.round((g.secs||0)/60)))} دقيقة</span>${g.earned?`<span>🎁 +${bbAr(g.earned)} نقطة</span>`:''}</div>${(!g.earned && khClaimedToday())?'<p class="gp" style="font-size:12px;opacity:.8;">نقاط خلوة النهارده اتسجلت قبل كده ✓</p>':(!g.earned?'<p class="gp" style="font-size:12px;opacity:.8;">اكتب تأمّل أو التزام في الخلوة الجاية عشان النقاط تتسجل.</p>':'')}<p class="gp">«أشكرك يا ربّ على كلمتك. ثبّتني في الخطوة التي التزمت بها، واحفظني في محبتك. آمين.»</p><p class="gp" style="font-size:12px;">اتحفظت في ملاحظاتك وفي سجل خلواتي ✝️</p></div>`;
   const foot = i<4 ? `<div class="bb-foot"><button type="button" class="bb-b" data-g="prev" ${i===0?'disabled':''}>‹ السابق</button><button type="button" class="bb-b pri" data-g="next">${i===3?'إنهاء الخلوة ✓':'التالي ›'}</button></div>` : `<div class="bb-foot"><button type="button" class="bb-b pri" data-g="close">إغلاق</button></div>`;
   sh.innerHTML = `<div class="bb-grab"></div><div class="bb-head"><div class="bb-ttl"><h3>الخلوة الموجّهة</h3><div class="bb-crumb">الخطوة ${bbAr(i+1)} من ٥ — ${names[i]}</div></div><button type="button" class="bb-ib" data-g="close" aria-label="إغلاق">✕</button></div><div class="bb-prog"><i style="width:${(i+1)*20}%"></i></div><div class="bb-body">${body}</div>${foot}`;
 }
