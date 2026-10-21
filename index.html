@@ -9914,10 +9914,10 @@ function visaCardHtml(pid, draft, isNew){
   const expTxt = expTs ? fmtVisaDate(expTs) : '--/--/--';
   const expired = !isNew && visaExpired(pid);
   const vcEnter = (Date.now() - (window.__vcSeenAt||0)) > 30000; window.__vcSeenAt = Date.now();
-  const vcVip = c.theme!=='custom' && cardThemeTier(c.theme)==='vip';
-  return `<div class="vc-scene ${expired?'vc-expired':''} ${vcEnter?'vc-enter':''} ${vcVip?'vc-vip':''}" data-action="visa-flip"><div class="vc-ground"></div><div class="vc-tilt"><div class="vc-inner" id="vc-inner">
-    <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}"><i class="vc-glare"></i><i class="vc-guil"></i>
-      <div class="vc-top"><span class="vc-brand">Te- epistoly</span><span class="vc-tag">GAME CARD</span></div>
+  const vcTier = c.theme!=='custom' ? cardThemeTier(c.theme) : 'simple', vcVip = vcTier==='vip', vcRoyal = vcTier==='royal';
+  return `<div class="vc-scene ${expired?'vc-expired':''} ${vcEnter?'vc-enter':''} ${vcVip?'vc-vip':''} ${vcRoyal?'vc-royal':''}" data-action="visa-flip"><div class="vc-ground"></div><div class="vc-tilt"><div class="vc-inner" id="vc-inner">
+    <div class="vc-face vc-front ${customImg?'vc-custom':''}" style="${frontStyle}"><i class="vc-glare"></i><i class="vc-guil"></i>${customImg?'':skinLayers(th)}
+      <div class="vc-top"><span class="vc-brand">Te- epistoly</span><span class="vc-tag">${vcRoyal?'ROYAL':vcVip?'VIP':'GAME CARD'}</span></div>
       <div class="vc-mid">${isNew ? '<span class="vc-chip"></span>' : `<span class="vc-chip vc-chip-code" data-action="visa-chip" role="button" tabindex="0" aria-label="الشريحة الصفراء — صاحبك يمسحها عشان يستلم منك"><img alt="" src="${chipStaticSrc(pid)}"></span>`}<svg class="vc-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.500 0 20"/></svg></div>
       <div class="vc-num-row">
         <span class="vc-num">${String(numDisplay).split(' ').map(g=>`<i>${g}</i>`).join('')}</span>
@@ -10021,7 +10021,7 @@ function renderVisaPage(){
   const chips = (tab==='deposit' ? [25,50,100,total] : [min, bal]).filter((v,i,a)=>v>0 && a.indexOf(v)===i)
     .map(v=>`<button type="button" class="vp-chip" data-action="visa-fill" data-v="${v}">${(tab==='deposit'&&v===total)?'الكل':v}</button>`).join('');
   const ownedThemes = OWNED_CARD_THEMES[pid] || [];
-  const allThemeKeys = themeKeysForTier('simple').concat(themeKeysForTier('vip'));
+  const allThemeKeys = themeKeysForTier('simple').concat(themeKeysForTier('vip')).concat(themeKeysForTier('royal'));
   const swatches = allThemeKeys.map(k=>{
     const img = cardThemeImg(k);
     const t = VISA_THEMES[k];
@@ -11671,8 +11671,28 @@ async function deleteStickerImage(stickerId){
 }
 /* ---- متجر الكروت (تصاميم فيزا Games) وطلبات الكروت المخصصة — جزء من متجر Shop ---- */
 let OWNED_CARD_THEMES = {}; // {pid:[themeKey,...]}
-let SHOP_PRICES = { simple:20, vip:60, custom:150 };
+let SHOP_PRICES = { simple:20, vip:60, royal:120, custom:150 };
 const CARD_THEME_TIER = { aurora:'simple', emerald:'simple', rose:'simple', gold:'vip', midnight:'vip' };
+
+/* ===== SKINS: 50 عادي + 20 VIP + 10 ROYAL (طبقات نقش + مؤثرات حركية) ===== */
+(function(){
+  const hx=(h,s,l)=>{h=((h%360)+360)%360;s=Math.max(0,Math.min(100,s))/100;l/=100;const a=s*Math.min(l,1-l),f=n=>{const k=(n+h/30)%12;return Math.round(255*(l-a*Math.max(-1,Math.min(k-3,9-k,1))))};return '#'+[f(0),f(8),f(4)].map(v=>v.toString(16).padStart(2,'0')).join('');};
+  const P=['tri','lines','grid','dots','rings','diamond','waves','arcs','chevron','mesh','stripes','topo'], T={}, K={};
+  const reg=(id,tier,o)=>{T[id]=o;K[id]=tier;};
+  'ياقوت|فيروز|لافندر|مرجان|كهرمان|زبرجد|عنابي|سماوي|نعناع|خوخي|ليموني|بنفسجي|توت|قرنفل|فولاذ|شفق|غروب|واحة|محيط|غابة|صحراء|ثلج|ربيع|خريف|شتاء|صيف|برق|غيمة|قمر|شمس|نجمة|سديم|كوكب|نيزك|هلال|بحيرة|جزيرة|شلال|بركان|حديقة|جوري|ياسمين|زنبق|أقحوان|لوتس|خزامى|قرفة|عسل|كراميل|رمّان'.split('|').forEach((n,i)=>{const h=(i*47+12)%360,s=52+(i%4)*9,d=[26,-34,64,140,-60][i%5],L=[[9,44,70,28],[14,54,76,34],[18,60,84,40]][i%3];
+    reg('sk_s'+(i+1),'simple',{name:n,base:hx(h,s*.8,L[0]),a:hx(h,s+14,L[1]),b:hx(h+d,s,L[2]),c:hx(h-d/2,s,L[3]),pat:P[i%12],fx:i%6===5?'shine':''});});
+  'ذهب سائل:44:88|فضة ملكية:215:10|ياقوت أحمر:350:80|زمرد ملكي:152:72|جمشت:276:64|نحاس عتيق:22:66|سفير كحلي:222:78|ذهب وردي:14:56|بلاتين:200:8|كهرمان نادر:36:84|تيتانيوم:230:14|عقيق:336:60|لؤلؤ أسود:260:12|برونز:30:58|فيروز ملكي:178:76|أوبسيديان:210:18|مرجان نادر:8:72|ماسة زرقاء:196:82|ذهب أبيض:48:22|بنفسج ملكي:288:70'.split('|').forEach((x,i)=>{const q=x.split(':'),H=+q[1],S=+q[2],f=['shine','sparkle','foil','aurora','edge'][i%5];
+    reg('sk_v'+(i+1),'vip',{name:q[0],base:hx(H,S*.5,7),a:hx(H,S,52),b:hx(H+(i%2?18:-14),Math.min(95,S+10),86),c:hx(H-12,S,24),pat:P[(i*5+3)%12],fx:(i%3===0&&f!=='shine')?f+' shine':f});});
+  [['التاج الذهبي','#140d02','#ffcf5a','#fff1b8','#8a5a08','rings','edge shine'],['الألماس الأسود','#05060a','#7e8aa3','#eef2fb','#232a3a','diamond','prism sparkle'],
+   ['المجرّة','#06031a','#6a3df0','#ff6fd8','#1a86ff','dots','plasma sparkle'],['الشفق القطبي','#021a1c','#19e3b1','#7aa7ff','#0b6e8a','topo','aurora edge'],
+   ['البلاتين الهولوغرام','#0d0f14','#aab4c8','#ffffff','#4a566c','tri','foil shine'],['الإمبراطورية القرمزية','#14020a','#ff2e5b','#ffb3c1','#7a0a2a','chevron','pulse edge'],
+   ['تاج الزمرد','#021a10','#1fd18a','#f2d77a','#0a6b43','arcs','aurora shine'],['بلّور الجليد','#06182a','#6fd8ff','#f2fcff','#2b6fb0','mesh','prism scan'],
+   ['الذهب الوردي الملكي','#1a0a0c','#ff9a8b','#ffe3d6','#a8505e','waves','foil sparkle'],['عرش الياقوت','#030a24','#2f6bff','#ffd66b','#0b2a8a','stripes','plasma edge']
+  ].forEach((r,i)=>reg('sk_r'+(i+1),'royal',{name:r[0],base:r[1],a:r[2],b:r[3],c:r[4],pat:r[5],fx:r[6]}));
+  Object.assign(VISA_THEMES,T); Object.assign(CARD_THEME_TIER,K);
+  window.skinLayers=t=>!t?'':(t.pat?'<i class="sk-p" data-k="'+t.pat+'"></i>':'')+(t.fx||'').split(' ').filter(Boolean).map(f=>'<i class="sk-f" data-k="'+f+'"></i>').join('');
+})();
+
 async function loadOwnedCardThemes(){
   try{ const r = await window.storage.get('glavera-owned-card-themes', true); return r && r.value ? JSON.parse(r.value) : {}; }
   catch(e){ return {}; }
@@ -11682,7 +11702,7 @@ async function saveOwnedCardThemes(obj){
   catch(e){ console.error('saveOwnedCardThemes failed:', e); return false; }
 }
 async function loadShopPrices(){
-  const def = {simple:20, vip:60, custom:150};
+  const def = {simple:20, vip:60, royal:120, custom:150};
   try{ const r = await window.storage.get('glavera-shop-prices', true); return r && r.value ? Object.assign({}, def, JSON.parse(r.value)) : def; }
   catch(e){ return def; }
 }
@@ -15692,7 +15712,7 @@ const TOUR_STEPS = [
   {v:'game-rooms', ch:'الغرف مع الأصحاب', ico:'🏆', t:'الجوايز', x:'جوايز الغرف بتتضاف لرصيد فيزتك على طول.', d:()=>{ const g=_GP(); return ['الغرف الجماعية: المركز الأول '+(g.first||0)+' نقطة، الثاني '+(g.second||0)+'، الثالث '+(g.third||0)+'.','المعارك الفردية (زي إكس أو): الفايز بياخد جايزة الغرفة.','الجوايز مش بتزوّد نقاطك الأساسية ولا ترتيبك في لوحة النقاط.']; }, ctr:true},
   /* ===== الفيزا ===== */
   {v:'visa', ch:'الفيزا', ico:'💳', t:'إيه هي الفيزا؟', x:'محفظتك الخاصة بالألعاب.', d:['منها بتدفع رسوم الغرف وتشتري من المتجر، وفيها بتنزل جوايز الألعاب.','نقاط الحضور (اللي في ملفك) حاجة منفصلة ملهاش علاقة برصيد الفيزا.','الوصل بينهم اختياري: تودع من نقاطك للفيزا، أو تسحب من الفيزا لنقاطك.'], mock:'split', ctr:true},
-  {v:'sticker-store', ch:'الفيزا', ico:'🛍️', t:'الخطوة 1: اشتري تصميم الكارد', x:'الفيزا بتبدأ بشراء تصميم كارد من المتجر (تاب «كارد»).', d:['تصاميم بسيطة وتصاميم VIP، وسعر كل تصميم مكتوب عليه.','مفيش تصميم مجاني، والدفع من رصيد الفيزا بالسحب للتأكيد.','وفيه طلب كارد مخصص بصورتك أو تصميمك.'], s:['[data-action="shop-tab"]','.opinion-hero'], all:true, pre:()=>{ state.shopTab='card'; }},
+  {v:'sticker-store', ch:'الفيزا', ico:'🛍️', t:'الخطوة 1: اشتري تصميم الكارد', x:'الفيزا بتبدأ بشراء تصميم كارد من المتجر (تاب «كارد»).', d:['تصاميم بسيطة وVIP وROYAL، وسعر كل تصميم مكتوب عليه.','مفيش تصميم مجاني، والدفع من رصيد الفيزا بالسحب للتأكيد.','وفيه طلب كارد مخصص بصورتك أو تصميمك.'], s:['[data-action="shop-tab"]','.opinion-hero'], all:true, pre:()=>{ state.shopTab='card'; }},
   {v:'visa', ch:'الفيزا', ico:'✍️', t:'الخطوة 2: اكتب اسمك على البطاقة', x:()=>_vcNote()+'من صفحة «فيزتي» اكتب الاسم اللي هيظهر على البطاقة، وهتشوف بطاقتك بتتكوّن قدامك.', s:['#visa-new-name','.vc-scene']},
   {v:'visa', ch:'الفيزا', ico:'🔐', t:'الخطوة 3: الرقم السري', x:()=>_vcNote()+'الرقم السري 3 أرقام (CVV) بتكتبهم مرتين للتأكيد، وبيتكتب على ظهر البطاقة.', d:['هتحتاجه في كل إيداع وسحب وتحويل وتجديد.','احفظه كويس.','لو نسيته كلّم المنظمين يعيدوا تعيينه.'], mock:'pin', s:['#visa-new-pin','.vc-scene']},
   {v:'visa', ch:'الفيزا', ico:'✅', t:'الخطوة 4: إنشاء الفيزا', x:()=>_vcNote()+'دوس «إنشاء الفيزا» وبطاقتك بتتفعّل فورًا. وتبقى صالحة '+visaValidDays()+' يوم من لحظة الإنشاء.', s:['[data-action="visa-create"]','.vc-scene']},
@@ -16799,7 +16819,7 @@ async function doBuySticker(id, price){
   render();
 }
 /* ---- تاب الكارد: تصاميم بطاقة فيزا Games — بسيطة و VIP ---- */
-function cardTierPrice(tier){ return (SHOP_PRICES && SHOP_PRICES[tier]) || (tier==='vip'?60:20); }
+function cardTierPrice(tier){ return (SHOP_PRICES && SHOP_PRICES[tier]) || ({vip:60,royal:120}[tier]||20); }
 function renderShopCardTab(){
   const owned = OWNED_CARD_THEMES[state.pid] || [];
   const renderGroup = (tier, label)=>{
@@ -16823,6 +16843,7 @@ function renderShopCardTab(){
   return `
     ${renderGroup('simple','🎨 تصاميم بسيطة')}
     ${renderGroup('vip','👑 تصاميم VIP')}
+    ${renderGroup('royal','💎 تصاميم ROYAL')}
     <div class="hint" style="margin-top:12px;text-align:center;">التصميم اللي تشتريه هتقدر تختاره من صفحة فيزتي</div>
   `;
 }
@@ -38036,16 +38057,18 @@ function renderAdminStickersTab(){
   return renderAdminStickersSubTab();
 }
 function renderAdminCardShopTab(){
-  const sub = ['simple','vip','requests'].indexOf(state.shopAdminTab)>-1 ? state.shopAdminTab : 'simple';
+  const sub = ['simple','vip','royal','requests'].indexOf(state.shopAdminTab)>-1 ? state.shopAdminTab : 'simple';
   const pendingCC = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
   const tabsHtml = `<div class="vp-tabs" style="margin-bottom:16px;">
     <button type="button" class="${sub==='simple'?'on':''}" data-action="admin-shop-tab" data-t="simple">🎨 كروت عادية</button>
     <button type="button" class="${sub==='vip'?'on':''}" data-action="admin-shop-tab" data-t="vip">👑 كروت VIP</button>
+    <button type="button" class="${sub==='royal'?'on':''}" data-action="admin-shop-tab" data-t="royal">💎 كروت ROYAL</button>
     <button type="button" class="${sub==='requests'?'on':''}" data-action="admin-shop-tab" data-t="requests">طلبات المشاركين${pendingCC?` (${pendingCC})`:''}</button>
   </div>`;
   let body = '';
   if(sub==='simple') body = renderAdminCardThemeSubTab('simple');
   else if(sub==='vip') body = renderAdminCardThemeSubTab('vip');
+  else if(sub==='royal') body = renderAdminCardThemeSubTab('royal');
   else body = renderAdminShopCustomSubTab();
   return tabsHtml + body;
 }
@@ -38084,7 +38107,7 @@ function renderAdminStickersSubTab(){
   `;
 }
 function renderAdminCardThemeSubTab(tier){
-  const label = tier==='vip' ? '👑 كروت VIP' : '🎨 كروت عادية';
+  const label = tier==='vip' ? '👑 كروت VIP' : tier==='royal' ? '💎 كروت ROYAL' : '🎨 كروت عادية';
   const price = cardTierPrice(tier);
   const uploaded = (CUSTOM_CARD_THEMES||[]).filter(t=>t.tier===tier);
   const builtAll = Object.keys(VISA_THEMES).filter(k=>(CARD_THEME_TIER[k]||'simple')===tier);
@@ -38206,7 +38229,7 @@ function attachStickerAdminInputs(){
   });
 }
 async function doAdminSetShopPrice(key, value){
-  SHOP_PRICES = Object.assign({simple:20,vip:60,custom:150}, SHOP_PRICES||{});
+  SHOP_PRICES = Object.assign({simple:20,vip:60,royal:120,custom:150}, SHOP_PRICES||{});
   SHOP_PRICES[key] = value;
   await saveShopPrices(SHOP_PRICES);
   showToast('✅ اتحفظ السعر');
@@ -42368,7 +42391,7 @@ function aiMarkSvg(variant){
   function themeName(k){ var v = VISA_THEMES[k]; if(v && v.name) return v.name; var c = (CUSTOM_CARD_THEMES||[]).find(function(x){ return x.id===k; }); return (c && c.name) || 'تصميم مميز'; }
   function themes(){
     var out = [];
-    ['simple','vip'].forEach(function(tier){ themeKeysForTier(tier).forEach(function(k){
+    ['simple','vip','royal'].forEach(function(tier){ themeKeysForTier(tier).forEach(function(k){
       out.push({k:k, tier:tier, name:themeName(k), price:cardTierPrice(tier), owned:ownsCardTheme(state.pid,k)});
     }); });
     return out;
@@ -42377,7 +42400,7 @@ function aiMarkSvg(variant){
     var img = cardThemeImg(k), t = VISA_THEMES[k];
     var bg = img ? "background-image:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.5)),url('"+img+"');background-size:cover;background-position:center"
       : (t ? 'background:linear-gradient(135deg,'+t.a+' 0%,'+t.base+' 52%,'+t.c+' 100%)' : 'background:linear-gradient(135deg,#c9a24a,#4a3510)');
-    return '<div class="cf-card" style="'+bg+'"><i class="cf-sheen"></i><b class="cf-logo">GLAFIRA</b><span class="cf-chip"></span>'
+    return '<div class="cf-card" style="'+bg+(t&&!img?';--a:'+t.a+';--b:'+t.b+';--c:'+t.c+';--base:'+t.base:'')+'"><i class="cf-sheen"></i>'+(img?'':skinLayers(t))+'<b class="cf-logo">GLAFIRA</b><span class="cf-chip"></span>'
       + '<svg class="cf-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.5 0 12M12 4c4.5 5 4.5 11 0 16M16 2c6 6.5 6 13.5 0 20"/></svg>'
       + '<span class="cf-visa">GAME<br>CARD</span></div>';
   }
@@ -42424,10 +42447,11 @@ function aiMarkSvg(variant){
   function drawPick(){
     var list = themes();
     if(!list.length){ screen(header('اختر كارتك') + '<div class="cf-center"><p style="margin-top:30vh">مفيش تصاميم متاحة دلوقتي</p></div>'); return; }
-    var slots = list.map(function(o,i){ return '<div class="cf-slot'+(o.owned?' owned':'')+(o.tier==='vip'?' vip':'')+'" data-i="'+i+'">'+face(o.k)+'</div>'; }).join('');
+    var slots = list.map(function(o,i){ return '<div class="cf-slot'+(o.owned?' owned':'')+(o.tier==='vip'?' vip':o.tier==='royal'?' royal':'')+'" data-i="'+i+'">'+face(o.k)+'</div>'; }).join('');
     var dots = list.map(function(){ return '<i></i>'; }).join('');
     var s = screen(header('اختر كارتك')
       + '<div class="cf-titlebox"><div class="cf-tier" id="cf-tier"></div><h2 id="cf-name"></h2><div class="cf-price" id="cf-price"></div></div>'
+      + '<div class="cf-jump"><button type="button" data-jump="simple">بسيط</button><button type="button" data-jump="vip">VIP 👑</button><button type="button" data-jump="royal">ROYAL 💎</button></div>'
       + '<div class="cf-stage" id="cf-stage">'+slots+'</div><div class="cf-dots" id="cf-dots">'+dots+'</div>'
       + '<button type="button" class="cf-cta" id="cf-pick" data-cf="pick"></button>'
       + '<p class="cf-foot">رصيد الفيزا: '+bal()+' نقطة · اسحب يمين أو شمال لتغيير التصميم</p>');
@@ -42443,6 +42467,7 @@ function aiMarkSvg(variant){
       var r = sl.getBoundingClientRect(), px = (e.clientX-r.left)/r.width-.5, py = (e.clientY-r.top)/r.height-.5;
       if(Math.abs(px) > .8) return; sl.firstChild.style.transform = 'rotateY('+(px*18)+'deg) rotateX('+(-py*18)+'deg)';
     });
+    s.addEventListener('click', function(e){ var j = e.target.closest('[data-jump]'); if(!j) return; var ix = themes().findIndex(function(o){ return o.tier === j.dataset.jump; }); if(ix > -1) go(ix); });
     st.addEventListener('pointerleave', function(){ document.querySelectorAll('.cf-slot .cf-card').forEach(function(c){ c.style.transform = ''; }); });
     layout(true);
   }
@@ -42476,11 +42501,11 @@ function aiMarkSvg(variant){
     document.querySelectorAll('.cf-slot').forEach(function(el, i){
       var d = i - CF.i, a = Math.abs(d);
       el.style.transform = 'translateX('+(d*62)+'%) translateZ('+(-a*130)+'px) rotateY('+(d*-42)+'deg) scale('+(a ? .86 : 1)+')';
-      el.style.opacity = a > 2 ? 0 : 1 - a*.3; el.style.zIndex = 10 - a; el.style.pointerEvents = a > 2 ? 'none' : 'auto';
+      el.style.opacity = a > 2 ? 0 : 1 - a*.3; el.style.zIndex = 10 - a; el.classList.toggle('far', a > 2); el.style.pointerEvents = a > 2 ? 'none' : 'auto';
     });
     document.querySelectorAll('#cf-dots i').forEach(function(el, i){ el.classList.toggle('on', i === CF.i); });
     var t = document.getElementById('cf-tier'), n = document.getElementById('cf-name'), p = document.getElementById('cf-price'), b = document.getElementById('cf-pick');
-    t.textContent = o.tier === 'vip' ? 'تصميم VIP 👑' : 'تصميم بسيط';
+    t.textContent = (o.tier === 'vip' ? 'تصميم VIP 👑' : o.tier === 'royal' ? 'تصميم ROYAL 💎' : 'تصميم بسيط') + ' · ' + (CF.i+1) + '/' + list.length;
     n.textContent = o.name; p.textContent = o.owned ? 'موجود في كروتك' : pts(o.price);
     if(!first) [t,n,p].forEach(function(el){ el.classList.remove('cf-swap'); void el.offsetWidth; el.classList.add('cf-swap'); });
     b.textContent = o.owned ? 'عندك التصميم ده' : (o.price>0 ? 'اختر ' : 'خذ ') + o.name; b.disabled = o.owned;
@@ -42488,7 +42513,7 @@ function aiMarkSvg(variant){
   /* ---------- 2) تأكيد الطلب ---------- */
   function drawConfirm(){
     var o = CF.sel, b = bal(), after = b - o.price, short = after < 0;
-    var rows = [['التصميم', o.name], ['الفئة', o.tier === 'vip' ? 'VIP' : 'بسيط'], ['السعر', pts(o.price)], ['رصيد الفيزا الحالي', b + ' نقطة'], ['الرصيد بعد الشراء', short ? '—' : after + ' نقطة']]
+    var rows = [['التصميم', o.name], ['الفئة', o.tier === 'vip' ? 'VIP' : o.tier === 'royal' ? 'ROYAL' : 'بسيط'], ['السعر', pts(o.price)], ['رصيد الفيزا الحالي', b + ' نقطة'], ['الرصيد بعد الشراء', short ? '—' : after + ' نقطة']]
       .map(function(r){ return '<div><span>'+r[0]+'</span><b>'+escapeHtml(String(r[1]))+'</b></div>'; }).join('');
     screen(header(CF.sel.price>0 ? 'الدفع' : 'تأكيد', 'back-pick')
       + '<div class="cf-big">تأكيد الطلب</div><p class="cf-sub">راجع التفاصيل قبل ما يتخصم من فيزتك</p>'
@@ -42729,7 +42754,7 @@ function aiMarkSvg(variant){
     var t = themes(), owned = t.filter(function(o){ return o.owned; }).length;
     var fan = t.slice(0,3).map(function(o,i){ return '<div class="cf-fanc" style="--r:'+((i-1)*9)+'deg;--x:'+((i-1)*46)+'px">'+face(o.k)+'</div>'; }).join('');
     return '<div class="cf-launch"><div class="cf-fan">'+fan+'</div><div class="cf-lt">اختر تصميم كارتك</div>'
-      + '<div class="hint">'+t.length+' تصميم · بسيط مجاني · VIP '+cardTierPrice('vip')+' 🌟'+(owned ? ' · عندك '+owned : '')+'</div>'
+      + '<div class="hint">'+t.length+' تصميم · بسيط مجاني · VIP '+cardTierPrice('vip')+' · ROYAL '+cardTierPrice('royal')+' 🌟'+(owned ? ' · عندك '+owned : '')+'</div>'
       + '<button type="button" class="btn btn-primary" data-cf-open="1">تصفّح التصاميم</button>'
       + '<div class="hint" style="margin-top:10px">التصميم اللي تشتريه هتقدر تختاره من صفحة فيزتي</div></div>';
   };
@@ -53945,5 +53970,48 @@ window.__ipm={show:function(m){ shown=false; show(m||mode()||'native'); },reset:
 })();
 </script>
 
+
+<style id="skins-css">
+@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+.sk-p,.sk-f{position:absolute;inset:0;border-radius:inherit;pointer-events:none}
+.vc-face>.sk-p,.vc-face>.sk-f{position:absolute;z-index:0}
+.sk-p{background:linear-gradient(135deg,var(--b),var(--a) 60%,var(--c));opacity:.26;mix-blend-mode:screen;-webkit-mask:var(--m);mask:var(--m);-webkit-mask-size:var(--s,22px);mask-size:var(--s,22px)}
+.sk-p[data-k=tri]{--m:repeating-linear-gradient(0deg,#000 0 1px,transparent 1px 15px),repeating-linear-gradient(60deg,#000 0 1px,transparent 1px 15px),repeating-linear-gradient(120deg,#000 0 1px,transparent 1px 15px);--s:100% 100%}
+.sk-p[data-k=lines]{--m:repeating-linear-gradient(135deg,#000 0 1px,transparent 1px 7px);--s:100% 100%}
+.sk-p[data-k=grid]{--m:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);--s:20px 20px}
+.sk-p[data-k=dots]{--m:radial-gradient(#000 1.1px,transparent 1.7px);--s:11px 11px}
+.sk-p[data-k=rings]{--m:repeating-radial-gradient(circle at 105% -5%,#000 0 1px,transparent 1px 10px),repeating-radial-gradient(circle at -5% 105%,#000 0 1px,transparent 1px 10px);--s:100% 100%}
+.sk-p[data-k=diamond]{--m:linear-gradient(45deg,transparent 47%,#000 48% 52%,transparent 53%),linear-gradient(-45deg,transparent 47%,#000 48% 52%,transparent 53%);--s:16px 16px}
+.sk-p[data-k=waves]{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='10'%3E%3Cpath d='M0 5Q9 0 18 5T36 5' fill='none' stroke='black'/%3E%3C/svg%3E");--s:36px 10px}
+.sk-p[data-k=arcs]{--m:radial-gradient(circle at 50% 100%,transparent 55%,#000 57% 62%,transparent 64%);--s:18px 10px}
+.sk-p[data-k=chevron]{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='12'%3E%3Cpath d='M0 12L10 4l10 8' fill='none' stroke='black'/%3E%3C/svg%3E");--s:20px 12px}
+.sk-p[data-k=mesh]{--m:repeating-linear-gradient(45deg,#000 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,#000 0 2px,transparent 2px 5px);--s:100% 100%;opacity:.14}
+.sk-p[data-k=stripes]{--m:repeating-linear-gradient(90deg,#000 0 2px,transparent 2px 9px);--s:100% 100%}
+.sk-p[data-k=topo]{--m:repeating-radial-gradient(ellipse at 28% 72%,#000 0 1px,transparent 1px 9px),repeating-radial-gradient(ellipse at 82% 18%,#000 0 1px,transparent 1px 11px);--s:100% 100%}
+.sk-f[data-k=shine]{background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.38) 48%,transparent 64%);background-size:280% 100%;animation:skSwp 4.6s linear infinite}
+.sk-f[data-k=foil]{background:conic-gradient(from 20deg at 72% 28%,#ff6ec7,#ffd86e,#7bffb1,#6ec8ff,#c77dff,#ff6ec7);mix-blend-mode:color-dodge;opacity:.3;animation:skHue 9s linear infinite}
+.sk-f[data-k=aurora]{background:linear-gradient(115deg,transparent 20%,var(--b) 38%,transparent 52%,var(--a) 68%,transparent 85%);background-size:220% 100%;mix-blend-mode:screen;opacity:.42;filter:blur(7px);animation:skSwp 7s ease-in-out infinite alternate}
+.sk-f[data-k=plasma]{background:radial-gradient(circle at 20% 25%,var(--a),transparent 46%),radial-gradient(circle at 82% 30%,var(--c),transparent 46%),radial-gradient(circle at 50% 95%,var(--b),transparent 52%);background-size:180% 180%;mix-blend-mode:screen;opacity:.55;animation:skDrift 9s ease-in-out infinite alternate}
+.sk-f[data-k=prism]{background:linear-gradient(110deg,transparent 34%,rgba(255,60,150,.3) 41%,rgba(255,225,60,.3) 46%,rgba(60,255,180,.3) 51%,rgba(60,150,255,.3) 56%,transparent 64%);background-size:260% 100%;mix-blend-mode:screen;animation:skSwp 5s linear infinite}
+.sk-f[data-k=scan]{background:linear-gradient(180deg,transparent 42%,rgba(255,255,255,.28) 50%,transparent 58%);background-size:100% 260%;animation:skScan 4s ease-in-out infinite}
+.sk-f[data-k=pulse]{box-shadow:inset 0 0 22px var(--b),inset 0 0 2px var(--b);animation:skPulse 3.2s ease-in-out infinite}
+.sk-f[data-k=sparkle]{background:radial-gradient(circle at 12% 22%,#fff 0 1px,transparent 2px),radial-gradient(circle at 78% 18%,#fff 0 1.4px,transparent 2.5px),radial-gradient(circle at 56% 64%,#fff 0 1px,transparent 2px),radial-gradient(circle at 90% 78%,#fff 0 1.3px,transparent 2.4px),radial-gradient(circle at 30% 84%,#fff 0 1px,transparent 2px),radial-gradient(circle at 44% 30%,#fff 0 .8px,transparent 1.8px);animation:skTw 2.4s ease-in-out infinite alternate}
+.sk-f[data-k=edge]{padding:2px;background:conic-gradient(from var(--ang),transparent 0 62%,var(--b) 80%,#fff 90%,var(--b) 96%,transparent);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;animation:skAng 5s linear infinite}
+@keyframes skSwp{from{background-position:140% 0}to{background-position:-60% 0}}
+@keyframes skHue{to{filter:hue-rotate(360deg)}}
+@keyframes skDrift{to{background-position:100% 100%}}
+@keyframes skTw{0%{opacity:.2}100%{opacity:1}}
+@keyframes skPulse{50%{box-shadow:inset 0 0 36px var(--b),inset 0 0 2px var(--b)}}
+@keyframes skScan{from{background-position:0 -120%}to{background-position:0 220%}}
+@keyframes skAng{to{--ang:360deg}}
+.vc-royal .vc-front{box-shadow:0 24px 54px rgba(0,0,0,.62),0 0 0 1.5px rgba(255,255,255,.55),0 0 38px color-mix(in srgb,var(--b) 55%,transparent),inset 0 1.5px 0 rgba(255,255,255,.6)}
+.cf-slot.royal .cf-card{box-shadow:0 22px 40px -18px rgba(0,0,0,.7),0 0 0 1.5px rgba(255,255,255,.65),0 0 30px color-mix(in srgb,var(--b) 60%,transparent)}
+.cf-slot.far .sk-f{animation-play-state:paused}
+.cf-dots{display:none}
+.cf-jump{display:flex;gap:8px;justify-content:center;margin:2px 0 4px;flex:none}
+.cf-jump button{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text);font:700 12px Cairo,sans-serif}
+.cf-jump button:active{transform:scale(.95)}
+@media (prefers-reduced-motion:reduce){.sk-f{animation:none!important}}
+</style>
 </body>
 </html>
