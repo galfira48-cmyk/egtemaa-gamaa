@@ -8894,6 +8894,30 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .dp-code{ direction:ltr; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; letter-spacing:1.2px; padding:7px 14px; border-radius:999px; background:rgba(234,223,201,.1); border:1px dashed rgba(234,223,201,.35); color:var(--aa-beige); word-break:break-all; text-align:center; animation:drRise .5s .35s ease backwards; }
   .dp-actions{ display:flex; gap:8px; margin-top:16px; }
   .dp-actions .btn{ flex:1; margin:0; }
+  .dp-day-actions{ display:flex; gap:8px; margin-top:16px; }
+  .aa-tile{ padding:14px 8px; }
+  .aa-tile b, .aa-tile small{ max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+  .aa-tile b{ font-size:14px; }
+  .dda{ flex:1; display:flex; align-items:center; justify-content:center; gap:7px; padding:13px 8px; border-radius:16px; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; cursor:pointer; transition:transform .15s, background .2s; -webkit-tap-highlight-color:transparent; }
+  .dda:active{ transform:scale(.96); }
+  .dda span{ font-size:16px; }
+  .dda.rec{ background:linear-gradient(145deg,#5FE0A4,#2A9D78); border:none; color:#06281c; }
+  .dda.close{ background:rgba(214,71,58,.14); border:1.5px solid rgba(214,71,58,.45); color:#ff8f8f; }
+  .dda.reopen{ background:rgba(244,183,64,.14); border:1.5px solid rgba(244,183,64,.45); color:#F4B740; }
+  .dsum{ margin-top:14px; padding:14px; border-radius:20px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); }
+  .dsum-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; }
+  .dsum-head b{ font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; }
+  .dsum-st{ font-size:11px; font-weight:800; padding:4px 10px; border-radius:999px; }
+  .dsum-st.live{ background:rgba(95,224,164,.14); color:#5FE0A4; }
+  .dsum-st.shut{ background:rgba(214,71,58,.14); color:#ff8f8f; }
+  .dsum-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .dsum-t{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:12px 6px; border-radius:16px; text-align:center; }
+  .dsum-t span{ font-size:18px; } .dsum-t b{ font-family:'Cairo',sans-serif; font-weight:900; font-size:26px; line-height:1.2; } .dsum-t small{ font-size:11px; opacity:.75; }
+  .dsum-t.in{ background:rgba(95,224,164,.12); border:1px solid rgba(95,224,164,.3); } .dsum-t.in b{ color:#5FE0A4; }
+  .dsum-t.out{ background:rgba(214,71,58,.1); border:1px solid rgba(214,71,58,.3); } .dsum-t.out b{ color:#ff8f8f; }
+  .dsum-peak{ display:flex; align-items:center; gap:12px; margin-top:8px; padding:12px 14px; border-radius:16px; background:rgba(244,183,64,.1); border:1px solid rgba(244,183,64,.3); }
+  .dsum-pi{ font-size:24px; flex:0 0 auto; }
+  .dsum-peak div{ display:flex; flex-direction:column; gap:2px; min-width:0; } .dsum-peak small{ font-size:11px; opacity:.72; } .dsum-peak b{ font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:#F4B740; }
   .dp-del{ display:block; width:100%; margin-top:14px; padding:12px; border-radius:16px; background:transparent; border:1px solid rgba(255,120,120,.3); color:#ff8f8f; font-family:inherit; font-weight:700; font-size:13px; cursor:pointer; transition:background .2s; }
   .dp-del:active{ background:rgba(255,120,120,.1); }
   .dp-whos{ border-radius:20px; background:var(--card,rgba(255,255,255,.06)); border:1px solid var(--border,rgba(255,255,255,.1)); overflow:hidden; }
@@ -33270,7 +33294,7 @@ function renderAdmin(){
     const an = state.attNav;
     if(an && an.page==='addtype') pageTitle = 'نشاط جديد';
     else if(an && an.type && ATT_TYPES[an.type]){
-      pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : an.page==='insights' ? 'التحليلات الذكية' : an.page==='audit' ? 'سجل التدقيق' : ATT_TYPES[an.type].label;
+      pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : an.page==='summary' ? 'ملخص اليوم' : an.page==='insights' ? 'التحليلات الذكية' : an.page==='audit' ? 'سجل التدقيق' : ATT_TYPES[an.type].label;
     }
   } else if(tab==='servants'){
     if(state.svEdit) pageTitle = state.svEdit==='new' ? 'إضافة خادم' : ((SV.list.find(x=>x.id===state.svEdit)||{}).name || 'تعديل خادم');
@@ -35087,7 +35111,29 @@ function attDefaultName(type, day){
 const ATT_WEEKDAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 let _attDaysKey = '';
 function aaScope(t, html){ const cc = (String((t&&t.color)||'').match(/#[0-9A-Fa-f]{6}/g)||[]); return '<div class="aa-scope" style="--c1:'+(cc[0]||'#7C9CFF')+';--c2:'+(cc[1]||cc[0]||'#5A67D8')+'">'+html+'</div>'; }
-function attDaySnap(c){ return {sessionId:c.sessionId, name:c.name, startedAt:c.startedAt, code:c.code, points:c.points}; }
+function attDaySnap(c){ return {sessionId:c.sessionId, name:c.name, startedAt:c.startedAt, code:c.code, points:c.points, closedAt:c.closedAt||null}; }
+/* ---------- ملخص اليوم: حضر / غاب / أكتر وقت حضور ---------- */
+function attPeakOf(recs){
+  const B = 15*60000, m = {};
+  (recs||[]).forEach(r=>{ if(r && r.ts){ const k = Math.floor(r.ts/B); m[k] = (m[k]||0)+1; } });
+  let bk = null, bn = 0;
+  Object.keys(m).forEach(k=>{ if(m[k]>bn){ bn = m[k]; bk = +k; } });
+  return bk==null ? null : {from:bk*B, to:(bk+1)*B, n:bn};
+}
+function attSummaryHtml(recs, total, day){
+  const here = new Set((recs||[]).map(r=>r.pid)).size, out = Math.max(0, total-here), pk = attPeakOf(recs);
+  const tf = ts=>{ try{ return new Date(ts).toLocaleTimeString('ar-EG', {hour:'numeric', minute:'2-digit'}); }catch(e){ return ''; } };
+  const pct = total ? Math.round(here/total*100) : 0;
+  const st = (day && day.closedAt) ? `<span class="dsum-st shut">🔒 اتقفل ${tf(day.closedAt)}</span>` : `<span class="dsum-st live">● مباشر</span>`;
+  return `<div class="dsum">
+    <div class="dsum-head"><b>📊 ملخص اليوم</b>${st}</div>
+    <div class="dsum-grid">
+      <div class="dsum-t in"><span>✅</span><b>${here}</b><small>حضروا · ${pct}%</small></div>
+      <div class="dsum-t out"><span>❌</span><b>${out}</b><small>غابوا · ${total?100-pct:0}%</small></div>
+    </div>
+    <div class="dsum-peak"><span class="dsum-pi">⏰</span><div><small>أكتر وقت الناس حضرت فيه</small><b>${pk ? 'من '+tf(pk.from)+' إلى '+tf(pk.to) : 'لسه مفيش حضور'}</b>${pk ? `<small>${pk.n} ${pk.n===1?'حضر':'حضروا'} في الفترة دي</small>` : ''}</div></div>
+  </div>`;
+}
 function attNewSync(type, src){
   const g = id=>document.getElementById(id);
   const dt = g('att-new-date'), wd = g('att-new-wd'), nm = g('att-new-name'); if(!dt) return;
@@ -35748,7 +35794,9 @@ function renderAdminAttendanceTabInner(){
         <span class="dp-ring"><svg viewBox="0 0 80 80"><circle class="bg" cx="40" cy="40" r="34"/><circle class="fg" cx="40" cy="40" r="34" style="--off:${off}"/></svg><span class="dp-ring-n"><b>${dRecs.length}</b><small>حضور</small></span></span>
         <div class="dp-info"><span class="dr-chip st-${stc[0]}"><i></i>${stc[1]}</span><h2>${escapeHtml(day.name||t.label)}</h2><p>${attFmtTime(day.startedAt)} · ${dpts>0?dpts+' نقطة':'بدون نقاط'}</p><p class="dp-sub">${dRecs.length} من ${total} · ${dpct}%</p></div>
       </div>`;
+    const sumHtml = attSummaryHtml(dRecs, total, day);
     if(isCur){
+      const isShut = !!(c.closedAt && !c.open);
       return `${head}
       <section class="dp">
         ${top}
@@ -35757,8 +35805,10 @@ function renderAdminAttendanceTabInner(){
         <div class="dp-actions"><button type="button" class="btn btn-outline" data-action="att-admin-print" data-type="${type}">🖨️ طباعة</button><button type="button" class="btn btn-ghost" data-action="att-admin-regen" data-type="${type}">🔄 كود جديد</button></div>
       </section>
       <div class="aa-grid" style="margin-top:14px;">
-        <button type="button" class="aa-tile" data-action="att-admin-page" data-page="manual" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#7C9CFF,#5A67D8)">✍️</span><b>تسجيل يدوي</b><small>سجّل المخدومين بنفسك</small></button>
+        <button type="button" class="aa-tile" data-action="att-admin-page" data-page="manual" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#7C9CFF,#5A67D8)">✍️</span><b>سجّل حضور اليوم</b><small>سجّل المخدومين بنفسك</small></button>
         <button type="button" class="aa-tile" data-action="att-admin-page" data-page="who" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#5FE0A4,#2A9D78)">👁️</span><b>شوف مين حضر</b><small>${dRecs.length} حضروا</small></button>
+        <button type="button" class="aa-tile" data-action="att-admin-closeday" data-type="${type}"><span class="aa-tile-ico" style="background:${isShut?'linear-gradient(145deg,#F4B740,#C98A12)':'linear-gradient(145deg,#FF8F8F,#D6473A)'}">${isShut?'🔓':'🔒'}</span><b>${isShut?'افتح اليوم تاني':'اقفل اليوم'}</b><small>${isShut?'اليوم مقفول':'اقفل الحضور واعرض الملخص'}</small></button>
+        <button type="button" class="aa-tile" data-action="att-admin-page" data-page="summary" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#F4B740,#E08A1E)">📊</span><b>ملخص اليوم</b><small>${dRecs.length} حضروا · ${Math.max(0,total-new Set(dRecs.map(r=>r.pid)).size)} غابوا</small></button>
       </div>
       ${delBtn}`;
     }
@@ -35766,6 +35816,7 @@ function renderAdminAttendanceTabInner(){
     return `${head}
       <section class="dp">
         ${top}
+        ${sumHtml}
         ${day.code?`<div class="dp-code" style="margin-top:14px;">${escapeHtml(day.code)}</div>`:''}
         <div class="hint" style="margin-top:8px;text-align:center;">كود اليوم ده مش بيشتغل غير لما تفعّله — وقتها اليوم الحالي بيتحفظ في الأيام.</div>
         <button type="button" class="btn btn-primary" style="margin-top:12px;width:100%;" data-action="att-admin-activate" data-type="${type}" data-sid="${escapeHtml(sid)}">🔁 فعّل اليوم ده</button>
@@ -35817,6 +35868,10 @@ function renderAdminAttendanceTabInner(){
     return `${adminKpis([{num:recs.length, lab:'حضروا'},{num:total-recs.length, lab:'لم يحضروا'},{num:pct+'%', lab:'نسبة الحضور'}])}
       <input type="text" class="field admin-search-input" data-filter-target=".audit-row" placeholder="🔍 دوّر بالاسم أو الكود..." style="margin:0 0 12px;" />
       <div class="card">${rows || '<div class="empty-note">لسه محدش سجّل حضوره</div>'}</div>
+      <button type="button" class="btn btn-outline" style="margin-top:12px;width:100%;" data-action="att-admin-export" data-type="${type}">⬇️ تصدير كشف الحضور (Excel / CSV)</button>`;
+  }
+  if(nav.page==='summary'){
+    return `${attSummaryHtml(recs, total, c)}
       <button type="button" class="btn btn-outline" style="margin-top:12px;width:100%;" data-action="att-admin-export" data-type="${type}">⬇️ تصدير كشف الحضور (Excel / CSV)</button>`;
   }
   if(nav.page==='insights') return attInsightsHtml(type, c);
@@ -36407,9 +36462,22 @@ async function attAdminAction(action, el){
     const ok = await attCfgUpdate(o=>{ o[type].points = v; });
     saveToast(ok, 'تم حفظ نقاط '+t.label+': '+v); return;
   }
+  if(action==='att-admin-closeday'){
+    const cc0 = attCfg(type); if(!cc0) return;
+    if(cc0.closedAt && !cc0.open){
+      const ok = await attCfgUpdate(o=>{ o[type].open = true; o[type].closedAt = null; });
+      saveToast(ok, 'تم إعادة فتح اليوم'); return;
+    }
+    const n0 = new Set(Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===cc0.sessionId).map(r=>r.pid)).size;
+    showConfirmDialog('قفل اليوم؟ هيتقفل استقبال الحضور وهيظهرلك الملخص ('+n0+' حضروا من '+PARTICIPANTS.length+').', async ()=>{
+      const ok = await attCfgUpdate(o=>{ o[type].open = false; o[type].closedAt = Date.now(); });
+      saveToast(ok, 'تم قفل اليوم 🔒');
+    }, {icon:'🔒', confirmLabel:'اقفل اليوم'});
+    return;
+  }
   if(action==='att-admin-toggle'){
     const want = !(attCfg(type) && attCfg(type).open);
-    const ok = await attCfgUpdate(o=>{ o[type].open = want; });
+    const ok = await attCfgUpdate(o=>{ o[type].open = want; if(want) o[type].closedAt = null; });
     saveToast(ok, want ? 'تم فتح استقبال الحضور' : 'تم قفل استقبال الحضور');
   }
   else if(action==='att-admin-regen'){
