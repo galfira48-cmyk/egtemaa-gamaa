@@ -35175,7 +35175,6 @@ async function attRefresh(force){
 async function attCfgUpdate(mut){
   const res = await window.storage.update(ATT_CONFIG_KEY, cur=>{
     let o = {}; try{ o = cur ? JSON.parse(cur) : {}; }catch(e){ o = {}; }
-    ATT_KEYS.forEach(k=>{ if(!o[k]) o[k] = attNewCfg(k); });
     mut(o);
     return JSON.stringify(o);
   }, true);
@@ -35183,7 +35182,6 @@ async function attCfgUpdate(mut){
   /* احتياطي: لو الترانزاكشن فشلت (اتصال/صلاحيات) نجرب كتابة مباشرة */
   try{
     const o = await attLoadJson(ATT_CONFIG_KEY);
-    ATT_KEYS.forEach(k=>{ if(!o[k]) o[k] = attNewCfg(k); });
     mut(o);
     const r = await window.storage.set(ATT_CONFIG_KEY, JSON.stringify(o), true);
     if(r){ _attVer++; ATT_CONFIG = o; return true; }
@@ -35241,6 +35239,7 @@ window.addEventListener('online', ()=>{ setTimeout(attSyncPending, 1500); });
 setInterval(attSyncPending, 30000);
 
 function attMaybeAdminInit(){
+  return; /* الأدمن هو اللي بينشئ اليوم بنفسه — مفيش إنشاء تلقائي */
   if(_attInitBusy || !_attLoadedOnce || Date.now()-_attInitFailedAt < 20000) return;
   if(!(state.view==='admin' && state.adminUnlocked && !state.adminHub && state.adminTab==='attendance')) return;
   if(ATT_KEYS.every(k=>ATT_CONFIG && ATT_CONFIG[k])) return;
@@ -35674,6 +35673,22 @@ function renderAdminAttendanceTab(){
   const sxc = (!nav.type && typeof window.sxAdminCard==='function') ? window.sxAdminCard() : '';
   return '<div class="'+(anim?'aa-anim':'')+'">'+html+sxc+'</div>'+(showFab?'<button type="button" class="att-fab" data-action="att-admin-scan" data-type="'+nav.type+'" aria-label="مسح سريع">'+ATT_SCAN_SVG+'</button>':'');
 }
+function attNewDayFormHtml(type, t, c, noCancel){
+  const todayWd = new Date().getDay();
+  return `<div class="card att-newsess aa-form">
+      <div class="att-ns-top"><span class="att-ns-ico">${t.icon}</span><div><b>يوم ${escapeHtml(t.label)} جديد</b><small>اختار اليوم والتاريخ واكتب اسم اليوم</small></div></div>
+      <div class="att-ns-grid">
+        <label class="att-ns-f"><span>📆 اليوم</span><select class="field" id="att-new-wd" onchange="attNewSync('${type}','wd')">${ATT_WEEKDAYS.map((w,i)=>`<option value="${i}"${i===todayWd?' selected':''}>${w}</option>`).join('')}</select></label>
+        <label class="att-ns-f"><span>📅 التاريخ</span><input class="field" type="date" id="att-new-date" value="${attTodayISO()}" dir="ltr" onchange="attNewSync('${type}','date')" /></label>
+      </div>
+      <div class="att-ns-grid">
+        <label class="att-ns-f"><span>✏️ اسم اليوم</span><input class="field" id="att-new-name" value="${escapeHtml(attDefaultName(type))}" oninput="this.dataset.t=1" /></label>
+        <label class="att-ns-f"><span>🪙 النقاط</span><input class="field" type="number" inputmode="numeric" min="0" max="1000" id="att-new-pts" dir="ltr" value="${attPtsOfCfg(type,c)}" /></label>
+      </div>
+      <input type="checkbox" id="att-new-open" checked style="display:none" />
+      <div class="aa-form-btns"><button type="button" class="btn btn-primary" data-action="att-admin-create" data-type="${type}">إنشاء</button>${noCancel?'':`<button type="button" class="btn btn-ghost" data-action="att-admin-page" data-page="home" data-type="${type}">إلغاء</button>`}</div>
+    </div>`;
+}
 function renderAdminAttendanceTabInner(){
   const nav = state.attNav || (state.attNav = {type:null, page:'home'});
   if(!_attLoadedOnce) return `<div class="empty-note">جارٍ التحميل...</div>`;
@@ -35694,15 +35709,18 @@ function renderAdminAttendanceTabInner(){
   if(!type || !t || !ATT_KEYS.includes(type)){
     const tiles = ATT_KEYS.map(k=>{
       const tt = ATT_TYPES[k], cc = attCfg(k);
-      const sub = cc ? `${cc.open?'🟢 مفتوح':'مقفول'} · ${cntOf(k,cc)} حضروا` : 'جاهز';
+      const sub = cc ? `${cc.open?'🟢 مفتوح':'مقفول'} · ${cntOf(k,cc)} حضروا` : 'لسه مفيش يوم';
       return `<div class="aa-tile-wrap"><button type="button" class="aa-tile" data-action="att-admin-open" data-type="${k}"><span class="aa-tile-ico${attLogoOf(k)?attIcoAttrs(k)+';background:'+tt.color:'" style="background:'+tt.color}">${attLogoOf(k)?attIconHtml(k):tt.icon}</span><b>${escapeHtml(tt.label)}</b><small>${sub}</small></button><button type="button" class="aa-tile-del" data-action="att-admin-deltype" data-type="${k}" aria-label="حذف ${escapeHtml(tt.label)}" title="حذف النشاط">🗑️</button></div>`;
     }).join('');
     return `<div class="aa-grid">${tiles}<button type="button" class="aa-tile add" data-action="att-admin-addtype"><span class="aa-tile-ico">＋</span><b>نشاط جديد</b><small>أضف نوع حضور</small></button></div>`;
   }
   const c = attCfg(type);
   if(!c){
-    const failed = _attInitFailedAt>0 && !_attInitBusy;
-    return `<div class="card" style="text-align:center;"><div class="empty-note">${failed?'تعذر تجهيز كود الحضور — اتأكد من الإنترنت وجرّب تاني':'<div class="ai-skel"></div><div class="ai-skel s2"></div>جارٍ تجهيز كود الحضور...'}</div><button type="button" class="btn btn-primary" style="margin-top:10px;" data-action="att-admin-init" data-type="${type}">🔄 تجهيز الكود الآن</button></div>`;
+    if(nav.page==='logo') return `<div class="aa-act-head"><span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>لوجو ${escapeHtml(t.label)}</span></div>${attLogoAdminCard(type)}`;
+    return `<div class="aa-act-head"><span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>${escapeHtml(t.label)}</span><button type="button" class="aa-logo-mini" data-action="att-admin-page" data-page="logo" data-type="${type}" aria-label="تعديل لوجو ${escapeHtml(t.label)}"><span class="aa-lm-in">${attIconHtml(type)}</span></button></div>
+      <div class="card" style="text-align:center;margin-bottom:12px;"><div class="empty-note">لسه مفيش يوم حضور لـ${escapeHtml(t.label)}.<br>اليوم بيتعمل بإيدك بس — اختار التاريخ واضغط إنشاء.</div></div>
+      ${attNewDayFormHtml(type, t, null, true)}
+      <button type="button" class="btn btn-outline" style="margin-top:10px;width:100%;color:var(--danger);" data-action="att-admin-deltype" data-type="${type}">🗑️ حذف نشاط ${escapeHtml(t.label)} بالكامل</button>`;
   }
   const recs = Object.entries(ATT_RECORDS||{}).filter(([k,r])=>r && r.type===type && r.sid===c.sessionId)
     .map(([k,r])=>Object.assign({key:k}, r)).sort((a,b)=>b.ts-a.ts);
@@ -35738,6 +35756,10 @@ function renderAdminAttendanceTabInner(){
         <div class="dp-qr"><div class="dp-qr-card"><div id="att-admin-qr"></div></div><div class="dp-code">${escapeHtml(c.code)}</div></div>
         <div class="dp-actions"><button type="button" class="btn btn-outline" data-action="att-admin-print" data-type="${type}">🖨️ طباعة</button><button type="button" class="btn btn-ghost" data-action="att-admin-regen" data-type="${type}">🔄 كود جديد</button></div>
       </section>
+      <div class="aa-grid" style="margin-top:14px;">
+        <button type="button" class="aa-tile" data-action="att-admin-page" data-page="manual" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#7C9CFF,#5A67D8)">✍️</span><b>تسجيل يدوي</b><small>سجّل المخدومين بنفسك</small></button>
+        <button type="button" class="aa-tile" data-action="att-admin-page" data-page="who" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#5FE0A4,#2A9D78)">👁️</span><b>شوف مين حضر</b><small>${dRecs.length} حضروا</small></button>
+      </div>
       ${delBtn}`;
     }
     const who = dRecs.slice(0,80).map(r=>{ const p = PARTICIPANTS.find(x=>String(x.id)===String(r.pid)); const nm = (p&&p.name)||String(r.pid); return `<div class="dp-who"><span class="dp-av">${escapeHtml(nm.trim().charAt(0))}</span><span class="dp-wn">${escapeHtml(nm)}</span><span class="dp-wt">${attFmtTime(r.ts)}</span></div>`; }).join('');
@@ -35819,19 +35841,7 @@ function renderAdminAttendanceTabInner(){
     </button>`;
   }).join('');
   const todayWd = new Date().getDay();
-  const formHtml = `<div class="card att-newsess aa-form">
-      <div class="att-ns-top"><span class="att-ns-ico">${t.icon}</span><div><b>يوم ${escapeHtml(t.label)} جديد</b><small>اختار اليوم والتاريخ واكتب اسم اليوم</small></div></div>
-      <div class="att-ns-grid">
-        <label class="att-ns-f"><span>📆 اليوم</span><select class="field" id="att-new-wd" onchange="attNewSync('${type}','wd')">${ATT_WEEKDAYS.map((w,i)=>`<option value="${i}"${i===todayWd?' selected':''}>${w}</option>`).join('')}</select></label>
-        <label class="att-ns-f"><span>📅 التاريخ</span><input class="field" type="date" id="att-new-date" value="${attTodayISO()}" dir="ltr" onchange="attNewSync('${type}','date')" /></label>
-      </div>
-      <div class="att-ns-grid">
-        <label class="att-ns-f"><span>✏️ اسم اليوم</span><input class="field" id="att-new-name" value="${escapeHtml(attDefaultName(type))}" oninput="this.dataset.t=1" /></label>
-        <label class="att-ns-f"><span>🪙 النقاط</span><input class="field" type="number" inputmode="numeric" min="0" max="1000" id="att-new-pts" dir="ltr" value="${attPtsOfCfg(type,c)}" /></label>
-      </div>
-      <input type="checkbox" id="att-new-open" checked style="display:none" />
-      <div class="aa-form-btns"><button type="button" class="btn btn-primary" data-action="att-admin-create" data-type="${type}">إنشاء</button><button type="button" class="btn btn-ghost" data-action="att-admin-page" data-page="home" data-type="${type}">إلغاء</button></div>
-    </div>`;
+  const formHtml = attNewDayFormHtml(type, t, c);
   return `
     <div class="aa-act-head">
       <span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>${escapeHtml(t.label)}</span>
@@ -36303,7 +36313,7 @@ async function attAdminAction(action, el){
         if(prev.sessionId===sid){
           const hist = (prev.history||[]).slice(); const last = hist.pop();
           if(last){ o[type] = Object.assign({}, prev, {sessionId:last.sessionId, name:last.name, startedAt:last.startedAt, code:last.code||attGenCode(type), points:(last.points!=null?last.points:prev.points), history:hist}); }
-          else { const n = attNewCfg(type); n.open = !!prev.open; o[type] = n; }
+          else { delete o[type]; }
         } else { prev.history = (prev.history||[]).filter(x=>x.sessionId!==sid); }
       });
       if(ok) await attRecUpdate(o=>{ Object.keys(o).forEach(k=>{ if(o[k] && o[k].type===type && o[k].sid===sid) delete o[k]; }); });
@@ -36507,7 +36517,7 @@ async function attAdminAction(action, el){
       const ok = await attCfgUpdate(o=>{
         const prev = o[type]; const n = attNewCfg(type, day); freshSid = n.sessionId;
         n.name = finalName; n.points = pts; n.open = openNow;
-        n.history = (prev.history||[]).concat([attDaySnap(prev)]).slice(-60);
+        n.history = prev ? (prev.history||[]).concat([attDaySnap(prev)]).slice(-60) : [];
         o[type] = n;
       });
       if(ok && state.attNav){ state.attNav.page = 'home'; state.attFreshSid = freshSid; }
