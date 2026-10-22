@@ -9441,14 +9441,14 @@ if(window.__GLV_LOCAL){
     }
     function newPc(){
       if(pc){ try{ pc.close(); }catch(e){} }
-      pc = new RTCPeerConnection({ iceServers: [] });   /* بدون STUN: شبكة محلية بس */
-      pc.onconnectionstatechange = function(){ setStatus(); };
+      pc = new RTCPeerConnection({ iceServers: (navigator.onLine!==false ? [{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}] : []) });   /* STUN لما يكون فيه نت (بيحل مشكلة الأجهزة اللي بتخبّي عنوان الشبكة)، وبدونه شبكة محلية بس */
+      pc.onconnectionstatechange = function(){ setStatus(); if(pc && pc.connectionState==='failed'){ clearTimeout(window.__glvLinkT); try{ alert('الربط فشل ❌\nتأكد إن الهاتفين على نفس الواي فاي (أو واحد فاتح هوت سبوت والتاني متصل بيه) وجرّب تاني من الأول.'); }catch(e){} closeModal(); } };
       pc.ondatachannel = function(e){ setupDc(e.channel); };
       return pc;
     }
     function setupDc(ch){
       dc = ch;
-      dc.onopen = function(){ send({op:'snap', items:snapshot()}); setStatus(); try{ showToast('✅ اتربطت بالهاتف التاني', false); }catch(e){} closeModal(); };
+      dc.onopen = function(){ clearTimeout(window.__glvLinkT); send({op:'snap', items:snapshot()}); setStatus(); try{ showToast('✅ اتربطت بالهاتف التاني', false); }catch(e){} closeModal(); };
       dc.onclose = function(){ setStatus(); };
       dc.onmessage = onMsg;
     }
@@ -9531,7 +9531,7 @@ if(window.__GLV_LOCAL){
       function step2(autoScan){
         var c = card(dots(2,2)+'<div style="font-weight:900;font-size:16px">دلوقتي امسح الكود اللي ظهر عند صاحبك</div><div style="font-size:12px;opacity:.7;margin:4px 0 10px">أول ما تمسحه هتتربطوا تلقائي</div><button style="'+BIG+'" id="p-scan">📷 افتح الكاميرا</button>'+manualBox('الصق كود صاحبك هنا','اتصال')+backBtn());
         var ta = c.querySelector('#p-in');
-        async function go(){ try{ var a = await unpack(ta.value); await pc.setRemoteDescription({type:'answer', sdp:a.s}); card('<div style="padding:30px 0;font-weight:800">⏳ بيتم الربط...</div>'); }catch(e){ alert('الكود غلط أو ناقص — جرّب تمسح تاني'); step2(); } }
+        async function go(){ try{ var a = await unpack(ta.value); await pc.setRemoteDescription({type:'answer', sdp:a.s}); card('<div style="padding:30px 0;font-weight:800">⏳ بيتم الربط...</div>'); clearTimeout(window.__glvLinkT); window.__glvLinkT = setTimeout(function(){ if(!connected() && modal){ var cc = card('<div style="font-weight:900;font-size:16px;margin:10px 0">⚠️ الربط اتأخر</div><div style="font-size:12px;opacity:.75;margin-bottom:8px">تأكد إن الهاتفين على نفس الواي فاي وجرّب من الأول</div><button style="'+BIG+'" id="p-retry">🔄 جرّب تاني</button>'); cc.querySelector('#p-retry').onclick = home; } }, 20000); }catch(e){ alert('الكود غلط أو ناقص — جرّب تمسح تاني'); step2(); } }
         c.querySelector('#p-scan').onclick = function(){ scanInto(ta, go); };
         c.querySelector('#p-ok').onclick = go;
         c.querySelector('#p-back').onclick = step1;
