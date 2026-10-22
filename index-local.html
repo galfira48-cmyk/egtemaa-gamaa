@@ -15,8 +15,10 @@
   var mode = null;
   try{
     var q = new URLSearchParams(location.search);
-    if(q.has('local')){ var v = q.get('local'); if(v==='0') localStorage.removeItem('glv-local'); else localStorage.setItem('glv-local', v==='tabs' ? 'tabs' : '1'); }
+    if(q.has('local')){ var v = q.get('local'); if(v==='0') localStorage.setItem('glv-local','off'); else localStorage.setItem('glv-local', v==='tabs' ? 'tabs' : '1'); }
     mode = localStorage.getItem('glv-local');
+    if(mode===null) mode = '1';   /* الوضع المحلي شغال تلقائي */
+    if(mode==='off') mode = null;
   }catch(e){}
   window.__GLV_LOCAL = !!mode;
   if(mode!=='tabs') return;
