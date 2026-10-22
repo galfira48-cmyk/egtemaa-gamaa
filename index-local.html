@@ -9564,7 +9564,7 @@ if(window.__GLV_LOCAL){
     window.addEventListener('DOMContentLoaded', function(){
       btn = document.createElement('button');
       btn.style.cssText = 'position:fixed;bottom:10px;left:10px;z-index:2147483645;background:#171449;color:#ffd76a;font:800 12px Cairo,sans-serif;padding:8px 14px;border:0;border-radius:99px;opacity:.92;box-shadow:0 2px 8px rgba(0,0,0,.4)';
-      btn.onclick = openModal; document.body.appendChild(btn); setStatus();
+      btn.onclick = openModal; setStatus(); /* الزر العائم اتشال */
       window.__glvLocalLink = openModal;
     });
   })();
@@ -17055,7 +17055,7 @@ const GAME_CATEGORY_OF = {
   xo:'board', connect4:'board', domino:'board', ludo:'board', chess:'board', checkers:'board', tmm:'board', backgammon:'board', snakes:'board',
   crossmath:'mind', spotdiff:'mind', dayriddle:'mind', matchsticks:'mind', vault:'mind', matchsq:'mind', treasure:'mind',
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
-  memory:'focus', who:'mind', revword:'mind', blocky:'focus', cube:'focus', numguess:'mind', math:'mind', millionaire:'mind', fawazeer:'mind', bus:'mind', rollpaint:'focus', simon:'focus',
+  memory:'focus', who:'mind', revword:'mind', blocky:'focus', cube:'focus', numguess:'mind', math:'mind', millionaire:'mind', mpmil:'mind', fawazeer:'mind', bus:'mind', rollpaint:'focus', simon:'focus',
   colorcards:'cards', rps:'cards',
   quiz:'party', mystery:'party', emojibible:'party', proverb:'party', stoptimer:'skill', uniqans:'party', fahmeen:'party', placemem:'focus', sqorder:'focus', fazzura:'party', drawguess:'party', battleship:'board', khatfa:'party',
 };
@@ -17255,6 +17255,7 @@ const GH_SOLO_SUB = {
   cube:'اضغط مرتين عشان المكعب يتخلط، واسحب على أي وش عشان تلفّ طبقة (واسحب بره المكعب عشان تدوّره) — التايمر بيبدأ مع أول حركة، ولما كل وش يبقى لون واحد تكسب نقط',
   blocky:'لوحة 8×8 — اسحب البلوكات وفجّر الصفوف والأعمدة، كومبو بيضاعف النقط، مستويات بتصعب، وتراجع وتبديل قطع لما تتزنق.',
   millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 15 ثانية للسؤال، وكمّلهم كلهم واكسب 300 نقطة',
+  mpmil:'نفس الأسئلة المسيحية بتظهر لكل اللاعبين مع بعض — أول واحد يدوس على الإجابة الصح ياخد النقط، ويظهر للباقي إنه حلها أسرع، وبعدين السؤال اللي بعده. 15 سؤال بيصعبوا تدريجيًا وقيمة النقط بتزيد',
   fawazeer:'10 مستويات بتتفتح بالتدريج ومئات الأسئلة (كتاب مقدس، طقس، عقيدة، قديسين، شهداء) — جاوب 7 من 10 صح عشان تعدّي، وتدريب حر في أي موضوع.',
   chess:'شطرنج كامل بكل القواعد — كش ملك، تبييت، الأسر بالمرور، ترقية البيدق',
   checkers:'أسر إجباري ومتسلسل، وتتويج القطعة لما توصل آخر الصف',
@@ -17670,7 +17671,7 @@ function liveRoomsList(){
     .sort((a,b)=> (b.updatedAt||0)-(a.updatedAt||0));
 }
 function watchRoomNames(room){
-  if(room.game==='ludo' || room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff'){
+  if(room.game==='ludo' || room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff' || room.game==='mpmil'){
     return (room.players||[]).map(p=>p.name).filter(Boolean).join(' • ') || 'لاعبين';
   }
   return [room.hostName, room.guestName].filter(Boolean).join('  🆚  ');
@@ -26077,6 +26078,8 @@ async function createGameRoom(gameType, paid){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], eb:null});
   } else if(gameType==='proverb'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], pv:null});
+  } else if(gameType==='mpmil'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], mm:null, maxPlayers:4});
   } else if(gameType==='stoptimer'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], st:null, stLevel:'easy'});
   } else if(gameType==='uniqans'){
@@ -26126,7 +26129,7 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(room.game==='ludo' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='stoptimer' || room.game==='uniqans' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura' || room.game==='drawguess' || room.game==='battleship' || room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff'){
+  if(room.game==='ludo' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='mpmil' || room.game==='stoptimer' || room.game==='uniqans' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura' || room.game==='drawguess' || room.game==='battleship' || room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff'){
     room.players = room.players || [{id:room.hostId, name:room.hostName}];
     if(!room.players.some(x=>x.id===state.pid)){
       if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
@@ -26217,7 +26220,7 @@ async function applyLeaveRoomPenalty(code){
       if(room.game==='ludo'){
         const seats = (room.ludo && room.ludo.seats) || (room.players||[]).map(p=>({pid:p.id, left:false}));
         recipients = seats.filter(s=> s.pid && s.pid!==state.pid && !s.left).map(s=>s.pid);
-      } else if(room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff'){
+      } else if(room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff' || room.game==='mpmil'){
         recipients = (room.players||[]).filter(p=> p.id && p.id!==state.pid).map(p=>p.id);
       } else {
         recipients = [room.hostId, room.guestId].filter(id=> id && id!==state.pid);
@@ -26306,11 +26309,11 @@ async function leaveGameRoom(){
         roomTouch(room);
         room.players.forEach(pl=>pushNotification(pl.id, `🚪 ${myName} خرج من الغرفة`, '🚪'));
       }
-    } else if(room.game==='khatfa' || room.game==='spotdiff'){
+    } else if(room.game==='khatfa' || room.game==='spotdiff' || room.game==='mpmil'){
       const myName = (room.players||[]).find(p=>p.id===state.pid)?.name
         || (PARTICIPANTS.find(x=>x.id===state.pid)||{}).name || 'لاعب';
       room.players = (room.players||[]).filter(p=>p.id!==state.pid);
-      if((room.kh||room.sd) && room.status==='playing'){
+      if((room.kh||room.sd||room.mm) && room.status==='playing'){
         if(room.players.length<2){ delete GAME_ROOMS[code]; }
         else { if(room.hostId===state.pid){ room.hostId = room.players[0].id; room.hostName = room.players[0].name; } roomTouch(room); room.players.forEach(pl=>pushNotification(pl.id, `🚪 ${myName} خرج من اللعبة`, '🚪')); }
       } else if(room.players.length===0){
@@ -26647,6 +26650,7 @@ const ROOM_GAMES = [
   {id:'mystery',  sub:'ادخلوا الغرفة مع بعض وفكّوا الألغاز والأقفال قبل ما الوقت يخلص'},
   {id:'emojibible', sub:'خمّنوا القصة أو المناسبة المسيحية من الإيموجيز — الأسرع والصح ياخد نقط أكتر'},
   {id:'proverb',  sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر'},
+  {id:'mpmil',    sub:'نفس الأسئلة — أول واحد يجاوب صح ياخد النقط وبعدها السؤال اللي بعده'},
   {id:'stoptimer', sub:'وقّفوا العدّاد على الرقم المطلوب — الأقرب يكسب الجولة'},
   {id:'uniqans', sub:'اكتب إجابة مختلفة عن الكل — اللي يتطابق مع حد يتقصى'},
   {id:'fahmeen',  sub:'اكتبوا أول حاجة تيجي في بالكم — اتطابقوا أو اتفردوا وراهنوا برقم'},
@@ -26662,6 +26666,7 @@ const ROOM_ONLY_TILES = {
   quiz: {id:'quiz', icon:'❓', title:'تحدي الأسئلة', sub:'لحد 4 أصحاب — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
   mystery: {id:'mystery', icon:'🕵️', title:'غرفة الغموض', sub:'ادخلوا مع أصحابكم وفكّوا الألغاز والأدلة والأقفال قبل ما الوقت يخلص', color:'linear-gradient(145deg,#241246,#5B2A86)'},
   emojibible: {id:'emojibible', icon:'😇', title:'إيموجي تحدي', sub:'خمّنوا القصة أو المناسبة المسيحية من الإيموجيز — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#2E5A8C,#6FB1E8)'},
+  mpmil: {id:'mpmil', icon:'👑', title:'من سيربح المليون — سباق', sub:'نفس الأسئلة المسيحية لكل اللاعبين — أول واحد يجاوب صح ياخد النقط ويتقال للباقي إنه حلها أسرع', color:'linear-gradient(145deg,#1B1464,#C9A227)'},
   proverb: {id:'proverb', icon:'📖', title:'أكمل المثل', sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#5C3A21,#C9A227)'},
   stoptimer: {id:'stoptimer', icon:'⏱️', title:'ستوب تايمر', sub:'وقّفوا العدّاد على الرقم المطلوب — الأقرب يكسب الجولة', color:'linear-gradient(145deg,#C23B3B,#2b0e0e)'},
   uniqans: {id:'uniqans', icon:'🚫', title:'إجابة فريدة', sub:'اكتب إجابة مختلفة عن الكل — اللي يتطابق مع حد يتقصى', color:'linear-gradient(145deg,#6C4DFF,#3FDCC9)'},
@@ -27342,6 +27347,217 @@ function renderRoomPv(){
     <div class="quiz-score-row">${scoreRow}</div>
     <div class="hint" style="text-align:center;margin:2px 0 6px;">سؤال ${Q.qIndex+1}/${Q.total} • جاوب ${answeredCount}/${ps.length}</div>
     <div class="xo-status">${statusText}</div>
+    <div class="quiz-qtext">${escapeHtml(q.q)}</div>
+    <div class="quiz-opts">${opts}</div>
+  `;
+}
+/* ================= من سيربح المليون — سباق (2-4 لاعبين): أول واحد يجاوب صح ياخد النقط ويتقال للباقي إنه حلها أسرع ================= */
+const MM_TITLE = 'من سيربح المليون';
+const MM_SEC = 20;            // وقت السؤال بالثواني
+const MM_REVEAL_MS = 3200;    // مدة عرض "مين حلها أسرع" قبل السؤال اللي بعده
+const MM_PER_TIER = 3;        // 3 أسئلة من كل مرحلة × 5 مراحل = 15 سؤال
+function mmPickQuestions(){
+  const out = [];
+  for(let t=1; t<=5; t++){
+    const pool = (typeof MIL_QUESTIONS!=='undefined' && MIL_QUESTIONS[t]) || [];
+    shuffleArray(pool.slice()).slice(0, MM_PER_TIER).forEach(q=>{
+      const sq = milShuffleQuestion(q);
+      sq.tier = t; sq.pts = MIL_TIER_VALUES[t-1];
+      out.push(sq);
+    });
+  }
+  return out;
+}
+function mmNewState(players){
+  const qs = mmPickQuestions(), now = Date.now();
+  return { gid: now+'-'+Math.floor(Math.random()*1e6), questions: qs, qIndex:0, total: qs.length,
+    scores: Object.fromEntries((players||[]).map(p=>[p.id,0])),
+    phase:'ask', qStart: now, deadline: now + MM_SEC*1000, wrong:{}, winner:null, winPts:0, winMs:0, timedOut:false, nextAt:0, finished:false };
+}
+function mmWinner(room){
+  const Q = room.mm; if(!Q) return null;
+  let best=null, bestScore=-1, tie=false;
+  (room.players||[]).forEach(p=>{ const s=(Q.scores||{})[p.id]||0; if(s>bestScore){ best=p.id; bestScore=s; tie=false; } else if(s===bestScore){ tie=true; } });
+  return tie ? 'draw' : best;
+}
+function mmName(room, id){
+  const p = (room.players||[]).find(x=>x.id===id) || (typeof PARTICIPANTS!=='undefined' ? PARTICIPANTS.find(x=>x.id===id) : null);
+  return p ? p.name : 'صاحبك';
+}
+function renderRoomMmLobby(room){ return window.__rdyWrap(__rdy_renderRoomMmLobby(room), room); }
+function __rdy_renderRoomMmLobby(room){
+  const ps = room.players || [];
+  const isHost = room.hostId===state.pid;
+  const slots = [0,1,2,3].map(i=>{
+    const p = ps[i];
+    if(!p) return `<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
+    return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
+  }).join('');
+  return `
+    <div class="room-waiting">
+      ${roomCodeCard(room.code, room.game)}
+      <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 👑 — نفس الأسئلة، وأول واحد يجاوب صح ياخد النقط</div>
+      <div class="uno-lobby-list">${slots}</div>
+      ${isHost
+        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-mm-start" ${ps.length<2?'disabled':''}>👑 ابدأ السباق (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
+        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ السباق</div>`}
+    </div>`;
+}
+async function doRoomMmStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='mpmil' || room.hostId!==state.pid || room.status!=='waiting') return;
+  const ps = room.players || [];
+  if(ps.length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
+  room.mm = mmNewState(ps);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){}
+  render();
+}
+/* أول واحد يدوس على الإجابة الصح هو اللي ياخد النقط — الغلط بيقفل عليك السؤال ده بس */
+async function doRoomMmPick(idxRaw, qiRaw){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.mm || room.mm.finished) return;
+  const Q = room.mm;
+  const qi = parseInt(qiRaw,10);
+  if(!isNaN(qi) && qi!==Q.qIndex){ render(); return; }     // السؤال اتغيّر وانت لسه ضاغط على القديم
+  if(Q.phase!=='ask' || (Q.wrong||{})[state.pid]!==undefined){ render(); return; }
+  const idx = parseInt(idxRaw,10);
+  const q = Q.questions[Q.qIndex];
+  if(idx===q.c){
+    Q.winner = state.pid; Q.winPts = q.pts; Q.winMs = Math.max(0, Date.now()-Q.qStart);
+    Q.scores[state.pid] = (Q.scores[state.pid]||0) + q.pts;
+    Q.phase = 'reveal'; Q.nextAt = Date.now() + MM_REVEAL_MS;
+    try{ SND.cheer(); }catch(e){}
+  } else {
+    Q.wrong = Q.wrong || {}; Q.wrong[state.pid] = idx;
+    try{ vibrate(30); }catch(e){}
+    const ps = room.players||[];
+    if(ps.every(p=>Q.wrong[p.id]!==undefined)){ Q.phase='reveal'; Q.winner=null; Q.timedOut=false; Q.nextAt = Date.now() + MM_REVEAL_MS; }
+  }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomMmTimeout(qi){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.mm || room.mm.finished) return;
+  const Q = room.mm;
+  if(Q.qIndex!==qi || Q.phase!=='ask') return;
+  Q.phase='reveal'; Q.winner=null; Q.timedOut=true; Q.nextAt = Date.now() + MM_REVEAL_MS;
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomMmAdvance(qi){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.mm || room.mm.finished) return;
+  const Q = room.mm;
+  if(Q.qIndex!==qi || Q.phase!=='reveal') return;
+  Q.qIndex = qi+1;
+  if(Q.qIndex>=Q.total){ Q.finished = true; }
+  else { const now=Date.now(); Q.phase='ask'; Q.qStart=now; Q.deadline=now+MM_SEC*1000; Q.wrong={}; Q.winner=null; Q.winPts=0; Q.winMs=0; Q.timedOut=false; Q.nextAt=0; }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(Q.finished){ try{ SND.coinChime(); if(mmWinner(room)===state.pid) launchConfetti(); }catch(e){} }
+}
+async function doRoomMmNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  room.mm = mmNewState(room.players||[]);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+/* مؤقّت اللعبة: بيحدّث العدّ التنازلي، وأي موبايل (صاحب الغرفة الأول) بينقل للسؤال اللي بعده أو يقفل السؤال لما الوقت يخلص */
+let mmTickId = null, mmTickBusy = false;
+function mmEnsureTick(){ if(!mmTickId) mmTickId = setInterval(mmTick, 250); }
+async function mmTick(){
+  if(state.view!=='room-mpmil'){ clearInterval(mmTickId); mmTickId = null; return; }
+  const room = GAME_ROOMS && GAME_ROOMS[state.roomCode];
+  const Q = room && room.mm;
+  if(!Q || Q.finished) return;
+  const now = Date.now();
+  const lag = room.hostId===state.pid ? 0 : 700;
+  if(Q.phase==='ask'){
+    const left = Math.max(0, Q.deadline - now);
+    const t = document.getElementById('mm-timer-txt'); if(t) t.textContent = Math.ceil(left/1000);
+    const b = document.getElementById('mm-timer-bar'); if(b) b.style.width = (left/(MM_SEC*1000)*100)+'%';
+    if(left===0 && now>=Q.deadline+lag && !mmTickBusy){ mmTickBusy = true; try{ await doRoomMmTimeout(Q.qIndex); }catch(e){} mmTickBusy = false; }
+  } else if(Q.phase==='reveal'){
+    if(now>=Q.nextAt+lag && !mmTickBusy){ mmTickBusy = true; try{ await doRoomMmAdvance(Q.qIndex); }catch(e){} mmTickBusy = false; }
+  }
+}
+function renderRoomMm(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate(MM_TITLE, room);
+  if(room.status==='waiting' || !room.mm) return roomHead(MM_TITLE, room) + renderRoomMmLobby(room);
+  const Q = room.mm, ps = room.players || [];
+  if(Q.finished){
+    const w = mmWinner(room);
+    const sorted = ps.slice().sort((a,b)=>(Q.scores[b.id]||0)-(Q.scores[a.id]||0));
+    const title = w==='draw' ? '🤝 تعادل!' : (w===state.pid ? '🎉 انت كسبت المليون!' : `🏆 ${escapeHtml(mmName(room,w))} كسب المليون`);
+    const rows = sorted.map((p,i)=>`
+      <div class="quiz-lb-row">
+        <span class="quiz-lb-rank">#${i+1}</span>
+        ${gameAvatar(p.id)}
+        <span class="quiz-lb-name">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}</span>
+        <b>${Q.scores[p.id]||0}</b>
+      </div>`).join('');
+    return `
+      ${roomHead(MM_TITLE, room)}
+      <div class="xo-status">${title}</div>
+      <div style="margin-top:14px;">${rows}</div>
+      ${nextProBtn('room-mm-next')}
+    `;
+  }
+  mmEnsureTick();
+  const q = Q.questions[Q.qIndex];
+  const reveal = Q.phase==='reveal';
+  const myWrong = (Q.wrong||{})[state.pid];
+  const locked = myWrong!==undefined;
+  const scoreRow = ps.map(p=>scorePill(gameAvatar(p.id), Q.scores[p.id]||0, '', Q.winner===p.id && reveal)).join('');
+  let banner;
+  if(reveal){
+    if(Q.winner){
+      const secs = (Q.winMs/1000).toFixed(1);
+      const nm = Q.winner===state.pid ? 'انت' : escapeHtml(mmName(room, Q.winner));
+      banner = Q.winner===state.pid
+        ? `🏆 حلتها أسرع واحد! +${Q.winPts} نقطة • ⚡ ${secs} ثانية`
+        : `⚡ ${nm} حلها أسرع منك! +${Q.winPts} نقطة • ${secs} ثانية`;
+    } else {
+      banner = Q.timedOut ? '⌛ الوقت خلص — محدش جاوب صح' : '❌ كلكم غلطتوا في السؤال ده';
+    }
+  } else if(locked){
+    banner = '❌ إجابتك غلط — استنى لو حد تاني يجاوب';
+  } else {
+    banner = '⚡ أول واحد يدوس على الإجابة الصح ياخد النقط!';
+  }
+  const opts = q.o.map((opt,i)=>{
+    let cls = 'quiz-opt';
+    if(reveal && i===q.c) cls += ' quiz-correct';
+    else if(locked && i===myWrong) cls += ' quiz-wrong';
+    return `<button type="button" class="${cls}" data-action="room-mm-pick" data-idx="${i}" data-qi="${Q.qIndex}" ${(reveal||locked)?'disabled':''}>${escapeHtml(opt)}</button>`;
+  }).join('');
+  const left = Math.max(0, Q.deadline - Date.now());
+  const timerHtml = reveal ? '' : `
+    <div style="margin:8px 4px 4px;">
+      <div style="display:flex;justify-content:space-between;font-weight:800;font-size:13px;opacity:.85;"><span>⏱️ الوقت</span><span id="mm-timer-txt">${Math.ceil(left/1000)}</span></div>
+      <div style="height:7px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:4px;"><div id="mm-timer-bar" style="height:100%;width:${(left/(MM_SEC*1000)*100)}%;background:linear-gradient(90deg,#F4C95D,#E8342A);border-radius:99px;"></div></div>
+    </div>`;
+  return `
+    ${roomHead(MM_TITLE, room)}
+    <div class="quiz-score-row">${scoreRow}</div>
+    <div class="hint" style="text-align:center;margin:2px 0 6px;">سؤال ${Q.qIndex+1}/${Q.total} • 💰 قيمته ${q.pts} ${q.pts>=11?'نقطة':(q.pts===1?'نقطة':'نقط')}</div>
+    <div class="xo-status">${banner}</div>
+    ${timerHtml}
     <div class="quiz-qtext">${escapeHtml(q.q)}</div>
     <div class="quiz-opts">${opts}</div>
   `;
@@ -34696,6 +34912,7 @@ function render(){
   else if(state.view==='room-mystery') html = renderRoomMystery();
   else if(state.view==='room-emojibible') html = renderRoomEb();
   else if(state.view==='room-proverb') html = renderRoomPv();
+  else if(state.view==='room-mpmil') html = renderRoomMm();
   else if(state.view==='room-stoptimer') html = renderRoomSt();
   else if(state.view==='room-uniqans') html = renderRoomUa();
   else if(state.view==='room-fahmeen') html = renderRoomFh();
@@ -37454,7 +37671,7 @@ function closeScanModal(){
 const NEXT_PRO_ACTIONS = new Set([
   'xo-reset','c4-reset','domino-reset','ludo-again',
   'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next',
-  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-st-next','room-ua-next','room-fh-next','room-fs-next','room-fz-next','room-dg-next','room-bs-next','pm-next','sqo-next',
+  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-mm-next','room-st-next','room-ua-next','room-fh-next','room-fs-next','room-fz-next','room-dg-next','room-bs-next','pm-next','sqo-next',
   'chess-reset','ck-reset','bg-reset','snl-reset','room-snr-next'
 ]);
 const SPECTATE_BLOCKED_ACTIONS = new Set([
@@ -37467,6 +37684,7 @@ const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-mystery-start','room-mystery-submit','room-mystery-hint','room-mystery-next',
   'room-eb-start','room-eb-pick','room-eb-next',
   'room-pv-start','room-pv-pick','room-pv-next',
+  'room-mm-start','room-mm-pick','room-mm-next',
   'room-st-start','room-st-level','room-st-press','room-st-next',
   'room-ua-start','room-ua-submit','room-ua-next','room-ua-end',
   'room-dg-start','room-dg-pick','room-dg-guess','room-dg-tool','room-dg-next',
@@ -37917,6 +38135,9 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-pv-start'){ doRoomPvStart(); }
   else if(action==='room-pv-pick'){ doRoomPvPick(el.dataset.idx); }
   else if(action==='room-pv-next'){ doRoomPvNext(); }
+  else if(action==='room-mm-start'){ doRoomMmStart(); }
+  else if(action==='room-mm-pick'){ doRoomMmPick(el.dataset.idx, el.dataset.qi); }
+  else if(action==='room-mm-next'){ doRoomMmNext(); }
   else if(action==='room-st-start'){ doRoomStStart(); }
   else if(action==='room-st-level'){ doRoomStLevel(el.dataset.lv); }
   else if(action==='room-st-press'){ doRoomStPress(); }
@@ -52746,7 +52967,7 @@ html[data-theme="dark"] body .su-meter.full .msg, html[data-theme="dark"] body .
 (function(){
   if(window.gxExitConfirm) return;
   var EMO = {matchsq:'🪵',treasure:'🗝️',vault:'🔐',matchsticks:'🔥',dayriddle:'📅',spotdiff:'🔍',ludo:'🎲',connect4:'🔴',domino:'🎴',chess:'♟️',checkers:'⚫',colorcards:'🎴',memory:'🧠',rps:'✊',backgammon:'🎲',snakes:'🐍',reflex:'⚡',math:'➗',numguess:'🔢',placemem:'📍',sqorder:'🔲',bus:'🚌',tmm:'🎯',
-    billiards:'🎱',stack:'🧱',cube:'🧊',blocky:'🟦',darts:'🎯',bowling:'🎳',millionaire:'👑',fawazeer:'🧩',revword:'🔤',who:'🕵️',crossmath:'➕',rollpaint:'🎨',simon:'🎵',quiz:'❓',mystery:'🕵️',emojibible:'😀',proverb:'📜'};
+    billiards:'🎱',stack:'🧱',cube:'🧊',blocky:'🟦',darts:'🎯',bowling:'🎳',millionaire:'👑',fawazeer:'🧩',revword:'🔤',who:'🕵️',crossmath:'➕',rollpaint:'🎨',simon:'🎵',quiz:'❓',mystery:'🕵️',emojibible:'😀',proverb:'📜',mpmil:'👑'};
   var open = null;
   function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function art(g){
