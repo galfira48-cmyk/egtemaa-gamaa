@@ -9,15 +9,17 @@
 <meta name="theme-color" content="#171449">
 <script id="glv-local-early">
 /* ===== الوضع المحلي (بدون نت) =====
+   الافتراضي: أونلاين (Firebase). الوضع المحلي بيشتغل بس لو فتحت الرابط بـ ?local
    ?local       → تشغيل الوضع المحلي (بيفضل شغال لحد ?local=0)
    ?local=tabs  → نفس الشيء + كل تاب بحساب مستقل (للتجربة على جهاز واحد) */
 (function(){
   var mode = null;
   try{
     var q = new URLSearchParams(location.search);
-    if(q.has('local')){ var v = q.get('local'); if(v==='0') localStorage.setItem('glv-local','off'); else localStorage.setItem('glv-local', v==='tabs' ? 'tabs' : '1'); }
+    if(q.has('local')){ var v = q.get('local'); if(v==='0') localStorage.setItem('glv-local','off'); else localStorage.setItem('glv-local', v==='tabs' ? 'tabs' : '1'); localStorage.setItem('glv-local-v','2'); }
+    else if(localStorage.getItem('glv-local-v')!=='2'){ localStorage.removeItem('glv-local'); localStorage.setItem('glv-local-v','2'); } /* تنظيف أي وضع محلي قديم كان مفعّل تلقائيًا */
     mode = localStorage.getItem('glv-local');
-    if(mode===null) mode = '1';   /* الوضع المحلي شغال تلقائي */
+    /* الافتراضي أونلاين: التسجيل والحضور لازم يروحوا Firebase عشان الأدمن يشوفهم */
     if(mode==='off') mode = null;
   }catch(e){}
   window.__GLV_LOCAL = !!mode;
@@ -9355,6 +9357,17 @@ window.storage = {
       const ks = (await _GC.keys()) || [];
       return { keys: ks.filter(k => (!prefix || k.startsWith(prefix)) && !_GC_SKIP.test(k)), prefix, shared: !!shared };
     }
+    /* أسرع بكتير: نجيب أسماء المفاتيح بس (shallow) بدل ما نحمّل كل البيانات والصور كل مرة */
+    try{
+      const ctl = (typeof AbortController!=='undefined') ? new AbortController() : null, tm = setTimeout(()=>{ try{ ctl && ctl.abort(); }catch(e){} }, 12000);
+      const resp = await fetch(firebaseConfig.databaseURL + '/' + _FB_ROOT + '.json?shallow=true', ctl ? {signal:ctl.signal} : undefined);
+      clearTimeout(tm);
+      if(resp && resp.ok){
+        const o = await resp.json();
+        if(!o || typeof o!=='object') return { keys: [], prefix, shared: !!shared };
+        return { keys: Object.keys(o).map(_fbDecodeKey).filter(k => !prefix || k.startsWith(prefix)), prefix, shared: !!shared };
+      }
+    }catch(e){ /* لو الـREST اتحجب نرجع للطريقة القديمة */ }
     try{
       const snap = await _fbWithTimeout(_fbDb.ref(_FB_ROOT).once('value'), null);
       if(!snap || !snap.exists()) return { keys: [], prefix, shared: !!shared };
@@ -11840,8 +11853,8 @@ async function saveParticipantOverrides(obj){
 }
 async function savePhotoIndividually(pid, dataUrl){
   try{
-    await window.storage.set('glavera-photo-'+pid, dataUrl, true);
-    return true;
+    const r = await window.storage.set('glavera-photo-'+pid, dataUrl, true);
+    return !!r;
   }catch(e){
     console.error('savePhotoIndividually failed:', e);
     return false;
@@ -11855,11 +11868,14 @@ async function loadAllParticipantPhotos(){
   try{
     const listed = await window.storage.list('glavera-photo-', true);
     if(!listed || !listed.keys) return map;
-    for(const key of listed.keys){
-      try{
-        const r = await window.storage.get(key, true);
-        if(r && r.value){ map[key.replace('glavera-photo-','')] = r.value; }
-      }catch(e){}
+    const ks = listed.keys.slice();
+    for(let i=0;i<ks.length;i+=8){
+      await Promise.all(ks.slice(i,i+8).map(async key=>{
+        try{
+          const r = await window.storage.get(key, true);
+          if(r && r.value){ map[key.replace('glavera-photo-','')] = r.value; }
+        }catch(e){}
+      }));
     }
   }catch(e){}
   return map;
@@ -11886,8 +11902,23 @@ const PARTICIPANTS_KEY = 'meeting-participants-v1';
 async function loadCustomParticipants(){
   try{ const r = await window.storage.get(PARTICIPANTS_KEY, true); return r ? JSON.parse(r.value) : []; }catch(e){ return []; }
 }
+window.__cpNewIds = window.__cpNewIds || new Set();
+/* دمج ذرّي مع نسخة السيرفر: قبل كده الأدمن كان بيكتب نسخته القديمة فوق السيرفر فيمسح أي مشارك سجّل بعد ما فتح التطبيق */
 async function saveCustomParticipants(arr){
-  try{ await window.storage.set(PARTICIPANTS_KEY, JSON.stringify(arr), true); }catch(e){}
+  try{
+    const local = new Map((arr||[]).map(x=>[String(x.id), x]));
+    const res = await window.storage.update(PARTICIPANTS_KEY, (cur)=>{
+      let srv = []; try{ srv = cur ? JSON.parse(cur) : []; }catch(e){ srv = []; }
+      if(!Array.isArray(srv)) srv = [];
+      const seen = new Set();
+      const out = srv.map(x=>{ const id = String(x.id); seen.add(id); return local.has(id) ? Object.assign({}, x, local.get(id)) : x; });
+      window.__cpNewIds.forEach(id=>{ if(!seen.has(id) && local.has(id)){ out.push(local.get(id)); seen.add(id); } });
+      return JSON.stringify(out);
+    }, true);
+    if(!res){ console.error('saveCustomParticipants failed', _fbLastError); return false; }
+    try{ const v = JSON.parse(res.value); if(Array.isArray(v)) v.forEach(x=>{ window.__cpNewIds.delete(String(x.id)); }); }catch(e){}
+    return true;
+  }catch(e){ console.error('saveCustomParticipants error', e); return false; }
 }
 async function loadAdminAlerts(){
   try{ const r = await window.storage.get('glavera-admin-alerts', true); return r ? JSON.parse(r.value) : []; }catch(e){ return []; }
@@ -37183,7 +37214,7 @@ function attCardInfo(type, p, pts){
 function attOpenQrScanner(type){
   const c = attCfg(type), t = ATT_TYPES[type];
   if(!c || !t){ showToast('مفيش يوم/جلسة مفتوحة للتسجيل', true); return; }
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ showToast('المتصفح مش بيدعم الكاميرا — افتح الرابط عبر الإنترنت (https)', true); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ showToast(glvCamErrMsg(null), true); return; }
   const ov = document.createElement('div'); ov.className = 'ass-ov'; ov.setAttribute('dir','rtl');
   ov.innerHTML = '<div class="ass-top"><b>📷 مسح ذكي — '+escapeHtml(c.name||t.label)+'</b><span class="ass-cnt" id="ass-cnt">0 اتسجّلوا</span></div>'
     +'<div class="ass-prog"><div><span id="ass-ptxt"></span><span id="ass-ppct"></span></div><div class="ass-pbar"><i id="ass-pfill"></i></div></div>'
@@ -37247,7 +37278,8 @@ function attOpenQrScanner(type){
       for(const raw of raws){
         const key = String(raw.p ? raw.p.id : raw).trim(); const now = Date.now();
         if(seenT[key] && now-seenT[key]<3500) continue; seenT[key] = now;
-        const p = raw.p || findP(key);
+        let p = raw.p || findP(key);
+        if(!p && !raw.p){ try{ await glvSyncParticipants(true); }catch(e){} p = findP(key); } /* مخدوم سجّل لسه حالًا وماسح الأدمن ماعرفوش */
         if(!p){ unknown.push(key); continue; }
         const r = await attRecord(type, p, how||'scan');
         if(!r.ok){ say('bad','❌ تعذر الحفظ — تحقق من الاتصال'); flash('bad'); errSound(); continue; }
@@ -37279,8 +37311,8 @@ function attOpenQrScanner(type){
   }
   $('#ass-voice').onclick = ()=>{ const b = $('#ass-voice'); if(rec){ try{ rec.stop(); }catch(e){} return; } b.classList.add('on'); b.textContent = '🎤 بسمعك… قول الاسم'; rec = attVoiceStart(onVoice, ()=>{ rec = null; b.classList.remove('on'); b.textContent = '🎤 أمر صوتي: «سجّل حضور …»'; }); if(!rec){ b.classList.remove('on'); b.textContent = '🎤 أمر صوتي: «سجّل حضور …»'; } };
   (async ()=>{
-    try{ stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:1280}}, audio:false}); }
-    catch(e){ say('bad','تعذر فتح الكاميرا — اسمح بإذن الكاميرا وحاول تاني (تقدر تستخدم الأمر الصوتي)'); return; }
+    try{ stream = await glvGetCamera(); }
+    catch(e){ say('bad', glvCamErrMsg(e)+' (تقدر تستخدم الأمر الصوتي)'); return; }
     if(!run){ stop(); return; }
     v.srcObject = stream; await v.play().catch(()=>{});
     try{ track = stream.getVideoTracks()[0]; const caps = (track.getCapabilities && track.getCapabilities()) || {};
@@ -37580,6 +37612,49 @@ document.addEventListener('keydown', (e)=>{
 
 /* ============================= SCAN MODAL ============================= */
 let scanStream = null, scanRAF = null, scanMode = 'checkin', scanTargetSessionId = null;
+/* ============================= أخطاء الكاميرا (جديد) =============================
+   قبل كده أي فشل في الكاميرا كانت بتطلع رسالة «افتح الرابط مش كملف» حتى لو فاتح من رابط صح.
+   السبب الحقيقي غالبًا: متصفح واتساب/فيسبوك الداخلي، أو إذن الكاميرا مرفوض، أو الكاميرا مشغولة. */
+function glvInAppBrowser(){ try{ return /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Messenger|Snapchat|MicroMessenger|TikTok|Line\/|; wv\)/i.test(navigator.userAgent||''); }catch(e){ return false; } }
+function glvCamErrMsg(e){
+  const n = (e && e.name) || '';
+  if(window.isSecureContext === false) return 'الكاميرا مش بتشتغل على رابط غير آمن. افتح التطبيق من الرابط الأساسي (https) وحاول تاني.';
+  if(glvInAppBrowser() && n !== 'NotFoundError') return 'الرابط مفتوح جوه متصفح تطبيق (واتساب/فيسبوك/ماسنجر) وده بيمنع الكاميرا. اضغط ⋮ أو «…» واختار «فتح في Chrome» (أو Safari على الآيفون) وحاول تاني.';
+  if(n === 'NotAllowedError' || n === 'SecurityError' || n === 'PermissionDeniedError') return 'إذن الكاميرا مرفوض. اضغط على القفل 🔒 جنب الرابط ← الأذونات ← الكاميرا ← سماح، وبعدين اضغط «حاول تاني».';
+  if(n === 'NotFoundError' || n === 'DevicesNotFoundError') return 'مش لاقي كاميرا على الجهاز ده.';
+  if(n === 'NotReadableError' || n === 'TrackStartError') return 'الكاميرا شغّالة في تطبيق تاني. اقفله وحاول تاني.';
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return 'المتصفح ده مش بيدعم الكاميرا. افتح الرابط في Chrome أو Safari.';
+  return 'تعذر تشغيل الكاميرا'+(n ? ' ('+n+')' : '')+'. جرّب «صوّر الكود» أو اكتبه يدويًا.';
+}
+async function glvGetCamera(){
+  const tries = [{video:{facingMode:{ideal:'environment'}}, audio:false}, {video:true, audio:false}];
+  let last = null;
+  for(const c of tries){
+    try{ return await navigator.mediaDevices.getUserMedia(c); }
+    catch(e){ last = e; if(e && (e.name==='NotAllowedError' || e.name==='SecurityError' || e.name==='PermissionDeniedError')) break; }
+  }
+  throw last || new Error('no camera');
+}
+/* قراءة QR من صورة (بديل لو الكاميرا المباشرة ممنوعة — بيشتغل حتى في متصفحات التطبيقات) */
+function glvDecodeFile(file){
+  return new Promise(resolve=>{
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = ()=>{
+      let out = null;
+      try{
+        const sc = Math.min(1, 1400/Math.max(img.width, img.height)), cv = document.createElement('canvas');
+        cv.width = Math.max(1, Math.round(img.width*sc)); cv.height = Math.max(1, Math.round(img.height*sc));
+        const cx = cv.getContext('2d', {willReadFrequently:true}); cx.drawImage(img, 0, 0, cv.width, cv.height);
+        const d = cx.getImageData(0, 0, cv.width, cv.height);
+        const q = window.jsQR ? jsQR(d.data, d.width, d.height, {inversionAttempts:'attemptBoth'}) : null;
+        if(q && q.data) out = q.data;
+      }catch(e){}
+      URL.revokeObjectURL(url); resolve(out);
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
 async function openScanModal(mode, sessionId){
   scanMode = mode || 'checkin';
   scanTargetSessionId = sessionId || null;
@@ -37599,7 +37674,7 @@ async function openScanModal(mode, sessionId){
 
   const video = document.getElementById('scan-video');
   const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', {willReadFrequently:true});
 
   function showManualFallback(msg){
     if(!document.getElementById('scan-overlay')) return;
@@ -37612,52 +37687,85 @@ async function openScanModal(mode, sessionId){
     const txt = document.getElementById('scan-status-txt');
     if(txt) txt.textContent = msg;
     const fb = document.getElementById('scan-fallback');
-    if(fb) fb.innerHTML = `
+    if(fb){
+      fb.innerHTML = `
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:0 auto 10px;">
+        <label class="btn btn-primary" style="width:auto;padding:0 16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">📷 صوّر الكود<input type="file" id="scan-photo-input" accept="image/*" capture="environment" style="display:none"></label>
+        <button type="button" class="btn btn-outline" id="scan-retry-btn" style="width:auto;padding:0 16px;">🔄 حاول تاني</button>
+      </div>
       <div class="manual-row" style="max-width:320px;margin:0 auto 6px;">
-        <input class="field" id="fallback-code-input" placeholder="اكتب الكود هنا" autocomplete="off" />
+        <input class="field" id="fallback-code-input" placeholder="أو اكتب الكود هنا" autocomplete="off" />
         <button type="button" class="btn btn-outline" style="width:auto;padding:0 18px;" data-action="submit-fallback-code">تأكيد</button>
       </div>`;
+      const rb = fb.querySelector('#scan-retry-btn');
+      if(rb) rb.onclick = ()=>{ const m = scanMode, s = scanTargetSessionId; closeScanModal(); openScanModal(m, s); };
+      const pi = fb.querySelector('#scan-photo-input');
+      if(pi) pi.onchange = async ()=>{
+        const f = pi.files && pi.files[0]; if(!f) return;
+        if(txt) txt.textContent = 'جاري قراءة الصورة...';
+        const data = await glvDecodeFile(f);
+        if(!data){ if(txt) txt.textContent = 'مقدرتش أقرا الكود من الصورة — قرّب الكاميرا وخلّي الكود واضح وصوّر تاني'; pi.value = ''; return; }
+        closeScanModal();
+        if(scanMode==='login'){ doLoginWithCode(data); }
+        else if(scanMode==='attendance'){ tryAttendance(data, scanTargetSessionId); }
+        else{ showToast('الكود غير صالح', true); }
+      };
+    }
   }
 
-  // لو مكتبة قراءة الـQR اتأخرت أو اتحجبت (مشكلة شبكة)، بلّغ المستخدم واديله بديل يدوي
-  // بدل ما يفضل واقف بيمسح من غير أي نتيجة
+  let det = null; try{ if(window.BarcodeDetector) det = new BarcodeDetector({formats:['qr_code']}); }catch(e){ det = null; }
+
+  // لو مكتبة قراءة الـQR اتأخرت أو اتحجبت (مشكلة شبكة) ومفيش BarcodeDetector، بلّغ المستخدم واديله بديل
   const jsQrWaitStart = Date.now();
   const jsQrWatchdog = setInterval(()=>{
-    if(window.jsQR){ clearInterval(jsQrWatchdog); return; }
-    if(Date.now() - jsQrWaitStart > 7000){
+    if(window.jsQR || det){ clearInterval(jsQrWatchdog); return; }
+    if(Date.now() - jsQrWaitStart > 8000){
       clearInterval(jsQrWatchdog);
       if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream=null; }
       if(scanRAF) cancelAnimationFrame(scanRAF);
-      showManualFallback('تعذّر تحميل مكوّن قراءة الكود (مشكلة اتصال). اكتب الكود يدويًا:');
+      showManualFallback('تعذّر تحميل مكوّن قراءة الكود (مشكلة اتصال). جرّب تاني أو اكتب الكود يدويًا:');
     }
   }, 500);
 
   try{
-    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ throw Object.assign(new Error('no mediaDevices'), {name:'NoMediaDevices'}); }
+    scanStream = await glvGetCamera();
     video.srcObject = scanStream;
     await video.play();
-    const tick = ()=>{
+    let lastTry = 0;
+    const tick = async ()=>{
       if(!document.getElementById('scan-overlay')) return;
-      if(video.readyState === video.HAVE_ENOUGH_DATA){
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
-        const result = window.jsQR ? jsQR(imgData.data, imgData.width, imgData.height) : null;
-        if(result && result.data){
-          clearInterval(jsQrWatchdog);
-          closeScanModal();
-          if(scanMode==='login'){ doLoginWithCode(result.data); }
-          else if(scanMode==='attendance'){ tryAttendance(result.data, scanTargetSessionId); }
-          else{ showToast('الكود غير صالح', true); }
-          return;
-        }
+      const now = performance.now();
+      if(now - lastTry > 130 && video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth){
+        lastTry = now;
+        try{
+          let data = null;
+          if(det){ const r = await det.detect(video); if(r && r.length) data = r[0].rawValue; }
+          if(!data && window.jsQR){
+            const sc = Math.min(1, 720/video.videoWidth);
+            canvas.width = Math.max(1, Math.round(video.videoWidth*sc)); canvas.height = Math.max(1, Math.round(video.videoHeight*sc));
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+            const q = jsQR(imgData.data, imgData.width, imgData.height, {inversionAttempts:'dontInvert'});
+            if(q && q.data) data = q.data;
+          }
+          if(data){
+            clearInterval(jsQrWatchdog);
+            closeScanModal();
+            if(scanMode==='login'){ doLoginWithCode(data); }
+            else if(scanMode==='attendance'){ tryAttendance(data, scanTargetSessionId); }
+            else{ showToast('الكود غير صالح', true); }
+            return;
+          }
+        }catch(e){}
       }
       scanRAF = requestAnimationFrame(tick);
     };
     scanRAF = requestAnimationFrame(tick);
   }catch(e){
     clearInterval(jsQrWatchdog);
-    showManualFallback('تعذر الوصول للكاميرا (يجب فتح الرابط عبر الإنترنت وليس كملف محفّظ على الجهاز). يمكنك كتابة الكود يدويًا كحل مؤقت:');
+    console.error('camera error', e);
+    showManualFallback(glvCamErrMsg(e));
   }
 }
 function closeScanModal(){
@@ -39573,12 +39681,14 @@ async function doAdminAddParticipant(){
   const newP = { id:newId, name };
   CUSTOM_PARTICIPANTS.push(newP);
   PARTICIPANTS.push(newP);
+  window.__cpNewIds.add(String(newId));
   showToast(`تمت إضافة ${name} — الكود #${newId}`);
   state.addingParticipant = false;
   state._suggestedNewCode = null;
   state.justAddedParticipantId = newId;
   render();
-  await saveCustomParticipants(CUSTOM_PARTICIPANTS);
+  const savedOk = await saveCustomParticipants(CUSTOM_PARTICIPANTS);
+  if(!savedOk) showToast('⚠️ المشارك اتضاف على جهازك بس مااتحفظش على السيرفر — تحقق من النت وجرّب تاني', true);
 }
 async function doDownloadAllQR(){
   if(!PARTICIPANTS.length){ showToast('لا يوجد مشاركين حاليًا', true); return; }
@@ -41332,14 +41442,34 @@ function normalizePhone(v){
   else if(d.startsWith('20') && d.length===12) d = '0'+d.slice(2);
   return d;
 }
+/* SHA-256 بالجافاسكريبت: بيدي نفس النتيجة بالظبط لو crypto.subtle مش متاح (متصفحات التطبيقات/http) — قبل كده كانت بتطلع بصمة مختلفة فالمشارك مش بيعرف يدخل من جهاز تاني */
+function sha256Js(str){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const b=new TextEncoder().encode(str), l=b.length, n=((l+9+63)>>6)<<6, m=new Uint8Array(n);
+  m.set(b); m[l]=0x80; const dv=new DataView(m.buffer); dv.setUint32(n-8, Math.floor(l*8/0x100000000)); dv.setUint32(n-4, (l*8)>>>0);
+  const w=new Uint32Array(64), rr=(x,c)=>(x>>>c)|(x<<(32-c));
+  for(let o=0;o<n;o+=64){
+    for(let i=0;i<16;i++) w[i]=dv.getUint32(o+i*4);
+    for(let i=16;i<64;i++){ const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3), s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0; }
+    let [a,bb,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      const S1=rr(e,6)^rr(e,11)^rr(e,25), ch=(e&f)^(~e&g), t1=(h+S1+ch+K[i]+w[i])>>>0;
+      const S0=rr(a,2)^rr(a,13)^rr(a,22), mj=(a&bb)^(a&c)^(bb&c), t2=(S0+mj)>>>0;
+      h=g; g=f; f=e; e=(d+t1)>>>0; d=c; c=bb; bb=a; a=(t1+t2)>>>0;
+    }
+    H=[(H[0]+a)>>>0,(H[1]+bb)>>>0,(H[2]+c)>>>0,(H[3]+d)>>>0,(H[4]+e)>>>0,(H[5]+f)>>>0,(H[6]+g)>>>0,(H[7]+h)>>>0];
+  }
+  return H.map(x=>x.toString(16).padStart(8,'0')).join('');
+}
 async function sha256Hex(str){
   try{
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }catch(e){
-    let h1=0x811c9dc5, h2=5381; for(let i=0;i<str.length;i++){ const c=str.charCodeAt(i); h1=Math.imul(h1^c,16777619)>>>0; h2=((h2<<5)+h2+c)>>>0; }
-    return 'x'+h1.toString(16)+h2.toString(16);
-  }
+    if(window.crypto && crypto.subtle){
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+  }catch(e){}
+  return sha256Js(str);
 }
 const AUTH_SALT = 'meeting-auth-v1';
 function phoneKeyHash(phone){ return sha256Hex(AUTH_SALT+':ph:'+phone); }
@@ -41487,7 +41617,8 @@ async function doLogin(){
   state._loggingIn = true;
   try{
     const [ph, pw] = await Promise.all([phoneKeyHash(phone), passHash(phone, pass)]);
-    const acc = CUSTOM_PARTICIPANTS.find(x=>x.ph===ph);
+    let acc = CUSTOM_PARTICIPANTS.find(x=>x.ph===ph);
+    if(!acc){ try{ await glvSyncParticipants(true); }catch(e){} acc = CUSTOM_PARTICIPANTS.find(x=>x.ph===ph); } /* ممكن يكون سجّل من جهاز تاني بعد ما الصفحة اتحمّلت */
     if(!acc){ showToast('الرقم ده مش مسجّل — أنشئ حسابك الأول', true); return; }
     if(acc.pw !== pw){ showToast('الباسورد غلط', true); return; }
     doLoginWithCode(acc.id);
@@ -41504,6 +41635,11 @@ function doLoginWithCode(code, opts){
 function doLoginWithCodeNow(code){
   const p = PARTICIPANTS.find(x=>x.id===code.trim().toUpperCase());
   if(!p && !__loginDataReady){ loginWaitAndRetry(()=>doLoginWithCodeNow(code)); return; }
+  if(!p && !window.__glvCodeRetry){
+    window.__glvCodeRetry = true;
+    glvSyncParticipants(true).catch(()=>{}).then(()=>{ window.__glvCodeRetry = false; if(PARTICIPANTS.some(x=>x.id===code.trim().toUpperCase())) doLoginWithCodeNow(code); else showToast('كود الدخول غير صحيح', true); });
+    return;
+  }
   if(!p){ showToast('كود الدخول غير صحيح', true); return; }
   const extra = myExtra(p.id);
   document.documentElement.dataset.theme = extra.mode==='light' ? 'light' : 'dark';
@@ -41577,7 +41713,7 @@ async function doSignup(){
     suCelebrate(celebName, celebPhoto, gift);
   }catch(e){
     reset();
-    showToast('معرفناش ننشئ الحساب، اتأكد من النت وجرّب تاني', true);
+    showToast('معرفناش ننشئ الحساب، اتأكد من النت وجرّب تاني'+(/permission/i.test(_fbLastError||'') ? ' (قاعدة البيانات رافضة الكتابة — راجع Firebase Rules)' : ''), true);
   }
 }
 async function doAddAddressSug(){
@@ -42922,6 +43058,39 @@ function renderRoomKh(){
   return `<div class="snp kh">${khTopBar(room, 'جولة '+kh.r)}<div class="kh-body">
     <div class="kh-cat">${escapeHtml(kh.cat)}</div>${lets}${info}${extra}<div class="kh-ps">${players}</div>${bottom}</div>${win}${state.khHelp ? khHelpHtml() : ''}</div>`;
 }
+
+/* ============================= مزامنة المشاركين (جديد) =============================
+   قبل كده قايمة المشاركين كانت بتتحمّل مرة واحدة أول ما التطبيق يفتح، فأي مشارك يسجّل بعد كده ما كانش بيظهر عند الأدمن
+   ولا بيتعرف عليه الماسح. دلوقتي: تحديث كل 15 ثانية للأدمن + عند الحاجة وقت الدخول/المسح. */
+let _glvSyncBusy = false;
+async function glvSyncParticipants(force){
+  if(_glvSyncBusy && !force) return false;
+  _glvSyncBusy = true;
+  try{
+    const fresh = await loadCustomParticipants();
+    if(!Array.isArray(fresh) || !fresh.length) return false;
+    const freshIds = new Set(fresh.map(x=>String(x.id)));
+    const pending = CUSTOM_PARTICIPANTS.filter(x=>window.__cpNewIds && window.__cpNewIds.has(String(x.id)) && !freshIds.has(String(x.id)));
+    CUSTOM_PARTICIPANTS = fresh.concat(pending);
+    let added = 0; const newOnes = [];
+    fresh.forEach(cp=>{
+      const ov = (typeof PARTICIPANT_OVERRIDES==='object' && PARTICIPANT_OVERRIDES) ? PARTICIPANT_OVERRIDES[cp.id] : null;
+      if(ov && ov.deleted) return;
+      if(!PARTICIPANTS.some(p=>String(p.id)===String(cp.id))){ const o = {id:cp.id, name:(ov && ov.name) || cp.name}; PARTICIPANTS.push(o); newOnes.push(o); added++; }
+    });
+    for(const o of newOnes){ try{ const r = await window.storage.get('glavera-photo-'+o.id, true); if(r && r.value) o.photo = r.value; }catch(e){} }
+    if(added && typeof state==='object' && state && state.adminUnlocked){
+      const ae = document.activeElement;
+      if(!(ae && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)) && !document.getElementById('scan-overlay') && !document.querySelector('.ass-ov')){ try{ render(); }catch(e){} }
+    }
+    return added>0;
+  }catch(e){ console.error('glvSyncParticipants', e); return false; }
+  finally{ _glvSyncBusy = false; }
+}
+setInterval(()=>{
+  try{ if(document.hidden || (typeof navigator!=='undefined' && navigator.onLine===false)) return; if(typeof state==='object' && state && state.adminUnlocked) glvSyncParticipants(); }catch(e){}
+}, 15000);
+document.addEventListener('visibilitychange', ()=>{ try{ if(!document.hidden && typeof state==='object' && state && state.adminUnlocked) glvSyncParticipants(); }catch(e){} });
 
 /* ============================= INIT ============================= */
 /* الأكواد بتاعة المشاركين المضافين من الأدمن كانت بتتعرف بس بعد ما يخلص تحميل كل بيانات التطبيق (ممكن ياخد لحد 10 ثواني)،
