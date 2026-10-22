@@ -7,6 +7,29 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#171449">
+<script id="glv-local-early">
+/* ===== الوضع المحلي (بدون نت) =====
+   ?local       → تشغيل الوضع المحلي (بيفضل شغال لحد ?local=0)
+   ?local=tabs  → نفس الشيء + كل تاب بحساب مستقل (للتجربة على جهاز واحد) */
+(function(){
+  var mode = null;
+  try{
+    var q = new URLSearchParams(location.search);
+    if(q.has('local')){ var v = q.get('local'); if(v==='0') localStorage.setItem('glv-local','off'); else localStorage.setItem('glv-local', v==='tabs' ? 'tabs' : '1'); }
+    mode = localStorage.getItem('glv-local');
+    if(mode===null) mode = '1';   /* الوضع المحلي شغال تلقائي */
+    if(mode==='off') mode = null;
+  }catch(e){}
+  window.__GLV_LOCAL = !!mode;
+  if(mode!=='tabs') return;
+  var PER_TAB = {'meeting-pid':1,'glv-device-id':1};
+  var g = Storage.prototype.getItem, s = Storage.prototype.setItem, r = Storage.prototype.removeItem;
+  Storage.prototype.getItem = function(k){ return (this===localStorage && PER_TAB[k]) ? g.call(sessionStorage,k) : g.call(this,k); };
+  Storage.prototype.setItem = function(k,v){ return (this===localStorage && PER_TAB[k]) ? s.call(sessionStorage,k,v) : s.call(this,k,v); };
+  Storage.prototype.removeItem = function(k){ return (this===localStorage && PER_TAB[k]) ? r.call(sessionStorage,k) : r.call(this,k); };
+})();
+</script>
+
 <script id="ipm-early">window.__ipmE=null;window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__ipmE=e;});</script>
 <link rel="manifest" href="manifest.json?v=5">
 <meta name="application-name" content="اجتماع جامعة">
@@ -8464,9 +8487,44 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .gh-tile.is-open .gh-back{opacity:1; transform:none; pointer-events:auto;}
   .gh-back-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:var(--text); opacity:.85; margin-top:2px;}
   .gh-panel{width:100%; display:flex; flex-direction:column; gap:9px; align-items:stretch;}
-  .gh-panel-join{display:none;}
-  .gh-tile.is-join .gh-panel-menu{display:none;}
-  .gh-tile.is-join .gh-panel-join{display:flex;}
+  .gh-panel-mode,.gh-panel-menu,.gh-panel-join{display:none;}
+  .gh-tile[data-step="mode"] .gh-panel-mode{display:flex;}
+  .gh-tile[data-step="menu"] .gh-panel-menu{display:flex;}
+  .gh-tile[data-step="join"] .gh-panel-join{display:flex;}
+  /* ---- friend tile: animated multi-step reveal ---- */
+  @keyframes ghRise{from{opacity:0; transform:translateY(16px) scale(.9);} to{opacity:1; transform:none;}}
+  @keyframes ghGlow{0%{opacity:0; transform:scale(.2);} 35%{opacity:.9;} 100%{opacity:0; transform:scale(1.6);}}
+  @keyframes ghOrbit{to{transform:rotate(360deg);}}
+  @keyframes ghRing{0%{transform:scale(.85); opacity:.65;} 100%{transform:scale(1.55); opacity:0;}}
+  .gh-panel > *{animation:ghRise .5s cubic-bezier(.2,.9,.3,1) both; animation-delay:calc(var(--k,0) * 75ms + 80ms);}
+  .gh-tile.is-open .gh-back::before{content:""; position:absolute; left:50%; top:50%; width:140%; aspect-ratio:1/1; margin:-70% 0 0 -70%; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,.38), rgba(255,255,255,0) 62%); pointer-events:none; animation:ghGlow .8s ease-out both;}
+  .gh-bk{display:none; font-size:20px; line-height:1; margin-top:-3px; font-weight:700;}
+  .gh-tile.has-mode:not([data-step="mode"]) .gh-x, .gh-tile[data-step="join"] .gh-x{display:none;}
+  .gh-tile.has-mode:not([data-step="mode"]) .gh-bk, .gh-tile[data-step="join"] .gh-bk{display:inline;}
+  .gh-mode{position:relative; width:100%; box-sizing:border-box; display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:17px; cursor:pointer;
+    font-family:'Cairo',sans-serif; color:var(--text); text-align:start; overflow:hidden;
+    background:rgba(255,255,255,.11); border:1px solid rgba(255,255,255,.22); box-shadow:inset 0 1px 0 rgba(255,255,255,.20), 0 6px 14px rgba(0,0,0,.14);
+    transition:transform .16s ease, box-shadow .25s ease, background .25s ease;}
+  .gh-mode::after{content:""; position:absolute; inset:0; background:linear-gradient(110deg, transparent 30%, rgba(255,255,255,.28) 50%, transparent 70%); transform:translateX(-120%); transition:transform .7s ease;}
+  .gh-mode:hover::after, .gh-mode:focus-visible::after{transform:translateX(120%);}
+  .gh-mode:active{transform:scale(.95);}
+  .gh-mode-ico{position:relative; flex:0 0 auto; width:34px; height:34px; border-radius:11px; display:grid; place-items:center; color:#fff;}
+  .gh-mode-ico svg{width:24px; height:24px; display:block; overflow:visible;}
+  .gh-mode-online .gh-mode-ico{background:linear-gradient(145deg,#6aa8ff,#4b3fe0); box-shadow:0 5px 12px rgba(75,63,224,.45);}
+  .gh-mode-local .gh-mode-ico{background:none; box-shadow:none; width:38px; height:38px; margin:-2px;}
+  .gh-mode-local .gh-mode-ico svg{width:100%; height:100%; filter:drop-shadow(0 4px 7px rgba(6,63,69,.5));}
+  .gh-mode-local .gh-mode-ico::before{content:""; position:absolute; inset:2px; border-radius:50%; border:2px solid #1fd6a0; animation:ghRing 2.2s ease-out infinite; pointer-events:none;}
+  .gh-orbit{transform-origin:16px 16px; animation:ghOrbit 3.4s linear infinite;}
+  .gh-mode-tx{display:flex; flex-direction:column; min-width:0; line-height:1.2;}
+  .gh-mode-tx b{font-weight:900; font-size:13.5px; white-space:nowrap;}
+  .gh-mode-tx small{font-size:9.5px; font-weight:700; opacity:.72; white-space:nowrap;}
+  .gh-mode-chev{margin-inline-start:auto; opacity:.55; font-size:15px; font-weight:800;}
+  .gh-chip{display:inline-flex; align-self:center; align-items:center; gap:5px; padding:3px 10px; border-radius:99px; font-size:10px; font-weight:800; font-family:'Cairo',sans-serif;
+    background:rgba(75,63,224,.28); border:1px solid rgba(255,255,255,.2); color:var(--text);}
+  html[data-theme="light"] .gh-mode{background:rgba(30,24,10,.05); border-color:rgba(30,24,10,.12); box-shadow:0 6px 14px rgba(30,24,10,.08);}
+  html[data-theme="light"] .gh-chip{background:rgba(75,63,224,.12); border-color:rgba(30,24,10,.12);}
+  @media (prefers-reduced-motion:reduce){ .gh-panel > *, .gh-orbit, .gh-mode-local .gh-mode-ico::before, .gh-tile.is-open .gh-back::before{animation:none!important;} }
   .gh-act{width:100%; padding:11px 8px; border-radius:15px; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; color:var(--text);
     background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.20); box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
     display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer; transition:transform .15s ease, background .2s ease;}
@@ -9061,6 +9119,56 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   @media (prefers-reduced-motion:reduce){ .aa-act-head, .at-bar, .aa-form, .aa-form *, .dr, .dr *, .dp, .dp *{ animation:none !important; } }
 </style>
 
+
+<style id="gh-friend-anim">
+/* ===== حركات وأنيميشن كارت "العب ضد صديق" ===== */
+@keyframes ghFloat{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-6px) rotate(4deg);}}
+@keyframes ghSheen{0%,55%{transform:translateX(-170%) skewX(-18deg);}100%{transform:translateX(420%) skewX(-18deg);}}
+@keyframes ghPulseRing{0%{transform:scale(1);opacity:.7;}100%{transform:scale(1.55);opacity:0;}}
+@keyframes ghReveal{0%{clip-path:circle(0% at 50% 50%);opacity:0;transform:scale(.8) rotate(-6deg);}60%{opacity:1;}100%{clip-path:circle(100% at 50% 50%);opacity:1;transform:none;}}
+@keyframes ghPanelFwd{from{opacity:0;transform:translateX(-34px) scale(.96);}to{opacity:1;transform:none;}}
+@keyframes ghPanelBack{from{opacity:0;transform:translateX(34px) scale(.96);}to{opacity:1;transform:none;}}
+@keyframes ghModeShine{0%,45%{transform:translateX(-120%);}100%{transform:translateX(120%);}}
+@keyframes ghChev{0%,100%{transform:translateX(0);}50%{transform:translateX(-4px);}}
+@keyframes ghBtnGlow{0%,100%{box-shadow:0 6px 16px rgba(244,183,64,.30),0 0 0 0 rgba(244,183,64,.55);}50%{box-shadow:0 8px 22px rgba(244,183,64,.55),0 0 0 7px rgba(244,183,64,0);}}
+@keyframes ghWave{0%{transform:scale(.7);opacity:.75;}100%{transform:scale(1.9);opacity:0;}}
+@keyframes ghSpark{from{transform:translate(-50%,-50%) scale(1);opacity:1;}to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.2);opacity:0;}}
+@keyframes ghIcoOut{to{transform:scale(1.7) rotate(18deg);opacity:0;}}
+
+/* الوش الأمامي: أيقونة بتطفو + لمعة بتعدّي + نبض حوالين الأيقونة */
+#gh-friend .gh-front .gh-ico{position:relative; animation:ghFloat 3.4s ease-in-out infinite;}
+#gh-friend .gh-front .gh-ico::before{content:""; position:absolute; inset:0; border-radius:inherit; border:2px solid rgba(255,255,255,.65); pointer-events:none; animation:ghPulseRing 2.6s ease-out infinite;}
+#gh-friend .gh-front::after{content:""; position:absolute; top:-10%; bottom:-10%; left:0; width:30%; pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.42),transparent); transform:translateX(-170%) skewX(-18deg); animation:ghSheen 5.2s ease-in-out infinite;}
+#gh-friend.is-open .gh-front .gh-ico{animation:ghIcoOut .35s ease-in both;}
+
+/* فتح الكارت: دايرة بتتوسع من النص */
+#gh-friend.is-open .gh-back{animation:ghReveal .6s cubic-bezier(.2,.9,.3,1) both;}
+
+/* التنقل بين الخطوات: سلايد حسب الاتجاه */
+#gh-friend .gh-panel{animation:ghPanelFwd .45s cubic-bezier(.2,.9,.3,1) both;}
+#gh-friend[data-dir="back"] .gh-panel{animation-name:ghPanelBack;}
+
+/* خانتا أونلاين / Local: لمعة دورية + سهم بيتحرك + موجات الإشارة */
+#gh-friend .gh-mode::after{transition:none; animation:ghModeShine 4.2s ease-in-out infinite; animation-delay:calc(var(--k,0) * .8s + 1s);}
+#gh-friend .gh-mode-chev{animation:ghChev 1.5s ease-in-out infinite;}
+#gh-friend .gh-mode-online .gh-mode-ico::after{content:""; position:absolute; inset:0; border-radius:11px; border:2px solid rgba(106,168,255,.9); pointer-events:none; animation:ghWave 2.2s ease-out infinite;}
+
+/* زرار إنشاء غرفة: نبض دهبي */
+#gh-friend .gh-panel-menu .gh-act-primary{animation:ghPanelFwd .45s cubic-bezier(.2,.9,.3,1) both, ghBtnGlow 2.4s ease-in-out 1s infinite;}
+#gh-friend[data-dir="back"] .gh-panel-menu .gh-act-primary{animation-name:ghPanelBack, ghBtnGlow;}
+#gh-friend .gh-act{transition:transform .15s ease, background .2s ease, box-shadow .2s ease;}
+#gh-friend .gh-act:hover{transform:translateY(-2px);}
+
+/* شرارات الفتح */
+.gh-spark{position:absolute; left:50%; top:50%; width:6px; height:6px; border-radius:50%; z-index:5; pointer-events:none; box-shadow:0 0 8px currentColor; animation:ghSpark .8s ease-out forwards;}
+
+body.data-saver #gh-friend .gh-front::after{display:none;}
+@media (prefers-reduced-motion:reduce){
+  #gh-friend .gh-front .gh-ico, #gh-friend .gh-front .gh-ico::before, #gh-friend .gh-front::after, #gh-friend .gh-mode::after, #gh-friend .gh-mode-chev,
+  #gh-friend .gh-mode-online .gh-mode-ico::after, #gh-friend .gh-panel-menu .gh-act-primary, #gh-friend.is-open .gh-back{animation:none!important;}
+}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -9256,6 +9364,211 @@ window.storage = {
     }catch(e){ console.error('storage.list error', prefix, e); return { keys: [], prefix, shared: !!shared }; }
   }
 };
+
+/* ===== الوضع المحلي: تخزين على الجهاز + مزامنة مباشرة بين هاتفين (WebRTC) بدون إنترنت ===== */
+if(window.__GLV_LOCAL){
+  (function(){
+    _fbDb = null; /* يمنع أي اتصال مباشر بـ Firebase */
+    var P = 'glvloc:';
+    var dc = null, pc = null;
+    function lget(k){ try{ var v = localStorage.getItem(P+k); return v===null ? undefined : JSON.parse(v); }catch(e){ return undefined; } }
+    function lset(k,v){ try{ localStorage.setItem(P+k, JSON.stringify(v)); localStorage.setItem('glvlocts:'+k, String(Date.now())); return true; }catch(e){ return false; } }
+    function ldel(k){ try{ localStorage.removeItem(P+k); localStorage.setItem('glvlocts:'+k, String(Date.now())); }catch(e){} }
+    function send(m){ try{ if(dc && dc.readyState==='open') dc.send(JSON.stringify(m)); }catch(e){} }
+    async function read(k){
+      var v = lget(k);
+      if(v!==undefined) return v;
+      if(_GC_SKIP.test(k)) return undefined;
+      return await _GC.get(k);   /* بيانات اتحفظت آخر مرة فتحت بالنت (حسابات، إعدادات...) */
+    }
+    window.storage = {
+      async get(key, shared){ var v = await read(key); return v===undefined ? null : { key:key, value:v, shared:!!shared }; },
+      async set(key, value, shared){ if(!lset(key, value)) return null; send({op:'set',k:key,v:value}); return { key:key, value:value, shared:!!shared }; },
+      async update(key, fn, shared){
+        var cur = await read(key);
+        var nv = fn(cur===undefined ? null : cur);
+        if(nv===undefined) return null;
+        if(!lset(key, nv)) return null; send({op:'set',k:key,v:nv});
+        return { key:key, value:nv, shared:!!shared };
+      },
+      async delete(key, shared){ ldel(key); send({op:'del',k:key}); return { key:key, deleted:true, shared:!!shared }; },
+      async list(prefix, shared){
+        var ks = {};
+        try{ for(var i=0;i<localStorage.length;i++){ var n = localStorage.key(i); if(n && n.indexOf(P)===0) ks[n.slice(P.length)] = 1; } }catch(e){}
+        try{ ((await _GC.keys())||[]).forEach(function(k){ ks[k]=1; }); }catch(e){}
+        return { keys:Object.keys(ks).filter(function(k){ return (!prefix || k.indexOf(prefix)===0) && !_GC_SKIP.test(k); }), prefix:prefix, shared:!!shared };
+      }
+    };
+
+    /* ---------- مزامنة القنوات ---------- */
+    function snapshot(){
+      var o = {};
+      try{ for(var i=0;i<localStorage.length;i++){ var n = localStorage.key(i); if(n && n.indexOf(P)===0){ var k = n.slice(P.length); o[k] = { v: JSON.parse(localStorage.getItem(n)), ts: +localStorage.getItem('glvlocts:'+k)||0 }; } } }catch(e){}
+      return o;
+    }
+    function onMsg(ev){
+      var m; try{ m = JSON.parse(ev.data); }catch(e){ return; }
+      if(m.op==='set') { try{ localStorage.setItem(P+m.k, JSON.stringify(m.v)); localStorage.setItem('glvlocts:'+m.k, String(Date.now())); }catch(e){} }
+      else if(m.op==='del') ldel(m.k);
+      else if(m.op==='snap'){
+        Object.keys(m.items||{}).forEach(function(k){
+          var mine = +localStorage.getItem('glvlocts:'+k)||0, it = m.items[k];
+          if(lget(k)===undefined || it.ts > mine){ try{ localStorage.setItem(P+k, JSON.stringify(it.v)); localStorage.setItem('glvlocts:'+k, String(it.ts)); }catch(e){} }
+        });
+      }
+    }
+
+    /* ---------- تشفير كود الربط (ضغط + base64) ---------- */
+    async function pack(obj){
+      var txt = JSON.stringify(obj), bytes = new TextEncoder().encode(txt), pre = 'r';
+      try{ if(window.CompressionStream){ var cs = new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw')); bytes = new Uint8Array(await new Response(cs).arrayBuffer()); pre = 'z'; } }catch(e){}
+      var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
+      return pre + btoa(s);
+    }
+    async function unpack(str){
+      str = String(str||'').trim().replace(/\s+/g,'');
+      var pre = str[0], bin = atob(str.slice(1)), bytes = new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+      if(pre==='z'){ var ds = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')); bytes = new Uint8Array(await new Response(ds).arrayBuffer()); }
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+    function waitIce(p){
+      return new Promise(function(res){
+        if(p.iceGatheringState==='complete') return res();
+        var t = setTimeout(res, 4000);
+        p.addEventListener('icegatheringstatechange', function(){ if(p.iceGatheringState==='complete'){ clearTimeout(t); res(); } });
+      });
+    }
+    function newPc(){
+      if(pc){ try{ pc.close(); }catch(e){} }
+      pc = new RTCPeerConnection({ iceServers: (navigator.onLine!==false ? [{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}] : []) });   /* STUN لما يكون فيه نت (بيحل مشكلة الأجهزة اللي بتخبّي عنوان الشبكة)، وبدونه شبكة محلية بس */
+      pc.onconnectionstatechange = function(){ setStatus(); if(pc && pc.connectionState==='failed'){ clearTimeout(window.__glvLinkT); try{ alert('الربط فشل ❌\nتأكد إن الهاتفين على نفس الواي فاي (أو واحد فاتح هوت سبوت والتاني متصل بيه) وجرّب تاني من الأول.'); }catch(e){} closeModal(); } };
+      pc.ondatachannel = function(e){ setupDc(e.channel); };
+      return pc;
+    }
+    function setupDc(ch){
+      dc = ch;
+      dc.onopen = function(){ clearTimeout(window.__glvLinkT); send({op:'snap', items:snapshot()}); setStatus(); try{ showToast('✅ اتربطت بالهاتف التاني', false); }catch(e){} closeModal(); };
+      dc.onclose = function(){ setStatus(); };
+      dc.onmessage = onMsg;
+    }
+
+    /* ---------- الواجهة ---------- */
+    var btn, modal;
+    function connected(){ return dc && dc.readyState==='open'; }
+    function setStatus(){ if(btn) btn.textContent = connected() ? '📡 متصل ✅' : '📡 ربط هاتفين'; }
+    function closeModal(){ if(modal){ modal.remove(); modal = null; } }
+    function drawQR(el, text){
+      el.innerHTML='';
+      try{
+        var tmp=document.createElement('div');
+        var q=new QRCode(tmp,{ text:text, width:64, height:64, correctLevel: QRCode.CorrectLevel ? QRCode.CorrectLevel.L : 1 });
+        var m=q._oQRCode, n=m.getModuleCount();
+        var Q=3, S=210;
+        var z=Math.min(4,(parseFloat(document.documentElement.style.zoom)||1)*(window.devicePixelRatio||1));
+        var cp=Math.max(2,Math.floor(S*z/(n+Q*2)));
+        var px=cp*(n+Q*2);
+        var cv=document.createElement('canvas'); cv.width=px; cv.height=px;
+        cv.style.cssText='display:block;width:'+(px/z)+'px;height:'+(px/z)+'px;image-rendering:pixelated;background:#fff';
+        var g=cv.getContext('2d');
+        g.fillStyle='#ffffff'; g.fillRect(0,0,px,px);
+        g.fillStyle='#000000';
+        for(var r=0;r<n;r++){ for(var c=0;c<n;c++){
+          if(m.isDark(r,c)) g.fillRect((Q+c)*cp,(Q+r)*cp,cp,cp);
+        } }
+        el.appendChild(cv);
+      }catch(e){ el.textContent = 'الكود طويل على QR — انسخه من تحت'; }
+    }
+    async function scanInto(ta, after){
+      if(!navigator.mediaDevices || !window.BarcodeDetector){ alert('الكاميرا/المسح مش متاح في المتصفح ده — الصق الكود يدوي'); return; }
+      var det = new BarcodeDetector({formats:['qr_code']}), v = document.createElement('video'), run = true, stream;
+      var ov = document.createElement('div'); ov.style.cssText='position:fixed;inset:0;background:#000;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px';
+      v.style.cssText='width:100%;max-height:70vh;object-fit:cover'; v.setAttribute('playsinline','');
+      var x = document.createElement('button'); x.textContent='إلغاء'; x.style.cssText='padding:10px 24px;border-radius:99px;border:0;font:700 14px Cairo,sans-serif';
+      ov.appendChild(v); ov.appendChild(x); document.body.appendChild(ov);
+      function stop(){ run=false; try{ stream.getTracks().forEach(function(t){t.stop();}); }catch(e){} ov.remove(); }
+      x.onclick = stop;
+      try{ stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); v.srcObject = stream; await v.play(); }catch(e){ stop(); alert('مقدرتش أفتح الكاميرا'); return; }
+      (async function loop(){ while(run){ try{ var r = await det.detect(v); if(r && r.length){ ta.value = r[0].rawValue; stop(); after(); return; } }catch(e){} await new Promise(function(r){ setTimeout(r,150); }); } })();
+    }
+    var CSS = 'background:#fff;color:#171449;border-radius:18px;padding:16px;width:min(92vw,360px);max-height:90vh;overflow:auto;text-align:center;font-family:Cairo,sans-serif;direction:rtl';
+    var B = 'display:block;width:100%;margin:8px 0;padding:12px;border:0;border-radius:12px;background:#171449;color:#ffd76a;font:800 14px Cairo,sans-serif';
+    var B2 = B.replace('#171449','#e8e6f5').replace('#ffd76a','#171449');
+    var TA = 'width:100%;height:70px;font:11px monospace;direction:ltr;border:1px solid #bbb;border-radius:8px;box-sizing:border-box';
+    function card(html){ modal.firstChild.innerHTML = html; return modal.firstChild; }
+    function openModal(){
+      closeModal();
+      modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2147483646;display:flex;align-items:center;justify-content:center';
+      modal.innerHTML = '<div style="'+CSS+'"></div>';
+      modal.addEventListener('click', function(e){ if(e.target===modal) closeModal(); });
+      document.body.appendChild(modal);
+      home();
+    }
+    /* ===== واجهة مبسّطة: خطوة واحدة في كل شاشة ===== */
+    var BIG = B.replace('padding:12px','padding:16px').replace('font:800 14px','font:900 16px');
+    var BIG2 = B2.replace('padding:12px','padding:16px').replace('font:800 14px','font:900 16px');
+    function dots(n,t){ var h='<div style="display:flex;gap:6px;justify-content:center;margin-bottom:10px">'; for(var i=1;i<=t;i++) h+='<i style="width:'+(i===n?26:8)+'px;height:8px;border-radius:9px;background:'+(i<=n?'#171449':'#d5d3e8')+'"></i>'; return h+'</div><div style="font-size:11px;opacity:.6;margin-bottom:6px">الخطوة '+n+' من '+t+'</div>'; }
+    function backBtn(){ return '<button id="p-back" style="background:none;border:0;color:#171449;opacity:.7;font:700 12px Cairo,sans-serif;margin-top:6px">◀ رجوع</button>'; }
+    function manualBox(ph, okLabel){ return '<details style="margin-top:8px;text-align:right"><summary style="font-size:12px;opacity:.7;cursor:pointer">مش بيمسح؟ الصق الكود يدوي</summary><textarea id="p-in" placeholder="'+ph+'" style="'+TA+';margin-top:6px"></textarea><button style="'+B2+'" id="p-ok">'+okLabel+'</button></details>'; }
+    function copyCode(code, el){ try{ navigator.clipboard.writeText(code).then(function(){ el.textContent='✅ اتنسخ'; }); }catch(e){ el.textContent='انسخ من الخانة'; } }
+    function home(){
+      var c = card('<div style="display:flex;justify-content:center;filter:drop-shadow(0 6px 12px rgba(0,0,0,.35))"><svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block"><defs><linearGradient id="lrmBg" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#1fd6a0"/><stop offset=".55" stop-color="#0c8f7a"/><stop offset="1" stop-color="#063f45"/></linearGradient><linearGradient id="lrmRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".5" stop-color="#f4c14d"/><stop offset="1" stop-color="#b9770e"/></linearGradient><linearGradient id="lrmPh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#bfeede"/></linearGradient><linearGradient id="lrmScr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#13a58c"/><stop offset="1" stop-color="#05524f"/></linearGradient><radialGradient id="lrmGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c9" stop-opacity=".95"/><stop offset="1" stop-color="#ffd76a" stop-opacity="0"/></radialGradient><clipPath id="lrmClip"><circle cx="32" cy="32" r="26"/></clipPath></defs><circle cx="32" cy="32" r="30" fill="url(#lrmRing)"/><circle cx="32" cy="32" r="27.6" fill="url(#lrmBg)"/><g clip-path="url(#lrmClip)"><ellipse cx="25" cy="10" rx="30" ry="14" fill="#fff" opacity=".13"/><circle cx="32" cy="32" r="21" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="1"/></g><g transform="rotate(-9 19 36)"><rect x="10" y="20" width="16" height="29" rx="4" fill="url(#lrmPh)" stroke="#06353a" stroke-width="1.6"/><rect x="12.2" y="24" width="11.6" height="20" rx="1.8" fill="url(#lrmScr)"/><rect x="16" y="21.8" width="4" height="1.2" rx=".6" fill="#06353a" opacity=".55"/><circle cx="18" cy="46.6" r="1" fill="#06353a" opacity=".6"/></g><g transform="rotate(9 45 36)"><rect x="38" y="20" width="16" height="29" rx="4" fill="url(#lrmPh)" stroke="#06353a" stroke-width="1.6"/><rect x="40.2" y="24" width="11.6" height="20" rx="1.8" fill="url(#lrmScr)"/><rect x="44" y="21.8" width="4" height="1.2" rx=".6" fill="#06353a" opacity=".55"/><circle cx="46" cy="46.6" r="1" fill="#06353a" opacity=".6"/></g><circle cx="32" cy="31" r="9" fill="url(#lrmGlow)"/><path d="M25.5 28.5 q6.5 -7.5 13 0" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M22.4 23.6 q9.6 -11.4 19.2 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".6"/><path d="M28.6 33 q3.4 -3.6 6.8 0" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="32" cy="37.4" r="3" fill="#ffd76a" stroke="#8a5a06" stroke-width="1"/><circle cx="31.1" cy="36.5" r="1" fill="#fff" opacity=".85"/><path d="M13 53 q19 8 38 0" fill="none" stroke="#fff" stroke-opacity=".0" stroke-width="1"/></svg></div><div style="font-weight:900;font-size:18px;margin:6px 0 4px">Local Room</div><div style="font-size:12px;opacity:.75;margin:4px 0 12px">اربط هاتفين بدون نت — الاتنين على نفس الواي فاي أو هوت سبوت</div>'+(connected()?'<div style="color:#1a8a3a;font-weight:800;margin-bottom:8px">✅ متصلين دلوقتي</div>':'')+'<button style="'+BIG+'" id="p-host">📤 أنا هعمل الغرفة</button><button style="'+BIG2+'" id="p-guest">📥 أنا هدخل غرفة صاحبي</button>');
+      c.querySelector('#p-host').onclick = host; c.querySelector('#p-guest').onclick = guest;
+    }
+    async function host(){
+      var c = card('<div style="padding:30px 0">⏳ بجهّز الكود...</div>');
+      newPc(); setupDc(pc.createDataChannel('glv'));
+      await pc.setLocalDescription(await pc.createOffer()); await waitIce(pc);
+      var code = await pack({t:'o', s: pc.localDescription.sdp});
+      function step1(){
+        var c = card(dots(1,2)+'<div style="font-weight:900;font-size:16px">خلّي صاحبك يمسح الكود ده</div><div style="font-size:12px;opacity:.7;margin:4px 0">على هاتفه: Local Room ← أنا هدخل غرفة صاحبي</div><div id="p-qr" style="display:flex;justify-content:center;margin:10px 0"></div><button style="'+BIG+'" id="p-next">صاحبي مسحه ◀ التالي</button><button style="'+B2+'" id="p-copy">📋 نسخ الكود بدل المسح</button>'+backBtn());
+        drawQR(c.querySelector('#p-qr'), code);
+        c.querySelector('#p-next').onclick = function(){ step2(true); };
+        c.querySelector('#p-copy').onclick = function(){ copyCode(code, this); };
+        c.querySelector('#p-back').onclick = home;
+      }
+      function step2(autoScan){
+        var c = card(dots(2,2)+'<div style="font-weight:900;font-size:16px">دلوقتي امسح الكود اللي ظهر عند صاحبك</div><div style="font-size:12px;opacity:.7;margin:4px 0 10px">أول ما تمسحه هتتربطوا تلقائي</div><button style="'+BIG+'" id="p-scan">📷 افتح الكاميرا</button>'+manualBox('الصق كود صاحبك هنا','اتصال')+backBtn());
+        var ta = c.querySelector('#p-in');
+        async function go(){ try{ var a = await unpack(ta.value); await pc.setRemoteDescription({type:'answer', sdp:a.s}); card('<div style="padding:30px 0;font-weight:800">⏳ بيتم الربط...</div>'); clearTimeout(window.__glvLinkT); window.__glvLinkT = setTimeout(function(){ if(!connected() && modal){ var cc = card('<div style="font-weight:900;font-size:16px;margin:10px 0">⚠️ الربط اتأخر</div><div style="font-size:12px;opacity:.75;margin-bottom:8px">تأكد إن الهاتفين على نفس الواي فاي وجرّب من الأول</div><button style="'+BIG+'" id="p-retry">🔄 جرّب تاني</button>'); cc.querySelector('#p-retry').onclick = home; } }, 20000); }catch(e){ alert('الكود غلط أو ناقص — جرّب تمسح تاني'); step2(); } }
+        c.querySelector('#p-scan').onclick = function(){ scanInto(ta, go); };
+        c.querySelector('#p-ok').onclick = go;
+        c.querySelector('#p-back').onclick = step1;
+        if(autoScan===true) scanInto(ta, go);
+      }
+      step1();
+    }
+    function guest(){
+      function step1(){
+        var c = card(dots(1,2)+'<div style="font-weight:900;font-size:16px">امسح الكود اللي ظاهر عند صاحبك</div><div style="font-size:12px;opacity:.7;margin:4px 0 10px">على هاتفه: Local Room ← أنا هعمل الغرفة</div><button style="'+BIG+'" id="p-scan">📷 افتح الكاميرا</button>'+manualBox('الصق كود صاحبك هنا','متابعة')+backBtn());
+        var ta = c.querySelector('#p-in');
+        async function go(){
+          try{
+            var o = await unpack(ta.value); newPc();
+            await pc.setRemoteDescription({type:'offer', sdp:o.s});
+            await pc.setLocalDescription(await pc.createAnswer()); await waitIce(pc);
+            var code = await pack({t:'a', s: pc.localDescription.sdp});
+            var c2 = card(dots(2,2)+'<div style="font-weight:900;font-size:16px">خلّي صاحبك يمسح الكود ده</div><div id="p-qr" style="display:flex;justify-content:center;margin:10px 0"></div><div style="font-size:13px;font-weight:800;color:#0f766e">⏳ استنى... هتتربطوا تلقائي أول ما يمسحه</div><button style="'+B2+'" id="p-copy">📋 نسخ الكود بدل المسح</button>'+backBtn());
+            drawQR(c2.querySelector('#p-qr'), code);
+            c2.querySelector('#p-copy').onclick = function(){ copyCode(code, this); };
+            c2.querySelector('#p-back').onclick = home;
+          }catch(e){ alert('الكود غلط أو ناقص — جرّب تمسح تاني'); }
+        }
+        c.querySelector('#p-scan').onclick = function(){ scanInto(ta, go); };
+        c.querySelector('#p-ok').onclick = go;
+        c.querySelector('#p-back').onclick = home;
+      }
+      step1();
+    }
+    window.addEventListener('DOMContentLoaded', function(){
+      btn = document.createElement('button');
+      btn.style.cssText = 'position:fixed;bottom:10px;left:10px;z-index:2147483645;background:#171449;color:#ffd76a;font:800 12px Cairo,sans-serif;padding:8px 14px;border:0;border-radius:99px;opacity:.92;box-shadow:0 2px 8px rgba(0,0,0,.4)';
+      btn.onclick = openModal; setStatus(); /* الزر العائم اتشال */
+      window.__glvLocalLink = openModal;
+    });
+  })();
+}
 /* تسخين الكاش: أول ما المشارك يدخل بالنت نحمّل هيكلة الاجتماع وصورها عشان تفتح أوفلاين */
 (function(){
   let warmed = '';
@@ -15984,7 +16297,7 @@ const TOUR_STEPS = [
   {v:'games', ch:'الألعاب', ico:'💳', t:'قبل ما تلعب', x:'لازم يكون عندك فيزا فعّالة وغير منتهية.', d:['من غير فيزا مش هتقدر تلعب ولا تدخل الغرف.','لو الفيزا انتهت صلاحيتها هتتنبّه وتجددها.','لو رصيدك مش كفاية لرسوم لعبة بكوين هتتنبّه وتشحن.'], ctr:true},
   {v:'games', ch:'الألعاب', ico:'🤖', t:'العب ضد الجهاز', x:'حوالي 30 لعبة بدون انتظار، تلعب في أي وقت لوحدك.', d:['مقسمة فئات: طاولة، سرعة ومهارة، ذكاء وأسئلة، ورق وحظ.','لما تكسب بتاخد جايزة بتتضاف لفيزتك.','الجايزة بتختلف حسب اللعبة والمستوى، وبتشوفها قبل ما تبدأ.'], s:'.gh-tile', t2:'ضد الجهاز'},
   {v:'games-solo', ch:'الألعاب', ico:'📂', t:'فئات الألعاب', x:'اختار فئة وبعدين اللعبة اللي تعجبك.', d:['جوه أي لعبة هتلاقي كاس 🏆 فوق على الشمال، يفتحلك ترتيب المشاركين في اللعبة دي.','لعبة بدّلت رأيك؟ ارجع بزرار الرجوع وكمّل.'], s:'.ghx-card'},
-  {v:'games', ch:'الألعاب', ico:'🧑‍🤝‍🧑', t:'العب ضد صديق', x:'غرف مباشرة مع أصحابك، كل واحد على موبايله.', d:['«إنشاء غرفة»: انت المضيف وتبعت الكود لصاحبك.','«انضمام لغرفة»: تكتب كود صاحبك وتدخل.'], s:'.gh-tile', t2:'ضد صديق'},
+  {v:'games', ch:'الألعاب', ico:'🧑‍🤝‍🧑', t:'العب ضد صديق', x:'غرف مباشرة مع أصحابك، كل واحد على موبايله.', d:['«إنشاء غرفة»: انت المضيف وتبعت الكود لصاحبك.','«انضمام لغرفة»: تكتب كود صاحبك وتدخل.','«Local Room»: تربط هاتفين بدون إنترنت وتلعبوا مع بعض.'], s:'.gh-tile', t2:'ضد صديق'},
   {v:'games', ch:'الألعاب', ico:'👀', t:'مشاهدة المعركة', x:'اتفرّج على أصحابك وهما بيلعبوا لايف من غير ما تدخل اللعبة.', s:'.gh-tile', t2:'مشاهدة المعركة'},
   {v:'games', ch:'الألعاب', ico:'🏅', t:'إنجازاتك', x:'أوسمة بتفتحها كل ما تلعب وتكسب، وبتتابع مستواك وعدد انتصاراتك.', s:'.gh-tile', t2:'إنجازاتي'},
   /* ===== الغرف مع الأصحاب ===== */
@@ -16742,7 +17055,7 @@ const GAME_CATEGORY_OF = {
   xo:'board', connect4:'board', domino:'board', ludo:'board', chess:'board', checkers:'board', tmm:'board', backgammon:'board', snakes:'board',
   crossmath:'mind', spotdiff:'mind', dayriddle:'mind', matchsticks:'mind', vault:'mind', matchsq:'mind', treasure:'mind',
   reflex:'skill', billiards:'skill', darts:'skill', bowling:'skill', stack:'skill',
-  memory:'focus', who:'mind', revword:'mind', blocky:'focus', cube:'focus', numguess:'mind', math:'mind', millionaire:'mind', fawazeer:'mind', bus:'mind', rollpaint:'focus', simon:'focus',
+  memory:'focus', who:'mind', revword:'mind', blocky:'focus', cube:'focus', numguess:'mind', math:'mind', millionaire:'mind', mpmil:'mind', fawazeer:'mind', bus:'mind', rollpaint:'focus', simon:'focus',
   colorcards:'cards', rps:'cards',
   quiz:'party', mystery:'party', emojibible:'party', proverb:'party', stoptimer:'skill', uniqans:'party', fahmeen:'party', placemem:'focus', sqorder:'focus', fazzura:'party', drawguess:'party', battleship:'board', khatfa:'party',
 };
@@ -16942,6 +17255,7 @@ const GH_SOLO_SUB = {
   cube:'اضغط مرتين عشان المكعب يتخلط، واسحب على أي وش عشان تلفّ طبقة (واسحب بره المكعب عشان تدوّره) — التايمر بيبدأ مع أول حركة، ولما كل وش يبقى لون واحد تكسب نقط',
   blocky:'لوحة 8×8 — اسحب البلوكات وفجّر الصفوف والأعمدة، كومبو بيضاعف النقط، مستويات بتصعب، وتراجع وتبديل قطع لما تتزنق.',
   millionaire:'50 سؤال مسيحي بيصعبوا جدًا كل ما تتقدّم، 15 ثانية للسؤال، وكمّلهم كلهم واكسب 300 نقطة',
+  mpmil:'نفس الأسئلة المسيحية بتظهر لكل اللاعبين مع بعض — أول واحد يدوس على الإجابة الصح ياخد النقط، ويظهر للباقي إنه حلها أسرع، وبعدين السؤال اللي بعده. 15 سؤال بيصعبوا تدريجيًا وقيمة النقط بتزيد',
   fawazeer:'10 مستويات بتتفتح بالتدريج ومئات الأسئلة (كتاب مقدس، طقس، عقيدة، قديسين، شهداء) — جاوب 7 من 10 صح عشان تعدّي، وتدريب حر في أي موضوع.',
   chess:'شطرنج كامل بكل القواعد — كش ملك، تبييت، الأسر بالمرور، ترقية البيدق',
   checkers:'أسر إجباري ومتسلسل، وتتويج القطعة لما توصل آخر الصف',
@@ -17051,23 +17365,36 @@ function renderGamesHub(){
       <span class="gh-title">العب ضد صديق</span>
       <span class="gh-sub">هنرجعها قريب — بنحدّثها دلوقتي</span>
     </button>` : `
-    <div class="gh-tile ${ft?'is-open':''} ${ft==='join'?'is-join':''}" id="gh-friend" style="--g:linear-gradient(145deg,#A18CD1,#FBC2EB); --i:0">
+    <div class="gh-tile ${ft?'is-open':''} ${ft==='join'?'is-join':''} ${window.__GLV_LOCAL?'has-mode':''}" id="gh-friend" data-step="${ft||''}" style="--g:linear-gradient(145deg,#A18CD1,#FBC2EB); --i:0">
       <button type="button" class="gh-face gh-front" data-action="friend-tile-open">
         <span class="gh-ico">🧑‍🤝‍🧑</span>
         <span class="gh-title">العب ضد صديق</span>
         <span class="gh-sub">غرفة مباشرة بكود</span>
       </button>
       <div class="gh-face gh-back">
-        <button type="button" class="gh-close" data-action="friend-tile-close" aria-label="إغلاق">✕</button>
+        <button type="button" class="gh-close" data-action="friend-tile-close" aria-label="رجوع"><span class="gh-x">✕</span><span class="gh-bk">‹</span></button>
+        <div class="gh-panel gh-panel-mode">
+          <div class="gh-back-title" style="--k:0">اختار طريقة اللعب</div>
+          <button type="button" class="gh-mode gh-mode-online" style="--k:1" data-action="friend-mode-online">
+            <span class="gh-mode-ico"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/><ellipse cx="16" cy="16" rx="4.6" ry="10.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 16h21M7.4 10.4h17.2M7.4 21.6h17.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><g class="gh-orbit"><circle cx="16" cy="2.6" r="2.2" fill="#ffd76a" stroke="#8a5a06" stroke-width=".8"/></g></svg></span>
+            <span class="gh-mode-tx"><b>أونلاين</b><small>بالإنترنت</small></span>
+            <span class="gh-mode-chev">›</span>
+          </button>
+          <button type="button" class="gh-mode gh-mode-local" style="--k:2" data-action="friend-mode-local">
+            <span class="gh-mode-ico"><svg viewBox="0 0 64 64" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block"><defs><linearGradient id="lrfBg" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#1fd6a0"/><stop offset=".55" stop-color="#0c8f7a"/><stop offset="1" stop-color="#063f45"/></linearGradient><linearGradient id="lrfRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".5" stop-color="#f4c14d"/><stop offset="1" stop-color="#b9770e"/></linearGradient><linearGradient id="lrfPh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#bfeede"/></linearGradient><linearGradient id="lrfScr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#13a58c"/><stop offset="1" stop-color="#05524f"/></linearGradient><radialGradient id="lrfGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c9" stop-opacity=".95"/><stop offset="1" stop-color="#ffd76a" stop-opacity="0"/></radialGradient><clipPath id="lrfClip"><circle cx="32" cy="32" r="26"/></clipPath></defs><circle cx="32" cy="32" r="30" fill="url(#lrfRing)"/><circle cx="32" cy="32" r="27.6" fill="url(#lrfBg)"/><g clip-path="url(#lrfClip)"><ellipse cx="25" cy="10" rx="30" ry="14" fill="#fff" opacity=".13"/><circle cx="32" cy="32" r="21" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="1"/></g><g transform="rotate(-9 19 36)"><rect x="10" y="20" width="16" height="29" rx="4" fill="url(#lrfPh)" stroke="#06353a" stroke-width="1.6"/><rect x="12.2" y="24" width="11.6" height="20" rx="1.8" fill="url(#lrfScr)"/><rect x="16" y="21.8" width="4" height="1.2" rx=".6" fill="#06353a" opacity=".55"/><circle cx="18" cy="46.6" r="1" fill="#06353a" opacity=".6"/></g><g transform="rotate(9 45 36)"><rect x="38" y="20" width="16" height="29" rx="4" fill="url(#lrfPh)" stroke="#06353a" stroke-width="1.6"/><rect x="40.2" y="24" width="11.6" height="20" rx="1.8" fill="url(#lrfScr)"/><rect x="44" y="21.8" width="4" height="1.2" rx=".6" fill="#06353a" opacity=".55"/><circle cx="46" cy="46.6" r="1" fill="#06353a" opacity=".6"/></g><circle cx="32" cy="31" r="9" fill="url(#lrfGlow)"/><path d="M25.5 28.5 q6.5 -7.5 13 0" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M22.4 23.6 q9.6 -11.4 19.2 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".6"/><path d="M28.6 33 q3.4 -3.6 6.8 0" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="32" cy="37.4" r="3" fill="#ffd76a" stroke="#8a5a06" stroke-width="1"/><circle cx="31.1" cy="36.5" r="1" fill="#fff" opacity=".85"/><path d="M13 53 q19 8 38 0" fill="none" stroke="#fff" stroke-opacity=".0" stroke-width="1"/></svg></span>
+            <span class="gh-mode-tx"><b>Local Room</b><small>بدون إنترنت</small></span>
+            <span class="gh-mode-chev">›</span>
+          </button>
+        </div>
         <div class="gh-panel gh-panel-menu">
-          <div class="gh-back-title">العب ضد صديق</div>
-          <button type="button" class="gh-act gh-act-primary" data-action="open-rooms">➕ إنشاء غرفة</button>
-          <button type="button" class="gh-act" data-action="friend-join-show">🔑 انضمام لغرفة</button>
+          ${window.__GLV_LOCAL ? '<div class="gh-chip" style="--k:0">🌐 أونلاين</div>' : '<div class="gh-back-title" style="--k:0">العب ضد صديق</div>'}
+          <button type="button" class="gh-act gh-act-primary" style="--k:1" data-action="open-rooms">➕ إنشاء غرفة</button>
+          <button type="button" class="gh-act" style="--k:2" data-action="friend-join-show">🔑 انضمام لغرفة</button>
         </div>
         <div class="gh-panel gh-panel-join">
-          <div class="gh-back-title">اكتب كود الغرفة</div>
-          <input type="text" inputmode="numeric" maxlength="4" autocomplete="off" class="gh-code-input" id="room-join-code" placeholder="0000" value="${state.roomJoinInput||''}">
-          <button type="button" class="gh-act gh-act-primary" data-action="join-room">انضم 🚀</button>
+          <div class="gh-back-title" style="--k:0">اكتب كود الغرفة</div>
+          <input type="text" inputmode="numeric" maxlength="4" autocomplete="off" class="gh-code-input" style="--k:1" id="room-join-code" placeholder="0000" value="${state.roomJoinInput||''}">
+          <button type="button" class="gh-act gh-act-primary" style="--k:2" data-action="join-room">انضم 🚀</button>
         </div>
       </div>
     </div>`;
@@ -17111,7 +17438,7 @@ function renderGamesHub(){
       <span class="gh-title">ترتيب الأبطال</span>
       <span class="gh-sub">مين الأعلى في النقاط الحالية؟</span>
     </button>`;
-  return `
+    return `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">Games</div>
@@ -17344,7 +17671,7 @@ function liveRoomsList(){
     .sort((a,b)=> (b.updatedAt||0)-(a.updatedAt||0));
 }
 function watchRoomNames(room){
-  if(room.game==='ludo' || room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff'){
+  if(room.game==='ludo' || room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff' || room.game==='mpmil'){
     return (room.players||[]).map(p=>p.name).filter(Boolean).join(' • ') || 'لاعبين';
   }
   return [room.hostName, room.guestName].filter(Boolean).join('  🆚  ');
@@ -17437,12 +17764,42 @@ document.addEventListener('input', e=>{
   res.innerHTML = hit.length ? hit.map((g,i)=>ghGameTile(g, GH_SOLO_SUB[g.id], 'open-game', i)).join('') : '<div class="empty-note" style="grid-column:1/-1;">مفيش لعبة بالاسم ده</div>';
   res.hidden = false; wrap.hidden = true;
 });
+function ghSparks(t){
+  try{
+    const n = 14, cols = ['#ffd76a','#ffffff','#9be7ff','#ff9ad5'];
+    for(let i=0;i<n;i++){
+      const s = document.createElement('i'); s.className = 'gh-spark';
+      const a = (Math.PI*2*i/n) + Math.random()*.5, d = 48 + Math.random()*46;
+      s.style.setProperty('--dx', (Math.cos(a)*d).toFixed(1)+'px');
+      s.style.setProperty('--dy', (Math.sin(a)*d).toFixed(1)+'px');
+      s.style.background = s.style.color = cols[i%cols.length];
+      s.style.animationDelay = (Math.random()*.1).toFixed(2)+'s';
+      t.appendChild(s); setTimeout(()=>{ try{ s.remove(); }catch(e){} }, 1000);
+    }
+  }catch(e){}
+}
+function ghReplayPanels(t){
+  try{
+    const els = t.querySelectorAll('.gh-panel, .gh-panel > *');
+    els.forEach(el=>{ el.style.animation = 'none'; });
+    void t.offsetWidth;
+    els.forEach(el=>{ el.style.animation = ''; });
+  }catch(e){}
+}
 function setFriendTile(mode){
+  const prev = state.friendTile || null;
   state.friendTile = mode;
   const t = document.getElementById('gh-friend');
   if(!t) return;
+  const rank = x => x==='join' ? 3 : x==='menu' ? 2 : x==='mode' ? 1 : 0;
   t.classList.toggle('is-open', !!mode);
   t.classList.toggle('is-join', mode==='join');
+  if(mode){
+    t.dataset.dir = rank(mode) >= rank(prev) ? 'fwd' : 'back';
+    t.dataset.step = mode;
+    if(!prev){ ghReplayPanels(t); ghSparks(t); }
+    try{ if(navigator.vibrate) navigator.vibrate(10); }catch(e){}
+  }
   if(mode==='join') setTimeout(()=>{ const i = document.getElementById('room-join-code'); if(i) i.focus(); }, 320);
 }
 function ghNormalizeDigits(v){
@@ -25721,6 +26078,8 @@ async function createGameRoom(gameType, paid){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], eb:null});
   } else if(gameType==='proverb'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], pv:null});
+  } else if(gameType==='mpmil'){
+    Object.assign(room, {players:[{id:state.pid, name:room.hostName}], mm:null, maxPlayers:4});
   } else if(gameType==='stoptimer'){
     Object.assign(room, {players:[{id:state.pid, name:room.hostName}], st:null, stLevel:'easy'});
   } else if(gameType==='uniqans'){
@@ -25770,7 +26129,7 @@ async function joinGameRoom(code){
   const room = GAME_ROOMS[code];
   if(!room){ showToast('الكود ده مش موجود', true); return; }
   const p = PARTICIPANTS.find(x=>x.id===state.pid);
-  if(room.game==='ludo' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='stoptimer' || room.game==='uniqans' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura' || room.game==='drawguess' || room.game==='battleship' || room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff'){
+  if(room.game==='ludo' || room.game==='quiz' || room.game==='mystery' || room.game==='emojibible' || room.game==='proverb' || room.game==='mpmil' || room.game==='stoptimer' || room.game==='uniqans' || room.game==='fahmeen' || room.game==='placemem' || room.game==='fazzura' || room.game==='drawguess' || room.game==='battleship' || room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff'){
     room.players = room.players || [{id:room.hostId, name:room.hostName}];
     if(!room.players.some(x=>x.id===state.pid)){
       if(room.status!=='waiting'){ showToast('اللعبة دي بدأت بالفعل', true); return; }
@@ -25861,7 +26220,7 @@ async function applyLeaveRoomPenalty(code){
       if(room.game==='ludo'){
         const seats = (room.ludo && room.ludo.seats) || (room.players||[]).map(p=>({pid:p.id, left:false}));
         recipients = seats.filter(s=> s.pid && s.pid!==state.pid && !s.left).map(s=>s.pid);
-      } else if(room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff'){
+      } else if(room.game==='snakes' || room.game==='khatfa' || room.game==='spotdiff' || room.game==='mpmil'){
         recipients = (room.players||[]).filter(p=> p.id && p.id!==state.pid).map(p=>p.id);
       } else {
         recipients = [room.hostId, room.guestId].filter(id=> id && id!==state.pid);
@@ -25950,11 +26309,11 @@ async function leaveGameRoom(){
         roomTouch(room);
         room.players.forEach(pl=>pushNotification(pl.id, `🚪 ${myName} خرج من الغرفة`, '🚪'));
       }
-    } else if(room.game==='khatfa' || room.game==='spotdiff'){
+    } else if(room.game==='khatfa' || room.game==='spotdiff' || room.game==='mpmil'){
       const myName = (room.players||[]).find(p=>p.id===state.pid)?.name
         || (PARTICIPANTS.find(x=>x.id===state.pid)||{}).name || 'لاعب';
       room.players = (room.players||[]).filter(p=>p.id!==state.pid);
-      if((room.kh||room.sd) && room.status==='playing'){
+      if((room.kh||room.sd||room.mm) && room.status==='playing'){
         if(room.players.length<2){ delete GAME_ROOMS[code]; }
         else { if(room.hostId===state.pid){ room.hostId = room.players[0].id; room.hostName = room.players[0].name; } roomTouch(room); room.players.forEach(pl=>pushNotification(pl.id, `🚪 ${myName} خرج من اللعبة`, '🚪')); }
       } else if(room.players.length===0){
@@ -26291,6 +26650,7 @@ const ROOM_GAMES = [
   {id:'mystery',  sub:'ادخلوا الغرفة مع بعض وفكّوا الألغاز والأقفال قبل ما الوقت يخلص'},
   {id:'emojibible', sub:'خمّنوا القصة أو المناسبة المسيحية من الإيموجيز — الأسرع والصح ياخد نقط أكتر'},
   {id:'proverb',  sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر'},
+  {id:'mpmil',    sub:'نفس الأسئلة — أول واحد يجاوب صح ياخد النقط وبعدها السؤال اللي بعده'},
   {id:'stoptimer', sub:'وقّفوا العدّاد على الرقم المطلوب — الأقرب يكسب الجولة'},
   {id:'uniqans', sub:'اكتب إجابة مختلفة عن الكل — اللي يتطابق مع حد يتقصى'},
   {id:'fahmeen',  sub:'اكتبوا أول حاجة تيجي في بالكم — اتطابقوا أو اتفردوا وراهنوا برقم'},
@@ -26306,6 +26666,7 @@ const ROOM_ONLY_TILES = {
   quiz: {id:'quiz', icon:'❓', title:'تحدي الأسئلة', sub:'لحد 4 أصحاب — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#845EC2,#FF9A8B)'},
   mystery: {id:'mystery', icon:'🕵️', title:'غرفة الغموض', sub:'ادخلوا مع أصحابكم وفكّوا الألغاز والأدلة والأقفال قبل ما الوقت يخلص', color:'linear-gradient(145deg,#241246,#5B2A86)'},
   emojibible: {id:'emojibible', icon:'😇', title:'إيموجي تحدي', sub:'خمّنوا القصة أو المناسبة المسيحية من الإيموجيز — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#2E5A8C,#6FB1E8)'},
+  mpmil: {id:'mpmil', icon:'👑', title:'من سيربح المليون — سباق', sub:'نفس الأسئلة المسيحية لكل اللاعبين — أول واحد يجاوب صح ياخد النقط ويتقال للباقي إنه حلها أسرع', color:'linear-gradient(145deg,#1B1464,#C9A227)'},
   proverb: {id:'proverb', icon:'📖', title:'أكمل المثل', sub:'كمّلوا المثل أو الآية الناقصة — الأسرع والصح ياخد نقط أكتر', color:'linear-gradient(145deg,#5C3A21,#C9A227)'},
   stoptimer: {id:'stoptimer', icon:'⏱️', title:'ستوب تايمر', sub:'وقّفوا العدّاد على الرقم المطلوب — الأقرب يكسب الجولة', color:'linear-gradient(145deg,#C23B3B,#2b0e0e)'},
   uniqans: {id:'uniqans', icon:'🚫', title:'إجابة فريدة', sub:'اكتب إجابة مختلفة عن الكل — اللي يتطابق مع حد يتقصى', color:'linear-gradient(145deg,#6C4DFF,#3FDCC9)'},
@@ -26986,6 +27347,217 @@ function renderRoomPv(){
     <div class="quiz-score-row">${scoreRow}</div>
     <div class="hint" style="text-align:center;margin:2px 0 6px;">سؤال ${Q.qIndex+1}/${Q.total} • جاوب ${answeredCount}/${ps.length}</div>
     <div class="xo-status">${statusText}</div>
+    <div class="quiz-qtext">${escapeHtml(q.q)}</div>
+    <div class="quiz-opts">${opts}</div>
+  `;
+}
+/* ================= من سيربح المليون — سباق (2-4 لاعبين): أول واحد يجاوب صح ياخد النقط ويتقال للباقي إنه حلها أسرع ================= */
+const MM_TITLE = 'من سيربح المليون';
+const MM_SEC = 20;            // وقت السؤال بالثواني
+const MM_REVEAL_MS = 3200;    // مدة عرض "مين حلها أسرع" قبل السؤال اللي بعده
+const MM_PER_TIER = 3;        // 3 أسئلة من كل مرحلة × 5 مراحل = 15 سؤال
+function mmPickQuestions(){
+  const out = [];
+  for(let t=1; t<=5; t++){
+    const pool = (typeof MIL_QUESTIONS!=='undefined' && MIL_QUESTIONS[t]) || [];
+    shuffleArray(pool.slice()).slice(0, MM_PER_TIER).forEach(q=>{
+      const sq = milShuffleQuestion(q);
+      sq.tier = t; sq.pts = MIL_TIER_VALUES[t-1];
+      out.push(sq);
+    });
+  }
+  return out;
+}
+function mmNewState(players){
+  const qs = mmPickQuestions(), now = Date.now();
+  return { gid: now+'-'+Math.floor(Math.random()*1e6), questions: qs, qIndex:0, total: qs.length,
+    scores: Object.fromEntries((players||[]).map(p=>[p.id,0])),
+    phase:'ask', qStart: now, deadline: now + MM_SEC*1000, wrong:{}, winner:null, winPts:0, winMs:0, timedOut:false, nextAt:0, finished:false };
+}
+function mmWinner(room){
+  const Q = room.mm; if(!Q) return null;
+  let best=null, bestScore=-1, tie=false;
+  (room.players||[]).forEach(p=>{ const s=(Q.scores||{})[p.id]||0; if(s>bestScore){ best=p.id; bestScore=s; tie=false; } else if(s===bestScore){ tie=true; } });
+  return tie ? 'draw' : best;
+}
+function mmName(room, id){
+  const p = (room.players||[]).find(x=>x.id===id) || (typeof PARTICIPANTS!=='undefined' ? PARTICIPANTS.find(x=>x.id===id) : null);
+  return p ? p.name : 'صاحبك';
+}
+function renderRoomMmLobby(room){ return window.__rdyWrap(__rdy_renderRoomMmLobby(room), room); }
+function __rdy_renderRoomMmLobby(room){
+  const ps = room.players || [];
+  const isHost = room.hostId===state.pid;
+  const slots = [0,1,2,3].map(i=>{
+    const p = ps[i];
+    if(!p) return `<div class="uno-lobby-row empty" title="في انتظار لاعب" aria-label="في انتظار لاعب"><span class="wait-ring"></span><span class="wait-txt"><em>في انتظار لاعب</em><i class="wait-dots"><b>.</b><b>.</b><b>.</b></i></span></div>`;
+    return `<div class="uno-lobby-row">${gameAvatar(p.id)}<div class="uno-lobby-pname">${escapeHtml(p.name)}${p.id===room.hostId?' • صاحب الغرفة':''}${p.id===state.pid?' (انت)':''}</div></div>`;
+  }).join('');
+  return `
+    <div class="room-waiting">
+      ${roomCodeCard(room.code, room.game)}
+      <div class="hint" style="text-align:center;margin:14px 0 14px;">شارك الكود مع أصحابك، لحد 4 لاعبين 👑 — نفس الأسئلة، وأول واحد يجاوب صح ياخد النقط</div>
+      <div class="uno-lobby-list">${slots}</div>
+      ${isHost
+        ? `<button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" data-action="room-mm-start" ${ps.length<2?'disabled':''}>👑 ابدأ السباق (${ps.length}/4)</button>${ps.length<2?'<div class="hint" style="text-align:center;margin-top:8px;">محتاج لاعب واحد على الأقل يدخل الغرفة</div>':''}`
+        : `<div class="hint" style="text-align:center;margin-top:14px;">⏳ في انتظار صاحب الغرفة يبدأ السباق</div>`}
+    </div>`;
+}
+async function doRoomMmStart(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || room.game!=='mpmil' || room.hostId!==state.pid || room.status!=='waiting') return;
+  const ps = room.players || [];
+  if(ps.length<2){ showToast('محتاج لاعبين اتنين على الأقل', true); return; }
+  room.mm = mmNewState(ps);
+  room.status = 'playing';
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  try{ SND.coinChime(); }catch(e){}
+  render();
+}
+/* أول واحد يدوس على الإجابة الصح هو اللي ياخد النقط — الغلط بيقفل عليك السؤال ده بس */
+async function doRoomMmPick(idxRaw, qiRaw){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.mm || room.mm.finished) return;
+  const Q = room.mm;
+  const qi = parseInt(qiRaw,10);
+  if(!isNaN(qi) && qi!==Q.qIndex){ render(); return; }     // السؤال اتغيّر وانت لسه ضاغط على القديم
+  if(Q.phase!=='ask' || (Q.wrong||{})[state.pid]!==undefined){ render(); return; }
+  const idx = parseInt(idxRaw,10);
+  const q = Q.questions[Q.qIndex];
+  if(idx===q.c){
+    Q.winner = state.pid; Q.winPts = q.pts; Q.winMs = Math.max(0, Date.now()-Q.qStart);
+    Q.scores[state.pid] = (Q.scores[state.pid]||0) + q.pts;
+    Q.phase = 'reveal'; Q.nextAt = Date.now() + MM_REVEAL_MS;
+    try{ SND.cheer(); }catch(e){}
+  } else {
+    Q.wrong = Q.wrong || {}; Q.wrong[state.pid] = idx;
+    try{ vibrate(30); }catch(e){}
+    const ps = room.players||[];
+    if(ps.every(p=>Q.wrong[p.id]!==undefined)){ Q.phase='reveal'; Q.winner=null; Q.timedOut=false; Q.nextAt = Date.now() + MM_REVEAL_MS; }
+  }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomMmTimeout(qi){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.mm || room.mm.finished) return;
+  const Q = room.mm;
+  if(Q.qIndex!==qi || Q.phase!=='ask') return;
+  Q.phase='reveal'; Q.winner=null; Q.timedOut=true; Q.nextAt = Date.now() + MM_REVEAL_MS;
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+async function doRoomMmAdvance(qi){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room || !room.mm || room.mm.finished) return;
+  const Q = room.mm;
+  if(Q.qIndex!==qi || Q.phase!=='reveal') return;
+  Q.qIndex = qi+1;
+  if(Q.qIndex>=Q.total){ Q.finished = true; }
+  else { const now=Date.now(); Q.phase='ask'; Q.qStart=now; Q.deadline=now+MM_SEC*1000; Q.wrong={}; Q.winner=null; Q.winPts=0; Q.winMs=0; Q.timedOut=false; Q.nextAt=0; }
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+  if(Q.finished){ try{ SND.coinChime(); if(mmWinner(room)===state.pid) launchConfetti(); }catch(e){} }
+}
+async function doRoomMmNext(){
+  GAME_ROOMS = await loadGameRooms();
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return;
+  room.mm = mmNewState(room.players||[]);
+  roomTouch(room);
+  await saveGameRooms(GAME_ROOMS);
+  render();
+}
+/* مؤقّت اللعبة: بيحدّث العدّ التنازلي، وأي موبايل (صاحب الغرفة الأول) بينقل للسؤال اللي بعده أو يقفل السؤال لما الوقت يخلص */
+let mmTickId = null, mmTickBusy = false;
+function mmEnsureTick(){ if(!mmTickId) mmTickId = setInterval(mmTick, 250); }
+async function mmTick(){
+  if(state.view!=='room-mpmil'){ clearInterval(mmTickId); mmTickId = null; return; }
+  const room = GAME_ROOMS && GAME_ROOMS[state.roomCode];
+  const Q = room && room.mm;
+  if(!Q || Q.finished) return;
+  const now = Date.now();
+  const lag = room.hostId===state.pid ? 0 : 700;
+  if(Q.phase==='ask'){
+    const left = Math.max(0, Q.deadline - now);
+    const t = document.getElementById('mm-timer-txt'); if(t) t.textContent = Math.ceil(left/1000);
+    const b = document.getElementById('mm-timer-bar'); if(b) b.style.width = (left/(MM_SEC*1000)*100)+'%';
+    if(left===0 && now>=Q.deadline+lag && !mmTickBusy){ mmTickBusy = true; try{ await doRoomMmTimeout(Q.qIndex); }catch(e){} mmTickBusy = false; }
+  } else if(Q.phase==='reveal'){
+    if(now>=Q.nextAt+lag && !mmTickBusy){ mmTickBusy = true; try{ await doRoomMmAdvance(Q.qIndex); }catch(e){} mmTickBusy = false; }
+  }
+}
+function renderRoomMm(){
+  const room = GAME_ROOMS[state.roomCode];
+  if(!room) return roomGate(MM_TITLE, room);
+  if(room.status==='waiting' || !room.mm) return roomHead(MM_TITLE, room) + renderRoomMmLobby(room);
+  const Q = room.mm, ps = room.players || [];
+  if(Q.finished){
+    const w = mmWinner(room);
+    const sorted = ps.slice().sort((a,b)=>(Q.scores[b.id]||0)-(Q.scores[a.id]||0));
+    const title = w==='draw' ? '🤝 تعادل!' : (w===state.pid ? '🎉 انت كسبت المليون!' : `🏆 ${escapeHtml(mmName(room,w))} كسب المليون`);
+    const rows = sorted.map((p,i)=>`
+      <div class="quiz-lb-row">
+        <span class="quiz-lb-rank">#${i+1}</span>
+        ${gameAvatar(p.id)}
+        <span class="quiz-lb-name">${escapeHtml(p.name)}${p.id===state.pid?' (انت)':''}</span>
+        <b>${Q.scores[p.id]||0}</b>
+      </div>`).join('');
+    return `
+      ${roomHead(MM_TITLE, room)}
+      <div class="xo-status">${title}</div>
+      <div style="margin-top:14px;">${rows}</div>
+      ${nextProBtn('room-mm-next')}
+    `;
+  }
+  mmEnsureTick();
+  const q = Q.questions[Q.qIndex];
+  const reveal = Q.phase==='reveal';
+  const myWrong = (Q.wrong||{})[state.pid];
+  const locked = myWrong!==undefined;
+  const scoreRow = ps.map(p=>scorePill(gameAvatar(p.id), Q.scores[p.id]||0, '', Q.winner===p.id && reveal)).join('');
+  let banner;
+  if(reveal){
+    if(Q.winner){
+      const secs = (Q.winMs/1000).toFixed(1);
+      const nm = Q.winner===state.pid ? 'انت' : escapeHtml(mmName(room, Q.winner));
+      banner = Q.winner===state.pid
+        ? `🏆 حلتها أسرع واحد! +${Q.winPts} نقطة • ⚡ ${secs} ثانية`
+        : `⚡ ${nm} حلها أسرع منك! +${Q.winPts} نقطة • ${secs} ثانية`;
+    } else {
+      banner = Q.timedOut ? '⌛ الوقت خلص — محدش جاوب صح' : '❌ كلكم غلطتوا في السؤال ده';
+    }
+  } else if(locked){
+    banner = '❌ إجابتك غلط — استنى لو حد تاني يجاوب';
+  } else {
+    banner = '⚡ أول واحد يدوس على الإجابة الصح ياخد النقط!';
+  }
+  const opts = q.o.map((opt,i)=>{
+    let cls = 'quiz-opt';
+    if(reveal && i===q.c) cls += ' quiz-correct';
+    else if(locked && i===myWrong) cls += ' quiz-wrong';
+    return `<button type="button" class="${cls}" data-action="room-mm-pick" data-idx="${i}" data-qi="${Q.qIndex}" ${(reveal||locked)?'disabled':''}>${escapeHtml(opt)}</button>`;
+  }).join('');
+  const left = Math.max(0, Q.deadline - Date.now());
+  const timerHtml = reveal ? '' : `
+    <div style="margin:8px 4px 4px;">
+      <div style="display:flex;justify-content:space-between;font-weight:800;font-size:13px;opacity:.85;"><span>⏱️ الوقت</span><span id="mm-timer-txt">${Math.ceil(left/1000)}</span></div>
+      <div style="height:7px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:4px;"><div id="mm-timer-bar" style="height:100%;width:${(left/(MM_SEC*1000)*100)}%;background:linear-gradient(90deg,#F4C95D,#E8342A);border-radius:99px;"></div></div>
+    </div>`;
+  return `
+    ${roomHead(MM_TITLE, room)}
+    <div class="quiz-score-row">${scoreRow}</div>
+    <div class="hint" style="text-align:center;margin:2px 0 6px;">سؤال ${Q.qIndex+1}/${Q.total} • 💰 قيمته ${q.pts} ${q.pts>=11?'نقطة':(q.pts===1?'نقطة':'نقط')}</div>
+    <div class="xo-status">${banner}</div>
+    ${timerHtml}
     <div class="quiz-qtext">${escapeHtml(q.q)}</div>
     <div class="quiz-opts">${opts}</div>
   `;
@@ -34340,6 +34912,7 @@ function render(){
   else if(state.view==='room-mystery') html = renderRoomMystery();
   else if(state.view==='room-emojibible') html = renderRoomEb();
   else if(state.view==='room-proverb') html = renderRoomPv();
+  else if(state.view==='room-mpmil') html = renderRoomMm();
   else if(state.view==='room-stoptimer') html = renderRoomSt();
   else if(state.view==='room-uniqans') html = renderRoomUa();
   else if(state.view==='room-fahmeen') html = renderRoomFh();
@@ -37098,7 +37671,7 @@ function closeScanModal(){
 const NEXT_PRO_ACTIONS = new Set([
   'xo-reset','c4-reset','domino-reset','ludo-again',
   'room-xo-next','room-rps-next','room-domino-next','room-c4-next','room-memory-next','room-num-next','room-math-next',
-  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-st-next','room-ua-next','room-fh-next','room-fs-next','room-fz-next','room-dg-next','room-bs-next','pm-next','sqo-next',
+  'reflex-reset','room-reflex-rematch','room-quiz-next','room-mystery-next','room-eb-next','room-pv-next','room-mm-next','room-st-next','room-ua-next','room-fh-next','room-fs-next','room-fz-next','room-dg-next','room-bs-next','pm-next','sqo-next',
   'chess-reset','ck-reset','bg-reset','snl-reset','room-snr-next'
 ]);
 const SPECTATE_BLOCKED_ACTIONS = new Set([
@@ -37111,6 +37684,7 @@ const SPECTATE_BLOCKED_ACTIONS = new Set([
   'room-mystery-start','room-mystery-submit','room-mystery-hint','room-mystery-next',
   'room-eb-start','room-eb-pick','room-eb-next',
   'room-pv-start','room-pv-pick','room-pv-next',
+  'room-mm-start','room-mm-pick','room-mm-next',
   'room-st-start','room-st-level','room-st-press','room-st-next',
   'room-ua-start','room-ua-submit','room-ua-next','room-ua-end',
   'room-dg-start','room-dg-pick','room-dg-guess','room-dg-tool','room-dg-next',
@@ -37449,6 +38023,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-room-cat'){ go('game-rooms-cat', {roomCatKey: el.dataset.cat}); }
   else if(action==='open-rooms'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } state.friendTile = null; go('game-rooms'); }
   else if(action==='open-visa'){ openVisaPage(); }
+  else if(action==='local-link'){ if(window.__glvLocalLink) window.__glvLocalLink(); }
   else if(action==='games-guide'){ showGamesIntroModal(); }
   else if(action==='visa-flip'){ const v=document.getElementById('vc-inner'); if(v) v.classList.toggle('flip'); }
   else if(action==='visa-toggle-number'){ state.visaNumVisible = !state.visaNumVisible; render(); }
@@ -37505,10 +38080,12 @@ document.addEventListener('click', (e)=>{
   else if(action==='claim-custom-card'){ doClaimCustomCard(); }
   else if(action==='watch-room'){ enterSpectateRoom(el.dataset.code, el.dataset.game); }
   else if(action==='friend-locked-tap'){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا، هنرجعه قريب بعد التحديث'); }
-  else if(action==='friend-tile-open'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } if(!requireVisaForRooms()) return; setFriendTile('menu'); }
+  else if(action==='friend-tile-open'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } if(window.__GLV_LOCAL){ setFriendTile('mode'); return; } if(!requireVisaForRooms()) return; setFriendTile('menu'); }
+  else if(action==='friend-mode-online'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } if(!requireVisaForRooms()) return; setFriendTile('menu'); try{ SND.click(); }catch(_){} }
+  else if(action==='friend-mode-local'){ setFriendTile(null); try{ SND.click(); }catch(_){} if(window.__glvLocalLink) window.__glvLocalLink(); }
   else if(action==='friend-join-show'){ state.friendTile = null; ROOM_LOBBY.ready = false; go('room-lobby'); lobbyRefresh(); }
   else if(action==='lobby-join'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } attemptJoinRoom(el.dataset.code); }
-  else if(action==='friend-tile-close'){ setFriendTile(state.friendTile==='join' ? 'menu' : null); }
+  else if(action==='friend-tile-close'){ const _s = state.friendTile; setFriendTile(_s==='join' ? 'menu' : (_s==='menu' && window.__GLV_LOCAL ? 'mode' : null)); }
   else if(action==='create-room'){ const gt = el.dataset.game; if(isGameDisabled(gt)){ showToast('🛠️ اللعبة دي قيد التحديث دلوقتي وهترجع قريب'); return; } showChallengeTypeModal(gt); }
   else if(action==='join-room'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } const inp = document.getElementById('room-join-code'); attemptJoinRoom(inp?inp.value:''); }
   else if(action==='leave-room'){ confirmLeaveGameRoom(); }
@@ -37558,6 +38135,9 @@ document.addEventListener('click', (e)=>{
   else if(action==='room-pv-start'){ doRoomPvStart(); }
   else if(action==='room-pv-pick'){ doRoomPvPick(el.dataset.idx); }
   else if(action==='room-pv-next'){ doRoomPvNext(); }
+  else if(action==='room-mm-start'){ doRoomMmStart(); }
+  else if(action==='room-mm-pick'){ doRoomMmPick(el.dataset.idx, el.dataset.qi); }
+  else if(action==='room-mm-next'){ doRoomMmNext(); }
   else if(action==='room-st-start'){ doRoomStStart(); }
   else if(action==='room-st-level'){ doRoomStLevel(el.dataset.lv); }
   else if(action==='room-st-press'){ doRoomStPress(); }
@@ -52387,7 +52967,7 @@ html[data-theme="dark"] body .su-meter.full .msg, html[data-theme="dark"] body .
 (function(){
   if(window.gxExitConfirm) return;
   var EMO = {matchsq:'🪵',treasure:'🗝️',vault:'🔐',matchsticks:'🔥',dayriddle:'📅',spotdiff:'🔍',ludo:'🎲',connect4:'🔴',domino:'🎴',chess:'♟️',checkers:'⚫',colorcards:'🎴',memory:'🧠',rps:'✊',backgammon:'🎲',snakes:'🐍',reflex:'⚡',math:'➗',numguess:'🔢',placemem:'📍',sqorder:'🔲',bus:'🚌',tmm:'🎯',
-    billiards:'🎱',stack:'🧱',cube:'🧊',blocky:'🟦',darts:'🎯',bowling:'🎳',millionaire:'👑',fawazeer:'🧩',revword:'🔤',who:'🕵️',crossmath:'➕',rollpaint:'🎨',simon:'🎵',quiz:'❓',mystery:'🕵️',emojibible:'😀',proverb:'📜'};
+    billiards:'🎱',stack:'🧱',cube:'🧊',blocky:'🟦',darts:'🎯',bowling:'🎳',millionaire:'👑',fawazeer:'🧩',revword:'🔤',who:'🕵️',crossmath:'➕',rollpaint:'🎨',simon:'🎵',quiz:'❓',mystery:'🕵️',emojibible:'😀',proverb:'📜',mpmil:'👑'};
   var open = null;
   function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function art(g){
