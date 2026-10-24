@@ -47417,9 +47417,9 @@ load(true);
 (function(){
 'use strict';
 if(window.__booking) return; window.__booking = 1;
-var KEYC = 'glavera-codes-v1', KEY = 'glavera-booking-v1', KEY2 = 'glavera-about-v1', WKEY = 'glavera-visa-wallet', KEY3 = 'glavera-glrank-v1', KEY4 = 'glavera-cap-order-v1';
+var KEY = 'glavera-booking-v1', KEY2 = 'glavera-about-v1', WKEY = 'glavera-visa-wallet', KEY3 = 'glavera-glrank-v1', KEY4 = 'glavera-cap-order-v1';
 var DEF_CATS = [
-  {id:'c_eve',  title:'أمسية', icon:'🌙', color:'linear-gradient(145deg,#7A5CFF,#3A24B8)'},
+  {id:'c_eve',  title:'أمسية', icon:'img:eve', color:'linear-gradient(145deg,#7A5CFF,#3A24B8)'},
   {id:'c_trip', title:'رحلة',  icon:'🚌', color:'linear-gradient(145deg,#2FD0C0,#1479C9)'},
   {id:'c_work', title:'ورشة',  icon:'🛠️', color:'linear-gradient(145deg,#FF9A5C,#E8458C)'},
   {id:'c_conf', title:'مؤتمر', icon:'🎤', color:'linear-gradient(145deg,#F1B53F,#D9622B)'}
@@ -47428,6 +47428,9 @@ var PALETTE = ['linear-gradient(145deg,#7A5CFF,#3A24B8)','linear-gradient(145deg
 var B = {cats:JSON.parse(JSON.stringify(DEF_CATS)), events:[], about:{tagline:'', about:'', sections:[]}, imgs:{}, imgReq:{}, rank:{}, t:0, sig:'', p:null};
 var PI = {cover:null, photos:[]};   /* صور فورم إضافة فعالية (لسه ما اتحفظتش) */
 var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+var EVE_IMG = 'data:image/webp;base64,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';
+var ci = function(ic){ ic = String(ic==null?'':ic); return ic==='img:eve' ? '<img class="ci-img" alt="" src="'+EVE_IMG+'">' : esc(ic); };
+var ct = function(ic){ ic = String(ic==null?'':ic); return esc(ic==='img:eve' ? '🧑‍🤝‍🧑' : ic); };
 if(typeof VISA_TX_META!=='undefined'){
   VISA_TX_META.booking_deposit = {label:'عربون حجز', ico:'🎟️', sign:-1, cat:'shop'};
   VISA_TX_META.booking_refund  = {label:'استرداد عربون', ico:'↩️', sign:1, cat:'shop'};
@@ -47447,9 +47450,9 @@ async function doLoad(){
   try{
     var o = await jg(KEY, null), a = await jg(KEY2, null), rk = await jg(KEY3, null); B.rank = (rk && typeof rk==='object') ? rk : {}; var co = await jg(KEY4, null); B.capOrder = Array.isArray(co) ? co : []; window.__capOrder = B.capOrder;
     B.cats = (o && Array.isArray(o.cats)) ? o.cats : JSON.parse(JSON.stringify(DEF_CATS));
+    B.cats.forEach(function(c){ if(c && c.id==='c_eve' && (c.icon==='🌙' || c.icon==='🧑‍🤝‍🧑')) c.icon='img:eve'; });
     B.events = (o && o.events) || [];
     B.about = baseAbout(a);
-    try{ var cc = await jg(KEYC, null); B.codes = (cc && cc.codes) || []; }catch(_){}
     var sig = JSON.stringify([B.cats, B.events, B.about, B.rank, B.capOrder]), ch = sig!==B.sig; B.sig = sig; B.t = Date.now();
     if(ch && relevant()) safeRender();
     runReminders();
@@ -47506,7 +47509,12 @@ function dayNum(e){ var d = dt(e); return d ? d.toLocaleDateString('ar-EG',{day:
 function monShort(e){ var d = dt(e); return d ? d.toLocaleDateString('ar-EG',{month:'short'}) : ''; }
 function longDate(e){ var d = dt(e); return d ? d.toLocaleDateString('ar-EG',{weekday:'long', day:'numeric', month:'long'}) : ''; }
 function timeTxt(e){ if(!e.time) return ''; var d = dt(e); return d ? d.toLocaleTimeString('ar-EG',{hour:'numeric', minute:'2-digit'}) : e.time; }
-function booked(e){ var t=0; Object.keys(e.res||{}).forEach(function(k){ t+=people(R(e,k)); }); return t; }
+function booked(e){ return Object.keys(e.res||{}).length; }
+function stopsOf(e){ return String(e.stops||'').split('\n').map(function(x){ return x.trim(); }).filter(Boolean).slice(0,12); }
+function progOf(e){ return String(e.program||'').split('\n').map(function(l){ var q = l.split('|').map(function(x){ return x.trim(); }); if(!q[0]) return null; return q.length>1 ? {t:q[0], n:q[1]||q[0], w:q[2]||''} : {t:'', n:q[0], w:''}; }).filter(Boolean).slice(0,30); }
+function lastTs(e){ if(!e.lastBook) return null; var d = new Date(e.lastBook); return isNaN(d.getTime()) ? null : d.getTime(); }
+function deadlinePassed(e){ var t = lastTs(e); return t!=null && Date.now()>t; }
+function isClosed(e){ return e.status==='closed' || deadlinePassed(e); }
 function seatsLeft(e){ return (+e.cap>0) ? Math.max(0, +e.cap - booked(e)) : Infinity; }
 function upcoming(e){ return !isPast(e); }
 function byDate(a,b){ var x = dt(a), y = dt(b); return (x?x.getTime():9e15) - (y?y.getTime():9e15); }
@@ -47537,7 +47545,7 @@ function coverHtml(e, k){
   var im = imgs(e.id), bg = im.cover ? 'background-image:url('+im.cover+')' : 'background:'+((k&&k.color)||PALETTE[0]);
   var all = (im.cover?1:0) + (im.photos||[]).length;
   return '<div class="bk-cover'+(im.cover?'':' ph')+'" style="'+bg+'"'+(all?' data-bk="view" data-id="'+esc(e.id)+'" data-i="0"':'')+'>'
-    + (im.cover ? '' : '<span class="bk-cover-ico">'+esc(e.icon||(k&&k.icon)||'🎟️')+'</span>')
+    + (im.cover ? '' : '<span class="bk-cover-ico">'+ci(e.icon||(k&&k.icon)||'🎟️')+'</span>')
     + '<div class="bk-date"><b>'+esc(dayNum(e))+'</b><span>'+esc(monShort(e))+'</span></div>'
     + (all>1 ? '<span class="bk-cover-n">🖼️ '+all+'</span>' : '') + '</div>';
 }
@@ -47545,9 +47553,8 @@ function actHtml(e){
   var pid = state.pid, r = R(e, pid), d = dep(e), id = esc(e.id);
   var wl = Object.keys(e.wait||{}).sort(function(a,b){ return e.wait[a]-e.wait[b]; }), wi = wl.indexOf(String(pid));
   if(r){
-    d = depOf(e, r);
     var depLine = d ? (r.paid ? '<div class="bk-ok sm">💳 العربون مدفوع ('+d+' نقطة)</div>' : '<div class="bk-warn">⏳ العربون لسه ما اتدفعش ('+d+' نقطة)</div>') : '';
-    return '<div class="bk-ok">✅ مكانك محجوز'+(people(r)>1?' ('+people(r)+' أفراد)':'')+'</div>'+depLine+confHtml(e, r)
+    return '<div class="bk-ok">✅ مكانك محجوز</div>'+depLine
       + '<div class="bk-btns"><button type="button" class="bk-btn" data-bk="ticket" data-id="'+id+'">🎫 تذكرتي</button>'
       + (d && !r.paid ? '<button type="button" class="bk-btn pay" data-bk="paydep" data-id="'+id+'">💳 ادفع العربون</button>' : '')
       + '<button type="button" class="bk-btn ghost" data-bk="cancel" data-id="'+id+'">إلغاء</button></div>';
@@ -47557,55 +47564,308 @@ function actHtml(e){
     if(wi>-1) return '<div class="bk-warn">⏳ أنت في قايمة الانتظار — رقمك '+(wi+1)+' من '+wl.length+'</div><div class="bk-btns"><button type="button" class="bk-btn ghost" data-bk="leavewait" data-id="'+id+'">خروج من القايمة</button></div>';
     return '<div class="bk-note">😔 اكتمل العدد'+(wl.length?' — '+wl.length+' في الانتظار':'')+'</div><div class="bk-btns"><button type="button" class="bk-btn" data-bk="joinwait" data-id="'+id+'">⏳ ضيفني في قايمة الانتظار</button></div>';
   }
+  if(d) return '<div class="bk-btns"><button type="button" class="bk-btn pay" data-bk="book" data-mode="visa" data-id="'+id+'">💳 احجز وادفع العربون ('+d+' نقطة)</button><button type="button" class="bk-btn ghost" data-bk="book" data-mode="cash" data-id="'+id+'">💵 احجز وادفع كاش</button></div>';
   return '<div class="bk-btns"><button type="button" class="bk-btn" data-bk="book" data-id="'+id+'">🎟️ احجز مكانك</button></div>';
 }
-function evCard(e){
-  var pid = state.pid, r = R(e, pid), k = cat(e.cat), left = seatsLeft(e), cap = +e.cap>0, n = booked(e);
-  var full = left===0, pct = cap ? Math.min(100, Math.round(n/e.cap*100)) : 0, urgent = cap && left>0 && left<=3;
-  var im = imgs(e.id), ph = im.photos || [];
-  var meta = [];
-  if(e.time) meta.push('🕒 '+esc(timeTxt(e)));
-  if(e.place) meta.push('📍 '+esc(e.place));
-  if(e.price) meta.push('💰 '+esc(e.price));
-  if(dep(e)) meta.push('💳 عربون '+dep(e)+' نقطة');
-  var w = whenTxt(e), mu = mapsUrl(e);
-  return '<div class="bk-ev'+(r?' mine':'')+'">'
-    + (r ? '<div class="bk-stamp">✓ تم الحجز</div>' : '')
-    + coverHtml(e, k)
-    + '<div class="bk-ev-body"><div class="bk-ev-tt"><b>'+esc(e.title)+'</b><small>'+esc(longDate(e))+(w?' · <em>'+w+'</em>':'')+'</small></div>'
-    + (meta.length ? '<div class="bk-meta">'+meta.map(function(m){ return '<span>'+m+'</span>'; }).join('')+'</div>' : '')
-    + (e.desc ? '<div class="bk-desc">'+esc(e.desc).replace(/\n/g,'<br>')+'</div>' : '')
-    + (ph.length ? '<div class="bk-strip">'+ph.map(function(s,i){ return '<span class="bk-sp" data-bk="view" data-id="'+esc(e.id)+'" data-i="'+(i+(im.cover?1:0))+'" style="background-image:url('+s+')"></span>'; }).join('')+'</div>' : '')
-    + (mu ? '<a class="bk-map" href="'+esc(mu)+'" target="_blank" rel="noopener">📍 افتح المكان على الخريطة</a>' : '')
-    + (cap ? '<div class="bk-seats'+(urgent?' hot':'')+'"><div class="bk-bar"><i style="width:'+pct+'%"></i></div><small>'+(full ? 'العدد اكتمل ('+n+'/'+e.cap+')' : (urgent ? '🔥 باقي '+left+' أماكن بس!' : 'باقي '+left+' من '+e.cap+' مكان'))+'</small></div>' : '<div class="bk-seats"><small>👥 '+n+' محجوز · الأماكن مفتوحة</small></div>')
-    + '<div class="bk-act">'+actHtml(e)+'</div></div></div>';
+/* ===== GLV-BK2: كارت الحجز الاحترافي (بدون أسماء الحاجزين) ===== */
+function fmtNum(n){ try{ return (+n).toLocaleString('ar-EG'); }catch(_){ return String(n); } }
+function cdParts(ms){ ms = Math.max(0, ms); var s = Math.floor(ms/1000), d = Math.floor(s/86400); s -= d*86400; var h = Math.floor(s/3600); s -= h*3600; var m = Math.floor(s/60); s -= m*60; return {d:d, h:h, m:m, s:s}; }
+function cdBoxes(ms){
+  var p = cdParts(ms);
+  return '<div class="bk-cdb">'+[['d','يوم'],['h','ساعة'],['m','دقيقة'],['s','ثانية']].map(function(u){ return '<span><b data-u="'+u[0]+'">'+fmtNum(p[u[0]])+'</b><i>'+u[1]+'</i></span>'; }).join('')+'</div>';
 }
+function cdTxt(ms){
+  if(!(ms>0)) return null;
+  var s = Math.floor(ms/1000), d = Math.floor(s/86400); s -= d*86400; var h = Math.floor(s/3600); s -= h*3600; var m = Math.floor(s/60); s -= m*60;
+  return (d ? fmtNum(d)+' يوم · ' : '')+fmtNum(h)+' س · '+fmtNum(m)+' د · '+fmtNum(s)+' ث';
+}
+function tickCd(){
+  var els = document.querySelectorAll('[data-bkcd]'); if(!els.length) return;
+  var now = Date.now();
+  els.forEach(function(el){
+    var ms = (+el.dataset.bkcd)-now, box = el.querySelector('.bk-cdb');
+    if(box){
+      if(ms<=0){ box.outerHTML = '<b class="bk-cd-done">'+(el.dataset.done||'—')+'</b>'; return; }
+      var p = cdParts(ms); box.querySelectorAll('[data-u]').forEach(function(b){ var v = fmtNum(p[b.dataset.u]); if(b.textContent!==v){ b.textContent = v; b.classList.remove('tick'); void b.offsetWidth; b.classList.add('tick'); } });
+    } else { var b2 = el.querySelector('b'); if(b2) b2.textContent = cdTxt(ms) || el.dataset.done || '—'; }
+  });
+}
+function seatsHtml2(e){
+  var cap = +e.cap>0, n = booked(e), left = seatsLeft(e);
+  if(!cap) return '<div class="bk2-seat"><div class="bk2-sl"><span><b>'+fmtNum(n)+'</b> محجوز</span><em>الأماكن مفتوحة</em></div></div>';
+  var pct = Math.min(100, Math.round(n/e.cap*100)), hot = left>0 && left<=3, full = left===0;
+  return '<div class="bk2-seat'+(hot?' hot':'')+(full?' full':'')+'"><div class="bk2-sl"><span><b>'+fmtNum(n)+'</b> / '+fmtNum(e.cap)+' محجوز</span><em>'+(full ? 'اكتمل العدد' : hot ? '🔥 باقي '+fmtNum(left)+' بس' : 'باقي '+fmtNum(left)+' مكان')+'</em></div><div class="bk2-bar"><i style="width:'+Math.max(n?4:0,pct)+'%"></i></div></div>';
+}
+function tile2(cls, ic, lab, val, sub, href){
+  var inner = '<span class="bk2-ti">'+ic+'</span><div class="bk2-tx"><small>'+lab+'</small><b>'+val+'</b>'+(sub?'<em>'+sub+'</em>':'')+'</div>';
+  return href ? '<a class="bk2-tile '+cls+'" href="'+esc(href)+'" target="_blank" rel="noopener">'+inner+'</a>' : '<div class="bk2-tile '+cls+'">'+inner+'</div>';
+}
+function cover2(e, k, r, full){
+  var im = imgs(e.id), bg = im.cover ? 'background-image:url('+im.cover+')' : 'background:'+((k&&k.color)||PALETTE[0]);
+  var all = (im.cover?1:0) + (im.photos||[]).length, w = whenTxt(e);
+  var chip = r ? '<span class="bk2-chip ok">✅ محجوز</span>' : (isClosed(e) ? '<span class="bk2-chip off">🔒 مقفول</span>' : (full ? '<span class="bk2-chip off">مكتمل</span>' : (w ? '<span class="bk2-chip">'+esc(w)+'</span>' : '')));
+  return '<div class="bk2-cv'+(im.cover?'':' ph')+'" style="'+bg+'"'+(all?' data-bk="view" data-id="'+esc(e.id)+'" data-i="0"':'')+'>'
+    + (im.cover ? '' : '<span class="bk2-cvi">'+ci(e.icon||(k&&k.icon)||'🎟️')+'</span>')
+    + '<div class="bk2-chips">'+chip+(all>1?'<span class="bk2-chip dim">🖼️ '+all+'</span>':'')+'</div>'
+    + '<div class="bk2-cvt">'+(k?'<span class="bk2-cat">'+ci(k.icon)+' '+esc(k.title)+'</span>':'')+'<h3>'+esc(e.title)+'</h3></div></div>';
+}
+function actHtml2(e){
+  var pid = state.pid, r = R(e, pid), d = dep(e), id = esc(e.id);
+  var wl = Object.keys(e.wait||{}).sort(function(a,b){ return e.wait[a]-e.wait[b]; }), wi = wl.indexOf(String(pid));
+  var share = isPast(e) ? '' : '<button type="button" class="bk2-tool" data-bk="share" data-id="'+id+'">📤 شارك</button>';
+  if(r){
+    var paid = !d || r.paid;
+    var steps = '<div class="bk2-steps"><div class="s ok"><i>✓</i><span>تم الحجز</span></div>'
+      + '<div class="s '+(!d?'na':paid?'ok':'cur')+'"><i>'+(!d?'–':paid?'✓':'٢')+'</i><span>'+(!d?'بدون عربون':paid?'العربون مدفوع':'ادفع العربون')+'</span></div>'
+      + '<div class="s '+(paid?'ok':'')+'"><i>'+(paid?'✓':'٣')+'</i><span>'+(paid?'التذكرة جاهزة':'التذكرة')+'</span></div></div>';
+    var sum = r.stop ? '<div class="bk2-sum">🚌 '+esc(r.stop)+'</div>' : '';
+    var cta = (d && !r.paid)
+      ? '<button type="button" class="bk2-cta pay" data-bk="paydep" data-id="'+id+'"><span>💳 ادفع العربون</span><small>'+fmtNum(d)+' نقطة</small></button><button type="button" class="bk2-sec" data-bk="ticket" data-id="'+id+'">🎫 تذكرتي</button>'
+      : '<button type="button" class="bk2-cta" data-bk="ticket" data-id="'+id+'"><span>🎫 تذكرتي</span><small>اعرض الكود عند الباب</small></button>';
+    var ics = isPast(e) ? '' : '<button type="button" class="bk2-sec" data-bk="ics" data-id="'+id+'">📅 ضيف الأمسية للتقويم</button>';
+    return steps + sum + '<div class="bk2-ctas">'+cta+ics+'</div>'
+      + '<div class="bk2-tools">'+(!isPast(e)?'<button type="button" class="bk2-tool" data-bk="editbook" data-id="'+id+'">✏️ تعديل</button>':'')+share+'<button type="button" class="bk2-tool danger" data-bk="cancel" data-id="'+id+'">إلغاء الحجز</button></div>';
+  }
+  if(isClosed(e)) return '<div class="bk2-state off">'+(e.status!=='closed'&&deadlinePassed(e)?'⏰ انتهى موعد الحجز':'🔒 الحجز مقفول')+'</div>'+(share?'<div class="bk2-tools">'+share+'</div>':'');
+  if(seatsLeft(e)===0){
+    if(wi>-1) return '<div class="bk2-state wn">⏳ أنت في قايمة الانتظار — رقمك '+fmtNum(wi+1)+' من '+fmtNum(wl.length)+'</div><div class="bk2-tools"><button type="button" class="bk2-tool" data-bk="leavewait" data-id="'+id+'">خروج من القايمة</button>'+share+'</div>';
+    return '<div class="bk2-state off">😔 اكتمل العدد'+(wl.length?' — '+fmtNum(wl.length)+' في الانتظار':'')+'</div><div class="bk2-ctas"><button type="button" class="bk2-cta" data-bk="joinwait" data-id="'+id+'"><span>⏳ ضيفني في قايمة الانتظار</span><small>هنبلغك لو فضي مكان</small></button></div>'+(share?'<div class="bk2-tools">'+share+'</div>':'');
+  }
+  if(d) return '<div class="bk2-ctas"><button type="button" class="bk2-cta pay" data-bk="book" data-mode="visa" data-id="'+id+'"><span>💳 احجز وادفع العربون</span><small>'+fmtNum(d)+' نقطة لتأكيد مكانك</small></button><button type="button" class="bk2-sec" data-bk="book" data-mode="cash" data-id="'+id+'">💵 احجز وادفع كاش</button></div>'+(share?'<div class="bk2-tools">'+share+'</div>':'');
+  return '<div class="bk2-ctas"><button type="button" class="bk2-cta" data-bk="book" data-id="'+id+'"><span>🎟️ احجز مكانك</span><small>'+(+e.cap>0 ? 'باقي '+fmtNum(seatsLeft(e))+' مكان' : 'الحجز مجاني ومفتوح')+'</small></button></div>'+(share?'<div class="bk2-tools">'+share+'</div>':'');
+}
+function evCard(e){
+  var pid = state.pid, r = R(e, pid), k = cat(e.cat), full = seatsLeft(e)===0, im = imgs(e.id), ph = im.photos || [];
+  var w = whenTxt(e), mu = mapsUrl(e), d = dt(e), ts = d ? d.getTime() : 0, lt = lastTs(e);
+  var tiles = '';
+  if(longDate(e)) tiles += tile2('t-date','📅','التاريخ',esc(longDate(e)), w?esc(w):'');
+  if(e.time) tiles += tile2('t-time','🕒','الساعة',esc(timeTxt(e)), '');
+  if(e.place) tiles += tile2('t-place','📍','المكان',esc(e.place), mu?'افتح الخريطة ›':'', mu);
+  if(e.price || dep(e)) tiles += tile2('t-price','💰','السعر',esc(e.price||'—'), dep(e)?'عربون '+fmtNum(dep(e))+' نقطة':'');
+  var cd = (d && !isPast(e) && ts>Date.now()) ? '<div class="bk-cd bk2-cd" data-bkcd="'+ts+'" data-done="بدأت دلوقتي 🎉"><small>⏳ باقي على الموعد</small>'+cdBoxes(ts-Date.now())+'</div>' : '';
+  var dl = (lt && e.status!=='closed' && !isPast(e)) ? (lt>Date.now() ? '<div class="bk2-dl" data-bkcd="'+lt+'" data-done="انتهى موعد الحجز">⏰ آخر موعد للحجز بعد <b>'+esc(cdTxt(lt-Date.now())||'')+'</b></div>' : '<div class="bk2-dl off">⏰ انتهى موعد الحجز</div>') : '';
+  return '<div class="bk2-ev'+(r?' mine':'')+'">'
+    + cover2(e, k, r, full)
+    + '<div class="bk2-body">'
+    + (tiles ? '<div class="bk2-tiles">'+tiles+'</div>' : '')
+    + (e.desc ? '<div class="bk2-desc">'+esc(e.desc).replace(/\n/g,'<br>')+'</div>' : '')
+    + cd + dl
+    + seatsHtml2(e) + extra2(e)
+    + (ph.length ? '<div class="bk-strip">'+ph.map(function(s,i){ return '<span class="bk-sp" data-bk="view" data-id="'+esc(e.id)+'" data-i="'+(i+(im.cover?1:0))+'" style="background-image:url('+s+')"></span>'; }).join('')+'</div>' : '')
+    + '<div class="bk2-act">'+actHtml2(e)+'</div></div></div>';
+}
+if(!window.__bkCdT) window.__bkCdT = setInterval(tickCd, 1000);
+/* ===== GLV-BK2:END ===== */
+/* ===== GLV-BK3: مواصلات + برنامج + آخر موعد + تعديل الحجز + مشاركة + شبكة الفعاليات ===== */
+function extra2(e){
+  var h = '', pg = progOf(e);
+  if(pg.length) h += '<details class="bk-prog bk2-prog"><summary>📋 برنامج الأمسية ('+fmtNum(pg.length)+' فقرة)</summary><div class="bk-pl">'
+    + pg.map(function(p){ return '<div class="bk-pi2"><span class="bk-pt">'+esc(p.t||'•')+'</span><div><b>'+esc(p.n)+'</b>'+(p.w?'<small>🎤 '+esc(p.w)+'</small>':'')+'</div></div>'; }).join('')+'</div></details>';
+  var st = stopsOf(e);
+  if(st.length) h += '<div class="bk2-note">🚌 مواصلات متاحة من: '+st.map(esc).join(' · ')+'</div>';
+  return h;
+}
+function shareEv(id){
+  var e = evt(id); if(!e) return; var mu = mapsUrl(e), link = location.href.split('#')[0].split('?')[0];
+  var t = '🎟️ *'+e.title+'*\n📅 '+longDate(e)+(e.time?' — '+timeTxt(e):'')+(e.place?'\n📍 '+e.place:'')+(mu?'\n🗺️ '+mu:'')+(e.price?'\n💰 '+e.price:'')+(+e.cap>0?'\n👥 الأماكن محدودة ('+e.cap+')':'')+'\n\nاحجز مكانك من التطبيق:\n'+link;
+  try{ window.open('https://wa.me/?text='+encodeURIComponent(t), '_blank'); }catch(_){ if(navigator.share) navigator.share({text:t}).catch(function(){}); }
+}
+function openBookForm(id, mode, edit){
+  var e = evt(id), pid = state.pid; if(!e || !pid) return;
+  var r = edit ? R(e, pid) : null; if(edit && !r) return;
+  if(!edit){
+    if(isPast(e)){ showToast('الفعالية خلصت', true); return; }
+    if(isClosed(e)){ showToast(deadlinePassed(e) ? 'انتهى موعد الحجز' : 'الحجز مقفول', true); return; }
+    if(!stopsOf(e).length){ if(mode==='wait') return joinWait(id); return book(id, mode||undefined); }
+  }
+  var st = stopsOf(e), k = cat(e.cat), im = imgs(e.id), cur = r ? (r.stop||'') : '';
+  var ttl = edit ? 'تعديل حجزك' : (mode==='wait' ? 'قايمة الانتظار' : 'احجز مكانك');
+  var bg = im.cover ? 'background-image:url('+im.cover+')' : 'background:'+((k&&k.color)||PALETTE[0]);
+  overlay('bk-fm', '<div class="bk-fcard bkq"><button type="button" class="bk-ov-x" data-bk="ovclose">✕</button>'
+    + '<div class="bkq-head" style="'+bg+'"><span class="bkq-orb o1"></span><span class="bkq-orb o2"></span><span class="bkq-orb o3"></span><div class="bkq-ico">'+ci(e.icon||(k&&k.icon)||'🎟️')+'</div><div class="bkq-ht"><b>'+ttl+'</b><small>'+esc(e.title)+' · '+esc(longDate(e))+(e.time?' · '+esc(timeTxt(e)):'')+'</small></div></div>'
+    + '<div class="bkq-body">'
+    + '<div class="bkq-who"><i>👤</i><div><small>الاسم</small><b>'+esc(pname(pid))+'</b></div></div>'
+    + (st.length ? '<div class="bkq-blk"><div class="bkq-lab"><i>🚌</i>المواصلات</div><div class="bkq-chips"><button type="button" class="bkq-chip'+(cur?'':' on')+'" data-bk="bfstop" data-v="">🚶 هاجي بنفسي</button>'
+        + st.map(function(x){ return '<button type="button" class="bkq-chip'+(cur===x?' on':'')+'" data-bk="bfstop" data-v="'+esc(x)+'">🚌 '+esc(x)+'</button>'; }).join('')+'</div><input type="hidden" id="bkf-stop" value="'+esc(cur)+'"></div>' : '')
+    + '<label class="bkq-f"><i>📝</i><span>ملاحظات (اختياري)</span><textarea id="bkf-note" rows="2" maxlength="200" placeholder="أي حاجة تحب المنظمين يعرفوها">'+esc(r ? (r.note||'') : '')+'</textarea></label>'
+    + (dep(e) && !edit && mode==='visa' ? '<div class="bk-warn">💳 هيتخصم العربون ('+dep(e)+' نقطة) من الفيزا</div>' : '')
+    + (mode==='wait' ? '<div class="bk-note sm">هنبلّغك أول ما يتفتح مكان</div>' : '')
+    + '<button type="button" class="bkq-go" data-bk="bfsubmit" data-id="'+esc(id)+'" data-mode="'+esc(mode||'')+'" data-edit="'+(edit?1:'')+'"><span>'+(edit?'💾 حفظ التعديل':(mode==='wait'?'⏳ ضيفني للانتظار':'🎟️ اطلع تذكرتي'))+'</span></button>'
+    + '</div></div>');
+}
+function readForm(){
+  var g = function(i){ var el = document.getElementById(i); return el ? el.value : ''; };
+  return {stop:g('bkf-stop'), note:String(g('bkf-note')).trim()};
+}
+async function editBook(id, x){
+  var pid = state.pid, res = 'x';
+  await ju(KEY, function(o){ o = base(o); var e = o.events.find(function(y){ return y.id===id; });
+    if(!e || !e.res || !e.res[pid]){ res = 'nf'; return o; }
+    if(isPast(e)){ res = 'past'; return o; }
+    var r = e.res[pid]; r.stop = x.stop; r.note = x.note; e.res[pid] = r; res = 'ok'; return o; });
+  if(res==='ok') showToast('اتحدّث حجزك ✅');
+  else showToast({nf:'الحجز مش موجود', past:'الفعالية خلصت'}[res]||'حصلت مشكلة', true);
+  await refresh();
+}
+async function submitForm(id, mode, edit){
+  var x = readForm();
+  var ov = document.querySelector('.bk-ov.bk-fm'); if(ov) ov.remove();
+  if(edit) return editBook(id, x);
+  if(mode==='wait') return joinWait(id, x);
+  return book(id, mode||undefined, x);
+}
+function extraFields(p, e){
+  e = e || {};
+  return '<div class="fx-sep">إعدادات متقدمة للحجز</div>'
+    + '<label class="emp-lab" for="'+p+'last">آخر موعد للحجز (اختياري — بعده الحجز بيتقفل لوحده)</label><input id="'+p+'last" class="field" type="datetime-local" value="'+esc(e.lastBook||'')+'">'
+    + '<label class="emp-lab" for="'+p+'stops">نقاط تجمع المواصلات — كل نقطة في سطر (سيبها فاضية لو مفيش مواصلات)</label><textarea id="'+p+'stops" class="field" rows="3" placeholder="مصر الجديدة — 5:00 م&#10;مدينة نصر — 5:20 م">'+esc(e.stops||'')+'</textarea>'
+    + '<label class="emp-lab" for="'+p+'prog">برنامج الأمسية — كل فقرة في سطر بالشكل: الوقت | الفقرة | المتحدث</label><textarea id="'+p+'prog" class="field" rows="4" placeholder="7:00 م | الاستقبال&#10;7:30 م | فقرة الترانيم | فريق الكورال&#10;8:15 م | كلمة الأمسية | أبونا فلان">'+esc(e.program||'')+'</textarea>';
+}
+function readExtra(p){ return {lastBook:gv(p+'last'), stops:gv(p+'stops'), program:gv(p+'prog')}; }
+function openBkSet(id){
+  var e = evt(id); if(!e) return;
+  overlay('bk-fm', '<div class="bk-fcard"><button type="button" class="bk-ov-x" data-bk="ovclose">✕</button><div class="bk-ft">⚙️ إعدادات الحجز</div><div class="bk-fs">'+esc(e.title)+'</div>'
+    + extraFields('bke-', e)
+    + '<div class="bk-btns" style="margin-top:12px"><button type="button" class="bk-btn" data-bk="bksave" data-id="'+esc(id)+'">💾 حفظ</button></div></div>');
+}
+function evTile(e, ix){
+  var pid = state.pid, r = R(e, pid), k = cat(e.cat), im = imgs(e.id), left = seatsLeft(e), cap = +e.cap>0, full = cap && left===0, hot = cap && left>0 && left<=3;
+  var hh = hash(String(e.id)+'t') % 360;
+  var bg = im.cover ? 'background-image:url('+im.cover+')' : 'background:linear-gradient(150deg,hsl('+hh+',72%,52%),hsl('+((hh+55)%360)+',74%,24%))';
+  var chip = r ? '<span class="bk3-st ok">✅ محجوز</span>' : isClosed(e) ? '<span class="bk3-st off">🔒 مقفول</span>' : full ? '<span class="bk3-st off">مكتمل</span>' : hot ? '<span class="bk3-st hot">🔥 باقي '+fmtNum(left)+'</span>' : '';
+  var w = whenTxt(e);
+  return '<button type="button" class="bk3-tile'+(r?' mine':'')+'" data-bk="evopen" data-id="'+esc(e.id)+'" style="--i:'+ix+';--h:'+hh+'">'
+    + '<span class="bk3-bg'+(im.cover?'':' ph')+'" style="'+bg+'">'+(im.cover?'':'<span class="bk3-ico">'+ci(e.icon||(k&&k.icon)||'🎟️')+'</span>')+'</span>'
+    + '<span class="bk3-shade"></span>'
+    + '<span class="bk3-leaf"><b>'+esc(dayNum(e))+'</b><i>'+esc(monShort(e))+'</i></span>'
+    + chip
+    + '<span class="bk3-info"><b>'+esc(e.title)+'</b>'
+    + '<small>'+(e.time?'🕒 '+esc(timeTxt(e)):'')+(e.place?(e.time?' · ':'')+'📍 '+esc(e.place):'')+'</small>'
+    + '<span class="bk3-foot"><em>'+(w?esc(w):'&nbsp;')+'</em><u>'+(e.price?'💰 '+esc(e.price):'')+'</u></span></span>'
+    + '</button>';
+}
+/* ===== GLV-BK3:END ===== */
+/* ===== GLV-BK4: تقييم الأمسيات + تقويم + إحصائيات + رسالة للحاجزين ===== */
+function stars(n){ n = Math.max(0, Math.min(5, Math.round(+n||0))); return '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n); }
+function pastHtml(pid){
+  var l = B.events.filter(function(e){ return isPast(e) && R(e, pid); }).sort(function(a,b){ return byDate(b,a); }).slice(0,6);
+  if(!l.length) return '';
+  return '<div class="bk-sec">⭐ أمسيات فاتت — قيّمها</div>'+l.map(function(e){
+    var rt = (e.rt||{})[pid], im = imgs(e.id), ph = (im.cover?[im.cover]:[]).concat(im.photos||[]);
+    return '<div class="bk-past"><div class="bk-past-h"><b>'+esc(e.title)+'</b><small>'+esc(longDate(e))+((e.att||{})[pid]?' · ✅ حضرت':'')+'</small></div>'
+      + (ph.length ? '<div class="bk-strip">'+ph.slice(0,8).map(function(s,i){ return '<span class="bk-sp" data-bk="view" data-id="'+esc(e.id)+'" data-i="'+i+'" style="background-image:url('+s+')"></span>'; }).join('')+'</div>' : '')
+      + '<div class="bk-past-r">'+(rt
+          ? '<span class="bk-stars">'+stars(rt.s)+'</span>'+(rt.c?'<small>«'+esc(rt.c)+'»</small>':'')+'<button type="button" class="bk-btn ghost sm" data-bk="rate" data-id="'+esc(e.id)+'">✏️ عدّل تقييمي</button>'
+          : '<button type="button" class="bk-btn sm" data-bk="rate" data-id="'+esc(e.id)+'">⭐ قيّم الأمسية</button>')+'</div></div>';
+  }).join('');
+}
+function openRate(id){
+  var e = evt(id), pid = state.pid; if(!e || !R(e, pid)) return;
+  var cur = (e.rt||{})[pid] || {s:0, c:''};
+  overlay('bk-fm', '<div class="bk-fcard"><button type="button" class="bk-ov-x" data-bk="ovclose">✕</button><div class="bk-ft">⭐ قيّم «'+esc(e.title)+'»</div><div class="bk-fs">رأيك بيوصل للمنظمين ويساعدنا نحسّن الجاي</div>'
+    + '<div class="bk-starpick">'+[1,2,3,4,5].map(function(i){ return '<button type="button" data-bk="star" data-v="'+i+'" class="'+(i<=cur.s?'on':'')+'">★</button>'; }).join('')+'</div>'
+    + '<input type="hidden" id="bkr-v" value="'+(+cur.s||0)+'"><textarea id="bkr-c" class="field" rows="3" maxlength="300" placeholder="رأيك في الأمسية (اختياري)">'+esc(cur.c||'')+'</textarea>'
+    + '<div class="bk-btns" style="margin-top:12px"><button type="button" class="bk-btn" data-bk="ratesave" data-id="'+esc(id)+'">حفظ التقييم</button></div></div>');
+}
+function icsEv(id){
+  var e = evt(id); if(!e) return; var d = dt(e); if(!d) return;
+  var p2 = function(n){ return ('0'+n).slice(-2); };
+  var f = function(x){ return x.getFullYear()+p2(x.getMonth()+1)+p2(x.getDate())+'T'+p2(x.getHours())+p2(x.getMinutes())+'00'; };
+  var t = function(x){ return String(x||'').replace(/[\\;,]/g,'\\$&').replace(/\r?\n/g,'\\n'); };
+  var mu = mapsUrl(e), end = new Date(d.getTime()+2*36e5);
+  var txt = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Glafera//AR','BEGIN:VEVENT','UID:'+e.id+'@glv','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z','DTSTART:'+f(d),'DTEND:'+f(end),
+    'SUMMARY:'+t(e.title),'LOCATION:'+t(e.place),'DESCRIPTION:'+t((e.desc||'')+(mu?'\n'+mu:'')),'BEGIN:VALARM','TRIGGER:-PT2H','ACTION:DISPLAY','DESCRIPTION:'+t('تذكير: '+e.title),'END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  try{
+    var url = URL.createObjectURL(new Blob([txt], {type:'text/calendar;charset=utf-8'})), a = document.createElement('a');
+    a.href = url; a.download = 'event.ics'; document.body.appendChild(a); a.click();
+    setTimeout(function(){ a.remove(); URL.revokeObjectURL(url); }, 1500);
+    showToast('📅 اتحمّل — افتحه عشان يتضاف للتقويم');
+  }catch(_){ showToast('معرفتش أحمّل ملف التقويم', true); }
+}
+function bkBars(obj, total){
+  var ks = Object.keys(obj).sort(function(a,b){ return obj[b]-obj[a]; });
+  if(!ks.length) return '<div class="fx-hint">لا توجد بيانات.</div>';
+  return '<div class="bk-bars">'+ks.map(function(k){ return '<div class="bk-br"><span title="'+esc(k)+'">'+esc(k)+'</span><i><u style="width:'+Math.max(4, Math.round(obj[k]/(total||1)*100))+'%"></u></i><em>'+obj[k]+'</em></div>'; }).join('')+'</div>';
+}
+function openStats(id){
+  var e = evt(id); if(!e) return;
+  var ids = Object.keys(e.res||{}), N = ids.length;
+  var attN = ids.filter(function(p){ return (e.att||{})[p]; }).length;
+  var pc = function(a,b){ return b ? Math.round(a/b*100) : 0; };
+  var byS = {}, byD = {};
+  ids.forEach(function(p){ var r = R(e,p);
+    if(stopsOf(e).length){ var s0 = r.stop || 'هيجي بنفسه'; byS[s0] = (byS[s0]||0)+1; }
+    var dk = new Date(r.ts||0), key = dk.getFullYear()+'-'+('0'+(dk.getMonth()+1)).slice(-2)+'-'+('0'+dk.getDate()).slice(-2); byD[key] = (byD[key]||0)+1; });
+  var dayRows = Object.keys(byD).sort().slice(-7), byDl = {};
+  dayRows.forEach(function(k){ var p = k.split('-'); byDl[new Date(+p[0], +p[1]-1, +p[2]).toLocaleDateString('ar-EG',{day:'numeric', month:'short'})] = byD[k]; });
+  var paid = ids.filter(function(p){ return R(e,p).paid; }).length;
+  var rts = Object.keys(e.rt||{}).map(function(k){ return e.rt[k]; }), avg = rts.length ? (rts.reduce(function(a,r){ return a+(+r.s||0); }, 0)/rts.length) : 0;
+  var cms = rts.filter(function(r){ return r.c; }).slice(-10).reverse();
+  var left = (+e.cap>0) ? seatsLeft(e) : '∞';
+  var kp = function(n,l){ return '<div><b>'+n+'</b><small>'+l+'</small></div>'; };
+  overlay('bk-fm', '<div class="bk-fcard"><button type="button" class="bk-ov-x" data-bk="ovclose">✕</button><div class="bk-ft">📊 إحصائيات «'+esc(e.title)+'»</div>'
+    + '<div class="bk-kp">'+kp(N,'حجز')+kp(left,'مكان فاضي')+kp(Object.keys(e.wait||{}).length,'انتظار')
+      + kp(attN+' ('+pc(attN,N)+'٪)','حضروا')+kp(Math.max(0,N-attN),'لم يحضروا')+(dep(e) ? kp(paid+'/'+N,'عربون مدفوع') : kp(rts.length ? avg.toFixed(1)+' ★' : '—','التقييم ('+rts.length+')'))+'</div>'
+    + (dep(e) ? '<div class="fx-hint">التقييم: '+(rts.length ? avg.toFixed(1)+' ★ ('+rts.length+')' : 'لسه مفيش')+'</div>' : '')
+    + (stopsOf(e).length ? '<div class="fx-sep">المواصلات</div>'+bkBars(byS, N) : '')
+    + '<div class="fx-sep">الحجز يوم بيوم (آخر ٧ أيام)</div>'+bkBars(byDl, N)
+    + (cms.length ? '<div class="fx-sep">آراء المشاركين</div>'+cms.map(function(r){ return '<div class="bk-cm"><span class="bk-stars">'+stars(r.s)+'</span> '+esc(r.c)+'</div>'; }).join('') : '')
+    + '</div>');
+}
+function openMsg(id){
+  var e = evt(id); if(!e) return;
+  var ids = Object.keys(e.res||{}), att = ids.filter(function(p){ return (e.att||{})[p]; }).length;
+  overlay('bk-fm', '<div class="bk-fcard"><button type="button" class="bk-ov-x" data-bk="ovclose">✕</button><div class="bk-ft">📣 رسالة للحاجزين</div><div class="bk-fs">«'+esc(e.title)+'» — بتوصل كإشعار جوه التطبيق</div>'
+    + '<label class="emp-lab" for="bkm-aud">اتبعت لـ</label><select id="bkm-aud" class="field"><option value="all">كل المحجوزين ('+ids.length+')</option><option value="att">اللي حضروا ('+att+')</option><option value="abs">اللي لسه ما حضروش ('+(ids.length-att)+')</option><option value="wait">قايمة الانتظار ('+Object.keys(e.wait||{}).length+')</option></select>'
+    + '<label class="emp-lab" for="bkm-txt">الرسالة</label><textarea id="bkm-txt" class="field" rows="4" maxlength="300" placeholder="مثال: الأمسية بدأت، الباب هيتقفل الساعة ٧:٣٠"></textarea>'
+    + '<div class="bk-btns" style="margin-top:12px"><button type="button" class="bk-btn" data-bk="msgsend" data-id="'+esc(id)+'">📣 إرسال</button></div></div>');
+}
+function sendMsg(id){
+  var e = evt(id); if(!e) return;
+  var aud = gv('bkm-aud'), txt = gv('bkm-txt'); if(!txt){ showToast('اكتب الرسالة الأول', true); return; }
+  var ids = Object.keys(e.res||{}), t;
+  if(aud==='att') t = ids.filter(function(p){ return (e.att||{})[p]; });
+  else if(aud==='abs') t = ids.filter(function(p){ return !(e.att||{})[p]; });
+  else if(aud==='wait') t = Object.keys(e.wait||{});
+  else t = ids;
+  if(!t.length){ showToast('مفيش حد في الفئة دي', true); return; }
+  t.forEach(function(p){ try{ pushNotification(p, '📣 «'+e.title+'»: '+txt, '📣'); }catch(_){} });
+  var ov = document.querySelector('.bk-ov.bk-fm'); if(ov) ov.remove();
+  showToast('اتبعتت الرسالة لـ '+t.length+' مشارك ✅');
+}
+/* ===== GLV-BK4:END ===== */
 window.FXVIEWS = window.FXVIEWS || {};
 window.FXVIEWS.book = function(){
   ensure();
   var pid = state.pid, cid = state.bkCat, c = cid ? cat(cid) : null;
   if(cid && !c){ state.bkCat = null; cid = null; }
-  var upc = B.events.filter(upcoming).filter(visFor);
+  var upc = B.events.filter(upcoming);
   if(c){
     var list = upc.filter(function(e){ return e.cat===c.id; }).sort(byDate);
-    return '<div class="back-row"><button class="icon-btn" data-bk="back">'+ICO.back+'</button><div class="back-title">'+esc(c.icon)+' '+esc(c.title)+'</div></div>'
-      + '<div class="bk-banner" style="--bk-c:'+esc(c.color)+'"><span class="bk-banner-ico">'+esc(c.icon)+'</span><div><b>'+esc(c.title)+'</b><small>'+(list.length ? list.length+' متاح للحجز' : 'مفيش حاجة متاحة دلوقتي')+'</small></div></div>'
-      + (list.length ? list.map(evCard).join('') : '<div class="empty-note">لسه مفيش '+esc(c.title)+' متاحة — ترقّب الجاي 💛</div>');
+    var one = list.length===1 ? list[0] : (state.bkEv ? list.filter(function(x){ return x.id===state.bkEv; })[0] : null);
+    if(state.bkEv && !one) state.bkEv = null;
+    var head = '<div class="back-row"><button class="icon-btn" data-bk="back">'+ICO.back+'</button><div class="back-title">'+ci(c.icon)+' '+esc(c.title)+'</div></div>';
+    if(!list.length) return head + '<div class="empty-note">لسه مفيش '+esc(c.title)+' متاحة — ترقّب الجاي 💛</div>';
+    if(one) return head + evCard(one);
+    return head
+      + '<div class="bk-banner" style="--bk-c:'+esc(c.color)+'"><span class="bk-banner-ico">'+ci(c.icon)+'</span><div><b>'+esc(c.title)+'</b><small>'+list.length+' متاح للحجز</small></div></div>'
+      + '<div class="bk3-hint">✨ اختار اللي يعجبك وادوس عليه تشوف التفاصيل</div>'
+      + '<div class="bk3-grid">'+list.map(evTile).join('')+'</div>';
   }
   var mine = upc.filter(function(e){ return R(e, pid); }).sort(byDate);
   var tiles = B.cats.map(function(k){
-    var n = upc.filter(function(e){ return e.cat===k.id && e.status!=='closed'; }).length;
+    var n = upc.filter(function(e){ return e.cat===k.id && !isClosed(e); }).length;
     var tot = upc.filter(function(e){ return e.cat===k.id; }).length;
     return '<button type="button" class="bk-tile" style="--bk-c:'+esc(k.color)+'" data-bk="cat" data-id="'+esc(k.id)+'">'
-      + '<span class="bk-tile-shine"></span><span class="bk-tile-ico">'+esc(k.icon)+'</span>'
+      + '<span class="bk-tile-shine"></span><span class="bk-tile-ico">'+ci(k.icon)+'</span>'
       + '<span class="bk-tile-name">'+esc(k.title)+'</span>'
       + '<span class="bk-tile-badge'+(n?'':' off')+'">'+(n ? n+' متاح' : (tot ? 'مقفول' : 'قريبًا'))+'</span>'
       + '<span class="bk-tile-go">›</span></button>';
   }).join('');
-  var mineHtml = mine.length ? '<div class="bk-mine"><div class="bk-sec">🎟️ حجوزاتي</div>'+mine.map(function(e){ var k = cat(e.cat), r = R(e, pid), w = whenTxt(e); return '<div class="bk-chip"><button type="button" class="bk-chip-main" data-bk="open" data-id="'+esc(e.id)+'" data-cat="'+esc(e.cat)+'"><span>'+esc((k&&k.icon)||'📅')+'</span><b>'+esc(e.title)+'</b><small>'+esc(w||longDate(e))+(dep(e)&&!r.paid?' · ⏳ عربون':'')+'</small></button><button type="button" class="bk-chip-qr" data-bk="ticket" data-id="'+esc(e.id)+'" title="تذكرتي">🎫</button></div>'; }).join('')+'</div>' : '';
+  var mineHtml = mine.length ? '<div class="bk-mine"><div class="bk-sec">🎟️ حجوزاتي</div>'+mine.map(function(e){ var k = cat(e.cat), r = R(e, pid), w = whenTxt(e); return '<div class="bk-chip"><button type="button" class="bk-chip-main" data-bk="open" data-id="'+esc(e.id)+'" data-cat="'+esc(e.cat)+'"><span>'+ci((k&&k.icon)||'📅')+'</span><b>'+esc(e.title)+'</b><small>'+esc(w||longDate(e))+(dep(e)&&!r.paid?' · ⏳ عربون':'')+'</small></button><button type="button" class="bk-chip-qr" data-bk="ticket" data-id="'+esc(e.id)+'" title="تذكرتي">🎫</button></div>'; }).join('')+'</div>' : '';
   return '<div class="back-row"><button class="icon-btn" data-action="back">'+ICO.back+'</button><div class="back-title">احجز الآن</div></div>'
     + '<div class="bk-hero"><div class="bk-hero-ico">🎟️</div><div><b>احجز مكانك</b><small>اختار النوع وبعدها اختار الفعالية اللي تناسبك</small></div></div>'
-    + mineHtml
+    + mineHtml + pastHtml(pid)
     + (B.cats.length ? '<div class="bk-sec">اختار نوع الفعالية</div><div class="bk-grid">'+tiles+'</div>' : '<div class="empty-note">لسه الأدمن مضافش أنواع للحجز 💛</div>');
 };
 
@@ -47618,7 +47878,7 @@ var GL_EDS = [
   {n:4, num:'٤', ico:'🎤', color:'linear-gradient(145deg,#F1B53F,#D9622B)'}
 ];
 function confCat(){ return B.cats.find(function(c){ return c.id==='c_conf'; }) || B.cats.find(function(c){ return /مؤتمر/.test(c.title||''); }); }
-function confEvents(){ var c = confCat(); if(!c) return []; return B.events.filter(function(e){ return e.cat===c.id && upcoming(e) && visFor(e); }).sort(byDate); }
+function confEvents(){ var c = confCat(); if(!c) return []; return B.events.filter(function(e){ return e.cat===c.id && upcoming(e); }).sort(byDate); }
 function glEdText(n){ var t = (B.about.eds||{})[n]; return t ? '<div class="card gl-about">'+esc(t).replace(/\n/g,'<br>')+'</div>' : ''; }
 function rankList(n){ return ((B.rank||{})[n]||[]).slice().sort(function(a,b){ return (+b.pts||0)-(+a.pts||0); }); }
 function rankHtml(n){
@@ -47678,8 +47938,8 @@ function evAdmin(e){
   var rows = ids.map(function(pid){
     var r = R(e, pid), came = (e.att||{})[pid];
     var badges = (d ? (r.paid ? '<em class="bk-b ok">💳 '+(r.via==='visa'?'فيزا':'كاش')+'</em>' : '<em class="bk-b wn">⏳ عربون</em>') : '')
-      + (r.confirmed ? '<em class="bk-b ok">👍 أكد</em>' : '') + ((r.guests||[]).length ? '<em class="bk-b">+'+r.guests.length+': '+esc(r.guests.join('، '))+'</em>' : '') + (came ? '<em class="bk-b ok">✅ حضر</em>' : '') + (r.via==='wait' ? '<em class="bk-b">من الانتظار</em>' : '');
-    return '<div class="bk-row"><div class="bk-who">'+av(person(pid))+'<div><b>'+esc(pname(pid))+'</b><div class="bk-bs">'+badges+'<code>'+tcode(e.id,pid)+'</code></div></div></div><div class="bk-ra">'
+      + (came ? '<em class="bk-b ok">✅ حضر</em>' : '') + (r.via==='wait' ? '<em class="bk-b">من الانتظار</em>' : '') + (r.stop ? '<em class="bk-b">🚌 '+esc(r.stop)+'</em>' : '');
+    return '<div class="bk-row"><div class="bk-who">'+av(person(pid))+'<div><b>'+esc(pname(pid))+'</b><div class="bk-bs">'+badges+'<code>'+tcode(e.id,pid)+'</code></div>'+(r.note ? '<div style="margin-top:3px;font-size:11.5px;opacity:.75">📝 '+esc(r.note)+'</div>' : '')+'</div></div><div class="bk-ra">'
       + (d && !r.paid ? '<button type="button" class="bk-mini" data-bk="markpaid" data-id="'+esc(e.id)+'" data-pid="'+esc(pid)+'" title="تأكيد استلام العربون كاش">💵</button>' : '')
       + '<button type="button" class="bk-mini" data-bk="att" data-id="'+esc(e.id)+'" data-pid="'+esc(pid)+'" title="تسجيل/إلغاء الحضور">'+(came?'↩︎':'✅')+'</button>'
       + '<button type="button" class="bk-x" data-bk="kick" data-id="'+esc(e.id)+'" data-pid="'+esc(pid)+'" title="شيله من الحجز">✕</button></div></div>';
@@ -47689,15 +47949,18 @@ function evAdmin(e){
   var avail = PARTICIPANTS.filter(function(p){ return !(e.res||{})[p.id]; });
   var add = avail.length ? '<div class="bk-add"><select id="bk-sel-'+esc(e.id)+'" class="field"><option value="">➕ احجز لمشارك…</option>'+avail.map(function(p){ return '<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>'; }).join('')+'</select><button type="button" class="bk-btn sm" data-bk="addp" data-id="'+esc(e.id)+'">إضافة</button></div>' : '';
   return '<div class="card bk-acard'+(past?' past':'')+'">'
-    + '<div class="bk-ahead">'+(im.cover?'<span class="bk-athumb" style="background-image:url('+im.cover+')"></span>':'<span class="bk-ai">'+esc(e.icon||(k&&k.icon)||'📅')+'</span>')+'<div class="bk-at"><b>'+esc(e.title)+'</b><small>'+esc((k?k.title+' · ':'')+longDate(e)+(e.time?' · '+timeTxt(e):''))+'</small></div><span class="bk-st '+(past?'p':(open?'o':'c'))+'">'+(past?'انتهت':(open?'مفتوح':'مقفول'))+'</span></div>'
+    + '<div class="bk-ahead">'+(im.cover?'<span class="bk-athumb" style="background-image:url('+im.cover+')"></span>':'<span class="bk-ai">'+ci(e.icon||(k&&k.icon)||'📅')+'</span>')+'<div class="bk-at"><b>'+esc(e.title)+'</b><small>'+esc((k?k.title+' · ':'')+longDate(e)+(e.time?' · '+timeTxt(e):''))+'</small></div><span class="bk-st '+(past?'p':((open&&!deadlinePassed(e))?'o':'c'))+'">'+(past?'انتهت':(open?(deadlinePassed(e)?'انتهى الموعد':'مفتوح'):'مقفول'))+'</span></div>'
     + (cap ? '<div class="bk-seats"><div class="bk-bar"><i style="width:'+pct+'%"></i></div><small>'+ids.length+' / '+e.cap+' محجوز'+(wl.length?' · '+wl.length+' انتظار':'')+(att?' · '+att+' حضر':'')+(d?' · عربون '+d:'')+'</small></div>' : '<div class="bk-seats"><small>'+ids.length+' محجوز · بدون حد أقصى'+(att?' · '+att+' حضر':'')+(d?' · عربون '+d:'')+'</small></div>')
+    + ((lastTs(e)||stopsOf(e).length||progOf(e).length||Object.keys(e.rt||{}).length) ? '<div style="margin-top:8px;font-size:12px;opacity:.8">'+(lastTs(e) ? '⏰ آخر حجز: '+new Date(lastTs(e)).toLocaleString('ar-EG',{day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}) : '')+(stopsOf(e).length ? ' · 🚌 '+stopsOf(e).length+' نقطة' : '')+(progOf(e).length ? ' · 📋 برنامج' : '')+(Object.keys(e.rt||{}).length ? ' · ⭐ '+(Object.keys(e.rt).reduce(function(a,k){ return a+(+e.rt[k].s||0); },0)/Object.keys(e.rt).length).toFixed(1)+' ('+Object.keys(e.rt).length+')' : '')+'</div>' : '')
     + '<details class="bk-det"><summary>👥 المحجوزين ('+ids.length+')</summary>'+(rows||'<div class="fx-hint">لسه حد ما حجزش.</div>')+add+'</details>'
     + (wl.length ? '<details class="bk-det"><summary>⏳ قايمة الانتظار ('+wl.length+')</summary>'+wrows+'</details>' : '')
     + '<div class="bk-aacts"><button type="button" class="bk-btn sm" data-bk="scan" data-id="'+esc(e.id)+'">📷 مسح التذاكر</button>'
     + '<button type="button" class="bk-btn sm ghost" data-bk="remind" data-id="'+esc(e.id)+'">🔔 ذكّر المحجوزين</button>'
-    + '<button type="button" class="bk-btn sm ghost" data-bk="vis" data-id="'+esc(e.id)+'">👁️ مين يشوفها ('+(e.vis&&e.vis.length?e.vis.length:'الكل')+')</button>'
+    + '<button type="button" class="bk-btn sm ghost" data-bk="msg" data-id="'+esc(e.id)+'">📣 رسالة للحاجزين</button>'
+    + '<button type="button" class="bk-btn sm ghost" data-bk="estats" data-id="'+esc(e.id)+'">📊 إحصائيات</button>'
     + '<button type="button" class="bk-btn sm ghost" data-bk="toggle" data-id="'+esc(e.id)+'">'+(open?'🔒 اقفل':'🔓 افتح')+'</button>'
     + '<button type="button" class="bk-btn sm ghost" data-bk="cap" data-id="'+esc(e.id)+'">✏️ السعة</button>'
+    + '<button type="button" class="bk-btn sm ghost" data-bk="bkset" data-id="'+esc(e.id)+'">⚙️ إعدادات الحجز</button>'
     + '<button type="button" class="bk-btn sm ghost" data-bk="eimg" data-id="'+esc(e.id)+'">🖼️ الغلاف</button>'
     + '<button type="button" class="bk-btn sm ghost" data-bk="eph" data-id="'+esc(e.id)+'">📷 صور المكان'+((im.photos||[]).length?' ('+im.photos.length+')':'')+'</button>'
     + ((im.cover||(im.photos||[]).length) ? '<button type="button" class="bk-btn sm ghost" data-bk="eclr" data-id="'+esc(e.id)+'">🧹 مسح الصور</button>' : '')
@@ -47709,11 +47972,11 @@ window.FXADMIN.book = function(){
   ensure();
   var tot = B.events.reduce(function(s,e){ return s+booked(e); }, 0);
   var kp = adminKpis([{num:B.events.filter(upcoming).length, lab:'فعالية جاية'},{num:tot, lab:'حجز'},{num:B.cats.length, lab:'نوع'}]);
-  var catChips = B.cats.map(function(c){ return '<span class="bk-cc" style="--bk-c:'+esc(c.color)+'">'+esc(c.icon)+' '+esc(c.title)+'<button type="button" data-bk="delcat" data-id="'+esc(c.id)+'" title="حذف النوع">✕</button></span>'; }).join('');
+  var catChips = B.cats.map(function(c){ return '<span class="bk-cc" style="--bk-c:'+esc(c.color)+'">'+ci(c.icon)+' '+esc(c.title)+'<button type="button" data-bk="delcat" data-id="'+esc(c.id)+'" title="حذف النوع">✕</button></span>'; }).join('');
   var catForm = '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">أنواع الفعاليات (الخانات المربعة)</div>'
     + '<div class="bk-ccs">'+(catChips||'<div class="fx-hint">مفيش أنواع.</div>')+'</div>'
     + '<div style="display:flex;gap:8px;margin-top:10px"><input id="bkc-ico" class="field" style="flex:1" value="🎉" maxlength="4"><input id="bkc-name" class="field" style="flex:3" placeholder="اسم نوع جديد (مثال: ريتريت)" maxlength="30"><button type="button" class="bk-btn sm" data-bk="addcat">➕</button></div></div>';
-  var opts = B.cats.map(function(c){ return '<option value="'+esc(c.id)+'">'+esc(c.icon)+' '+esc(c.title)+'</option>'; }).join('');
+  var opts = B.cats.map(function(c){ return '<option value="'+esc(c.id)+'">'+ct(c.icon)+' '+esc(c.title)+'</option>'; }).join('');
   var form = '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">فعالية جديدة</div>'
     + '<label class="emp-lab" for="bk-cat">النوع</label><select id="bk-cat" class="field">'+opts+'</select>'
     + '<label class="emp-lab" for="bk-title">اسم الفعالية</label><input id="bk-title" class="field" maxlength="80" placeholder="مثال: أمسية ترانيم الصيف">'
@@ -47723,6 +47986,7 @@ window.FXADMIN.book = function(){
     + '<div style="display:flex;gap:8px"><div style="flex:1"><label class="emp-lab" for="bk-price">السعر (اختياري)</label><input id="bk-price" class="field" maxlength="30" placeholder="مجاني / 150 ج"></div><div style="flex:1"><label class="emp-lab" for="bk-cap">عدد الأماكن (0 = مفتوح)</label><input id="bk-cap" class="field" type="number" min="0" max="2000" value="30"></div></div>'
     + '<label class="emp-lab" for="bk-dep">العربون بالنقاط (0 = بدون عربون)</label><input id="bk-dep" class="field" type="number" min="0" max="100000" value="0">'
     + '<label class="emp-lab" for="bk-desc">تفاصيل (اختياري)</label><textarea id="bk-desc" class="field" rows="2" maxlength="600"></textarea>'
+    + extraFields('bk-')
     + '<div class="fx-sep">الصور</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="bk-btn sm ghost" data-bk="picov">🖼️ صورة الغلاف</button><button type="button" class="bk-btn sm ghost" data-bk="piph">📷 صور المكان (لحد 5)</button></div><div class="bk-pi" id="bk-pi">'+piHtml()+'</div>'
     + '<div class="sar-actions" style="margin-top:12px"><button type="button" class="btn btn-primary" data-bk="add">➕ إضافة الفعالية</button></div></div>';
   var evs = B.events.slice().sort(function(a,b){ return (isPast(a)-isPast(b)) || byDate(a,b); }).map(evAdmin).join('');
@@ -47818,120 +48082,44 @@ async function refund(pid, amt, e, why){
 function gv(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
 function promoteIn(e, out){
   e.wait = e.wait || {}; e.res = e.res || {};
-  while(+e.cap>0 && booked(e) < +e.cap){
+  while(+e.cap>0 && Object.keys(e.res).length < +e.cap){
     var ks = Object.keys(e.wait).sort(function(a,b){ return e.wait[a]-e.wait[b]; }); if(!ks.length) break;
-    var w = ks[0]; delete e.wait[w]; if(e.res[w]) continue;
-    e.res[w] = {ts:Date.now(), paid:0, via:'wait'}; out.push(w);
+    var w = ks[0], wi0 = (e.wi||{})[w]||{}; delete e.wait[w]; if(e.wi) delete e.wi[w]; if(e.res[w]) continue;
+    e.res[w] = {ts:Date.now(), paid:0, via:'wait', note:wi0.note||'', stop:wi0.stop||''}; out.push(w);
   }
 }
 function notifyPromoted(list, e){
   list.forEach(function(pid){ try{ pushNotification(pid, '🎉 اتفتح مكان ليك في «'+e.title+'»'+(dep(e)?' — ادفع العربون ('+dep(e)+' نقطة) من «احجز الآن» عشان تثبّت مكانك':''), '🎟️'); }catch(_){} });
 }
-function people(r){ return r ? 1+((r.guests||[]).length) : 0; }
-function depOf(e, r){ return (r && r.dp!=null) ? (+r.dp||0) : dep(e); }
-function dpTotal(e, n, cd){ return Math.round(dep(e)*n*(100-(cd?cd.pct:0))/100); }
-async function codeCheck(c){
-  c = String(c||'').trim().toUpperCase(); if(!c) return null;
-  var o = await jg(KEYC, null), x = ((o&&o.codes)||[]).find(function(k){ return k.code===c; });
-  if(!x || (+x.max>0 && (+x.used||0)>=+x.max)) return null;
-  return {code:x.code, pct:Math.max(0, Math.min(100, +x.pct||0))};
-}
-function confHtml(e, r){
-  if((e.att||{})[state.pid]) return '';
-  if(r.confirmed) return '<div class="bk-ok sm">👍 أكدت حضورك</div>';
-  var df = dayDiff(e);
-  return (df===0 || df===1) ? '<div class="bk-btns"><button type="button" class="bk-btn conf" data-bk="confirm" data-id="'+esc(e.id)+'">👍 تأكيد الحضور</button></div>' : '';
-}
-async function book(id, mode, x){
-  x = x || {};
-  var pid = state.pid; if(!pid) return false;
-  var e0 = evt(id); if(!e0) return false;
-  var gs = (x.guests||[]).slice(0,9), n = 1+gs.length, cd = null;
-  if(x.code){ cd = await codeCheck(x.code); if(!cd){ showToast('كود الخصم غير صحيح أو منتهي', true); return false; } }
-  var d = dpTotal(e0, n, cd), paid = 0, via = '';
-  if(d && mode==='visa'){ var ok0 = await chargeDeposit(e0, d); if(!ok0) return false; paid = Date.now(); via = 'visa'; }
+async function book(id, mode, ex){
+  ex = ex || {};
+  var pid = state.pid; if(!pid) return;
+  var e0 = evt(id); if(!e0) return;
+  var d = dep(e0), paid = 0, via = '';
+  if(d && mode==='visa'){ var ok0 = await chargeDeposit(e0, d); if(!ok0) return; paid = Date.now(); via = 'visa'; }
   else if(d && mode==='cash'){ via = 'cash'; }
   var res = 'x';
-  await ju(KEY, function(o){ o = base(o); res = 'nf'; var e = o.events.find(function(y){ return y.id===id; }); if(!e) return o;
+  await ju(KEY, function(o){ o = base(o); res = 'nf'; var e = o.events.find(function(x){ return x.id===id; }); if(!e) return o;
     e.res = e.res || {};
-    if(e.status==='closed'){ res = 'closed'; return o; }
+    if(isClosed(e)){ res = (e.status!=='closed' && deadlinePassed(e)) ? 'late' : 'closed'; return o; }
     if(isPast(e)){ res = 'past'; return o; }
     if(e.res[pid]){ res = 'dup'; return o; }
-    if(+e.cap>0 && booked(e)+n > +e.cap){ res = 'full'; return o; }
+    if(+e.cap>0 && Object.keys(e.res).length >= +e.cap){ res = 'full'; return o; }
     if(e.wait) delete e.wait[pid];
-    e.res[pid] = {ts:Date.now(), bat:Date.now(), paid:paid, via:via, guests:gs, code:cd?cd.code:'', pct:cd?cd.pct:0, dp:d}; res = 'ok'; return o; });
-  var msgs = {nf:'الفعالية مش موجودة', closed:'الحجز مقفول', past:'الفعالية خلصت', dup:'أنت حاجز بالفعل', full:'الأماكن المتاحة مش كفاية للعدد ده 😔'};
+    e.res[pid] = {ts:Date.now(), paid:paid, via:via, note:ex.note||'', stop:ex.stop||''}; res = 'ok'; return o; });
+  var msgs = {nf:'الفعالية مش موجودة', closed:'الحجز مقفول', late:'انتهى موعد الحجز', past:'الفعالية خلصت', dup:'أنت حاجز بالفعل', full:'للأسف العدد اكتمل 😔'};
   if(res!=='ok' && paid) await refund(pid, d, e0, 'تعذّر الحجز');
   await load(true);
   if(res==='ok'){
-    if(cd) ju(KEYC, function(o){ o = o||{codes:[]}; (o.codes||[]).forEach(function(k){ if(k.code===cd.code) k.used = (+k.used||0)+1; }); return o; });
     try{ SND.coinChime(); }catch(_){}
+    showToast('اتحجز مكانك ✅ 🎉');
     try{ pushNotification(pid, 'اتأكد حجزك في «'+e0.title+'» 🎟️'+(e0.date?' — '+longDate(e0):'')+(d&&!paid?' — لسه العربون ('+d+' نقطة)':''), '🎟️'); }catch(_){}
-    render(); setTimeout(function(){ openTicket(id, true); }, 250); return true;
+    render(); setTimeout(function(){ openTicket(id); }, 250); return;
   }
-  showToast(msgs[res]||'حصلت مشكلة', true); render(); return false;
-}
-function pnum(s){ var t = String(s||'').replace(/[٠-٩]/g, function(c){ return c.charCodeAt(0)-1632; }), m = t.match(/\d+(?:\.\d+)?/); return m ? +m[0] : null; }
-function money(s, v){ var sf = String(s||'').replace(/[٠-٩0-9.,]+/g,'').trim(); return v+(sf?' '+esc(sf):''); }
-function openBookSheet(id){
-  var e = evt(id), pid = state.pid; if(!e || !pid) return;
-  if(R(e, pid)){ openTicket(id); return; }
-  var k = cat(e.cat), im = imgs(e.id), d = dep(e), S = {g:[], cd:null, m:d?'visa':'cash'}, busy = false;
-  var left = seatsLeft(e), max = Math.min(9, isFinite(left) ? left-1 : 9);
-  var bg = im.cover ? 'background-image:url('+im.cover+')' : 'background:'+((k&&k.color)||PALETTE[0]);
-  var today = new Date().toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-  var det = [['📅', longDate(e)+(e.time?' — '+timeTxt(e):'')], e.place?['📍', e.place]:null, e.desc?['📝', e.desc]:null, e.price?['💰', e.price]:null, d?['💳', 'عربون '+d+' نقطة للفرد']:null].filter(Boolean)
-    .map(function(x){ return '<div class="bks-d"><i>'+x[0]+'</i><span>'+esc(x[1]).replace(/\n/g,'<br>')+'</span></div>'; }).join('');
-  var ov = overlay('bk-bs', '<div class="bks"><div class="bks-hd" style="'+bg+'"><button type="button" class="bks-x" data-bs="x">✕</button><div><small>'+esc((k&&k.icon)||'')+' '+esc((k&&k.title)||'')+'</small><b>'+esc(e.title)+'</b></div></div>'
-    + '<div class="bks-sc"><label class="emp-lab">الاسم</label><input class="field" readonly value="'+esc(pname(pid))+'">'
-    + '<label class="emp-lab">إضافة أشخاص</label><div id="bs-g"></div>'
-    + (max>0 ? '<button type="button" class="bk-btn sm ghost" data-bs="gadd">➕ إضافة شخص</button>' : '<small class="fx-hint">مفيش أماكن كفاية لإضافة أشخاص</small>')
-    + '<label class="emp-lab">تاريخ الحجز</label><input class="field" readonly value="'+esc(today)+'">'
-    + '<div class="bks-sec">تفاصيل الأمسية</div><div class="bks-card">'+det+'</div>'
-    + '<label class="emp-lab">كود الخصم (لو معاك)</label><div class="bks-code"><input id="bs-code" class="field" dir="ltr" maxlength="20" placeholder="CODE" autocapitalize="characters"><button type="button" class="bk-btn sm" data-bs="code">تطبيق</button></div><div id="bs-cm" class="fx-hint"></div>'
-    + (d ? '<div class="bks-sec">طريقة دفع العربون</div><div class="bks-pay"><button type="button" data-bs="pay" data-m="visa" class="on">💳 فيزا</button><button type="button" data-bs="pay" data-m="cash">💵 كاش</button></div>' : '')
-    + '<div class="bks-sum" id="bs-sum"></div></div>'
-    + '<div class="bks-ft"><button type="button" class="bks-go" data-bs="go">🎟️ احجز الآن</button></div></div>');
-  function paintS(){
-    var n = 1+S.g.filter(function(v){ return v.trim(); }).length, pc = S.cd ? S.cd.pct : 0, pn = pnum(e.price), rows = [['عدد الأفراد', n]];
-    if(pn!=null){ var bs = pn*n, tot = Math.round(bs*(100-pc))/100; rows.push(['السعر', money(e.price, bs)]); if(pc) rows.push(['خصم '+pc+'%', '− '+money(e.price, Math.round(bs*pc)/100)]); rows.push(['الإجمالي', '<b>'+money(e.price, tot)+'</b>']); }
-    else if(e.price) rows.push(['السعر', esc(e.price)]);
-    if(d) rows.push(['العربون المستحق', '<b>'+dpTotal(e, n, S.cd)+' نقطة</b>']);
-    ov.querySelector('#bs-sum').innerHTML = rows.map(function(x){ return '<div><span>'+x[0]+'</span><em>'+x[1]+'</em></div>'; }).join('');
-  }
-  function paintG(focus){
-    var g = ov.querySelector('#bs-g');
-    g.innerHTML = S.g.map(function(v,i){ return '<div class="bks-g"><input class="field" data-gi="'+i+'" maxlength="40" placeholder="اسم الشخص" value="'+esc(v)+'"><button type="button" data-bs="grm" data-i="'+i+'">✕</button></div>'; }).join('');
-    if(focus){ var ins = g.querySelectorAll('input'); if(ins.length) ins[ins.length-1].focus(); }
-    paintS();
-  }
-  ov.addEventListener('input', function(ev){ var i = ev.target.dataset && ev.target.dataset.gi; if(i!=null){ S.g[+i] = ev.target.value; paintS(); } });
-  ov.addEventListener('click', async function(ev){
-    var b = ev.target.closest('[data-bs]'); if(!b) return; var a = b.dataset.bs;
-    if(a==='x') ov.remove();
-    else if(a==='gadd'){ if(S.g.length<max) { S.g.push(''); paintG(true); } else showToast('وصلت للحد الأقصى', true); }
-    else if(a==='grm'){ S.g.splice(+b.dataset.i, 1); paintG(); }
-    else if(a==='pay'){ S.m = b.dataset.m; ov.querySelectorAll('.bks-pay button').forEach(function(x){ x.classList.toggle('on', x===b); }); }
-    else if(a==='code'){
-      var c = ov.querySelector('#bs-code').value, cm = ov.querySelector('#bs-cm');
-      if(!c.trim()){ S.cd = null; cm.textContent = ''; paintS(); return; }
-      cm.textContent = 'بنتأكد…'; S.cd = await codeCheck(c);
-      cm.innerHTML = S.cd ? '<span style="color:#7CF5B8">✅ تم تطبيق خصم '+S.cd.pct+'%</span>' : '<span style="color:#FF8A8A">❌ الكود غير صحيح أو منتهي</span>'; paintS();
-    }
-    else if(a==='go'){
-      if(busy) return; busy = true; b.disabled = true;
-      var raw = ov.querySelector('#bs-code').value.trim();
-      if(!S.cd && raw){ S.cd = await codeCheck(raw); if(!S.cd){ showToast('كود الخصم غير صحيح أو منتهي', true); busy = false; b.disabled = false; return; } }
-      ov.style.display = 'none';
-      var ok = await book(id, S.m, {guests:S.g.map(function(v){ return v.trim(); }).filter(Boolean), code:S.cd?S.cd.code:''});
-      busy = false; b.disabled = false;
-      if(ok) ov.remove(); else ov.style.display = '';
-    }
-  });
-  paintG();
+  showToast(msgs[res]||'حصلت مشكلة', true); render();
 }
 async function payDep(id){
-  var pid = state.pid, e = evt(id); if(!e) return; var r = R(e, pid), d = depOf(e, r);
+  var pid = state.pid, e = evt(id); if(!e) return; var r = R(e, pid), d = dep(e);
   if(!r || r.paid || !d) return;
   var ok = await chargeDeposit(e, d); if(!ok) return;
   var done = false;
@@ -47943,23 +48131,24 @@ async function payDep(id){
 async function cancelBook(id){
   var pid = state.pid; if(!pid) return;
   var e = evt(id); if(!e) return; var r = R(e, pid); if(!r) return;
-  var canRefund = r.paid && r.via==='visa' && depOf(e,r)>0 && hoursTo(e) >= 24;
+  var canRefund = r.paid && r.via==='visa' && dep(e)>0 && hoursTo(e) >= 24;
   var msg = 'تلغي حجزك في «'+e.title+'»؟';
-  if(r.paid && r.via==='visa') msg += canRefund ? '\nهيتردّلك العربون ('+depOf(e,r)+' نقطة).' : '\nالعربون مش بيترد قبل الفعالية بأقل من ٢٤ ساعة.';
+  if(r.paid && r.via==='visa') msg += canRefund ? '\nهيتردّلك العربون ('+dep(e)+' نقطة).' : '\nالعربون مش بيترد قبل الفعالية بأقل من ٢٤ ساعة.';
   if(!confirm(msg)) return;
   var promoted = [];
   await ju(KEY, function(o){ o = base(o); promoted = []; var x = o.events.find(function(y){ return y.id===id; }); if(x && x.res && x.res[pid]){ delete x.res[pid]; if(x.att) delete x.att[pid]; promoteIn(x, promoted); } return o; });
-  if(canRefund) await refund(pid, depOf(e,r), e, 'إلغاء الحجز');
+  if(canRefund) await refund(pid, dep(e), e, 'إلغاء الحجز');
   notifyPromoted(promoted, e);
   showToast('اتلغى الحجز'); await refresh();
 }
-async function joinWait(id){
+async function joinWait(id, ex){
+  ex = ex || {};
   var pid = state.pid; if(!pid) return; var res = 'x';
   await ju(KEY, function(o){ o = base(o); var e = o.events.find(function(y){ return y.id===id; }); if(!e){ res = 'nf'; return o; }
     e.res = e.res || {}; e.wait = e.wait || {};
     if(e.res[pid]){ res = 'dup'; return o; }
     if(!(+e.cap>0 && Object.keys(e.res).length >= +e.cap)){ res = 'open'; return o; }
-    if(!e.wait[pid]) e.wait[pid] = Date.now(); res = 'ok'; return o; });
+    if(!e.wait[pid]) e.wait[pid] = Date.now(); e.wi = e.wi || {}; e.wi[pid] = {note:ex.note||'', stop:ex.stop||''}; res = 'ok'; return o; });
   if(res==='ok') showToast('اتضفت لقايمة الانتظار ⏳ — هنبلّغك لو اتفتح مكان');
   else if(res==='open') showToast('في مكان فاضي — احجز دلوقتي', true);
   await refresh();
@@ -47972,7 +48161,7 @@ async function addEvent(){
   if(!title){ showToast('اكتب اسم الفعالية', true); return; }
   if(!date){ showToast('اختار التاريخ', true); return; }
   var ev = {id:uid('ev'), cat:c, title:title, date:date, time:gv('bk-time'), place:gv('bk-place'), maps:gv('bk-maps'), price:gv('bk-price'), desc:gv('bk-desc'),
-    cap:Math.max(0, Math.min(2000, parseInt(gv('bk-cap'),10)||0)), deposit:Math.max(0, Math.min(100000, parseInt(gv('bk-dep'),10)||0)), status:'open', at:Date.now(), res:{}, wait:{}, att:{}};
+    cap:Math.max(0, Math.min(2000, parseInt(gv('bk-cap'),10)||0)), deposit:Math.max(0, Math.min(100000, parseInt(gv('bk-dep'),10)||0)), status:'open', at:Date.now(), res:{}, wait:{}, att:{}, lastBook:gv('bk-last'), stops:gv('bk-stops'), program:gv('bk-prog')};
   await ju(KEY, function(o){ o = base(o); o.events.push(ev); return o; });
   if(PI.cover || PI.photos.length){ var pc = PI.cover, pp = PI.photos.slice(); await saveImgs(ev.id, function(o){ if(pc) o.cover = pc; o.photos = pp; }); }
   PI = {cover:null, photos:[]};
@@ -47998,7 +48187,7 @@ async function deleteEvent(id){
   var e = evt(id); if(!e) return;
   var vs = Object.keys(e.res||{}).filter(function(p){ var r = R(e,p); return r && r.paid && r.via==='visa'; });
   if(!confirm('تحذف الفعالية دي وكل حجوزاتها؟'+(vs.length?'\nهيتردّ العربون لـ '+vs.length+' مشارك (فيزا).':''))) return;
-  for(var i=0;i<vs.length;i++){ var r = R(e, vs[i]); await refund(vs[i], depOf(e,r), e, 'اتلغت الفعالية'); }
+  for(var i=0;i<vs.length;i++){ var r = R(e, vs[i]); await refund(vs[i], dep(e), e, 'اتلغت الفعالية'); }
   Object.keys(e.res||{}).forEach(function(p){ try{ pushNotification(p, 'اتلغت فعالية «'+e.title+'» اللي كنت حاجز فيها', '⚠️'); }catch(_){} });
   await ju(KEY, function(o){ o = base(o); o.events = o.events.filter(function(x){ return x.id!==id; }); return o; });
   try{ await window.storage.delete(IK(id), true); }catch(_){}
@@ -48016,61 +48205,17 @@ function openViewer(id, idx){
   var ov = overlay('bk-view', '<button type="button" class="bk-ov-x" data-bk="ovclose">✕</button><div class="bk-vwrap">'+list.map(function(s){ return '<div class="bk-vslide"><img src="'+s+'" alt=""></div>'; }).join('')+'</div><div class="bk-vcount">'+list.length+' صورة — اسحب للتنقل</div>');
   var w = ov.querySelector('.bk-vwrap'); setTimeout(function(){ w.scrollLeft = -(idx||0) * w.clientWidth; w.scrollTo({left: -(idx||0)*w.clientWidth, behavior:'instant'}); }, 30);
 }
-function tkConfetti(cv, W, H){
-  var c = cv.getContext('2d'), P = [], cols = ['#FFE29A','#F1B53F','#7CF5B8','#7A5CFF','#FF6B9D','#2FD0C0']; cv.width = W; cv.height = H;
-  for(var i=0;i<130;i++) P.push({x:W/2, y:H*.45, vx:(Math.random()-.5)*15, vy:-Math.random()*15-4, s:5+Math.random()*7, r:Math.random()*6, vr:(Math.random()-.5)*.4, c:cols[i%6], l:1});
-  (function f(){ c.clearRect(0,0,W,H); var live = 0;
-    P.forEach(function(p){ p.x+=p.vx; p.y+=p.vy; p.vy+=.36; p.vx*=.99; p.r+=p.vr; p.l-=.008;
-      if(p.l>0 && p.y<H+20){ live++; c.save(); c.globalAlpha = Math.max(0,p.l); c.translate(p.x,p.y); c.rotate(p.r); c.fillStyle = p.c; c.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); c.restore(); } });
-    if(live && cv.isConnected) requestAnimationFrame(f); })();
-}
-function openTicket(id, fresh, quiet){
+function openTicket(id){
   var e = evt(id), pid = state.pid; if(!e) return; var r = R(e, pid); if(!r){ showToast('مفيش حجز ليك هنا', true); return; }
-  var k = cat(e.cat), came = (e.att||{})[pid], d = depOf(e, r), gs = r.guests||[], n = people(r), df = dayDiff(e);
-  var bat = new Date(r.bat||r.ts).toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'});
-  var rows = [['👤','الاسم',pname(pid)], gs.length?['👥','معاه',gs.join('، ')]:null, ['📅','الميعاد',longDate(e)+(e.time?' — '+timeTxt(e):'')], e.place?['📍','المكان',e.place]:null,
-    ['🗓️','تاريخ الحجز',bat], ['🎫','عدد الأفراد',n], e.price?['💰','السعر',e.price+(r.code?' · كود '+r.code+' (−'+r.pct+'%)':'')]:null].filter(Boolean);
-  var rowsH = rows.map(function(x,i){ return '<div class="tkx-row" style="animation-delay:'+(.8+i*.11)+'s"><i>'+x[0]+'</i><span><small>'+x[1]+'</small><b>'+esc(x[2])+'</b></span></div>'; }).join('');
-  var bars = ''; for(var i=0;i<34;i++) bars += '<u style="height:'+(8+((i*7)%5)*5)+'px;animation-delay:'+(i*.05)+'s"></u>';
-  var stT = came ? '✅ تم تسجيل حضورك' : (r.confirmed ? '👍 أكدت حضورك' : (d&&!r.paid ? '⏳ العربون لسه ما اتدفعش ('+d+' نقطة)' : '🎟️ تذكرة صالحة — اعرضها عند الدخول'));
-  var stC = (came||r.confirmed) ? 'ok' : (d&&!r.paid ? 'wn' : '');
-  var canConf = !r.confirmed && !came && (df===0 || df===1);
-  var ov = overlay('bk-tk'+(quiet?' quiet':''), '<canvas class="tkx-fx"></canvas><button type="button" class="bk-ov-x" data-bk="ovclose">✕</button>'
-    + '<div class="tkx-tilt"><div class="tkx-card">'
-    + '<div class="tkx-top" style="background-image:'+esc((k&&k.color)||PALETTE[0])+'"><span class="tkx-orb o1"></span><span class="tkx-orb o2"></span><em class="tkx-tag">GLAVERA · تذكرة دخول</em><span class="tkx-ico">'+esc(e.icon||(k&&k.icon)||'🎟️')+'</span><b>'+esc(e.title)+'</b></div>'
-    + '<div class="tkx-cut"><i></i><u></u><i></i></div>'
-    + '<div class="tkx-body">'+rowsH
-    + '<div class="tkx-qr" id="bk-qr"><span class="tkx-scan"></span></div><div class="tkx-code" dir="ltr">'+tcode(id,pid)+'</div>'
-    + '<div class="tkx-bars">'+bars+'</div><div class="tkx-st '+stC+'">'+stT+'</div></div>'
-    + '<div class="tkx-stamp">✓ مؤكدة</div><div class="tkx-shine"></div></div></div>'
-    + (canConf ? '<button type="button" class="bks-go tkx-conf" data-bk="confirm" data-id="'+esc(id)+'">👍 تأكيد الحضور</button>' : ''));
-  try{ createQR('bk-qr', {text:tpayload(id,pid), width:170, height:170, colorDark:'#0b1230', colorLight:'#ffffff', correctLevel:(window.QRCode && QRCode.CorrectLevel) ? QRCode.CorrectLevel.M : undefined}); }catch(err){ var q = document.getElementById('bk-qr'); if(q) q.insertAdjacentHTML('beforeend','<b dir="ltr" style="color:#0b1230">'+tcode(id,pid)+'</b>'); }
-  var card = ov.querySelector('.tkx-tilt');
-  ov.addEventListener('pointermove', function(ev){ var bb = card.getBoundingClientRect(), x = (ev.clientX-bb.left)/bb.width-.5, y = (ev.clientY-bb.top)/bb.height-.5; card.style.setProperty('--ry', (x*18)+'deg'); card.style.setProperty('--rx', (-y*18)+'deg'); card.style.setProperty('--mx', ((x+.5)*100)+'%'); });
-  ov.addEventListener('pointerleave', function(){ card.style.setProperty('--ry','0deg'); card.style.setProperty('--rx','0deg'); });
-  if(fresh){ setTimeout(function(){ if(ov.isConnected) tkConfetti(ov.querySelector('.tkx-fx'), ov.clientWidth, ov.clientHeight); try{ vibrate([30,40,70]); }catch(_){} }, 700); }
-}
-function visFor(e){ var pid = String(state.pid); return !e.vis || !e.vis.length || e.vis.indexOf(pid)>-1 || !!R(e, state.pid); }
-function openVisSheet(id){
-  var e = evt(id); if(!e) return;
-  var cur = (e.vis && e.vis.length) ? e.vis.map(String) : PARTICIPANTS.map(function(p){ return String(p.id); });
-  var rows = PARTICIPANTS.map(function(p){ return '<label class="bks-vr"><input type="checkbox" value="'+esc(p.id)+'"'+(cur.indexOf(String(p.id))>-1?' checked':'')+'><span>'+esc(p.name)+'</span></label>'; }).join('');
-  var ov = overlay('bk-bs', '<div class="bks"><div class="bks-hd" style="background:linear-gradient(145deg,#7A5CFF,#3A24B8)"><button type="button" class="bks-x" data-bs="x">✕</button><div><small>👁️ مين يشوف الفعالية</small><b>'+esc(e.title)+'</b></div></div>'
-    + '<div class="bks-sc"><div class="fx-hint" style="margin:10px 0">اللي تعلّمه هيشوف الفعالية ويحجز. الباقي هيظهرله «قريبًا».</div>'
-    + '<div style="display:flex;gap:8px;margin-bottom:8px"><button type="button" class="bk-btn sm ghost" data-bs="all">تحديد الكل</button><button type="button" class="bk-btn sm ghost" data-bs="none">إلغاء الكل</button></div>'+rows+'</div>'
-    + '<div class="bks-ft"><button type="button" class="bks-go" data-bs="save">💾 حفظ</button></div></div>');
-  ov.addEventListener('click', function(ev){
-    var b = ev.target.closest('[data-bs]'); if(!b) return; var a = b.dataset.bs, bx = ov.querySelectorAll('input[type=checkbox]');
-    if(a==='x') ov.remove();
-    else if(a==='all') bx.forEach(function(c){ c.checked = true; });
-    else if(a==='none') bx.forEach(function(c){ c.checked = false; });
-    else if(a==='save'){
-      var sel = []; bx.forEach(function(c){ if(c.checked) sel.push(c.value); });
-      if(!sel.length){ showToast('اختار شخص واحد على الأقل', true); return; }
-      var v = sel.length===bx.length ? [] : sel;
-      mut(id, function(x){ x.vis = v; }).then(function(){ showToast(v.length ? 'الفعالية ظاهرة لـ '+v.length+' مشارك والباقي «قريبًا»' : 'الفعالية ظاهرة للكل ✅'); ov.remove(); return refresh(); });
-    }
-  });
+  var k = cat(e.cat), came = (e.att||{})[pid], d = dep(e);
+  var ov = overlay('bk-tk', '<div class="bk-tk-card"><button type="button" class="bk-ov-x dark" data-bk="ovclose">✕</button>'
+    + '<div class="bk-tk-top" style="background:'+esc((k&&k.color)||PALETTE[0])+'"><span>'+ci(e.icon||(k&&k.icon)||'🎟️')+'</span><b>'+esc(e.title)+'</b><small>'+esc(longDate(e))+(e.time?' — '+esc(timeTxt(e)):'')+'</small></div>'
+    + '<div class="bk-tk-cut"><i></i><u></u><i></i></div>'
+    + '<div class="bk-tk-body"><div class="bk-tk-name">'+esc(pname(pid))+'</div>'
+    + (e.place ? '<div class="bk-tk-pl">📍 '+esc(e.place)+'</div>' : '')
+    + '<div class="bk-tk-qr" id="bk-qr"></div><div class="bk-tk-code" dir="ltr">'+tcode(id,pid)+'</div>'
+    + '<div class="bk-tk-st '+(came?'ok':(d&&!r.paid?'wn':''))+'">'+(came?'✅ تم تسجيل حضورك':(d&&!r.paid?'⏳ العربون لسه ما اتدفعش ('+d+' نقطة)':'🎟️ تذكرة صالحة — اعرضها عند الدخول'))+'</div></div></div>');
+  try{ createQR('bk-qr', {text:tpayload(id,pid), width:190, height:190, colorDark:'#0b1230', colorLight:'#ffffff', correctLevel: (window.QRCode && QRCode.CorrectLevel) ? QRCode.CorrectLevel.M : undefined}); }catch(err){ var q = document.getElementById('bk-qr'); if(q) q.innerHTML = '<div class="fx-hint">الكود: '+tcode(id,pid)+'</div>'; }
 }
 function openScanner(id){
   var e = evt(id); if(!e) return;
@@ -48136,9 +48281,10 @@ function openScanner(id){
 document.addEventListener('click', function(ev){
   var el = ev.target.closest && ev.target.closest('[data-bk]'); if(!el || el.disabled) return;
   var a = el.dataset.bk, id = el.dataset.id, pid = el.dataset.pid;
-  if(a==='cat'){ state.bkCat = id; try{ SND.nav(); }catch(_){} render(); window.scrollTo(0,0); }
-  else if(a==='open'){ state.bkCat = el.dataset.cat; render(); window.scrollTo(0,0); }
-  else if(a==='back'){ state.bkCat = null; render(); }
+  if(a==='evopen'){ state.bkEv = id; try{ SND.nav(); }catch(_){} render(); window.scrollTo(0,0); }
+  else if(a==='cat'){ state.bkCat = id; state.bkEv = null; try{ SND.nav(); }catch(_){} render(); window.scrollTo(0,0); }
+  else if(a==='open'){ state.bkCat = el.dataset.cat; state.bkEv = id || null; render(); window.scrollTo(0,0); }
+  else if(a==='back'){ if(state.bkEv){ state.bkEv = null; } else { state.bkCat = null; } render(); window.scrollTo(0,0); }
   else if(a==='gobook'){ state.bkCat = null; go('book'); }
   else if(a==='glsub'){ state.glSub = +el.dataset.n || null; try{ SND.nav(); }catch(_){} render(); window.scrollTo(0,0); }
   else if(a==='capup') capMove(el.dataset.page, -1);
@@ -48154,16 +48300,24 @@ document.addEventListener('click', function(ev){
   else if(a==='ovclose'){ var o = el.closest('.bk-ov'); if(o) o.remove(); }
   else if(a==='view') openViewer(id, +el.dataset.i||0);
   else if(a==='ticket') openTicket(id);
-  else if(a==='vis') openVisSheet(id);
-  else if(a==='book') openBookSheet(id);
-  else if(a==='confirm') mut(id, function(x){ var rr = R(x, state.pid); if(rr && !rr.confirmed){ rr.confirmed = Date.now(); x.res[state.pid] = rr; } }).then(function(){ try{ SND.coinChime(); }catch(_){} showToast('اتأكد حضورك 👍'); return load(true); }).then(function(){ render(); if(document.querySelector('.bk-ov.bk-tk')) openTicket(id, false, true); });
-  else if(a==='codeadd'){ var cc = gv('bkcd-code').toUpperCase().replace(/[^A-Z0-9_-]/g,''), cp = Math.max(1, Math.min(100, parseInt(gv('bkcd-pct'),10)||0)), cm = Math.max(0, parseInt(gv('bkcd-max'),10)||0); if(!cc||!cp){ showToast('اكتب الكود والنسبة', true); return; }
-    ju(KEYC, function(o){ o = o||{codes:[]}; o.codes = (o.codes||[]).filter(function(k){ return k.code!==cc; }); o.codes.push({code:cc, pct:cp, max:cm, used:0}); return o; }).then(function(){ showToast('اتضاف الكود ✅'); return refresh(); }); }
-  else if(a==='codedel') ju(KEYC, function(o){ o = o||{codes:[]}; o.codes = (o.codes||[]).filter(function(k){ return k.code!==id; }); return o; }).then(refresh);
+  else if(a==='book') openBookForm(id, el.dataset.mode);
   else if(a==='paydep') payDep(id);
   else if(a==='cancel') cancelBook(id);
-  else if(a==='joinwait') joinWait(id);
-  else if(a==='leavewait') mut(id, function(e){ if(e.wait) delete e.wait[state.pid]; }).then(refresh);
+  else if(a==='joinwait') openBookForm(id, 'wait');
+  else if(a==='editbook') openBookForm(id, '', true);
+  else if(a==='bfsubmit') submitForm(id, el.dataset.mode, el.dataset.edit==='1');
+  else if(a==='bfstop'){ var hs = document.getElementById('bkf-stop'); if(hs) hs.value = el.dataset.v||''; el.parentNode.querySelectorAll('.bkq-chip').forEach(function(b4){ b4.classList.toggle('on', b4===el); }); }
+  else if(a==='share') shareEv(id);
+  else if(a==='ics') icsEv(id);
+  else if(a==='rate') openRate(id);
+  else if(a==='star'){ var sv = +el.dataset.v||0, hv = document.getElementById('bkr-v'); if(hv) hv.value = sv; el.parentNode.querySelectorAll('button').forEach(function(bt){ bt.classList.toggle('on', (+bt.dataset.v)<=sv); }); }
+  else if(a==='ratesave'){ var rv = +(document.getElementById('bkr-v')||{}).value||0; if(!rv){ showToast('اختار عدد النجوم', true); return; } var rc = gv('bkr-c'), rpid = state.pid, rov = el.closest('.bk-ov'); mut(id, function(x){ x.rt = x.rt||{}; x.rt[rpid] = {s:rv, c:rc, ts:Date.now()}; }).then(function(){ if(rov) rov.remove(); showToast('شكرًا على تقييمك ⭐'); return refresh(); }); }
+  else if(a==='estats') openStats(id);
+  else if(a==='msg') openMsg(id);
+  else if(a==='msgsend') sendMsg(id);
+  else if(a==='bkset') openBkSet(id);
+  else if(a==='bksave'){ var x0 = readExtra('bke-'), ov0 = el.closest('.bk-ov'); mut(id, function(e){ e.lastBook = x0.lastBook; e.stops = x0.stops; e.program = x0.program; }).then(function(){ if(ov0) ov0.remove(); showToast('اتحفظت إعدادات الحجز ✅'); return refresh(); }); }
+  else if(a==='leavewait') mut(id, function(e){ if(e.wait) delete e.wait[state.pid]; if(e.wi) delete e.wi[state.pid]; }).then(refresh);
   else if(a==='add') addEvent();
   else if(a==='addcat') addCat();
   else if(a==='picov') pickImages(false, 760, function(l){ PI.cover = l[0]; piRefresh(); });
@@ -48176,8 +48330,8 @@ document.addEventListener('click', function(ev){
   else if(a==='toggle') mut(id, function(e){ e.status = e.status==='closed' ? 'open' : 'closed'; }).then(refresh);
   else if(a==='cap'){ var e = evt(id); if(!e) return; var v = prompt('عدد الأماكن (0 = مفتوح بدون حد)', e.cap||0); if(v===null) return; var n = Math.max(0, Math.min(2000, parseInt(v,10)||0)); var pr = []; ju(KEY, function(o){ o = base(o); pr = []; var x = o.events.find(function(y){ return y.id===id; }); if(x){ x.cap = n; promoteIn(x, pr); } return o; }).then(function(){ notifyPromoted(pr, e); return refresh(); }); }
   else if(a==='kick'){ var e1 = evt(id), r1 = e1 && R(e1, pid), pr1 = []; if(!e1||!r1) return; if(!confirm('تشيل '+pname(pid)+' من الحجز؟'+(r1.paid&&r1.via==='visa'?'\nهيتردّله العربون.':''))) return;
-    ju(KEY, function(o){ o = base(o); pr1 = []; var x = o.events.find(function(y){ return y.id===id; }); if(x && x.res){ delete x.res[pid]; if(x.att) delete x.att[pid]; promoteIn(x, pr1); } return o; }).then(function(){ if(r1.paid && r1.via==='visa') return refund(pid, depOf(e1,r1), e1, 'اتشال الحجز'); }).then(function(){ notifyPromoted(pr1, e1); return refresh(); }); }
-  else if(a==='kickwait') mut(id, function(e){ if(e.wait) delete e.wait[pid]; }).then(refresh);
+    ju(KEY, function(o){ o = base(o); pr1 = []; var x = o.events.find(function(y){ return y.id===id; }); if(x && x.res){ delete x.res[pid]; if(x.att) delete x.att[pid]; promoteIn(x, pr1); } return o; }).then(function(){ if(r1.paid && r1.via==='visa') return refund(pid, dep(e1), e1, 'اتشال الحجز'); }).then(function(){ notifyPromoted(pr1, e1); return refresh(); }); }
+  else if(a==='kickwait') mut(id, function(e){ if(e.wait) delete e.wait[pid]; if(e.wi) delete e.wi[pid]; }).then(refresh);
   else if(a==='addp'){ var s = document.getElementById('bk-sel-'+id); var v2 = s && s.value; if(!v2){ showToast('اختار مشارك الأول', true); return; } mut(id, function(e){ e.res = e.res||{}; if(+e.cap>0 && Object.keys(e.res).length>=+e.cap) return; e.res[v2] = {ts:Date.now(), paid:0, via:'admin'}; if(e.wait) delete e.wait[v2]; }).then(refresh); }
   else if(a==='markpaid'){ var e3 = evt(id); mut(id, function(x){ var rr = R(x, pid); if(rr){ rr.paid = Date.now(); rr.via = rr.via||'cash'; x.res[pid] = rr; } }).then(function(){ try{ pushNotification(pid, '✅ اتأكد استلام عربونك في «'+(e3?e3.title:'')+'»', '💵'); }catch(_){} showToast('اتأكد العربون ✅'); return refresh(); }); }
   else if(a==='att') mut(id, function(x){ x.att = x.att||{}; if(x.att[pid]) delete x.att[pid]; else x.att[pid] = Date.now(); }).then(refresh);
@@ -48237,6 +48391,7 @@ st.textContent = [
 '.bk-tile:active{transform:scale(.96)}',
 '.bk-tile::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(90px 70px at 85% 12%,rgba(255,255,255,.28),transparent 70%),repeating-linear-gradient(135deg,rgba(255,255,255,.06) 0 8px,transparent 8px 18px)}',
 '.bk-tile-shine{position:absolute;left:-30%;top:-40%;width:160%;height:55%;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.35),transparent);transform:rotate(-14deg);pointer-events:none}',
+'.ci-img{width:1.3em;height:1.3em;border-radius:50%;object-fit:cover;vertical-align:-.28em;display:inline-block;box-shadow:0 2px 6px rgba(0,0,0,.35)}.bk-cover-ico .ci-img,.bk2-cvi .ci-img,.bk3-ico .ci-img{vertical-align:middle}',
 '.bk-tile-ico{position:absolute;top:14px;right:14px;width:64px;height:64px;display:grid;place-items:center;font-size:36px;border-radius:20px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);box-shadow:0 10px 18px -8px rgba(0,0,0,.5)}',
 '.bk-tile-name{position:relative;font-size:19px;font-weight:900;text-shadow:0 2px 6px rgba(0,0,0,.35)}',
 '.bk-tile-badge{position:relative;align-self:flex-start;padding:3px 11px;font-size:11px;font-weight:800;border-radius:20px;color:#0c1a3a;background:rgba(255,255,255,.92)}.bk-tile-badge.off{background:rgba(0,0,0,.28);color:rgba(255,255,255,.85)}',
@@ -48261,6 +48416,123 @@ st.textContent = [
 '.bk-seats{margin-top:12px}.bk-seats small{display:block;margin-top:6px;font-size:11.5px;font-weight:700;opacity:.8}.bk-seats.hot small{color:#FFB37A;opacity:1}',
 '.bk-bar{height:7px;border-radius:7px;background:rgba(255,255,255,.12);overflow:hidden}.bk-bar i{display:block;height:100%;border-radius:7px;background:linear-gradient(90deg,#5FE0A4,#F1B53F)}.bk-seats.hot .bk-bar i{background:linear-gradient(90deg,#F1B53F,#FF6A5C)}',
 '.bk-act{display:flex;flex-direction:column;gap:8px;margin-top:13px}.bk-btns{display:flex;flex-wrap:wrap;gap:8px}',
+'.bk-past{margin-bottom:10px;padding:12px;border-radius:18px;color:#fff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14)}.bk-past-h b{display:block;font-size:14px}.bk-past-h small{opacity:.7;font-size:11.5px}',
+'.bk-past-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}.bk-past-r small{opacity:.8;font-size:11.5px}.bk-stars{color:#F1B53F;font-size:18px;letter-spacing:2px}',
+'.bk-starpick{display:flex;justify-content:center;gap:6px;margin:10px 0}.bk-starpick button{border:0;background:none;font-size:38px;line-height:1;cursor:pointer;color:rgba(128,128,160,.45)}.bk-starpick button.on{color:#F1B53F;text-shadow:0 4px 12px rgba(241,181,63,.5)}',
+'.bk-kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.bk-kp div{padding:10px 4px;text-align:center;border-radius:14px;background:rgba(128,128,160,.14)}.bk-kp b{display:block;font-size:18px;font-weight:900}.bk-kp small{font-size:10.5px;opacity:.75;font-weight:700}',
+'.bk-bars{display:flex;flex-direction:column;gap:7px;margin:6px 0 12px}.bk-br{display:flex;align-items:center;gap:8px;font-size:12px}.bk-br span{flex:none;width:34%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bk-br i{flex:1;height:9px;border-radius:9px;background:rgba(128,128,160,.22);overflow:hidden}.bk-br i u{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#7A5CFF,#2FD0C0)}.bk-br em{flex:none;min-width:24px;font-style:normal;font-weight:900;text-align:left}',
+'.bk-cm{padding:8px 10px;margin-bottom:6px;border-radius:12px;font-size:12px;background:rgba(128,128,160,.14)}',
+'.bk-prog{margin-top:12px;padding:2px 12px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14)}.bk-prog summary{cursor:pointer;padding:10px 0;font-size:13px;font-weight:900}',
+'.bk-pl{display:flex;flex-direction:column;gap:9px;padding:2px 0 12px}.bk-pi2{display:flex;gap:10px;align-items:flex-start}.bk-pt{flex:none;min-width:64px;padding:3px 8px;text-align:center;font-size:11.5px;font-weight:900;border-radius:10px;color:#241704;background:linear-gradient(145deg,#FFE29A,#F1B53F)}.bk-pi2 b{display:block;font-size:13px}.bk-pi2 small{display:block;margin-top:2px;opacity:.7;font-size:11.5px}',
+'.bk-bus{margin-top:10px;padding:8px 12px;font-size:12px;font-weight:700;line-height:1.7;border-radius:13px;background:rgba(47,208,192,.12);border:1px solid rgba(47,208,192,.4)}',
+'.bk-fm{overflow-y:auto;justify-content:flex-start;padding:60px 14px 24px}',
+'.bk-fcard{position:relative;width:min(420px,100%);margin:auto 0;padding:18px 16px;border-radius:24px;background:var(--surface,#1D1A52);color:var(--text,#fff);border:1px solid var(--border,rgba(255,255,255,.12));box-shadow:0 30px 60px -20px #000}',
+'.bk-fcard .bk-ov-x{top:10px;left:10px;color:var(--text,#fff);background:rgba(128,128,160,.25)}',
+'.bk-ft{font-size:17px;font-weight:900;margin-bottom:4px;padding-left:44px}.bk-fs{font-size:12px;opacity:.7;margin-bottom:12px}',
+'.bk-flt{display:flex;gap:8px;margin:8px 0}.bk-flt .field{margin:0;flex:1;min-width:0}.bk-ph{margin-top:3px;font-size:11.5px}.bk-ph a{color:inherit;opacity:.8}.bk-nt{margin-top:3px;font-size:11.5px;opacity:.75}.bk-ainfo{margin-top:8px;font-size:11.5px;opacity:.75;font-weight:700}',
+'.bkq{padding:0;overflow:hidden;animation:bkFormIn .5s cubic-bezier(.2,.9,.3,1.1) both;background:linear-gradient(170deg,var(--surface,#1D1A52),var(--bg-2,#171449))}',
+'.bkq .bk-ov-x{z-index:5;background:rgba(0,0,0,.35);color:#fff}',
+'.bkq-head{position:relative;display:flex;align-items:flex-end;gap:12px;min-height:130px;padding:56px 16px 18px;color:#fff;background-size:cover;background-position:center;clip-path:polygon(0 0,100% 0,100% 88%,50% 100%,0 88%);overflow:hidden}',
+'.bkq-head::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(8,10,40,.7))}',
+'.bkq-orb{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.55),rgba(255,255,255,.05));animation:bkOrb 5s ease-in-out infinite}.bkq-orb.o1{width:70px;height:70px;top:-14px;right:30px}.bkq-orb.o2{width:34px;height:34px;top:40px;left:70px;animation-delay:-1.5s}.bkq-orb.o3{width:20px;height:20px;top:12px;left:30%;animation-delay:-3s}',
+'.bkq-ico{position:relative;flex:none;width:56px;height:56px;display:grid;place-items:center;font-size:30px;border-radius:18px 18px 18px 6px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(6px);transform:rotate(-6deg)}',
+'.bkq-ht{position:relative;min-width:0}.bkq-ht b{display:block;font-size:20px;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,.45)}.bkq-ht small{display:block;margin-top:2px;font-size:11.5px;opacity:.9;line-height:1.5}',
+'.bkq-body{display:flex;flex-direction:column;gap:12px;padding:6px 16px 18px}',
+'.bkq-who{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:18px 18px 18px 6px;background:linear-gradient(135deg,rgba(122,92,255,.22),rgba(47,208,192,.12));border:1px solid rgba(122,92,255,.35)}',
+'.bkq-who>i{flex:none;width:38px;height:38px;display:grid;place-items:center;font-style:normal;font-size:19px;border-radius:13px;background:rgba(255,255,255,.14)}.bkq-who div{flex:1;min-width:0}.bkq-who small{display:block;font-size:10.5px;opacity:.65;font-weight:700}.bkq-who b{font-size:15px;font-weight:900}.bkq-who em{font-style:normal;padding:3px 10px;font-size:11px;font-weight:800;border-radius:12px;color:#241704;background:linear-gradient(145deg,#FFE29A,#F1B53F)}',
+'.bkq-blk{padding:12px;border-radius:20px;background:rgba(128,128,160,.1);border:1px solid rgba(128,128,160,.2)}',
+'.bkq-lab{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px;font-weight:900}.bkq-lab i{font-style:normal;width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:rgba(241,181,63,.2)}.bkq-lab em{margin-inline-start:auto;font-style:normal;min-width:30px;padding:2px 10px;text-align:center;font-size:15px;border-radius:12px;color:#241704;background:linear-gradient(145deg,#FFE29A,#F1B53F)}',
+'.bkq-pps{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}.bkq-pp{width:46px;height:54px;border:0;border-radius:16px 16px 22px 22px;cursor:pointer;background:rgba(128,128,160,.18);border:1.5px dashed rgba(128,128,160,.45);transition:transform .18s,background .18s;filter:grayscale(1) opacity(.55)}',
+'.bkq-pp span{font-size:24px}.bkq-pp.on{filter:none;border:1.5px solid transparent;background:linear-gradient(160deg,#FFE29A,#F1B53F);animation:bkPop .35s both;animation-delay:calc(var(--i)*40ms);box-shadow:0 8px 14px -6px rgba(241,181,63,.8)}.bkq-pp:active{transform:scale(.88)}.bkq-pp.dis{opacity:.25;filter:grayscale(1);cursor:not-allowed}',
+'.bkq-f{display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;padding:10px 12px;border-radius:20px 20px 20px 6px;background:rgba(128,128,160,.1);border:1.5px solid rgba(128,128,160,.25);transition:border-color .2s,box-shadow .2s,transform .2s}',
+'.bkq-f:focus-within{border-color:#F1B53F;box-shadow:0 0 0 4px rgba(241,181,63,.18);transform:translateY(-2px)}',
+'.bkq-f>i{grid-row:1/3;width:42px;height:42px;display:grid;place-items:center;font-style:normal;font-size:20px;border-radius:14px;background:linear-gradient(145deg,rgba(241,181,63,.3),rgba(241,181,63,.08))}',
+'.bkq-f>span{font-size:11px;font-weight:800;opacity:.7}.bkq-f input,.bkq-f textarea{width:100%;border:0;outline:0;background:transparent;color:inherit;font:inherit;font-size:15px;font-weight:800;padding:2px 0;resize:none}.bkq-f input::placeholder,.bkq-f textarea::placeholder{opacity:.4;font-weight:600}',
+'.bkq-chips{display:flex;flex-wrap:wrap;gap:8px}.bkq-chip{padding:9px 14px;border:1.5px solid rgba(128,128,160,.35);border-radius:16px 16px 16px 5px;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;color:inherit;background:transparent;transition:all .18s}.bkq-chip.on{color:#241704;border-color:transparent;background:linear-gradient(145deg,#FFE29A,#F1B53F);box-shadow:0 8px 14px -8px rgba(241,181,63,.9);transform:translateY(-1px)}.bkq-chip:active{transform:scale(.94)}',
+'.bkq-go{position:relative;overflow:hidden;width:100%;padding:15px;border:0;border-radius:22px 22px 22px 8px;font:inherit;font-size:16px;font-weight:900;cursor:pointer;color:#241704;background:linear-gradient(100deg,#F1B53F,#FFE29A,#F1B53F);background-size:200% 100%;box-shadow:0 16px 24px -12px rgba(241,181,63,.9),inset 0 1px 0 rgba(255,255,255,.6);animation:bkPulse 2s ease-in-out infinite;transition:transform .12s}',
+'.bkq-go::after{content:"";position:absolute;top:0;bottom:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.7),transparent);animation:bkSweep 2.6s ease-in-out infinite}.bkq-go:active{transform:scale(.97)}.bkq-go span{position:relative;z-index:1}',
+'.bk2-prog{margin:0}',
+'.bk3-hint{margin:2px 4px 12px;font-size:12.5px;font-weight:800;color:rgba(255,255,255,.7);text-align:center}',
+'.bk3-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;padding-bottom:6px}',
+'.bk3-tile{position:relative;display:block;overflow:hidden;width:100%;aspect-ratio:1/1.14;padding:0;border:0;border-radius:30px 30px 30px 10px;color:#fff;font-family:inherit;text-align:right;cursor:pointer;background:#0d1233;-webkit-tap-highlight-color:transparent;box-shadow:0 20px 28px -16px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.13);animation:bk3In .6s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--i)*.09s);transition:transform .2s}',
+'.bk3-tile:nth-child(even){border-radius:30px 10px 30px 30px}.bk3-tile:active{transform:scale(.95)}',
+'.bk3-tile:last-child:nth-child(odd){grid-column:1/-1;aspect-ratio:2.1/1}',
+'.bk3-tile::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 1.5px hsla(var(--h),95%,78%,.4),inset 0 -40px 50px -30px hsla(var(--h),95%,60%,.35)}',
+'.bk3-tile.mine::after{box-shadow:inset 0 0 0 2px rgba(95,224,164,.85),inset 0 -40px 50px -30px rgba(95,224,164,.3)}',
+'.bk3-bg{position:absolute;inset:0;display:block;background-size:cover;background-position:center;transition:transform .6s}.bk3-tile:active .bk3-bg{transform:scale(1.06)}',
+'.bk3-bg.ph::before{content:"";position:absolute;inset:0;background:radial-gradient(90px 70px at 25% 18%,rgba(255,255,255,.3),transparent 70%),repeating-linear-gradient(135deg,rgba(255,255,255,.07) 0 9px,transparent 9px 20px)}',
+'.bk3-ico{position:absolute;left:0;right:0;top:17%;text-align:center;font-size:58px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45));animation:bkFloat 4s ease-in-out infinite}',
+'.bk3-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,30,.12) 25%,rgba(6,8,30,.93) 100%)}',
+'.bk3-leaf{position:absolute;top:11px;right:11px;width:46px;padding:5px 0 6px;text-align:center;border-radius:15px 15px 15px 5px;color:#241704;background:linear-gradient(145deg,#FFE29A,#F1B53F);box-shadow:0 8px 14px -8px #000,0 0 0 2px rgba(255,255,255,.28);transform:rotate(5deg)}',
+'.bk3-leaf b{display:block;font-size:21px;line-height:1;font-weight:900}.bk3-leaf i{display:block;margin-top:2px;font-style:normal;font-size:10px;font-weight:900}',
+'.bk3-st{position:absolute;top:13px;left:11px;padding:4px 10px;font-size:10.5px;font-weight:900;border-radius:20px;color:#241704;background:#F1B53F;box-shadow:0 6px 12px -6px #000}',
+'.bk3-st.ok{color:#05301f;background:linear-gradient(145deg,#8CF0C0,#3FD08F)}.bk3-st.off{color:#fff;background:rgba(20,22,50,.85);border:1px solid rgba(255,255,255,.25)}.bk3-st.hot{color:#fff;background:linear-gradient(145deg,#FF9A4D,#F0455F)}',
+'.bk3-info{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;gap:3px;padding:0 13px 12px}',
+'.bk3-info b{font-size:16px;line-height:1.25;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,.6);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
+'.bk3-info small{display:block;font-size:10.5px;font-weight:700;opacity:.82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+'.bk3-foot{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:5px;padding-top:6px;border-top:1px solid rgba(255,255,255,.16);font-size:11px;font-weight:900}.bk3-foot em{font-style:normal;color:#8FE8C2}.bk3-foot u{text-decoration:none;color:#FFD58A}',
+'@keyframes bk3In{from{opacity:0;transform:translateY(22px) scale(.92)}to{opacity:1;transform:none}}',
+'@keyframes bkFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-5px) rotate(-3deg)}}',
+'@keyframes bkFormIn{from{opacity:0;transform:translateY(40px) scale(.95)}to{opacity:1;transform:none}}',
+'@keyframes bkOrb{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(10px,-8px) scale(1.15)}}',
+'@keyframes bkPop{0%{opacity:0;transform:scale(.6) rotate(-6deg)}70%{transform:scale(1.05)}100%{opacity:1;transform:none}}',
+'@keyframes bkSweep{0%{transform:translateX(-130%) skewX(-18deg)}60%,100%{transform:translateX(230%) skewX(-18deg)}}',
+'.bk-cd{margin-top:12px;padding:10px 12px;border-radius:16px;text-align:center;background:linear-gradient(135deg,rgba(122,92,255,.28),rgba(47,208,192,.18));border:1px solid rgba(160,180,255,.35)}',
+'.bk-cd small{display:block;font-size:11.5px;opacity:.85;font-weight:700}.bk-cd b{display:block;margin-top:3px;font-size:16px;font-weight:900;color:#FFE29A}',
+'.bk-cd.lb{background:rgba(255,154,61,.13);border-color:rgba(255,154,61,.45)}.bk-cd.lb b{color:#FFD9A8;font-size:14px}',
+'@keyframes bkTick{0%{transform:translateY(-35%);opacity:.3}100%{transform:none;opacity:1}}',
+'@keyframes bkPulse{0%,100%{box-shadow:0 0 0 0 rgba(241,181,63,.5)}50%{box-shadow:0 0 0 9px rgba(241,181,63,0)}}',
+'.bk-cd{position:relative;overflow:hidden;border-radius:20px;background:linear-gradient(135deg,rgba(122,92,255,.4),rgba(47,208,192,.22))}',
+'.bk-cdb{display:flex;justify-content:center;gap:8px;margin-top:8px;direction:rtl}.bk-cdb span{flex:1;max-width:72px;padding:8px 2px 6px;border-radius:14px;background:rgba(5,8,28,.45);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 -10px 14px -10px rgba(0,0,0,.5)}',
+'.bk-cdb b{display:block;font-size:22px;line-height:1.1;font-weight:900;color:#FFE29A;overflow:hidden}.bk-cdb b.tick{animation:bkTick .35s ease-out}.bk-cdb i{display:block;margin-top:2px;font-style:normal;font-size:10px;font-weight:800;opacity:.75}',
+'.bk-cd-done{display:block;margin-top:6px;font-size:15px;color:#7CF5B8}',
+'.bk-cd.lb .bk-cdb span{background:rgba(60,25,0,.4)}.bk-cd.lb .bk-cdb b{color:#FFD9A8;font-size:18px}',
+'.bk-seats.hot .bk-dots i:not(.f){animation:bkSeat .45s both,bkPulse 1.6s ease-in-out infinite}',
+'.bkx-go{position:relative;overflow:hidden;width:100%;padding:15px;border:0;border-radius:22px 22px 22px 8px;font:inherit;font-size:16px;font-weight:900;cursor:pointer;color:#241704;background:linear-gradient(100deg,#F1B53F,#FFE29A,#F1B53F);background-size:200% 100%;box-shadow:0 16px 24px -12px rgba(241,181,63,.9),inset 0 1px 0 rgba(255,255,255,.6);animation:bkPulse 2s ease-in-out infinite;transition:transform .12s}',
+'.bk2-ev{position:relative;margin-bottom:18px;overflow:hidden;border-radius:24px;color:#fff;background:linear-gradient(175deg,#161c52 0%,#0d1233 100%);border:1px solid rgba(255,255,255,.1);box-shadow:0 18px 30px -20px rgba(0,0,0,.9);animation:bkIn .5s cubic-bezier(.2,.8,.2,1) both}',
+'.bk2-ev.mine{border-color:rgba(95,224,164,.55);box-shadow:0 0 0 1px rgba(95,224,164,.18),0 18px 30px -20px rgba(0,0,0,.9)}',
+'.bk2-cv{position:relative;height:172px;background-size:cover;background-position:center;display:flex;align-items:flex-end;cursor:pointer}',
+'.bk2-cv.ph{cursor:default;background-blend-mode:normal}.bk2-cv::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.06) 0 10px,transparent 10px 22px)}',
+'.bk2-cv::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,10,34,.05) 20%,rgba(8,10,34,.88) 100%)}',
+'.bk2-cvi{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-size:62px;z-index:1;filter:drop-shadow(0 8px 12px rgba(0,0,0,.4))}',
+'.bk2-cvt{position:relative;z-index:2;width:100%;padding:0 16px 14px}.bk2-cvt h3{margin:6px 0 0;font-size:22px;line-height:1.25;font-weight:900;text-shadow:0 2px 10px rgba(0,0,0,.6)}',
+'.bk2-cat{display:inline-block;padding:3px 11px;font-size:11px;font-weight:800;border-radius:20px;background:rgba(255,255,255,.16);backdrop-filter:blur(6px)}',
+'.bk2-chips{position:absolute;z-index:3;top:12px;left:12px;display:flex;gap:6px}',
+'.bk2-chip{padding:5px 12px;font-size:11.5px;font-weight:900;border-radius:20px;color:#241704;background:linear-gradient(145deg,#FFE29A,#F1B53F);box-shadow:0 6px 12px -6px rgba(0,0,0,.6)}',
+'.bk2-chip.ok{color:#05301f;background:linear-gradient(145deg,#8CF0C0,#3FD08F)}.bk2-chip.off{color:#fff;background:rgba(20,22,50,.8);border:1px solid rgba(255,255,255,.25)}.bk2-chip.dim{color:#fff;background:rgba(0,0,0,.5);box-shadow:none}',
+'.bk2-body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:11px}',
+'.bk2-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bk2-tile:last-child:nth-child(odd){grid-column:1/-1}',
+'.bk2-tile{display:flex;align-items:center;gap:10px;min-width:0;padding:10px;border-radius:16px;color:#fff;text-decoration:none;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}a.bk2-tile:active{transform:scale(.97)}',
+'.bk2-ti{flex:none;width:40px;height:40px;display:grid;place-items:center;font-size:19px;border-radius:13px;background:linear-gradient(145deg,#7A5CFF,#3A24B8)}',
+'.t-time .bk2-ti{background:linear-gradient(145deg,#3FA8F5,#1E63E0)}.t-place .bk2-ti{background:linear-gradient(145deg,#2FD0C0,#1479C9)}.t-price .bk2-ti{background:linear-gradient(145deg,#FFD36B,#E8932B)}',
+'.bk2-tx{min-width:0;display:flex;flex-direction:column;gap:1px}.bk2-tx small{font-size:10.5px;font-weight:700;opacity:.6}.bk2-tx b{font-size:14.5px;line-height:1.3;font-weight:900;word-break:break-word}.bk2-tx em{font-style:normal;font-size:11px;font-weight:800;color:#8FE8C2}',
+'.t-place .bk2-tx em{color:#7FD6FF}.t-price .bk2-tx em{color:#FFD58A}',
+'.bk2-desc{font-size:13px;line-height:1.7;opacity:.82;padding:0 2px}',
+'.bk2-cd.bk-cd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;padding:7px 10px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}',
+'.bk2-cd small{margin:0;font-size:11.5px;font-weight:800;opacity:.8}.bk2-cd .bk-cdb{margin:0;gap:4px;flex:none}',
+'.bk2-cd .bk-cdb span{flex:none;width:38px;max-width:none;padding:3px 0 2px;border-radius:9px}.bk2-cd .bk-cdb b{font-size:14px}.bk2-cd .bk-cdb i{font-size:8.5px;margin-top:0}',
+'.bk2-dl{padding:8px 12px;font-size:12px;font-weight:800;border-radius:12px;color:#FFD9A8;background:rgba(255,154,61,.1);border:1px solid rgba(255,154,61,.3)}.bk2-dl b{font-weight:900;color:#fff}.bk2-dl.off{color:#FFB3C0}',
+'.bk2-seat{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}',
+'.bk2-sl{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700}.bk2-sl b{font-size:16px;font-weight:900;color:#FFE29A}.bk2-sl em{font-style:normal;font-weight:900;color:#8FE8C2}',
+'.bk2-seat.hot .bk2-sl em{color:#FFB37A}.bk2-seat.full .bk2-sl em{color:#FF9AAE}',
+'.bk2-bar{margin-top:8px;height:7px;border-radius:7px;background:rgba(255,255,255,.1);overflow:hidden}.bk2-bar i{display:block;height:100%;border-radius:7px;background:linear-gradient(90deg,#5FE0A4,#2FD0C0);transition:width .6s}',
+'.bk2-seat.hot .bk2-bar i{background:linear-gradient(90deg,#FFB347,#FF6B6B)}.bk2-seat.full .bk2-bar i{background:#FF6B8A}',
+'.bk2-note{padding:8px 12px;font-size:12px;font-weight:700;border-radius:12px;background:rgba(255,255,255,.05);opacity:.9}',
+'.bk2-prog{margin:0}',
+'.bk2-act{display:flex;flex-direction:column;gap:10px;margin-top:2px}',
+'.bk2-steps{direction:rtl;display:flex;padding:4px 0 2px}.bk2-steps .s{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;font-size:10.5px;font-weight:800;opacity:.55}',
+'.bk2-steps .s:not(:first-child)::before{content:"";position:absolute;top:13px;left:50%;width:100%;height:2px;background:rgba(255,255,255,.16)}',
+'.bk2-steps i{position:relative;z-index:1;width:26px;height:26px;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:900;border-radius:50%;background:#262c70;border:2px solid rgba(255,255,255,.2)}',
+'.bk2-steps .s.ok,.bk2-steps .s.cur,.bk2-steps .s.na{opacity:1}.bk2-steps .s.ok i{background:#3FD08F;border-color:#3FD08F;color:#05301f}.bk2-steps .s.ok:not(:first-child)::before{background:#3FD08F}',
+'.bk2-steps .s.cur i{background:#F1B53F;border-color:#F1B53F;color:#241704;animation:bkPulse 1.6s ease-in-out infinite}.bk2-steps .s.cur{color:#FFD58A}.bk2-steps .s.na i{opacity:.6}',
+'.bk2-sum{text-align:center;font-size:12px;font-weight:800;opacity:.75}',
+'.bk2-ctas{display:flex;flex-direction:column;gap:8px}',
+'.bk2-cta{position:relative;overflow:hidden;width:100%;min-height:56px;padding:9px 14px;border:0;border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:inherit;color:#241704;background:linear-gradient(100deg,#F1B53F,#FFDD94);box-shadow:0 14px 22px -12px rgba(241,181,63,.8),inset 0 1px 0 rgba(255,255,255,.5);cursor:pointer}',
+'.bk2-cta span{font-size:15.5px;font-weight:900}.bk2-cta small{font-size:11px;font-weight:800;opacity:.75}.bk2-cta:active{transform:scale(.98)}',
+'.bk2-cta.pay{color:#fff;background:linear-gradient(100deg,#4F7CFF,#8A5CFF);box-shadow:0 14px 22px -12px rgba(79,124,255,.9),inset 0 1px 0 rgba(255,255,255,.3)}',
+'.bk2-sec{width:100%;min-height:46px;border-radius:15px;font-family:inherit;font-size:13.5px;font-weight:900;color:#fff;cursor:pointer;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18)}.bk2-sec:active{transform:scale(.98)}',
+'.bk2-tools{display:flex;gap:8px}.bk2-tool{flex:1;min-height:40px;padding:0 8px;border-radius:13px;font-family:inherit;font-size:12.5px;font-weight:800;color:#fff;cursor:pointer;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.12)}.bk2-tool.danger{color:#FFB3C0;border-color:rgba(255,120,140,.3)}.bk2-tool:active{transform:scale(.97)}',
+'.bk2-state{padding:12px 14px;text-align:center;font-size:13px;font-weight:900;border-radius:15px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14)}.bk2-state.wn{color:#FFD9A8;background:rgba(255,154,61,.12);border-color:rgba(255,154,61,.4)}.bk2-state.off{color:#FFB3C0}',
 '.bk-btn{flex:1;padding:12px 16px;border:0;border-radius:15px;font-family:inherit;font-size:13.5px;font-weight:900;cursor:pointer;color:#241704;background:linear-gradient(100deg,#F1B53F,#FFDD94);box-shadow:0 12px 20px -10px rgba(241,181,63,.8),inset 0 1px 0 rgba(255,255,255,.5);transition:transform .12s}',
 '.bk-btn:active{transform:scale(.97)}.bk-btn.ghost{color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);box-shadow:none}.bk-btn.ghost.danger{color:#FFB3C0;border-color:rgba(255,120,140,.4)}.bk-btn.sm{flex:none;padding:9px 14px;font-size:12.5px}',
 '.bk-btn.pay{color:#fff;background:linear-gradient(100deg,#4F7CFF,#8A5CFF);box-shadow:0 12px 20px -10px rgba(79,124,255,.8),inset 0 1px 0 rgba(255,255,255,.3)}',
@@ -48302,43 +48574,9 @@ st.textContent = [
 '.cap-or-row .bk-who{flex:1}.cap-or-n{font-style:normal;width:22px;font-weight:900;opacity:.6;font-size:12px}.cap-or-ico{flex:none;width:34px;height:34px;display:grid;place-items:center;font-size:18px;border-radius:11px;color:#fff}.cap-or-row .bk-mini{background:rgba(120,150,255,.18)}',
 '.gl-ban .bk-banner-ico{width:56px;height:56px;font-size:30px}',
 '.gl-sechead{display:flex;align-items:center;gap:8px;font-size:16px;margin-top:18px}.gl-sechead::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(241,192,74,.5),transparent)}',
-`.bk-ev{position:relative}.bk-stamp{position:absolute;z-index:4;top:44px;left:50%;padding:7px 18px;font-size:19px;font-weight:900;letter-spacing:1px;color:#7CF5B8;border:3px double #7CF5B8;border-radius:14px;background:rgba(6,36,28,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);box-shadow:0 0 22px rgba(95,224,164,.45);transform:translateX(-50%) rotate(-11deg);pointer-events:none;animation:bkStamp .7s cubic-bezier(.2,1.6,.4,1) both}@keyframes bkStamp{0%{opacity:0;transform:translateX(-50%) scale(3.2) rotate(-32deg)}100%{opacity:1;transform:translateX(-50%) scale(1) rotate(-11deg)}}`,
-`.bk-btn.conf{background:linear-gradient(145deg,#7CF5B8,#1C8F6B);color:#06281c}`,
-`.bk-bs{justify-content:flex-start;align-items:stretch;background:rgba(5,8,28,.97)}.bks{width:100%;max-width:480px;height:100%;margin:0 auto;display:flex;flex-direction:column;color:#fff;animation:bksUp .45s cubic-bezier(.2,.9,.3,1) both}@keyframes bksUp{from{transform:translateY(40px);opacity:0}}`,
-`.bks-hd{position:relative;flex:none;display:flex;align-items:flex-end;min-height:120px;padding:16px;background-size:cover;background-position:center}.bks-hd::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,8,28,.15),rgba(5,8,28,.9))}.bks-hd>div{position:relative;z-index:1}.bks-hd small{display:block;opacity:.85;font-size:12px}.bks-hd b{display:block;font-size:20px;font-weight:900}.bks-x{position:absolute;z-index:2;top:12px;left:12px;width:38px;height:38px;border:0;border-radius:50%;cursor:pointer;color:#fff;background:rgba(0,0,0,.4)}`,
-`.bks-sc{flex:1;overflow:auto;padding:6px 16px 16px}.bks-sc .field[readonly]{opacity:.75}.bks-g{display:flex;gap:6px;margin-bottom:6px}.bks-g input{flex:1}.bks-g button{flex:none;width:42px;border:0;border-radius:12px;cursor:pointer;color:#fff;background:rgba(229,72,77,.7)}.bks-sec{margin:16px 0 6px;font-size:14px;font-weight:900;opacity:.9}`,
-`.bks-card{padding:6px 12px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14)}.bks-d{display:flex;gap:10px;padding:8px 0;font-size:13px;line-height:1.7;border-bottom:1px dashed rgba(255,255,255,.12)}.bks-d:last-child{border:0}.bks-d i{font-style:normal;flex:none}.bks-code{display:flex;gap:8px}.bks-code input{flex:1;text-transform:uppercase;letter-spacing:2px}`,
-`.bks-pay{display:flex;gap:8px}.bks-pay button{flex:1;padding:11px;border-radius:14px;font:inherit;font-weight:800;cursor:pointer;color:#fff;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2)}.bks-pay button.on{background:rgba(241,181,63,.22);border-color:#F1B53F}`,
-`.bks-sum{margin-top:16px;padding:12px 14px;border-radius:18px;background:linear-gradient(145deg,rgba(241,181,63,.16),rgba(122,92,255,.14));border:1px solid rgba(241,181,63,.35)}.bks-sum div{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}.bks-sum em{font-style:normal}`,
-`.bks-ft{flex:none;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(5,8,28,.95);border-top:1px solid rgba(255,255,255,.12)}.bks-go{width:100%;padding:15px;border:0;border-radius:18px;font:inherit;font-size:16.5px;font-weight:900;cursor:pointer;color:#2a1a00;background:linear-gradient(145deg,#FFE29A,#F1B53F);box-shadow:0 12px 24px -10px rgba(241,181,63,.7);animation:tkPulse 2.2s ease-in-out infinite}.bks-go:disabled{opacity:.6}@keyframes tkPulse{50%{box-shadow:0 12px 34px -4px rgba(241,181,63,.95)}}`,
-`.bk-tk{overflow:auto;justify-content:safe center;gap:16px;padding:18px 0;perspective:1200px}.tkx-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6}.tkx-conf{width:min(330px,88vw);flex:none}`,
-`.tkx-tilt{flex:none;transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .18s ease-out}.tkx-card{position:relative;width:min(330px,88vw);border-radius:28px;overflow:hidden;color:#fff;background:linear-gradient(160deg,#1b2a78,#0d1445 60%,#2a1566);border:1.5px solid rgba(255,226,154,.6);box-shadow:0 40px 70px -24px #000,0 0 70px -10px rgba(122,92,255,.6);animation:tkIn 1.15s cubic-bezier(.2,1.2,.3,1) both}@keyframes tkIn{0%{opacity:0;transform:translateY(130%) rotateX(80deg) scale(.7)}55%{opacity:1}100%{opacity:1;transform:none}}`,
-`.tkx-top{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 16px 20px;text-align:center;background-size:220% 220%;animation:tkBg 7s ease-in-out infinite}@keyframes tkBg{50%{background-position:100% 100%}}.tkx-top b{position:relative;font-size:20px;font-weight:900;text-shadow:0 2px 10px rgba(0,0,0,.45)}.tkx-tag{position:relative;font-style:normal;letter-spacing:2px;font-size:10px;padding:3px 12px;border-radius:20px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4)}`,
-`.tkx-ico{position:relative;font-size:46px;animation:tkPop .9s .5s cubic-bezier(.3,1.8,.4,1) both,tkFloat 3.2s 1.5s ease-in-out infinite}@keyframes tkPop{from{transform:scale(0) rotate(-120deg);opacity:0}}@keyframes tkFloat{50%{transform:translateY(-6px) rotate(4deg)}}.tkx-orb{position:absolute;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.4),transparent 70%);animation:tkOrb 6s ease-in-out infinite}.tkx-orb.o1{top:-40px;right:-30px}.tkx-orb.o2{bottom:-50px;left:-30px;animation-delay:-3s}@keyframes tkOrb{50%{transform:translate(-30px,24px) scale(1.3)}}`,
-`.tkx-cut{display:flex;align-items:center;margin:-1px 0;background:transparent}.tkx-cut i{flex:none;width:24px;height:24px;border-radius:50%;background:#070b24;margin:-12px}.tkx-cut u{flex:1;border-top:2px dashed rgba(255,226,154,.4);margin:0 14px}`,
-`.tkx-body{position:relative;display:flex;flex-direction:column;gap:9px;padding:14px 18px 20px}.tkx-row{display:flex;gap:10px;align-items:center;opacity:0;animation:tkUp .6s both}@keyframes tkUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}.tkx-row i{flex:none;width:32px;height:32px;display:grid;place-items:center;font-style:normal;font-size:16px;border-radius:10px;background:rgba(255,255,255,.1)}.tkx-row small{display:block;font-size:10.5px;opacity:.6}.tkx-row b{font-size:13px;font-weight:800}`,
-`.tkx-qr{position:relative;align-self:center;margin-top:6px;padding:10px;min-width:190px;min-height:190px;display:grid;place-items:center;overflow:hidden;border-radius:18px;background:#fff;animation:tkZoom .9s 1.25s cubic-bezier(.3,1.4,.4,1) both}@keyframes tkZoom{from{opacity:0;transform:scale(.3) rotate(-20deg)}}.tkx-scan{position:absolute;z-index:2;left:6px;right:6px;top:8px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#1fd18b,transparent);box-shadow:0 0 14px #1fd18b;animation:tkScan 2.4s 2s ease-in-out infinite}@keyframes tkScan{0%,100%{top:8px}50%{top:calc(100% - 12px)}}`,
-`.tkx-code{align-self:center;font-size:21px;font-weight:900;letter-spacing:5px;font-family:monospace;color:#FFE29A;animation:tkUp .6s 1.9s both}.tkx-bars{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:38px}.tkx-bars u{width:3px;border-radius:2px;background:rgba(255,226,154,.75);transform-origin:bottom;animation:tkBar 1.6s ease-in-out infinite}@keyframes tkBar{50%{transform:scaleY(1.6)}}`,
-`.tkx-st{text-align:center;padding:10px;font-size:12.5px;font-weight:800;border-radius:14px;background:rgba(255,255,255,.1);animation:tkUp .6s 2.1s both}.tkx-st.ok{background:rgba(95,224,164,.22);color:#BFFFDD}.tkx-st.wn{background:rgba(255,170,60,.22);color:#FFD9A0}`,
-`.tkx-stamp{position:absolute;z-index:4;top:132px;left:14px;padding:5px 14px;font-size:17px;font-weight:900;color:#7CF5B8;border:3px double #7CF5B8;border-radius:12px;background:rgba(6,36,28,.6);transform:rotate(-14deg);animation:tkStamp .55s 2.3s cubic-bezier(.2,1.6,.4,1) both}@keyframes tkStamp{from{opacity:0;transform:scale(3.4) rotate(-40deg)}to{opacity:1;transform:scale(1) rotate(-14deg)}}`,
-`.tkx-shine{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(circle at var(--mx,30%) 15%,rgba(255,255,255,.3),transparent 45%),linear-gradient(115deg,transparent 30%,rgba(255,226,154,.2) 45%,rgba(122,255,235,.18) 55%,transparent 70%);background-size:100% 100%,250% 100%;animation:tkSh 4.5s 2s ease-in-out infinite}@keyframes tkSh{0%{background-position:0 0,150% 0}60%,100%{background-position:0 0,-60% 0}}`,
-`.bks-vr{display:flex;align-items:center;gap:10px;padding:11px 12px;margin-bottom:6px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);cursor:pointer}.bks-vr input{width:20px;height:20px;accent-color:#F1B53F}`,
-`.bk-tk.quiet *{animation-duration:.01s!important;animation-delay:0s!important}`,
 '.gl-secs{display:flex;flex-direction:column;gap:10px}.gl-sec{display:flex;gap:12px;padding:13px;border-radius:18px;color:#fff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}.gl-sec-ico{flex:none;width:44px;height:44px;display:grid;place-items:center;font-size:22px;border-radius:14px;background:linear-gradient(145deg,rgba(241,181,63,.3),rgba(241,181,63,.1))}.gl-sec b{display:block;font-size:14px}.gl-sec p{margin:4px 0 0;font-size:12.5px;line-height:1.7;opacity:.78}'
 ].join('');
 document.head.appendChild(st);
-
-/* ===== أكواد الخصم (الأدمن) ===== */
-(function(){
-  var _a = window.FXADMIN && window.FXADMIN.book; if(!_a) return;
-  window.FXADMIN.book = function(){
-    var rows = (B.codes||[]).map(function(c){ return '<div class="bk-row"><div class="bk-who"><b dir="ltr">'+esc(c.code)+'</b><small> — خصم '+(+c.pct||0)+'% · اتستخدم '+(+c.used||0)+(+c.max>0?' / '+c.max:'')+'</small></div><button type="button" class="bk-x" data-bk="codedel" data-id="'+esc(c.code)+'">✕</button></div>'; }).join('');
-    var card = '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">🏷️ أكواد الخصم</div>'+(rows||'<div class="fx-hint">مفيش أكواد لسه.</div>')
-      + '<div style="display:flex;gap:8px;margin-top:10px"><input id="bkcd-code" class="field" dir="ltr" style="flex:2" maxlength="20" placeholder="CODE (إنجليزي/أرقام)"><input id="bkcd-pct" class="field" type="number" min="1" max="100" style="flex:1" placeholder="%"><input id="bkcd-max" class="field" type="number" min="0" style="flex:1" placeholder="حد الاستخدام"></div>'
-      + '<div class="sar-actions" style="margin-top:10px"><button type="button" class="btn btn-primary" data-bk="codeadd">➕ إضافة كود</button></div></div>';
-    return card + _a.apply(this, arguments);
-  };
-})();
 window.bkLoad = load;
 (function(){ var _gv = window.FXVIEWS && window.FXVIEWS.glavera; if(_gv){ window.FXVIEWS.glavera = function(){ if(typeof featureLockedForMe==='function' && featureLockedForMe('glavera')) return renderMaintenancePage('جلافيرا', window.GLAFERA_LOGO); return _gv.apply(this, arguments); }; } })();
 (function(){ var _go = window.go; if(typeof _go==='function'){ window.go = function(v){ if(v==='book') state.bkCat = null; if(v==='glavera') state.glSub = null; return _go.apply(this, arguments); }; } })();
