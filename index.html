@@ -12735,6 +12735,7 @@ let _deviceKickCheckBusy = false;
 const GLV_DEVICE_ID = (function(){ try{ let d = localStorage.getItem('glv-device-id'); if(!d){ d = 'dv'+Date.now()+Math.random().toString(36).slice(2,10); localStorage.setItem('glv-device-id', d); } return d; }catch(e){ return DEVICE_SESSION_ID; } })();
 const SESSION_FRESH_MS = 10*60*1000; /* لو الجهاز المفتوح مبعتش نبضة 10 دقايق نعتبر الجلسة ميتة ونسمح بالدخول من جهاز تاني */
 async function claimDeviceSession(pid){
+  return; /* ملغي: مفيش قفل جهاز واحد — الحساب يتفتح من أي جهاز */
   if(!pid) return;
   try{ await window.storage.set('glavera-active-session-'+pid, JSON.stringify({sessionId:DEVICE_SESSION_ID, deviceId:GLV_DEVICE_ID, ts:Date.now()}), true); }
   catch(e){ console.error('claimDeviceSession failed:', e); }
@@ -12760,6 +12761,7 @@ async function gxSessionUpdate(pid, fn){
   }catch(e){}
 }
 function gxHeartbeat(){
+  return; /* ملغي */
   if(!state || !state.pid) return;
   gxSessionUpdate(state.pid, (o)=> o.sessionId===DEVICE_SESSION_ID ? Object.assign(o,{ts:Date.now()}) : null);
 }
@@ -12767,6 +12769,7 @@ setInterval(function(){ try{ gxHeartbeat(); }catch(e){} }, 60000);
 document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ gxHeartbeat(); }catch(e){} } });
 /* بوّابة الدخول: false = الحساب مفتوح دلوقتي من جهاز تاني */
 async function gxLoginGate(pid){
+  return true; /* ملغي: الدخول مسموح من أي جهاز حتى لو الحساب مفتوح من جهاز تاني */
   try{
     const r = await window.storage.get('glavera-active-session-'+pid, true);
     if(!r || !r.value) return true;
@@ -12812,6 +12815,7 @@ async function gxShowLoginBlocked(pid){
 function gxAttemptSeenGet(pid){ try{ return +localStorage.getItem('glv-attempt-seen-'+pid)||0; }catch(e){ return 0; } }
 function gxAttemptSeenSet(pid,ts){ try{ localStorage.setItem('glv-attempt-seen-'+pid, String(ts)); }catch(e){} }
 async function checkDeviceSessionKicked(){
+  return; /* ملغي: مفيش طرد من الجهاز التاني */
   if(!state.pid || _deviceKickCheckBusy) return;
   _deviceKickCheckBusy = true;
   try{
