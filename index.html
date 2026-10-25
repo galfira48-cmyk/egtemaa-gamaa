@@ -56640,5 +56640,234 @@ window.openMatchsticksGame=open;
 })();
 </script>
 
+<script id="admin-pts-insight">
+/* ===== تحليل النقط (أدمن): نقط كل مشارك جت منين + ترتيب الألعاب بالنقط + تعديل جايزة كل لعبة ===== */
+(function(){
+  'use strict';
+  var GKEY = 'glavera-game-score-by';
+  var P = window.__PTS = window.__PTS || { gsg:null, loading:false, sel:null, q:'', open:null };
+
+  /* اللعبة -> الاسم + إعدادات الجايزة اللي موجودة فعلاً في التطبيق (GAME_POINTS_SETTINGS) */
+  var GM = {
+    xo:{i:'⭕',n:'إكس أو',f:[{k:'soloXoReward',l:'ضد الجهاز (بعد عدد الفوز المطلوب)',d:25},{k:'xoWinReward',l:'معركة إكس أو أونلاين',d:50}]},
+    connect4:{i:'🔴',n:'كونكت فور',f:[{k:'soloC4Reward',l:'جايزة الفوز على الجهاز',d:25}]},
+    ludo:{i:'🎲',n:'لودو',f:[{k:'first',l:'المركز الأول',d:100},{k:'second',l:'المركز التاني',d:50},{k:'third',l:'المركز التالت',d:30}],note:'نفس جدول المراكز بتاع «فاهمين بعض؟» — تعديله بيأثر على الاتنين'},
+    fahmeen:{i:'💬',n:'فاهمين بعض؟',f:[{k:'first',l:'المركز الأول',d:100},{k:'second',l:'المركز التاني',d:50},{k:'third',l:'المركز التالت',d:30}],note:'نفس جدول المراكز بتاع اللودو — تعديله بيأثر على الاتنين'},
+    math:{i:'➗',n:'رياضيات سريعة',f:[{k:'soloMathReward',l:'جايزة الجولة',d:50}]},
+    numguess:{i:'🔢',n:'تخمين الرقم',f:[{k:'soloNumGuessReward',l:'جايزة التخمين الصح',d:100}]},
+    placemem:{i:'🧠',n:'ذاكرة الأماكن',f:[{k:'soloPlaceMemReward',l:'جايزة الجولة',d:40}]},
+    sqorder:{i:'🔲',n:'ترتيب المربعات',f:[{k:'soloSqOrderReward',l:'جايزة الجولة',d:40}]},
+    cube:{i:'🧊',n:'مكعب روبيك',f:[{k:'soloCubeReward',l:'جايزة الحل',d:50}]},
+    crossmath:{i:'🧮',n:'كروس ماث',f:[{k:'soloCrossMathReward',l:'جايزة الحل',d:40}]},
+    rollpaint:{i:'🎨',n:'الأرضية',f:[{k:'soloRollPaintReward',l:'جايزة الجولة',d:20}]},
+    simon:{i:'🎵',n:'سايمن',f:[{k:'soloSimonReward',l:'جايزة الجولة',d:20}]},
+    reflex:{i:'⚡',n:'أسرع واحد',f:[{k:'soloReflexReward',l:'جايزة الفوز',d:30}]},
+    darts:{i:'🎯',n:'النشان',f:[{k:'soloDartsReward',l:'جايزة الفوز',d:35}]},
+    bowling:{i:'🎳',n:'البولينج',f:[{k:'soloBowlingReward',l:'جايزة الفوز',d:40}]},
+    billiards:{i:'🎱',n:'البلياردو',f:[{k:'soloBilliardsReward',l:'جايزة الفوز',d:40}]},
+    tmm:{i:'⚪',n:'الطاحونة',f:[{k:'soloTmmReward',l:'جايزة الفوز',d:25}]},
+    who:{i:'🕵️',n:'مين هو؟',f:[{k:'soloWhoReward',l:'جايزة الفوز',d:40}]},
+    colorcards:{i:'🎴',n:'كروت الألوان',f:[{k:'soloColorCardsReward',l:'جايزة الفوز',d:35}]},
+    mystery:{i:'🕯️',n:'غرفة الغموض',f:[{k:'mysteryWin',l:'جايزة كل لاعب فايز',d:60}]},
+    stack:{i:'🗼',n:'البرج',f:[{k:'soloStackPerBlock',l:'نقط كل طوبة',d:3},{k:'soloStackMilestoneUnit',l:'نقط كل مرحلة',d:5},{k:'soloStackPerfectBonus',l:'بونص الطوبة المظبوطة',d:2}]},
+    blocky:{i:'🧩',n:'بلوكي',f:[{k:'soloBlockyUnit',l:'نقط كل مرحلة سكور',d:5}]},
+    snakes:{i:'🐍',n:'سلم وثعبان',f:[{k:'soloSnlReward',l:'جايزة الفوز',d:30}]},
+    millionaire:{i:'👑',n:'من سيربح المليون'},
+    fawazeer:{i:'🧩',n:'فوازير'},
+    vault:{i:'🔐',n:'افتح الخزنة'},
+    matchsq:{i:'🪵',n:'أعواد المربعات'},
+    treasure:{i:'🗝️',n:'لغز الكنز'},
+    bus:{i:'🚌',n:'أتوبيس كومبليت'},
+    revword:{i:'🔄',n:'الكلمة المعكوسة'},
+    fazzura:{i:'❓',n:'فزورة'}
+  };
+
+  function esc(s){ return (typeof escapeHtml==='function') ? escapeHtml(String(s==null?'':s)) : String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function num(n){ return (Number(n)||0).toLocaleString('en-US'); }
+  function gname(g){ var m = GM[g]; return m ? m.n : g; }
+  function gico(g){ var m = GM[g]; return m ? m.i : '🎮'; }
+  function cur(k, d){ var s = (typeof GAME_POINTS_SETTINGS!=='undefined' && GAME_POINTS_SETTINGS) || {}; return s[k]==null ? d : s[k]; }
+  function pname(pid){ var p = (PARTICIPANTS||[]).find(function(x){ return String(x.id)===String(pid); }); return p ? p.name : pid; }
+
+  /* ---------- تحميل سجل نقط الألعاب (بيتحدّث لما الأدمن يفتح الشاشة) ---------- */
+  function loadGsg(force){
+    if(P.loading) return; if(P.gsg && !force) return;
+    P.loading = true;
+    Promise.resolve().then(function(){ return window.storage.get(GKEY, true); }).then(function(r){
+      try{ P.gsg = (r && r.value) ? (JSON.parse(r.value)||{}) : {}; }catch(e){ P.gsg = {}; }
+    }).catch(function(){ P.gsg = P.gsg || {}; }).then(function(){
+      P.loading = false;
+      if(typeof state!=='undefined' && state.adminUnlocked){ try{ render(); }catch(e){} }
+    });
+  }
+
+  /* ---------- حسابات ---------- */
+  function gameTotals(){
+    var out = [], g = P.gsg || {}, all = 0;
+    Object.keys(GM).forEach(function(id){
+      var m = g[id] || {}, pts = 0, wins = 0, best = 0, players = 0;
+      Object.keys(m).forEach(function(pid){ var r = m[pid]||{}; var p = +r.pts||0; if(p>0){ pts += p; wins += (+r.wins||0); players++; if((+r.best||0)>best) best = +r.best||0; } });
+      all += pts; out.push({id:id, pts:pts, wins:wins, players:players, best:best});
+    });
+    out.sort(function(a,b){ return b.pts-a.pts || b.wins-a.wins; });
+    return {rows:out, total:all};
+  }
+  function myGames(pid){
+    var g = P.gsg || {}, rows = [], tot = 0;
+    Object.keys(g).forEach(function(id){ var r = (g[id]||{})[pid]; if(r && (+r.pts||0)>0){ rows.push({id:id, pts:+r.pts||0, wins:+r.wins||0, best:+r.best||0}); tot += +r.pts||0; } });
+    rows.sort(function(a,b){ return b.pts-a.pts; });
+    return {rows:rows, total:tot};
+  }
+  function mySessions(pid){
+    var rows = [], tot = 0;
+    (DAYS||[]).forEach(function(d){ d.sessions.forEach(function(s){ var v = sessionPoints(pid, s.id); if(v){ tot += v; var info = (typeof SESSION_INFO!=='undefined' && SESSION_INFO[s.id]) || {}; rows.push({n:(info.name||s.name||s.id), d:d.label||'', v:v}); } }); });
+    return {rows:rows, total:tot};
+  }
+  function myAtt(pid){
+    var by = {}, tot = 0;
+    try{ Object.values(ATT_RECORDS||{}).forEach(function(r){ if(r && String(r.pid)===String(pid)){ var v = +r.pts||0; tot += v; var t = r.type||'?'; by[t] = (by[t]||0) + v; } }); }catch(e){}
+    var rows = Object.keys(by).map(function(t){ var T = (typeof ATT_TYPES!=='undefined' && ATT_TYPES[t]) || {}; return {n:(T.full||T.label||t), i:(T.icon||'📋'), v:by[t]}; });
+    return {rows:rows, total:tot};
+  }
+
+  function barRow(name, val, max, sub){
+    var pct = max>0 ? Math.max(3, Math.round(val/max*100)) : 0;
+    return '<div class="admin-bar-row"><div class="abr-name">'+name+(sub?'<div class="arr-sub">'+sub+'</div>':'')+'</div><div class="abr-track"><div class="abr-fill" style="width:'+pct+'%"></div></div><div class="abr-val">'+num(val)+'</div></div>';
+  }
+
+  /* ---------- كارت تفصيل المشارك (بيظهر في شاشة المشارك وفي شاشة التحليل) ---------- */
+  function participantCard(pid){
+    var S = mySessions(pid), A = myAtt(pid), G = myGames(pid);
+    var bonus = Math.max(0, (typeof BONUS!=='undefined' && BONUS[pid]) || 0);
+    var rankTotal = participantTotal(pid), wallet = (typeof WALLET!=='undefined' && WALLET[pid]) || 0;
+    var max = Math.max(S.total, A.total, bonus, 1);
+    var h = '<div class="card" style="margin-bottom:12px;">';
+    h += '<div class="admin-session-name" style="margin-bottom:6px;">📊 نقط '+esc(pname(pid))+' جت منين؟</div>';
+    h += adminKpis([{num:num(rankTotal),lab:'نقط الترتيب'},{num:num(G.total),lab:'اتكسبت من ألعاب'},{num:num(wallet),lab:'رصيد فيزا Games'}]);
+    h += '<div class="admin-session-name" style="margin:12px 0 8px;font-size:12.5px;">🏆 نقط الترتيب</div>';
+    h += barRow('🗓️ الجلسات', S.total, max, S.rows.length?('من '+S.rows.length+' جلسة'):'');
+    h += barRow('⛪ الحضور (QR)', A.total, max, A.rows.map(function(r){ return esc(r.n)+' '+num(r.v); }).join(' · '));
+    h += barRow('🎁 البونص (الحالي)', bonus, max, 'إضافات المنظمين والخلوة وغيرها بعد خصم المشتريات والإيداع في الفيزا');
+    h += '<div class="admin-session-name" style="margin:14px 0 8px;font-size:12.5px;">🎮 نقط الألعاب (حسب اللعبة)</div>';
+    if(!P.gsg){ h += '<div class="hint">⏳ جاري تحميل سجل الألعاب...</div>'; }
+    else if(!G.rows.length){ h += '<div class="empty-note" style="padding:8px 0;">لسه مفيش نقط ألعاب مسجّلة للمشارك ده</div>'; }
+    else { var gmax = G.rows[0].pts; G.rows.forEach(function(r){ h += barRow(gico(r.id)+' '+esc(gname(r.id)), r.pts, gmax, num(r.wins)+' مرة · أعلى جايزة '+num(r.best)); }); }
+    h += '<div class="hint" style="margin-top:10px;">نقط الألعاب بتروح رصيد فيزا Games، وبتدخل في نقط الترتيب بس لو المشارك سحبها للنقاط.</div>';
+    h += '</div>';
+    return h;
+  }
+
+  /* ---------- شاشة ترتيب الألعاب + تعديل الجوايز ---------- */
+  function gameCard(r, rank, maxPts, total){
+    var m = GM[r.id] || {}, share = total>0 ? Math.round(r.pts/total*100) : 0;
+    var medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':('#'+rank);
+    var avg = r.wins ? Math.round(r.pts/r.wins) : 0;
+    var h = '<div class="card" style="margin-bottom:10px;">';
+    h += '<div class="admin-row-line"><div class="admin-session-name">'+medal+' '+gico(r.id)+' '+esc(gname(r.id))+'</div><div class="arr-pts">'+num(r.pts)+' نقطة</div></div>';
+    h += adminPctBar(maxPts>0 ? r.pts/maxPts*100 : 0);
+    h += '<div class="arr-sub" style="margin-top:6px;">'+(r.pts? (share+'% من كل نقط الألعاب · '+num(r.wins)+' فوز · '+num(r.players)+' لاعب · متوسط '+num(avg)+' · أعلى '+num(r.best)) : 'مفيش نقط مسجّلة لسه')+'</div>';
+    if(m.f && m.f.length){
+      h += '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">';
+      h += '<div class="arr-sub" style="margin-bottom:6px;">⚙️ الجايزة الحالية — عدّل واضغط حفظ</div>';
+      m.f.forEach(function(f){
+        h += '<label style="display:block;margin:8px 2px 4px;font-size:11.5px;">'+esc(f.l)+'</label>';
+        h += '<input type="number" min="0" class="field" data-pts-g="'+r.id+'" data-pts-k="'+f.k+'" data-pts-d="'+f.d+'" value="'+cur(f.k,f.d)+'" style="text-align:center;" />';
+      });
+      if(m.note) h += '<div class="hint" style="margin-top:6px;">'+esc(m.note)+'</div>';
+      h += '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">';
+      [10,25,50].forEach(function(p){ h += '<button type="button" class="btn btn-ghost" style="flex:1;margin:0;padding:8px;font-size:12px;" data-pts="cut" data-g="'+r.id+'" data-pct="'+p+'">−'+p+'%</button>'; });
+      h += '<button type="button" class="btn btn-primary" style="flex:1.4;margin:0;padding:8px;font-size:12.5px;" data-pts="save" data-g="'+r.id+'">💾 حفظ</button>';
+      h += '</div>';
+    } else if(!m.f){
+      h += '<div class="hint" style="margin-top:10px;">نقط اللعبة دي ثابتة جوه الكود — مفيش إعداد جاهز ليها من الأدمن دلوقتي.</div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function gamesTab(){
+    if(!P.gsg){ return '<div class="hint" style="padding:18px 4px;">⏳ جاري تحميل سجل نقط الألعاب...</div>'; }
+    var T = gameTotals(), rows = T.rows, maxPts = rows.length ? rows[0].pts : 0;
+    var top = rows[0] && rows[0].pts>0 ? (gico(rows[0].id)+' '+gname(rows[0].id)) : '—';
+    var h = adminKpis([{num:num(T.total),lab:'إجمالي نقط الألعاب'},{num:rows.filter(function(r){return r.pts>0;}).length,lab:'ألعاب اتلعبت'},{num:top,lab:'أكتر لعبة بتدّي نقط'}]);
+    h += '<div class="hint" style="margin:8px 2px 12px;">الترتيب من سجل الفوز المسجّل لكل لعبة. تعديل الجايزة بيأثر على الفوز الجاي بس — النقط اللي اتكسبت قبل كده مبتتغيرش، والتغيير بيوصل لباقي المشاركين لما يفتحوا التطبيق.</div>';
+    var rank = 0; rows.forEach(function(r){ rank++; h += gameCard(r, rank, maxPts, T.total); });
+    return h;
+  }
+
+  /* ---------- شاشة المشاركين ---------- */
+  function peopleTab(){
+    if(P.sel){
+      return '<button type="button" class="admin-back-link" data-pts="back">'+ICO.back+' كل المشاركين</button>' + participantCard(P.sel);
+    }
+    var q = (P.q||'').trim().toLowerCase();
+    var rows = (typeof rankedParticipants==='function' ? rankedParticipants() : (PARTICIPANTS||[]).map(function(p){ return {id:p.id,name:p.name,total:participantTotal(p.id)}; }));
+    if(q) rows = rows.filter(function(p){ return String(p.name).toLowerCase().indexOf(q)>-1 || String(p.id).indexOf(q)>-1; });
+    var h = '<input type="text" class="field admin-search-input" id="pts-q" placeholder="🔍 دوّر على مشارك..." value="'+esc(P.q||'')+'" />';
+    h += '<div class="card" style="margin-top:10px;">';
+    if(!rows.length) h += adminEmptyState('🔍','مفيش نتايج','');
+    rows.slice(0,200).forEach(function(p,i){
+      h += '<button type="button" class="admin-rank-row" style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:inherit;font:inherit;text-align:start;cursor:pointer;" data-pts="open" data-pid="'+esc(p.id)+'"><span class="arr-num">'+(i+1)+'</span><span class="arr-body">'+esc(p.name)+'<div class="arr-sub">#'+esc(p.id)+'</div></span><span class="arr-pts">'+num(p.total)+'</span></button>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  window.FXADMIN = window.FXADMIN || {};
+  window.FXADMIN.ptsrc = function(){
+    P.open = true; loadGsg(false);
+    var sub = adminSubGet('ptsrc','games');
+    return adminSubTabs('ptsrc',[{id:'games',label:'🎮 الألعاب'},{id:'people',label:'👤 المشاركين'}], sub)
+      + '<div style="display:flex;justify-content:flex-end;margin:-4px 0 8px;"><button type="button" class="btn btn-ghost" style="width:auto;margin:0;padding:6px 12px;font-size:12px;" data-pts="refresh">🔄 تحديث</button></div>'
+      + (sub==='people' ? peopleTab() : gamesTab());
+  };
+
+  if(typeof ADMIN_HUB_ITEMS!=='undefined' && !ADMIN_HUB_ITEMS.some(function(x){return x.tab==='ptsrc';})){
+    ADMIN_HUB_ITEMS.push({group:'games', tab:'ptsrc', short:'النقط جت منين وأنهي لعبة بتدّي أكتر', desc:'تفصيل نقط كل مشارك (جلسات/حضور/بونص/ألعاب) وترتيب الألعاب بالنقط مع تعديل جايزة كل لعبة', icon:'📈', label:'تحليل النقط', color:'linear-gradient(145deg,#F4B740,#3FDCC9)'});
+  }
+
+  /* كارت التفصيل جوه شاشة المشارك → تبويب «النقاط» */
+  if(typeof window.renderAdminParticipantDetail==='function' && !window.renderAdminParticipantDetail.__pts){
+    var orig = window.renderAdminParticipantDetail;
+    var wrapped = function(p){
+      var html = orig.apply(this, arguments);
+      try{
+        if(adminSubGet('participant:'+p.id,'info')==='points'){ P.open = true; loadGsg(false); html += participantCard(p.id); }
+      }catch(e){}
+      return html;
+    };
+    wrapped.__pts = true; window.renderAdminParticipantDetail = wrapped;
+  }
+
+  /* ---------- أحداث ---------- */
+  function fieldsOf(g){ return Array.prototype.slice.call(document.querySelectorAll('input[data-pts-g="'+g+'"]')); }
+  document.addEventListener('input', function(e){
+    var t = e.target; if(t && t.id==='pts-q'){ P.q = t.value; var pos = t.selectionStart; try{ render(); var n = document.getElementById('pts-q'); if(n){ n.focus(); n.setSelectionRange(pos,pos); } }catch(_){} }
+  });
+  document.addEventListener('click', function(e){
+    var el = e.target.closest && e.target.closest('[data-pts]'); if(!el) return;
+    var a = el.getAttribute('data-pts'), g = el.getAttribute('data-g');
+    if(a==='open'){ P.sel = el.getAttribute('data-pid'); loadGsg(false); render(); }
+    else if(a==='back'){ P.sel = null; render(); }
+    else if(a==='refresh'){ P.gsg = null; loadGsg(true); render(); }
+    else if(a==='cut'){
+      var pct = +el.getAttribute('data-pct') || 0;
+      fieldsOf(g).forEach(function(inp){ var base = Number(cur(inp.getAttribute('data-pts-k'), +inp.getAttribute('data-pts-d')))||0; inp.value = Math.max(0, Math.round(base*(100-pct)/100)); });
+      showToast('اتحسبت القيم الجديدة — اضغط «حفظ» عشان تتطبّق');
+    }
+    else if(a==='save'){
+      var inputs = fieldsOf(g), vals = {};
+      var bad = inputs.some(function(inp){ var v = parseInt(normalizeDigits(inp.value),10); if(isNaN(v) || v<0){ return true; } vals[inp.getAttribute('data-pts-k')] = v; return false; });
+      if(bad){ showToast('اكتب أرقام صحيحة (صفر أو أكتر)', true); return; }
+      var desc = Object.keys(vals).map(function(k){ return vals[k]; }).join(' / ');
+      showConfirmDialog('تغيير جايزة '+gname(g)+' لـ '+desc+'؟', function(){
+        Object.keys(vals).forEach(function(k){ GAME_POINTS_SETTINGS[k] = vals[k]; });
+        Promise.resolve(saveGamePointsSettings(GAME_POINTS_SETTINGS)).then(function(){ showToast('✅ اتحفظت جايزة '+gname(g)); render(); });
+      }, {icon:'🎮', confirmLabel:'حفظ', sub:'التغيير بيأثر على أي فوز جاي من دلوقتي.'});
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
