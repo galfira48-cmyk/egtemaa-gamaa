@@ -20,7 +20,9 @@
     else if(localStorage.getItem('glv-local-v')!=='2'){ localStorage.removeItem('glv-local'); localStorage.setItem('glv-local-v','2'); } /* تنظيف أي وضع محلي قديم كان مفعّل تلقائيًا */
     mode = localStorage.getItem('glv-local');
     /* الافتراضي أونلاين: التسجيل والحضور لازم يروحوا Firebase عشان الأدمن يشوفهم */
-    if(mode==='off') mode = null;
+    var __off = (mode==='off'); if(__off) mode = null;
+    /* لو التطبيق اتفتح من غير نت: وضع محلي تلقائي للجلسة دي بس (مش بيتحفظ) ويرجع أونلاين لوحده لما النت يرجع */
+    if(!mode && !__off && navigator.onLine===false){ mode = '1'; window.__GLV_AUTO_LOCAL = true; }
   }catch(e){}
   window.__GLV_LOCAL = !!mode;
   if(mode!=='tabs') return;
@@ -12086,9 +12088,11 @@ async function saveChatMessages(arr){
 }
 async function saveChatMessagesWithRetry(arr, attempt){
   attempt = attempt || 1;
+  if(navigator.onLine===false){ try{ glvChatNotePend(arr); }catch(e){} return false; }
   const ok = await saveChatMessages(arr);
-  if(ok) return true;
+  if(ok){ try{ glvChatPendPrune(arr); }catch(e){} return true; }
   if(attempt < 3){ await sleep(800*attempt); return saveChatMessagesWithRetry(arr, attempt+1); }
+  try{ glvChatNotePend(arr); }catch(e){}
   return false;
 }
 async function saveChatMedia(mediaId, dataUrl, attempt){
@@ -12458,6 +12462,109 @@ let _visaOpBusy = false;
 let GALLERY_ALBUMS = [];
 let PENDING_GALLERY_UPLOADS = []; // صور فشل رفعها بسبب ضعف/انقطاع النت، بتتحفظ هنا وبترفع تلقائي أول ما الاتصال يرجع
 let PENDING_PARTICIPANT_PHOTO_UPLOADS = []; // نفس الفكرة بس لصور المشاركين الخاصة
+/* ===== GLV-OUTBOX: الطوابير بتتحفظ على الجهاز (حتى لو التطبيق اتقفل) وبتتبعت لما النت يرجع ===== */
+var __glvSessionTs = Date.now(), __glvRestored = false, __glvSig = {}, __glvFlushing = false, __glvIDB = null;
+function glvIdb(){ return new Promise(function(res){ if(__glvIDB) return res(__glvIDB); try{ var r = indexedDB.open('glv-outbox',1); r.onupgradeneeded = function(){ try{ r.result.createObjectStore('kv'); }catch(e){} }; r.onsuccess = function(){ __glvIDB = r.result; res(__glvIDB); }; r.onerror = function(){ res(null); }; r.onblocked = function(){ res(null); }; }catch(e){ res(null); } }); }
+function glvIdbGet(k){ return glvIdb().then(function(db){ return new Promise(function(res){ if(!db) return res(null); try{ var q = db.transaction('kv','readonly').objectStore('kv').get(k); q.onsuccess = function(){ res(q.result===undefined ? null : q.result); }; q.onerror = function(){ res(null); }; }catch(e){ res(null); } }); }); }
+function glvIdbSet(k,v){ return glvIdb().then(function(db){ return new Promise(function(res){ if(!db) return res(false); try{ var t = db.transaction('kv','readwrite'); t.objectStore('kv').put(v,k); t.oncomplete = function(){ res(true); }; t.onerror = function(){ res(false); }; t.onabort = function(){ res(false); }; }catch(e){ res(false); } }); }); }
+function glvQueues(){ return [
+  { k:'chatMedia', get:function(){ return PENDING_CHAT_MEDIA_UPLOADS; }, set:function(v){ PENDING_CHAT_MEDIA_UPLOADS = v; }, id:function(x){ return x.mediaId; }, cache:function(x){ CHAT_MEDIA_CACHE[x.mediaId] = x.dataUrl; }, kick:function(){ scheduleChatMediaUploadRetry(); } },
+  { k:'gallery', get:function(){ return PENDING_GALLERY_UPLOADS; }, set:function(v){ PENDING_GALLERY_UPLOADS = v; }, id:function(x){ return x.pid; }, cache:function(x){ GALLERY_PHOTO_CACHE[x.pid] = x.dataUrl; }, kick:function(){ scheduleGalleryUploadRetry(); } },
+  { k:'pphoto', get:function(){ return PENDING_PARTICIPANT_PHOTO_UPLOADS; }, set:function(v){ PENDING_PARTICIPANT_PHOTO_UPLOADS = v; }, id:function(x){ return x.photoId; }, cache:function(x){ PARTICIPANT_PHOTO_CACHE[x.photoId] = x.dataUrl; }, kick:function(){ scheduleParticipantPhotoUploadRetry(); } }
+]; }
+async function glvRestoreQueues(){
+  try{
+    var qs = glvQueues();
+    for(var i=0;i<qs.length;i++){
+      var q = qs[i], saved = await glvIdbGet('q:'+q.k);
+      if(saved && saved.length){
+        var cur = q.get() || [], have = {};
+        cur.forEach(function(x){ have[q.id(x)] = 1; });
+        saved.forEach(function(x){ if(!have[q.id(x)]) cur.push(x); try{ q.cache(x); }catch(e){} });
+        q.set(cur); try{ q.kick(); }catch(e){}
+      }
+    }
+  }catch(e){}
+  __glvRestored = true;
+}
+function glvPersistQueues(force){
+  if(!__glvRestored) return Promise.resolve();
+  return Promise.all(glvQueues().map(function(q){
+    var a = q.get() || [], sig = a.map(function(x){ return q.id(x); }).join('|');
+    if(!force && __glvSig[q.k]===sig) return null;
+    __glvSig[q.k] = sig; return glvIdbSet('q:'+q.k, a);
+  }));
+}
+/* رسايل الشات النصية اللي اتكتبت من غير نت */
+function glvChatPendRead(){ try{ var a = JSON.parse(localStorage.getItem('glv-chat-pend')||'[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } }
+function glvChatPendWrite(a){ try{ if(a.length) localStorage.setItem('glv-chat-pend', JSON.stringify(a.slice(-60))); else localStorage.removeItem('glv-chat-pend'); }catch(e){} }
+function glvChatNotePend(arr){
+  var pid = (typeof state==='object' && state) ? state.pid : null; if(!pid) return;
+  var cur = glvChatPendRead(), have = {}; cur.forEach(function(m){ have[m.id] = 1; });
+  (arr||[]).forEach(function(m){ if(m && m.id && m.pid===pid && !m.mediaId && !have[m.id] && (m.ts||0) >= __glvSessionTs - 1000){ cur.push(m); have[m.id] = 1; } });
+  glvChatPendWrite(cur);
+}
+function glvChatPendPrune(arr){
+  var cur = glvChatPendRead(); if(!cur.length) return;
+  var ids = {}; (arr||[]).forEach(function(m){ if(m && m.id) ids[m.id] = 1; });
+  glvChatPendWrite(cur.filter(function(m){ return !ids[m.id]; }));
+}
+function glvMerge(a,b){ var seen = {}, out = []; (a||[]).concat(b||[]).forEach(function(m){ if(m && m.id && !seen[m.id]){ seen[m.id] = 1; out.push(m); } }); out.sort(function(x,y){ return (x.ts||0)-(y.ts||0); }); return out; }
+async function glvFetchServerChat(){
+  try{ if(!window.storage || navigator.onLine===false) return null;
+    var r = await window.storage.get('glavera-chat-messages', true);
+    if(!r || !r.value || r.__stale) return null;
+    var a = JSON.parse(r.value); return Array.isArray(a) ? a : null;
+  }catch(e){ return null; }
+}
+async function glvChatPrepMedia(){
+  try{
+    var need = PENDING_CHAT_MEDIA_UPLOADS.filter(function(x){ return x.msg && !CHAT_MESSAGES.some(function(m){ return m.id===x.msg.id; }); });
+    if(!need.length) return true;
+    var server = await glvFetchServerChat(); if(!server) return false;
+    CHAT_MESSAGES = glvMerge(glvMerge(server, CHAT_MESSAGES), need.map(function(x){ return x.msg; }));
+    trimChatMessages();
+    return true;
+  }catch(e){ return false; }
+}
+async function glvChatFlush(){
+  if(__glvFlushing || navigator.onLine===false) return;
+  var pend = glvChatPendRead(); if(!pend.length) return;
+  __glvFlushing = true;
+  try{
+    var server = await glvFetchServerChat(); if(!server) return;
+    var saveArr = glvMerge(server, pend);
+    if(saveArr.length > CHAT_MAX_MESSAGES) saveArr = saveArr.slice(saveArr.length - CHAT_MAX_MESSAGES);
+    var ok = await saveChatMessagesWithRetry(saveArr);
+    if(ok){
+      glvChatPendWrite([]);
+      var pm = (PENDING_CHAT_MEDIA_UPLOADS||[]).map(function(x){ return x.msg; }).filter(Boolean);
+      CHAT_MESSAGES = glvMerge(saveArr, pm); trimChatMessages();
+      try{ showToast('✅ اتبعتت رسايل الشات اللي كانت مستنية'); }catch(e){}
+      try{ render(); }catch(e){}
+    }
+  }catch(e){} finally{ __glvFlushing = false; }
+}
+function glvOutboxKick(){
+  if(navigator.onLine===false || !__glvRestored) return;
+  try{ glvChatFlush(); }catch(e){}
+  try{ processPendingChatMediaUploads(); }catch(e){}
+  try{ processPendingGalleryUploads(); }catch(e){}
+  try{ processPendingParticipantPhotoUploads(); }catch(e){}
+}
+(function(){
+  function init(){ glvRestoreQueues().then(function(){ setInterval(function(){ glvPersistQueues(); }, 1500); setTimeout(glvOutboxKick, 2500); }); }
+  if(document.readyState==='complete') setTimeout(init, 1200); else window.addEventListener('load', function(){ setTimeout(init, 1200); });
+  window.addEventListener('online', function(){ setTimeout(glvOutboxKick, 800); });
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) setTimeout(glvOutboxKick, 500); });
+  setInterval(glvOutboxKick, 30000);
+  /* لو التطبيق كان شغال بالوضع المحلي التلقائي ورجع النت: نحفظ الطوابير ونرجع أونلاين */
+  window.addEventListener('online', function(){
+    if(!window.__GLV_AUTO_LOCAL) return;
+    try{ showToast('رجع النت 🌐 — بنرجع للوضع الأونلاين'); }catch(e){}
+    Promise.resolve(glvPersistQueues(true)).then(function(){ setTimeout(function(){ location.reload(); }, 1200); });
+  });
+})();
 const SOCIAL_LINKS = [
   {key:'facebook', label:'فيسبوك', cls:'facebook', url:'https://www.facebook.com/share/1BQxTZtP3o/',
     svg:`<svg viewBox="0 0 24 24"><path class="st-fill" d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>`},
@@ -14549,6 +14656,11 @@ function renderRetreatPage(){
       <span><div class="bt">الكتاب المقدس</div><div class="bd">العهد القديم والعهد الجديد — اقرأ بين يدي ربنا</div></span>
       <span class="bc">${ICO.chev}</span>
     </button>
+    <button type="button" class="rt-bible-card" data-action="khb-open" aria-label="رفيق الخلوة">
+      <span class="bi">🤝</span>
+      <span><div class="bt">رفيق الخلوة <i id="khb-chip" class="khb-chip"></i></div><div class="bd">مهمة قراءة مشتركة مع صاحبك — لما حد يخلّص التاني يوصله إشعار</div></span>
+      <span class="bc">${ICO.chev}</span>
+    </button>${(setTimeout(function(){ try{ khbCss(); khbRefreshChip(); }catch(e){} }, 350), '')}
     <div class="rt-rem" id="kh-rem">${khRemHtml()}</div>
     <div class="section-title">خطوات الخلوة</div>
     <div class="rt-tl">${steps}</div>
@@ -14569,6 +14681,272 @@ async function saveRetreatNote(){
   const sv = document.getElementById('retreat-saved');
   if(sv) sv.textContent = 'آخر حفظ: '+new Date(ex.retreatNoteTs).toLocaleString('ar-EG',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'long'});
   showToast('تم حفظ ملاحظاتك ✝️');
+}
+
+/* ============================= رفيق الخلوة: مهمة قراءة مشتركة مع صاحبك ============================= */
+const KHB_KEY = 'glavera-khbuddy';
+let KHB_TASKS = [], KHB_LOADED = 0, KHB_BUSY = false;
+let KHB_UI = { mode:'list', q:'', friend:null, kind:'chapter', t:'nt', bi:3, ch:1, free:'' };
+function khbName(id){ const p = (PARTICIPANTS||[]).find(x=>x.id===id); return p ? String(p.name||'').trim() : ''; }
+function khbFirst(n){ return String(n||'').trim().split(/\s+/)[0] || 'صاحبك'; }
+function khbParse(cur){ let o = null; try{ o = (typeof cur==='string') ? JSON.parse(cur) : cur; }catch(e){ o = null; } if(!o || !Array.isArray(o.tasks)) o = {tasks:[]}; return o; }
+async function khbRead(){
+  if(navigator.onLine===false || !window.storage) return null;
+  try{ const r = await window.storage.get(KHB_KEY, true); KHB_TASKS = khbParse(r && r.value).tasks; KHB_LOADED = Date.now(); return KHB_TASKS; }catch(e){ return null; }
+}
+/* كل التعديلات بتتم بمعاملة ذرّية على السيرفر عشان تعديلات الاتنين ما تكتبش فوق بعض */
+async function khbMut(fn){
+  if(!window.storage || !window.storage.update || navigator.onLine===false) return null;
+  let out;
+  try{
+    const r = await window.storage.update(KHB_KEY, function(cur){
+      const o = khbParse(cur); out = fn(o);
+      if(out===false) return undefined;
+      const now = Date.now();
+      o.tasks = o.tasks.filter(function(t){ return (t.da && t.db) ? (Math.max(t.da,t.db) > now-120*864e5) : ((t.ts||0) > now-30*864e5); }).slice(-400);
+      return JSON.stringify(o);
+    }, true, 12000);
+    if(!r) return null;
+    KHB_TASKS = khbParse(r.value).tasks; KHB_LOADED = Date.now();
+    return { out: out };
+  }catch(e){ return null; }
+}
+function khbCss(){
+  if(document.getElementById('khb-css')) return;
+  const st = document.createElement('style'); st.id = 'khb-css';
+  st.textContent = `
+  .khb-ov{position:fixed;inset:0;z-index:10050;background:rgba(5,4,25,.72);display:flex;align-items:flex-end;justify-content:center;direction:rtl;font-family:inherit}
+  .khb-sheet{width:100%;max-width:520px;max-height:90vh;overflow-y:auto;background:linear-gradient(180deg,#221f66,#12103d);color:#fff;border-radius:26px 26px 0 0;padding:10px 16px calc(22px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.5);-webkit-overflow-scrolling:touch}
+  .khb-grab{width:44px;height:5px;border-radius:9px;background:rgba(255,255,255,.25);margin:4px auto 12px}
+  .khb-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .khb-head h3{margin:0;font-size:20px;font-weight:900}
+  .khb-head p{margin:4px 0 0;font-size:12.5px;line-height:1.7;opacity:.72}
+  .khb-x{flex:none;width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#fff;font-size:16px}
+  .khb-sec{margin:16px 2px 8px;font-size:13px;font-weight:800;opacity:.8}
+  .khb-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:13px 14px;margin-bottom:10px}
+  .khb-card.ok{border-color:rgba(95,224,164,.55);background:rgba(95,224,164,.1)}
+  .khb-t{font-weight:900;font-size:15px;margin-bottom:8px}
+  .khb-row{display:flex;gap:8px;margin-bottom:10px}
+  .khb-row span{flex:1;text-align:center;padding:7px 6px;border-radius:12px;font-size:12.5px;font-weight:800;background:rgba(255,255,255,.06)}
+  .khb-row span.y{background:rgba(95,224,164,.18);color:#9ff0c9}
+  .khb-btns{display:flex;gap:8px}
+  .khb-btns button,.khb-b{flex:1;padding:10px 8px;border-radius:13px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#fff;font-weight:800;font-size:13px;font-family:inherit}
+  .khb-btns button.pri,.khb-b.pri{background:linear-gradient(135deg,#f4b740,#e8892b);color:#2a1a00;border:none}
+  .khb-btns button.g{flex:0 0 46px}
+  .khb-ok{margin-top:9px;text-align:center;font-weight:900;color:#9ff0c9;font-size:13px}
+  .khb-hint{margin-top:8px;font-size:11.5px;opacity:.6;line-height:1.6}
+  .khb-empty{text-align:center;opacity:.7;padding:22px 8px;font-size:13px;line-height:1.8}
+  .khb-in,.khb-sel{width:100%;box-sizing:border-box;padding:12px;border-radius:13px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font-size:14px;font-family:inherit;margin-bottom:8px}
+  .khb-sel option{color:#111}
+  .khb-fl{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:6px}
+  .khb-fr{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;font-size:13px;font-weight:700;font-family:inherit}
+  .khb-fr.on{background:#f4b740;color:#2a1a00;border-color:#f4b740}
+  .khb-kinds{display:flex;gap:7px;margin-bottom:10px}
+  .khb-kinds button{flex:1;padding:10px 4px;border-radius:13px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.07);color:#fff;font-size:12.5px;font-weight:800;font-family:inherit}
+  .khb-kinds button.on{background:rgba(244,183,64,.22);border-color:#f4b740}
+  .khb-chip{font-style:normal;display:inline-block;margin-right:6px;padding:1px 8px;border-radius:99px;background:#ff6b6b;color:#fff;font-size:11px;font-weight:900}
+  .khb-chip:empty{display:none}`;
+  document.head.appendChild(st);
+}
+function khbOpen(){
+  if(!state.pid){ showToast('سجّل دخولك الأول', true); return; }
+  khbCss();
+  const old = document.getElementById('khb-overlay'); if(old) old.remove();
+  const ov = document.createElement('div'); ov.id = 'khb-overlay'; ov.className = 'khb-ov';
+  ov.innerHTML = '<div class="khb-sheet" id="khb-sheet"></div>';
+  document.body.appendChild(ov);
+  ov.addEventListener('click', khbClick);
+  ov.addEventListener('input', khbInput);
+  ov.addEventListener('change', khbInput);
+  KHB_UI.mode = 'list'; KHB_UI.q = ''; KHB_UI.friend = null;
+  khbRender();
+  khbRead().then(function(){ if(document.getElementById('khb-overlay') && KHB_UI.mode==='list') khbRender(); khbRefreshChip(true); });
+}
+function khbClose(){ const o = document.getElementById('khb-overlay'); if(o) o.remove(); khbRefreshChip(true); }
+function khbRender(){
+  const sh = document.getElementById('khb-sheet'); if(!sh) return;
+  const body = KHB_UI.mode==='new' ? khbNewHtml() : khbListHtml();
+  sh.innerHTML = '<div class="khb-grab"></div><div class="khb-head"><div><h3>🤝 رفيق الخلوة</h3><p>اتفق مع صاحبك على مهمة قراءة، ولما حد فيكم يخلّصها التاني بيوصله إشعار</p></div><button type="button" class="khb-x" data-k="close">✕</button></div>' + body;
+}
+function khbCard(t){
+  const me = state.pid, iA = t.a===me, my = iA ? t.da : t.db, th = iA ? t.db : t.da;
+  const on = khbFirst(iA ? (t.bn||khbName(t.b)) : (t.an||khbName(t.a))), both = my && th;
+  return '<div class="khb-card '+(both?'ok':'')+'"><div class="khb-t">'+escapeHtml(t.title)+'</div>'
+    + '<div class="khb-row"><span class="'+(my?'y':'')+'">'+(my?'✅':'⏳')+' إنت</span><span class="'+(th?'y':'')+'">'+(th?'✅':'⏳')+' '+escapeHtml(on)+'</span></div>'
+    + '<div class="khb-btns">'+(!my?'<button type="button" class="pri" data-k="done" data-id="'+t.id+'">✅ خلصت</button>':'')+(!th?'<button type="button" data-k="nudge" data-id="'+t.id+'">👏 شجّعه</button>':'')+'<button type="button" class="g" data-k="del" data-id="'+t.id+'" aria-label="إنهاء المهمة">🗑</button></div>'
+    + (both ? '<div class="khb-ok">🎉 خلّصتوها سوا</div>' : '')
+    + (!my && t.kind==='chapter' ? '<div class="khb-hint">بتتسجّل لوحدها لما تعلّم الأصحاح «تمت قراءته» في الكتاب المقدس</div>' : '')
+    + (!my && t.kind==='guided' ? '<div class="khb-hint">بتتسجّل لوحدها لما تخلّص خلوة موجّهة</div>' : '')
+    + '</div>';
+}
+function khbStreakFor(other){
+  const me = state.pid, days = new Set();
+  KHB_TASKS.forEach(function(t){ if(t.da && t.db && ((t.a===me && t.b===other) || (t.b===me && t.a===other))) days.add(bbDayKey(Math.max(t.da, t.db))); });
+  const d = new Date(), today = days.has(bbDayKey(d)); if(!today) d.setDate(d.getDate()-1);
+  let n = 0; while(days.has(bbDayKey(d))){ n++; d.setDate(d.getDate()-1); }
+  return { n:n, today:today };
+}
+function khbStreakHtml(){
+  const me = state.pid, others = {};
+  KHB_TASKS.forEach(function(t){ if(t.a===me) others[t.b] = t.bn || khbName(t.b); else if(t.b===me) others[t.a] = t.an || khbName(t.a); });
+  const rows = Object.keys(others).map(function(id){ const s = khbStreakFor(id); return { id:id, name:others[id], n:s.n, today:s.today }; }).filter(function(x){ return x.n>0; }).sort(function(a,b){ return b.n-a.n; });
+  if(!rows.length) return '';
+  return '<div class="khb-sec">🔥 ستريككم المشترك</div>' + rows.map(function(x){
+    return '<div class="khb-card '+(x.today?'ok':'')+'"><div class="khb-t">🔥 '+bbAr(x.n)+(x.n===1?' يوم':' أيام')+' متتالية مع '+escapeHtml(khbFirst(x.name))+'</div>'
+      + (x.today ? '<div class="khb-ok" style="margin-top:0">✅ خلّصتوا مهمة النهاردة</div>' : '<div class="khb-hint" style="margin-top:0">خلّصوا مهمة النهاردة سوا عشان الستريك يكمّل 💪</div>') + '</div>';
+  }).join('');
+}
+function khbListHtml(){
+  const me = state.pid;
+  const mine = KHB_TASKS.filter(function(t){ return t.a===me || t.b===me; }).sort(function(x,y){ return (y.ts||0)-(x.ts||0); });
+  const open = mine.filter(function(t){ return !(t.da && t.db); }), done = mine.filter(function(t){ return t.da && t.db; });
+  let h = '<button type="button" class="khb-b pri" style="width:100%;padding:13px" data-k="new">➕ مهمة جديدة مع صاحبي</button>';
+  if(navigator.onLine===false) h += '<div class="khb-hint">المهام المشتركة محتاجة نت عشان الإشعارات توصل.</div>';
+  if(!KHB_LOADED && navigator.onLine!==false) h += '<div class="khb-empty">⏳ بنحمّل المهام...</div>';
+  else if(!mine.length) h += '<div class="khb-empty">لسه مفيش مهام مشتركة.<br>اختار صاحبك وحدّدوا أصحاح تقروه سوا 📖</div>';
+  h += khbStreakHtml();
+  if(open.length) h += '<div class="khb-sec">مهام شغّالة</div>' + open.map(khbCard).join('');
+  if(done.length) h += '<div class="khb-sec">🎉 خلّصتوها سوا ('+bbAr(done.length)+')</div>' + done.slice(0,5).map(khbCard).join('');
+  return h;
+}
+function khbFriendsHtml(){
+  const q = (KHB_UI.q||'').trim(), me = state.pid;
+  const list = (PARTICIPANTS||[]).filter(function(p){ return p.id!==me && p.name && (!q || String(p.name).indexOf(q)>-1); }).slice(0,10);
+  return list.map(function(p){ return '<button type="button" class="khb-fr '+(KHB_UI.friend===p.id?'on':'')+'" data-k="fr" data-id="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+'</button>'; }).join('') || '<div class="khb-hint">مفيش نتيجة</div>';
+}
+function khbNewHtml(){
+  const U = KHB_UI;
+  const kinds = [['chapter','📖 أصحاح'],['guided','🕊 خلوة موجّهة'],['free','✍️ مهمة حرة']];
+  let f = '';
+  if(U.kind==='chapter'){
+    const books = BIBLE_BOOKS[U.t], b = books[U.bi] || books[0], n = b[2];
+    f = '<select class="khb-sel" data-f="t"><option value="nt" '+(U.t==='nt'?'selected':'')+'>العهد الجديد</option><option value="ot" '+(U.t==='ot'?'selected':'')+'>العهد القديم</option></select>'
+      + '<select class="khb-sel" data-f="bi">'+books.map(function(x,i){ return '<option value="'+i+'" '+(i===U.bi?'selected':'')+'>'+x[1]+'</option>'; }).join('')+'</select>'
+      + '<select class="khb-sel" data-f="ch">'+Array.from({length:n},function(_,i){ return '<option value="'+(i+1)+'" '+((i+1)===U.ch?'selected':'')+'>أصحاح '+bbAr(i+1)+'</option>'; }).join('')+'</select>';
+  } else if(U.kind==='guided'){
+    f = '<div class="khb-hint" style="margin:0 0 8px">المهمة دي بتتحسب لما كل واحد فيكم يخلّص خلوة موجّهة النهاردة.</div>';
+  } else {
+    f = '<input class="khb-in" data-f="free" maxlength="70" placeholder="مثلاً: نقرأ مزمور ٢٣ ونكتب آية" value="'+escapeHtml(U.free||'')+'">';
+  }
+  return '<div class="khb-sec">١) اختار صاحبك</div><input class="khb-in" id="khb-q" placeholder="ابحث بالاسم..." value="'+escapeHtml(U.q||'')+'"><div class="khb-fl" id="khb-fl">'+khbFriendsHtml()+'</div>'
+    + '<div class="khb-sec">٢) المهمة</div><div class="khb-kinds">'+kinds.map(function(k){ return '<button type="button" class="'+(U.kind===k[0]?'on':'')+'" data-k="kind" data-id="'+k[0]+'">'+k[1]+'</button>'; }).join('')+'</div>'+f
+    + '<div class="khb-btns" style="margin-top:12px"><button type="button" data-k="back">رجوع</button><button type="button" class="pri" data-k="create">🤝 ابدأ المهمة</button></div>';
+}
+function khbInput(e){
+  const el = e.target, U = KHB_UI;
+  if(el.id==='khb-q'){ U.q = el.value; const fl = document.getElementById('khb-fl'); if(fl) fl.innerHTML = khbFriendsHtml(); return; }
+  const f = el.getAttribute && el.getAttribute('data-f'); if(!f) return;
+  if(f==='free'){ U.free = el.value; return; }
+  if(e.type!=='change') return;
+  if(f==='t'){ U.t = el.value; U.bi = 0; U.ch = 1; }
+  else if(f==='bi'){ U.bi = parseInt(el.value,10)||0; U.ch = 1; }
+  else if(f==='ch'){ U.ch = parseInt(el.value,10)||1; }
+  khbRender();
+}
+async function khbClick(e){
+  const ov = document.getElementById('khb-overlay');
+  if(e.target===ov){ khbClose(); return; }
+  const b = e.target.closest && e.target.closest('[data-k]'); if(!b) return;
+  const k = b.getAttribute('data-k'), id = b.getAttribute('data-id'), U = KHB_UI;
+  if(k==='close') khbClose();
+  else if(k==='new'){ U.mode = 'new'; U.friend = null; U.q = ''; khbRender(); }
+  else if(k==='back'){ U.mode = 'list'; khbRender(); }
+  else if(k==='fr'){ U.friend = id; const fl = document.getElementById('khb-fl'); if(fl) fl.innerHTML = khbFriendsHtml(); }
+  else if(k==='kind'){ U.kind = id; khbRender(); }
+  else if(k==='create') await khbCreate();
+  else if(k==='done'){ if(KHB_BUSY) return; KHB_BUSY = true; try{ await khbDone(id); }finally{ KHB_BUSY = false; } khbRender(); }
+  else if(k==='nudge'){ if(KHB_BUSY) return; KHB_BUSY = true; try{ await khbNudge(id); }finally{ KHB_BUSY = false; } }
+  else if(k==='del'){ if(!confirm('تنهي المهمة دي؟ هتتمسح عند الاتنين.')) return; await khbDel(id); khbRender(); }
+}
+async function khbCreate(){
+  const U = KHB_UI, me = state.pid;
+  if(!U.friend){ showToast('اختار صاحبك الأول', true); return; }
+  if(navigator.onLine===false){ showToast('محتاج نت عشان تبدأ مهمة مشتركة', true); return; }
+  let title = '', extra = {};
+  if(U.kind==='chapter'){ const bk = BIBLE_BOOKS[U.t][U.bi]; title = 'قراءة '+bk[1]+' '+bbAr(U.ch); extra = {t:U.t, bi:U.bi, ch:U.ch}; }
+  else if(U.kind==='guided'){ title = 'خلوة موجّهة النهاردة'; extra = {day: bbDayKey(Date.now())}; }
+  else { title = (U.free||'').trim().slice(0,70); if(!title){ showToast('اكتب المهمة الأول', true); return; } }
+  if(KHB_BUSY) return; KHB_BUSY = true;
+  try{
+    const id = 'kb'+Date.now()+Math.random().toString(36).slice(2,6);
+    const task = Object.assign({ id:id, a:me, an:khbName(me), b:U.friend, bn:khbName(U.friend), kind:U.kind, title:title, ts:Date.now(), da:0, db:0 }, extra);
+    const r = await khbMut(function(o){ o.tasks.push(task); return true; });
+    if(!r){ showToast('معرفتش أبدأ المهمة — جرّب تاني', true); return; }
+    try{ pushNotification(U.friend, '🤝 '+khbFirst(khbName(me))+' دعاك لمهمة مشتركة: «'+title+'» — افتح الخلوة الفردية ← رفيق الخلوة', '🤝'); }catch(e){}
+    showToast('🤝 اتبعتت المهمة لـ '+khbFirst(khbName(U.friend)));
+    U.mode = 'list'; U.friend = null; U.free = '';
+    khbRender();
+  } finally { KHB_BUSY = false; }
+}
+async function khbDone(id, auto){
+  const me = state.pid; let snap = null, was = false;
+  const r = await khbMut(function(o){
+    const t = o.tasks.find(function(x){ return x.id===id; }); if(!t) return false;
+    const key = t.a===me ? 'da' : (t.b===me ? 'db' : null); if(!key) return false;
+    was = !!t[key]; if(!was) t[key] = Date.now();
+    snap = JSON.parse(JSON.stringify(t)); return true;
+  });
+  if(!r || !snap){ if(!auto) showToast('معرفتش أسجّل دلوقتي — اتأكد من النت', true); return false; }
+  if(was) return true;
+  const other = snap.a===me ? snap.b : snap.a, myN = khbFirst(khbName(me)), otN = khbFirst(khbName(other));
+  if(snap.da && snap.db){
+    const sn = khbStreakFor(other).n, sx = sn>=2 ? ' 🔥 ستريك '+bbAr(sn)+' أيام متتالية' : '';
+    try{ pushNotification(other, '🎉 خلّصتوا «'+snap.title+'» سوا إنت و'+myN+' — ربنا يبارك!'+sx, '🎉'); }catch(e){}
+    try{ pushNotification(me, '🎉 خلّصتوا «'+snap.title+'» سوا إنت و'+otN+' — ربنا يبارك!'+sx, '🎉'); }catch(e){}
+    showToast('🎉 خلّصتوا المهمة سوا!');
+  } else {
+    try{ pushNotification(other, '✅ '+myN+' خلّص «'+snap.title+'» — فاضلك إنت تخلّصها 📖', '✅'); }catch(e){}
+    showToast(auto ? '✅ اتسجّلت في مهمتك المشتركة مع '+otN : '✅ اتسجّلت — '+otN+' هيوصله إشعار');
+  }
+  khbRefreshChip(true);
+  return true;
+}
+async function khbNudge(id){
+  const me = state.pid; let snap = null, wait = false;
+  const r = await khbMut(function(o){
+    const t = o.tasks.find(function(x){ return x.id===id; }); if(!t || (t.a!==me && t.b!==me)) return false;
+    if(Date.now() - (t.nudge||0) < 3*3600*1000){ wait = true; return false; }
+    t.nudge = Date.now(); snap = JSON.parse(JSON.stringify(t)); return true;
+  });
+  if(wait){ showToast('بعتّله تشجيع من شوية 😊 استنى شوية'); return; }
+  if(!r || !snap){ showToast('معرفتش أبعت دلوقتي — اتأكد من النت', true); return; }
+  const other = snap.a===me ? snap.b : snap.a;
+  try{ pushNotification(other, '👏 '+khbFirst(khbName(me))+' بيشجّعك تخلّص «'+snap.title+'» — يلا نكمّل سوا', '👏'); }catch(e){}
+  showToast('👏 اتبعت التشجيع');
+}
+async function khbDel(id){
+  const me = state.pid;
+  const r = await khbMut(function(o){ const n = o.tasks.length; o.tasks = o.tasks.filter(function(t){ return t.id!==id || (t.a!==me && t.b!==me); }); return o.tasks.length!==n; });
+  if(!r) showToast('معرفتش أنهي المهمة — اتأكد من النت', true);
+}
+/* تسجيل تلقائي: لما تعلّم أصحاح كمقروء أو تخلّص خلوة موجّهة */
+async function khbAuto(kind, nr, ch){
+  try{
+    if(!state.pid || navigator.onLine===false) return;
+    if(!KHB_LOADED || Date.now()-KHB_LOADED > 45000) await khbRead();
+    const me = state.pid, today = bbDayKey(Date.now());
+    const mine = KHB_TASKS.filter(function(t){ return (t.a===me && !t.da) || (t.b===me && !t.db); });
+    for(let i=0;i<mine.length;i++){
+      const t = mine[i]; let hit = false;
+      if(kind==='chapter' && t.kind==='chapter' && BIBLE_BOOKS[t.t] && bibleNr(t.t, t.bi)===nr && t.ch===ch) hit = true;
+      if(kind==='guided' && t.kind==='guided' && (!t.day || t.day===today)) hit = true;
+      if(hit) await khbDone(t.id, true);
+    }
+  }catch(e){}
+}
+let __khbChipTs = 0;
+async function khbRefreshChip(force){
+  try{
+    if(!state.pid || navigator.onLine===false) return;
+    if(!force && Date.now()-__khbChipTs < 20000 && KHB_LOADED) { khbChipPaint(); return; }
+    __khbChipTs = Date.now(); await khbRead(); khbChipPaint();
+  }catch(e){}
+}
+function khbChipPaint(){
+  const el = document.getElementById('khb-chip'); if(!el) return;
+  const me = state.pid;
+  const n = KHB_TASKS.filter(function(t){ return (t.a===me && !t.da) || (t.b===me && !t.db); }).length;
+  el.textContent = n ? bbAr(n) : '';
 }
 
 /* ============================= تذكير الخلوة اليومي ============================= */
@@ -14696,14 +15074,14 @@ async function bibleChapter(t, bi, ch){
 }
 async function bibleDownloadGospels(btn){
   if(!window.caches){ showToast('المتصفح ده مش بيدعم التنزيل للقراءة بدون نت', true); return; }
-  const jobs = []; BIBLE_BOOKS.nt.slice(0,4).forEach((b,i)=>{ for(let c=1;c<=b[2];c++) jobs.push([i,c]); });
+  const jobs = []; ['nt','ot'].forEach(t=>{ BIBLE_BOOKS[t].forEach((b,i)=>{ for(let c=1;c<=b[2];c++) jobs.push([t,i,c]); }); });
   let done = 0, fail = 0, idx = 0;
   const upd = ()=>{ if(btn && btn.isConnected) btn.textContent = '⏳ جاري التنزيل '+done+'/'+jobs.length; };
   upd();
-  const worker = async()=>{ while(idx<jobs.length){ const j = jobs[idx++]; const v = await bibleChapter('nt', j[0], j[1]); if(!v) fail++; done++; upd(); } };
-  await Promise.all([worker(),worker(),worker(),worker()]);
-  if(btn && btn.isConnected) btn.textContent = fail ? '⚠️ اكتمل التنزيل ماعدا '+fail+' أصحاح — جرّب تاني' : '✅ الأناجيل الأربعة متاحة بدون إنترنت';
-  showToast(fail ? 'حصل خطأ في بعض الأصحاحات، جرّب تاني' : 'تم تنزيل الأناجيل ✝️', !!fail);
+  const worker = async()=>{ while(idx<jobs.length){ const j = jobs[idx++]; const v = await bibleChapter(j[0], j[1], j[2]); if(!v) fail++; done++; upd(); } };
+  await Promise.all([worker(),worker(),worker(),worker(),worker(),worker()]);
+  if(btn && btn.isConnected) btn.textContent = fail ? '⚠️ اكتمل التنزيل ماعدا '+fail+' أصحاح — جرّب تاني' : '✅ الكتاب المقدس كامل متاح بدون إنترنت';
+  showToast(fail ? 'حصل خطأ في بعض الأصحاحات، جرّب تاني' : 'تم تنزيل الكتاب المقدس كامل ✝️', !!fail);
 }
 function bibleLast(){ try{ return JSON.parse(localStorage.getItem('glv_bible_last')||'null'); }catch(e){ return null; } }
 function bibleSaveLast(){ try{ localStorage.setItem('glv_bible_last', JSON.stringify({t:BB.t,bi:BB.bi,ch:BB.ch})); }catch(e){} }
@@ -14980,7 +15358,7 @@ async function bbGuideFinish(){
   const g = BB.g, d = bbData(), l = bibleLast();
   const ref = g.ref || ((l && BIBLE_BOOKS[l.t] && BIBLE_BOOKS[l.t][l.bi]) ? BIBLE_BOOKS[l.t][l.bi][1]+' '+bbAr(l.ch) : '');
   const date = new Date().toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
-  g.secs = Math.round(g.active||0); g.finished = true; g.refOut = ref;
+  g.secs = Math.round(g.active||0); g.finished = true; g.refOut = ref; try{ khbAuto('guided'); }catch(e){}
   d.sess.unshift({ts:Date.now(), ref, q:g.q, refl:g.refl.trim(), commit:g.commit.trim(), secs:g.secs}); if(d.sess.length>60) d.sess.length = 60;
   try{ g.earned = await khAward(g); }catch(e){ g.earned = 0; }
   let t = '🕊 خلوة '+date; if(ref) t += '\n📖 '+ref; if(g.refl.trim()) t += '\n💭 '+g.q+'\n'+g.refl.trim(); if(g.commit.trim()) t += '\n🎯 التزامي: '+g.commit.trim();
@@ -15071,7 +15449,7 @@ function openBibleSheet(){
       const d = bbData(), key = bibleNr(BB.t,BB.bi)+':'+BB.ch; if(d.done[key]) delete d.done[key]; else d.done[key] = Date.now();
       bbPersist(); const on = !!d.done[key], bt = ov.querySelector('.bb-donebtn');
       if(bt){ bt.classList.toggle('on', on); bt.textContent = on ? '✓ تمت قراءة هذا الأصحاح' : '☐ أتممت قراءة هذا الأصحاح'; }
-      if(on){ const pr = bbPlanProgress(); showToast(pr.done===pr.total ? '🎉 مبروك! أتممت قراءة الأناجيل الأربعة' : '✓ اتسجّل في خطتك ✝️'); }
+      if(on){ try{ khbAuto('chapter', bibleNr(BB.t,BB.bi), BB.ch); }catch(e){} const pr = bbPlanProgress(); showToast(pr.done===pr.total ? '🎉 مبروك! أتممت قراءة الأناجيل الأربعة' : '✓ اتسجّل في خطتك ✝️'); }
     }
   });
   renderBibleSheet();
@@ -15093,7 +15471,7 @@ function renderBibleSheet(){
         <button type="button" class="bb-t" data-bb="t:nt"><span class="e">✝️</span><span><div class="n">العهد الجديد</div><div class="s">٢٧ سفراً — الأناجيل والأعمال والرسائل والرؤيا</div></span></button>
       </div>
       <button type="button" class="bb-lib" style="margin-top:12px;" data-bb="view:lib">⭐ آياتي وخلواتي وإحصائياتي</button>
-      <button type="button" class="bb-last" style="margin:0;" data-bb="dl:1">⬇️ نزّل الأناجيل الأربعة للقراءة بدون إنترنت</button>`;
+      <button type="button" class="bb-last" style="margin:0;" data-bb="dl:1">⬇️ نزّل الكتاب المقدس كامل للقراءة بدون إنترنت</button>`;
   } else if(!BB.t && BB.view==='plan'){
     const pr = bbPlanProgress(), days = bbPlanDays(), ti = bbPlanToday();
     title = 'خطة القراءة'; crumb = 'الأناجيل الأربعة في ٤ أيام';
@@ -32628,7 +33006,7 @@ async function sendChatMediaMessage(type, dataUrl, duration){
   if(saved){
     await saveChatMessagesWithRetry(CHAT_MESSAGES);
   } else {
-    PENDING_CHAT_MEDIA_UPLOADS.push({ mediaId, dataUrl, ts:Date.now() });
+    PENDING_CHAT_MEDIA_UPLOADS.push({ mediaId, dataUrl, ts:Date.now(), msg:msg });
     scheduleChatMediaUploadRetry();
     showToast('📵 النت ضعيف — الرسالة هترفع تلقائي لما الاتصال يرجع', true);
   }
@@ -32697,6 +33075,7 @@ function scheduleChatMediaUploadRetry(){
 async function processPendingChatMediaUploads(){
   if(!PENDING_CHAT_MEDIA_UPLOADS.length) return;
   if(navigator.onLine === false) return;
+  if(!(await glvChatPrepMedia())) return;
   const queue = PENDING_CHAT_MEDIA_UPLOADS.slice();
   let doneAny = false;
   for(const item of queue){
@@ -34327,6 +34706,12 @@ function renderAdminReportsTab(){
       <span class="admin-item-time">${timeAgoAr(r.ts)}</span>
     </div>
     <div class="admin-item-text">${escapeHtml(r.text)}</div>
+    ${r.reply ? `<div class="hint" style="margin-top:10px;">✅ اتبعت رد ${timeAgoAr(r.reply.ts)}: ${escapeHtml(r.reply.text)}</div>` : ''}
+    ${r.pid ? `<div style="margin-top:12px;">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">${RR_TEMPLATES.map((t,i)=>`<button type="button" class="btn btn-ghost" style="padding:6px 10px;font-size:12px;" data-action="admin-report-tpl" data-id="${r.id}" data-i="${i}">${t[0]}</button>`).join('')}</div>
+      <textarea id="rr-${r.id}" data-rrid="${r.id}" class="field" rows="2" placeholder="اكتب رد للمُبلّغ... (هيوصله إشعار)" style="margin-bottom:8px;">${escapeHtml(RR_DRAFTS[r.id]||'')}</textarea>
+      <button type="button" class="btn btn-primary" style="width:100%;" data-action="admin-report-reply" data-id="${r.id}">📩 إرسال الرد لـ ${escapeHtml(String(r.name||'').split(' ')[0])}</button>
+    </div>` : '<div class="hint" style="margin-top:8px;">البلاغ ده من غير حساب — مينفعش يتبعتله رد.</div>'}
     <div class="admin-item-actions">
       <button type="button" class="btn btn-ghost" data-action="admin-delete-report" data-id="${r.id}">✕ حذف البلاغ</button>
     </div>
@@ -38014,6 +38399,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='kh-test'){ khTest(); }
   else if(action==='bible-open'){ openBibleSheet(); }
   else if(action==='bible-guide'){ bbGuideOpen(); }
+  else if(action==='khb-open'){ khbOpen(); }
   else if(action==='edit-logistics'){ state.editingLogisticsId = el.dataset.pid; render(); }
   else if(action==='cancel-edit-logistics'){ state.editingLogisticsId = null; render(); }
   else if(action==='save-logistics'){ doSaveLogistics(el.dataset.pid); }
@@ -38447,6 +38833,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='admin-toggle-ask'){ doAdminToggleAsk(el.dataset.session); }
   else if(action==='admin-mark-question-answered'){ doAdminMarkQuestionAnswered(el.dataset.id); }
   else if(action==='admin-delete-report'){ confirmAdminDeleteReport(el.dataset.id); }
+  else if(action==='admin-report-tpl'){ adminReportTpl(el.dataset.id, parseInt(el.dataset.i,10)); }
+  else if(action==='admin-report-reply'){ doAdminReplyReport(el.dataset.id); }
   else if(action==='admin-delete-opinion'){ confirmAdminDeleteOpinion(el.dataset.id); }
   else if(action==='view-opinion'){ state.viewingOpinionId = el.dataset.id; render(); }
   else if(action==='admin-opinions-back'){ state.viewingOpinionId = null; render(); }
@@ -38857,6 +39245,31 @@ async function doSubmitReport(){
   await saveReports(REPORTS);
   if(ta) ta.value = '';
   showToast('وصلنا بلاغك وهنتعامل معاه 🙏');
+  render();
+}
+const RR_TEMPLATES = [
+  ['✅ تمت إضافة الميزة','تمت إضافة الميزة اللي اقترحتها ✅ شكرًا على مشاركة رأيك 🙏'],
+  ['🛠️ المشكلة اتحلّت','المشكلة اللي بلّغت عنها اتحلّت ✅ شكرًا على بلاغك 🙏'],
+  ['📝 هنشتغل عليها','وصلنا اقتراحك وهنشتغل عليه قريب 🙏 شكرًا لمشاركتك'],
+  ['🙏 شكرًا','شكرًا على مشاركتك ربنا يبارك حياتك 🙏']
+];
+let RR_DRAFTS = {};
+document.addEventListener('input', (e)=>{ const t = e.target; if(t && t.dataset && t.dataset.rrid) RR_DRAFTS[t.dataset.rrid] = t.value; });
+function adminReportTpl(id, i){
+  const ta = document.getElementById('rr-'+id), t = RR_TEMPLATES[i]; if(!ta || !t) return;
+  ta.value = t[1]; RR_DRAFTS[id] = t[1]; ta.focus();
+}
+async function doAdminReplyReport(id){
+  const r = REPORTS.find(x=>x.id===id); if(!r) return;
+  const ta = document.getElementById('rr-'+id), text = ((ta && ta.value) || RR_DRAFTS[id] || '').trim();
+  if(!r.pid){ showToast('البلاغ ده من غير حساب — مينفعش يتبعتله رد', true); return; }
+  if(!text){ showToast('اكتب الرد الأول', true); return; }
+  const snip = String(r.text||'').trim().slice(0,40);
+  try{ pushNotification(r.pid, '📩 ردّ المنظمين على «'+snip+(String(r.text||'').length>40?'…':'')+'»: '+text, '📩'); }catch(e){}
+  r.reply = { text: text, ts: Date.now() };
+  await saveReports(REPORTS);
+  delete RR_DRAFTS[id];
+  showToast('✅ اتبعت الرد لـ '+String(r.name||'').split(' ')[0]);
   render();
 }
 function confirmAdminDeleteReport(id){
@@ -39461,6 +39874,9 @@ function scheduleGalleryUploadRetry(){
 async function processPendingGalleryUploads(){
   if(!PENDING_GALLERY_UPLOADS.length) return;
   if(navigator.onLine === false) return; // متضيعش وقت لو الجهاز نفسه شايف إنه Offline
+  if(!GALLERY_ALBUMS.length) return;
+  PENDING_GALLERY_UPLOADS = PENDING_GALLERY_UPLOADS.filter(x=>GALLERY_ALBUMS[x.albumIdx]);
+  if(!PENDING_GALLERY_UPLOADS.length) return;
   const queue = PENDING_GALLERY_UPLOADS.slice();
   let doneAny = false;
   for(const item of queue){
@@ -39546,6 +39962,7 @@ function scheduleParticipantPhotoUploadRetry(){
 async function processPendingParticipantPhotoUploads(){
   if(!PENDING_PARTICIPANT_PHOTO_UPLOADS.length) return;
   if(navigator.onLine === false) return;
+  if(!Object.keys(PARTICIPANT_PHOTOS||{}).length) return; /* مستنيين فهرس الصور يتحمّل عشان منكتبش فوقه */
   const queue = PENDING_PARTICIPANT_PHOTO_UPLOADS.slice();
   let doneAny = false;
   for(const item of queue){
