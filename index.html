@@ -7393,6 +7393,10 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .ludo-hero{text-align:center; padding:6px 0 10px;}
   .ludo-hero-dice{width:64px; height:64px; margin:0 auto 6px; border-radius:18px; background:linear-gradient(145deg,#fff,#E8E2D2); border:3px solid #F00315; box-shadow:0 10px 22px rgba(0,0,0,.45), inset 0 -6px 10px rgba(0,0,0,.08), inset 0 3px 4px rgba(255,255,255,.7); transform:rotate(-8deg);}
   .ludo-hero-dice svg{width:100%; height:100%; display:block;}
+  .ludo-hero-dice.v2{width:84px; height:84px; margin:0 auto 4px; border:0; border-radius:0; background:none; box-shadow:none; transform:none;
+    filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)); animation:ludoHeroFloat 3.2s ease-in-out infinite;}
+  @keyframes ludoHeroFloat{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-5px) rotate(3deg);}}
+  @media (prefers-reduced-motion:reduce){ .ludo-hero-dice.v2{animation:none;} }
   .ludo-hero-title{font-family:'Cairo',sans-serif; font-weight:900; font-size:24px; color:var(--text);}
   .ludo-hero-sub{font-size:12.5px; font-weight:700; color:var(--text-muted); margin-top:2px;}
   .ls-presets{display:flex; gap:8px; margin:6px 0 4px;}
@@ -9303,6 +9307,14 @@ html body #gh-friend .gh-fr-art{
 }
 html body #gh-friend .gh-fr-title{ color:#fff; text-shadow:0 1px 10px rgba(130,150,255,.45), 0 2px 4px rgba(0,0,0,.3); }
 html body #gh-friend .gh-fr-sub{ color:#cfc8ff; text-shadow:0 1px 6px rgba(120,130,255,.35); }
+</style>
+<style id="dice-bw">
+.ludo-dice,.lp-die,.fx-f,.snl-die{background:linear-gradient(145deg,#ffffff,#ececec) !important;}
+.ludo-dice{border-color:#111 !important;}
+.lp-die{--dsh:0 0 0 2.5px #111, 0 0 0 4px rgba(0,0,0,.30), 0 10px 16px rgba(0,0,0,.55), inset 0 -5px 8px rgba(0,0,0,.12), inset 0 4px 6px rgba(255,255,255,.95);}
+.lp-die:not(.bd){border-color:#111 !important;}
+.snl-die.snz-gdie{box-shadow:0 10px 16px rgba(0,0,0,.6), inset 0 -6px 9px rgba(0,0,0,.12), 0 0 0 5px #222, 0 0 0 8px #000 !important;}
+.snl-die i.on{background:#000 !important;}
 </style>
 </head>
 <body>
@@ -25539,6 +25551,7 @@ const LUDO_DICE_PIPS = {
   5:[[28,28],[72,28],[50,50],[28,72],[72,72]], 6:[[30,26],[70,26],[30,50],[70,50],[30,74],[70,74]]
 };
 function ludoDiceFace(v, color){
+  color = '#000';
   const ghost = !v, n = v || 3, op = ghost ? ' opacity=".3"' : '';
   const pips = LUDO_DICE_PIPS[n].map(p=>{
     const x = p[0], y = p[1];
@@ -25549,6 +25562,29 @@ function ludoDiceFace(v, color){
       + `<ellipse cx="${x-2.9}" cy="${y-3.3}" rx="3.2" ry="2.3" fill="#fff" opacity=".5"/>`;
   }).join('');
   return `<svg viewBox="0 0 100 100" aria-hidden="true"><g${op}>${pips}</g></svg>`;
+}
+
+/* نرد كلاسيكي ثلاثي الأبعاد للوجو لودو */
+function ludoHeroDice(){
+  const P = {1:[[50,50]], 2:[[28,28],[72,72]], 3:[[26,26],[50,50],[74,74]],
+             4:[[28,28],[72,28],[28,72],[72,72]], 5:[[26,26],[74,26],[50,50],[26,74],[74,74]],
+             6:[[30,24],[70,24],[30,50],[70,50],[30,76],[70,76]]};
+  const pips = (n, m)=> `<g transform="matrix(${m})">` + P[n].map(p=>
+      `<circle cx="${p[0]}" cy="${p[1]+2}" r="10.5" fill="#fff" opacity=".35"/>`
+    + `<circle cx="${p[0]}" cy="${p[1]}" r="10" fill="#000"/>`
+    + `<circle cx="${p[0]-3}" cy="${p[1]-3.2}" r="3.2" fill="#fff" opacity=".18"/>`).join('') + `</g>`;
+  const edge = 'stroke="#bdbdbd" stroke-width="2.2" stroke-linejoin="round"';
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">`
+    + `<ellipse cx="50" cy="96.5" rx="30" ry="3.4" fill="#000" opacity=".28"/>`
+    + `<polygon points="12,30 50,52 50,94 12,72" fill="#ececec" ${edge}/>`
+    + `<polygon points="50,52 88,30 88,72 50,94" fill="#d2d2d2" ${edge}/>`
+    + `<polygon points="50,10 88,30 50,52 12,30" fill="#ffffff" ${edge}/>`
+    + `<polygon points="50,10 88,30 50,52 12,30" fill="#fff" opacity=".35"/>`
+    + `<polygon points="12,30 50,52 50,94 12,72" fill="#000" opacity=".05"/>`
+    + pips(5, '.38 -.20 .38 .22 12 30')
+    + pips(3, '.38 .22 0 .42 12 30')
+    + pips(1, '.38 -.22 0 .42 50 52')
+    + `</svg>`;
 }
 function ludoDockHtml(L, ctx){
   const pal = LUDO_PAL[L.seats[L.turn].color];
@@ -25728,7 +25764,7 @@ function renderLudoSetup(G){
   }).join('');
   return `
     <div class="ludo-hero">
-      <div class="ludo-hero-dice">${ludoDiceFace(6,'#F00315')}</div>
+      <div class="ludo-hero-dice v2">${ludoHeroDice()}</div>
       <div class="ludo-hero-title">لودو</div>
       <div class="ludo-hero-sub">من 2 لـ 4 لاعبين • ٦ يخرّج البيدق • كُل بياديق صحابك</div>
     </div>
