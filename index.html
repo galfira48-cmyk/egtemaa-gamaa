@@ -17785,7 +17785,7 @@ function renderGamesHub(){
       <span class="gh-title">العب ضد صديق</span>
       <span class="gh-sub">هنرجعها قريب — بنحدّثها دلوقتي</span>
     </button>` : `
-    <div class="gh-tile ${ft?'is-open':''} ${ft==='join'?'is-join':''} ${window.__GLV_LOCAL?'has-mode':''}" id="gh-friend" data-step="${ft||''}" style="--g:linear-gradient(145deg,#A18CD1,#FBC2EB); --i:0">
+    <div class="gh-tile ${ft?'is-open':''} ${ft==='join'?'is-join':''} has-mode" id="gh-friend" data-step="${ft||''}" style="--g:linear-gradient(145deg,#A18CD1,#FBC2EB); --i:0">
       <button type="button" class="gh-face gh-front" data-action="friend-tile-open">
         <span class="gh-ico">🧑‍🤝‍🧑</span>
         <span class="gh-title">العب ضد صديق</span>
@@ -17807,7 +17807,7 @@ function renderGamesHub(){
           </button>
         </div>
         <div class="gh-panel gh-panel-menu">
-          ${window.__GLV_LOCAL ? '<div class="gh-chip" style="--k:0">🌐 أونلاين</div>' : '<div class="gh-back-title" style="--k:0">العب ضد صديق</div>'}
+          <div class="gh-chip" style="--k:0">🌐 أونلاين</div>
           <button type="button" class="gh-act gh-act-primary" style="--k:1" data-action="open-rooms">➕ إنشاء غرفة</button>
           <button type="button" class="gh-act" style="--k:2" data-action="friend-join-show">🔑 انضمام لغرفة</button>
         </div>
@@ -38587,12 +38587,19 @@ document.addEventListener('click', (e)=>{
   else if(action==='claim-custom-card'){ doClaimCustomCard(); }
   else if(action==='watch-room'){ enterSpectateRoom(el.dataset.code, el.dataset.game); }
   else if(action==='friend-locked-tap'){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا، هنرجعه قريب بعد التحديث'); }
-  else if(action==='friend-tile-open'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } if(window.__GLV_LOCAL){ setFriendTile('mode'); return; } if(!requireVisaForRooms()) return; setFriendTile('menu'); }
-  else if(action==='friend-mode-online'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } if(!requireVisaForRooms()) return; setFriendTile('menu'); try{ SND.click(); }catch(_){} }
-  else if(action==='friend-mode-local'){ setFriendTile(null); try{ SND.click(); }catch(_){} if(window.__glvLocalLink) window.__glvLocalLink(); }
+  else if(action==='friend-tile-open'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } setFriendTile('mode'); }
+  else if(action==='friend-mode-online'){ if(window.__GLV_LOCAL && !window.__GLV_AUTO_LOCAL && confirm('ترجع للوضع الأونلاين الكامل؟ هيتعمل إعادة تحميل للتطبيق.')){ try{ localStorage.setItem('glv-local','off'); localStorage.setItem('glv-local-v','2'); }catch(_){} location.reload(); return; } if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } if(!requireVisaForRooms()) return; setFriendTile('menu'); try{ SND.click(); }catch(_){} }
+  else if(action==='friend-mode-local'){
+    try{ SND.click(); }catch(_){}
+    if(window.__glvLocalLink){ setFriendTile(null); window.__glvLocalLink(); }
+    else if(confirm('Local Room بيشغّل التطبيق بدون إنترنت وبيربط موبايلك بموبايل صاحبك مباشرة.\n\nالتسجيل والحضور مش هيتبعتوا للأدمن طول ما الوضع ده شغّال، وتقدر ترجع للأونلاين من نفس القايمة.\n\nهيتعمل إعادة تحميل للتطبيق. تكمّل؟')){
+      try{ localStorage.setItem('glv-local','1'); localStorage.setItem('glv-local-v','2'); }catch(_){}
+      location.reload();
+    }
+  }
   else if(action==='friend-join-show'){ state.friendTile = null; ROOM_LOBBY.ready = false; go('room-lobby'); lobbyRefresh(); }
   else if(action==='lobby-join'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } attemptJoinRoom(el.dataset.code); }
-  else if(action==='friend-tile-close'){ const _s = state.friendTile; setFriendTile(_s==='join' ? 'menu' : (_s==='menu' && window.__GLV_LOCAL ? 'mode' : null)); }
+  else if(action==='friend-tile-close'){ const _s = state.friendTile; setFriendTile(_s==='join' ? 'menu' : (_s==='menu' ? 'mode' : null)); }
   else if(action==='create-room'){ const gt = el.dataset.game; if(isGameDisabled(gt)){ showToast('🛠️ اللعبة دي قيد التحديث دلوقتي وهترجع قريب'); return; } showChallengeTypeModal(gt); }
   else if(action==='join-room'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } const inp = document.getElementById('room-join-code'); attemptJoinRoom(inp?inp.value:''); }
   else if(action==='leave-room'){ confirmLeaveGameRoom(); }
