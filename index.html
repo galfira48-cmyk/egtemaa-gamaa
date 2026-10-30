@@ -2071,16 +2071,18 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .gh-tile[data-game="ludo"] .gh-ico.has-logo{ height:104px; max-width:140px; margin:-4px 0 -2px; }
   .gh-tile[data-game="connect4"] .gh-ico.has-logo{ height:96px; max-width:130px; margin:-2px 0; }
   .gh-tile[data-game="stack"] .gh-ico.has-logo{ height:104px; max-width:140px; margin:-4px 0 -2px; }
-  /* صفحة العب ضد صديق */
-  .fh-list{ display:flex; flex-direction:column; gap:14px; margin-top:6px; }
-  .fh-card{ position:relative; isolation:isolate; overflow:hidden; display:flex; align-items:center; gap:14px; width:100%; text-align:right; padding:18px 16px; border-radius:24px; border:1px solid rgba(255,255,255,.2); background:var(--fh-g); color:#fff; font-family:inherit; cursor:pointer; box-shadow:0 12px 26px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.28); transition:transform .18s ease; }
-  .fh-card:active{ transform:scale(.97); }
-  .fh-card::after{ content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(125deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 40%); pointer-events:none; }
-  .fh-ico{ width:58px; height:58px; min-width:58px; border-radius:18px; display:grid; place-items:center; font-size:28px; background:rgba(255,255,255,.2); box-shadow:0 6px 14px rgba(0,0,0,.22); }
-  .fh-tx{ flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
-  .fh-tx b{ font-family:'Cairo',sans-serif; font-weight:900; font-size:17px; color:#fff; }
-  .fh-tx small{ font-size:12.5px; line-height:1.6; color:rgba(255,255,255,.88); }
-  .fh-chev{ font-size:30px; line-height:1; color:rgba(255,255,255,.85); }
+  /* صفحة العب ضد صديق — مربعين */
+  .fhx-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
+  .fhx-card{ position:relative; isolation:isolate; overflow:hidden; aspect-ratio:1/1; border-radius:28px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:14px 8px; text-align:center; color:#fff; font-family:inherit; cursor:pointer; border:1px solid rgba(255,255,255,.3); background:var(--g); box-shadow:0 16px 30px var(--sh), inset 0 1px 0 rgba(255,255,255,.45); animation:fhxIn 1.15s cubic-bezier(.2,1.2,.35,1) backwards; animation-delay:calc(.12s + var(--i) * .3s); }
+  .fhx-card::before{ content:""; position:absolute; width:90%; height:90%; top:-35%; inset-inline-start:-25%; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.38), transparent 70%); z-index:-1; }
+  .fhx-card::after{ content:""; position:absolute; top:0; bottom:0; width:38%; left:-60%; background:linear-gradient(100deg, transparent, rgba(255,255,255,.3), transparent); transform:skewX(-18deg); animation:fhxShine 3.8s ease-in-out infinite; animation-delay:calc(1.6s + var(--i) * .5s); z-index:-1; }
+  .fhx-ico{ width:76px; height:76px; border-radius:24px; display:grid; place-items:center; font-size:40px; background:rgba(255,255,255,.22); box-shadow:0 8px 16px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.4); animation:fhxBob 2.8s ease-in-out infinite; animation-delay:calc(1.4s + var(--i) * .4s); }
+  .fhx-card b{ font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; line-height:1.2; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.25); }
+  .fhx-card small{ font-size:11.5px; font-weight:700; line-height:1.4; color:rgba(255,255,255,.92); padding:0 4px; }
+  @keyframes fhxIn{ 0%{ opacity:0; transform:translateY(80px) scale(.55) rotate(-9deg); } 55%{ opacity:1; transform:translateY(-10px) scale(1.05) rotate(1.8deg); } 78%{ transform:translateY(3px) scale(.99) rotate(-.6deg); } 100%{ opacity:1; transform:none; } }
+  @keyframes fhxBob{ 0%,100%{ transform:translateY(0) rotate(0); } 50%{ transform:translateY(-6px) rotate(3deg); } }
+  @keyframes fhxShine{ 0%,60%{ left:-60%; } 100%{ left:130%; } }
+  @media (prefers-reduced-motion:reduce){ .fhx-card, .fhx-card::after, .fhx-ico{ animation:none !important; } }
   /* لوجو الروبوت — العب ضد الجهاز */
   .gh-ico.ai-robot-logo{ height:104px; max-width:110px; margin:-6px 0 -2px; filter:drop-shadow(0 8px 12px rgba(16,8,52,.45)); }
   .gh-ico.ai-robot-logo img{ height:100%; width:auto; max-width:100%; object-fit:contain; }
@@ -18193,18 +18195,18 @@ function ghReplayPanels(t){
 }
 function renderFriendHub(){
   const step = state.friendStep || null;
-  const card = (g, ico, title, sub, action) => `
-    <button type="button" class="fh-card" style="--fh-g:${g}" data-action="${action}">
-      <span class="fh-ico">${ico}</span>
-      <span class="fh-tx"><b>${title}</b><small>${sub}</small></span>
-      <span class="fh-chev">‹</span>
+  const card = (g, sh, i, ico, title, sub, action) => `
+    <button type="button" class="fhx-card" style="--g:${g}; --sh:${sh}; --i:${i}" data-action="${action}">
+      <span class="fhx-ico">${ico}</span>
+      <b>${title}</b>
+      <small>${sub}</small>
     </button>`;
   const localOn = !!window.__GLV_LOCAL;
   const cards = step==='online'
-    ? card('linear-gradient(145deg,#F6A623,#E8590C)','➕','إنشاء غرفة','اختار اللعبة وافتح غرفة وابعت الكود لصاحبك','open-rooms')
-      + card('linear-gradient(145deg,#A18CD1,#6C4DFF)','🔑','انضمام لغرفة','اكتب كود الغرفة اللي بعتهولك صاحبك','friend-join-show')
-    : card('linear-gradient(145deg,#4FACFE,#6C4DFF)','🌐','أونلاين','بالإنترنت — أنشئ غرفة أو انضم بكود', 'friend-hub-online')
-      + card('linear-gradient(145deg,#1fd6a0,#0c8f7a)','📡','Local Room','بدون إنترنت — موبايل لموبايل مباشرة','friend-hub-local');
+    ? card('linear-gradient(155deg,#43e97b,#0ba5a0)','rgba(11,165,160,.42)',0,'➕','إنشاء غرفة','افتح غرفة وابعت الكود','open-rooms')
+      + card('linear-gradient(155deg,#b96bff,#5b47fb)','rgba(91,71,251,.42)',1,'🔑','انضمام لغرفة','اكتب كود الغرفة','friend-join-show')
+    : card('linear-gradient(155deg,#00d2ff,#3a47d5)','rgba(58,71,213,.45)',0,'🌐','أونلاين','بالإنترنت','friend-hub-online')
+      + card('linear-gradient(155deg,#ffb347,#ff2d6f)','rgba(255,45,111,.4)',1,'📡','Local Room','بدون إنترنت','friend-hub-local');
   return `
     <div class="back-row">
       <button class="icon-btn" data-action="friend-hub-back">${ICO.back}</button>
@@ -18215,7 +18217,7 @@ function renderFriendHub(){
       <div class="opinion-hero-title">${step==='online' ? 'أونلاين' : 'العب ضد صديق'}</div>
       <div class="opinion-hero-sub">${step==='online' ? 'اختار تنشئ غرفة ولا تنضم لغرفة' : 'اختار طريقة اللعب'}${localOn && step!=='online' ? ' — الوضع المحلي شغّال دلوقتي' : ''}</div>
     </div>
-    <div class="fh-list">${cards}</div>
+    <div class="fhx-grid">${cards}</div>
   `;
 }
 function setFriendTile(mode){
