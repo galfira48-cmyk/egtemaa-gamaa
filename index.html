@@ -7530,6 +7530,20 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .ludo-dice.rolling{animation:diceRoll .65s ease-in-out;}
   @keyframes diceReady{0%,100%{transform:scale(1); box-shadow:0 10px 20px rgba(0,0,0,.5), 0 0 0 0 rgba(var(--dr),.0), 0 0 14px rgba(var(--dr),.4);} 50%{transform:scale(1.08); box-shadow:0 12px 24px rgba(0,0,0,.5), 0 0 0 8px rgba(var(--dr),.16), 0 0 30px rgba(var(--dr),.85);}}
   @keyframes diceRoll{0%{transform:rotate(0) scale(1);} 25%{transform:rotate(-26deg) scale(1.14) translateY(-12px);} 50%{transform:rotate(24deg) scale(1.18) translateY(-16px);} 75%{transform:rotate(-12deg) scale(1.08) translateY(-6px);} 100%{transform:rotate(0) scale(1);}}
+  /* ===== نرد لكل لاعب + رمية طايرة ===== */
+  .lp-die{display:block; width:50px; height:50px; margin:6px auto 2px; padding:0; border-radius:14px; background:linear-gradient(145deg,#FFFFFF,#E6DFCD); border:2.5px solid var(--dc); box-shadow:0 6px 12px rgba(0,0,0,.45), inset 0 -4px 7px rgba(0,0,0,.12), inset 0 3px 5px rgba(255,255,255,.8);}
+  .lp-die svg{width:100%; height:100%; display:block;}
+  .lp-die:disabled{opacity:.88; filter:saturate(.8);}
+  .lp-die.ready{cursor:pointer; opacity:1; filter:none; animation:diceReady 1.1s ease-in-out infinite;}
+  #ludo-fx{position:fixed; left:0; top:0; width:0; height:0; z-index:99999; pointer-events:none; transition:opacity .25s;}
+  .ludo-dice-layer{position:absolute; inset:0; pointer-events:none; z-index:30; direction:ltr;}
+  .lp-die.bd{position:absolute; width:9.5%; height:auto; aspect-ratio:1; margin:-4.75% 0 0 -4.75%; border-radius:22%; pointer-events:auto;}
+  .fx-die{position:absolute; left:0; top:0; width:52px; height:52px; margin:-26px 0 0 -26px; perspective:420px; will-change:transform;}
+  .fx-cube{position:relative; width:100%; height:100%; transform-style:preserve-3d;}
+  .fx-f{position:absolute; inset:0; border-radius:11px; backface-visibility:hidden; background:linear-gradient(145deg,#fff,#e9e4d6); box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.1), inset 0 -4px 8px rgba(0,0,0,.1);}
+  .fx-f svg{width:100%; height:100%; display:block;}
+  .fx-sh{position:absolute; left:0; top:0; width:44px; height:14px; margin:-7px 0 0 -22px; border-radius:50%; background:rgba(0,0,0,.5); filter:blur(3px);}
+  .fx-p{position:absolute; border-radius:50%; mix-blend-mode:screen; background:radial-gradient(circle,#fff6b0 0%,#ffb020 38%,rgba(255,80,0,.55) 65%,transparent 75%);}
   .ludo-msg{min-height:20px; font-weight:800; font-size:13px; color:var(--text-muted); text-align:center; padding:0 10px; line-height:1.5;}
   /* النتيجة */
   .ludo-result{border-color:var(--pc); background:linear-gradient(160deg, rgba(var(--pr,244,183,64),.16), rgba(155,140,255,.12));
@@ -25239,7 +25253,7 @@ function ludoLegal(L, seat, d){
 }
 /* رمية الزهر: بترجّع 'forfeit' (٣ ستات ورا بعض) أو 'none' (مفيش حركة) أو 'moves' */
 function ludoRoll(L, v){
-  L.dice = v; L.seq++;
+  L.dice = v; L.seq++; (L.dv=L.dv||{})[L.turn]=v; L.rs=L.turn;
   if(v===6) L.sixes++; else L.sixes = 0;
   if(L.sixes>=3){ L.movable = []; return 'forfeit'; }
   L.movable = ludoLegal(L, L.turn, v);
@@ -25513,7 +25527,6 @@ function ludoDockHtml(L, ctx){
   return `
     <div class="ludo-dock">
       ${ludoMyBadgeHtml(L)}
-      <button type="button" class="ludo-dice no-ripple${ctx.ready?' ready':''}" id="ludo-dice" data-action="ludo-roll" style="--dc:${pal.solid};--dr:${pal.rgb};" ${dis} aria-label="ارمي الزهر">${ludoDiceFace(L.dice, pal.b)}</button>
       <div class="ludo-msg" id="ludo-msg">${escapeHtml(L.msg||'')}</div>
     </div>`;
 }
@@ -25539,6 +25552,8 @@ function ludoPlayersHtml(L, ctx){
     const homeN = ludoHomeCount(L,i);
     const dots = [0,1,2,3].map(k=>`<span class="lp-dot${k<homeN?' on':''}"></span>`).join('');
     const mine = ctx.mode==='room' && ctx.me===i;
+    const rdy = !!ctx.ready && L.turn===i && !s.left;
+    const dieHtml = s.left ? '' : `<button type="button" class="lp-die no-ripple${rdy?' ready':''}" id="lpd-${i}" ${rdy?'data-action="ludo-roll"':'disabled'} style="--dc:${pal.solid};--dr:${pal.rgb};" aria-label="نرد ${escapeHtml(s.name)}">${ludoDiceFace(L.dv?L.dv[i]:null, pal.b)}</button>`;
     const ring = (turn && ctx.mode==='room' && ctx.turnDeadline)
       ? ludoTurnRingHtml(Math.max(0, ctx.turnDeadline-Date.now()), LUDO_IDLE_MS) : '';
     return `<div class="lp-chip${turn?' turn':''}${s.left?' left':''}" id="lp-${i}" style="--pc:${pal.solid};--pr:${pal.rgb};">
@@ -25578,10 +25593,11 @@ function ludoResultHtml(L, ctx){
     </div>`;
 }
 function ludoPlayHtml(L, ctx){
+  if(ctx.mode==='room') setTimeout(()=>ludoObserveFx(L,ctx),60);
   return `
     ${ludoPlayersHtml(L, ctx)}
     <div class="ludo-status-card"><div class="xo-status" id="ludo-status">${ludoStatusText(L, ctx)}</div></div>
-    <div class="ludo-board-wrap">${ludoBoardHtml(L, ctx.disp || L.pos, ctx.movable)}</div>
+    <div class="ludo-board-wrap">${ludoBoardHtml(L, ctx.disp || L.pos, ctx.movable)}<div class="ludo-dice-layer" id="ludo-dice-layer">${ludoDiceLayerInner(L, ctx)}</div></div>
     ${ludoDockHtml(L, ctx)}
     ${L.phase==='over' ? ludoResultHtml(L, ctx) : ''}`;
 }
@@ -25768,6 +25784,7 @@ function ludoPatch(G){
   const pl = document.getElementById('ludo-players');
   if(pl){ const tmp = document.createElement('div'); tmp.innerHTML = ludoPlayersHtml(L, ctx); pl.innerHTML = tmp.firstChild.innerHTML; }
   ludoPaintTokens(G, ctx);
+  const dl = document.getElementById('ludo-dice-layer'); if(dl) dl.innerHTML = ludoDiceLayerInner(L, ctx);
   const dice = document.getElementById('ludo-dice');
   if(dice){
     const pal = LUDO_PAL[L.seats[L.turn].color];
@@ -25845,25 +25862,89 @@ function diceRattle(){
     setTimeout(()=>{ diceKnock(0.22, 900); }, t+130);
   }catch(e){}
 }
-function ludoDiceAnim(L, v, aliveFn){
+/* ===== رمية النرد الطايرة (قوس + دوران 3D + نار + ارتداد) — كل لاعب بيرمي من عنده ===== */
+const LUDO_FX_FACE = {1:[0,0],6:[0,180],3:[0,-90],4:[0,90],2:[-90,0],5:[90,0]};
+function ludoDiceLayerInner(L, ctx){
+  const rot = ludoBoardRotation(L)*Math.PI/180, c = Math.cos(rot), sn = Math.sin(rot);
+  return L.seats.map((st,i)=>{
+    if(st.left) return '';
+    const pal = LUDO_PAL[st.color]; let hx = 0, hy = 0;
+    LUDO_BASE_SLOTS[st.color].forEach(p=>{ hx += p[0]/4; hy += p[1]/4; });
+    const dx = hx-7.5, dy = hy-7.5, x = 7.5+dx*c-dy*sn, y = 7.5+dx*sn+dy*c+2.45;
+    const rdy = !!ctx.ready && L.turn===i;
+    return `<button type="button" class="lp-die bd no-ripple${rdy?' ready':''}" id="lpd-${i}" ${rdy?'data-action="ludo-roll"':'disabled'} style="left:${(x/15*100).toFixed(2)}%;top:${(y/15*100).toFixed(2)}%;--dc:${pal.solid};--dr:${pal.rgb};" aria-label="نرد ${escapeHtml(st.name)}">${ludoDiceFace(L.dv?L.dv[i]:null, pal.b)}</button>`;
+  }).join('');
+}
+function ludoObserveFx(L, ctx){
+  const k = state.roomCode, st = window.__ludoSeqSeen || (window.__ludoSeqSeen = {});
+  const prev = st[k]; st[k] = L.seq;
+  if(prev===undefined || L.seq<=prev || L.rs==null || L.rs===ctx.me || window.__ludoFxBusy) return;
+  const v = L.dv ? L.dv[L.rs] : null; if(!v) return;
+  ludoThrowFx(L.rs, v, L, ()=>state.view==='room-ludo');
+}
+function ludoDiceAnim(L, v, aliveFn){ return ludoThrowFx(L.turn, v, L, aliveFn); }
+function ludoThrowFx(seat, v, L, aliveFn){
   return new Promise(res=>{
-    const el = document.getElementById('ludo-dice');
-    if(!el){ res(); return; }
-    const col = LUDO_PAL[L.seats[L.turn].color].b;
-    el.classList.add('rolling');
+    const src = document.getElementById('lpd-'+seat), wrap = document.querySelector('.ludo-board-wrap');
+    if(!src || !wrap || !v){ res(); return; }
+    window.__ludoFxBusy = true;
+    const old = document.getElementById('ludo-fx'); if(old) old.remove();
+    const pr = document.createElement('div'); pr.style.cssText = 'position:fixed;left:100px;top:0;width:1px;height:1px;visibility:hidden';
+    document.body.appendChild(pr); const f = (pr.getBoundingClientRect().left/100) || 1; pr.remove();
+    const sr = src.getBoundingClientRect(), wr = wrap.getBoundingClientRect();
+    const rot = ludoBoardRotation(L)*Math.PI/180, sl = LUDO_BASE_SLOTS[L.seats[seat].color];
+    let hx = 0, hy = 0; sl.forEach(p=>{ hx += p[0]/4; hy += p[1]/4; });
+    const dx = hx-7.5, dy = hy-7.5, c = Math.cos(rot), s = Math.sin(rot);
+    const gx = 7.5 + (dx*c-dy*s)*.45, gy = 7.5 + (dx*s+dy*c)*.45;
+    const sx = (sr.left+sr.width/2)/f, sy = (sr.top+sr.height/2)/f;
+    const ex = (wr.left+gx/15*wr.width)/f + (Math.random()-.5)*14, ey = (wr.top+gy/15*wr.height)/f + (Math.random()-.5)*14;
+    const len = Math.hypot(ex-sx, ey-sy) || 1, ux = (ex-sx)/len, uy = (ey-sy)/len;
+    const fx = document.createElement('div'); fx.id = 'ludo-fx';
+    const faces = [[1,'translateZ(26px)'],[6,'rotateY(180deg) translateZ(26px)'],[3,'rotateY(90deg) translateZ(26px)'],[4,'rotateY(-90deg) translateZ(26px)'],[2,'rotateX(90deg) translateZ(26px)'],[5,'rotateX(-90deg) translateZ(26px)']];
+    fx.innerHTML = '<div class="fx-sh"></div><div class="fx-die"><div class="fx-cube">' + faces.map(a=>`<div class="fx-f" style="transform:${a[1]}">${ludoDiceFace(a[0],'#1b1b1b')}</div>`).join('') + '</div></div>';
+    document.body.appendChild(fx);
+    const die = fx.querySelector('.fx-die'), cube = fx.querySelector('.fx-cube'), sh = fx.querySelector('.fx-sh');
+    const fin = LUDO_FX_FACE[v], az = (Math.random()-.5)*26;
+    const R = [1+Math.floor(Math.random()*2), 2+Math.floor(Math.random()*2), 1+Math.floor(Math.random()*2)].map(n=>n*360+Math.random()*80);
+    const T1 = 800, T2 = 250, T3 = 170, TT = T1+T2+T3, H = Math.max(110, len*.35);
     diceRattle();
-    let n = 0;
-    const iv = setInterval(()=>{
-      if(!aliveFn()){ clearInterval(iv); res(); return; }
-      n++;
-      el.innerHTML = ludoDiceFace(1+Math.floor(Math.random()*6), col);
-      if(n>=9){
-        clearInterval(iv);
-        el.classList.remove('rolling');
-        el.innerHTML = ludoDiceFace(v, col);
-        res();
+    let t0 = null, hit = 0, lastP = 0;
+    const spark = (x, y, big)=>{
+      const p = document.createElement('div'), z = (big?16:9)+Math.random()*10;
+      p.className = 'fx-p'; p.style.cssText = `left:${x-z/2}px;top:${y-z/2}px;width:${z}px;height:${z}px;`;
+      fx.appendChild(p);
+      const a = p.animate([{opacity:.95, transform:'scale(1)'},{opacity:0, transform:`translate(${-ux*16+(Math.random()-.5)*14}px,${-uy*16+(Math.random()-.5)*14}px) scale(.15)`}], {duration:420+Math.random()*160, easing:'ease-out'});
+      a.onfinish = ()=>p.remove();
+    };
+    const end = ()=>{
+      window.__ludoFxBusy = false;
+      setTimeout(()=>{ fx.style.opacity = 0; setTimeout(()=>fx.remove(), 280); }, 650);
+    };
+    const frame = now=>{
+      if(!aliveFn()){ fx.remove(); window.__ludoFxBusy = false; res(); return; }
+      if(t0===null) t0 = now;
+      const t = Math.min(TT, now-t0);
+      let x, y, h = 0, sc;
+      if(t < T1){
+        const p = t/T1, e = p<.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+        x = sx+(ex-sx)*(1-Math.pow(1-p,1.6)); y = sy+(ey-sy)*e; h = H*4*p*(1-p); sc = 1.9-.9*e + .25*Math.sin(p*Math.PI);
+        if(now-lastP > 22){ lastP = now; spark(x, y-h, true); spark(x+(Math.random()-.5)*10, y-h+(Math.random()-.5)*10, false); }
+      } else {
+        const b2 = t < T1+T2, q = b2 ? (t-T1)/T2 : (t-T1-T2)/T3, bh = b2 ? 30 : 12, off = b2 ? 16*q : 16+7*q;
+        x = ex+ux*off; y = ey+uy*off; h = bh*4*q*(1-q); sc = 1+.05*Math.sin(q*Math.PI);
+        if(hit<2 && ((b2 && t>=T1+T2-8) || (!b2 && t>=TT-8))){ hit++; diceKnock(hit===1?.3:.16, hit===1?900:1250); }
       }
-    }, 70);
+      if(hit===0 && t>=T1-8){ hit = 1-1; }
+      const u = t/TT, k = Math.pow(1-u,3);
+      cube.style.transform = `rotateZ(${az+k*R[2]}deg) rotateX(${fin[0]+k*R[0]}deg) rotateY(${fin[1]+k*R[1]}deg)`;
+      die.style.transform = `translate(${x}px,${y-h}px) scale(${sc})`;
+      sh.style.transform = `translate(${x}px,${y+8}px) scale(${Math.max(.45,1.15-h/170)})`;
+      sh.style.opacity = Math.max(.12, .55-h/260);
+      if(t < TT) requestAnimationFrame(frame);
+      else { end(); res(); }
+    };
+    setTimeout(()=>{ try{ diceKnock(.34, 620); }catch(e){} }, T1);
+    requestAnimationFrame(frame);
   });
 }
 async function ludoBeginTurn(G){
