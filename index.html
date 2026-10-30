@@ -2073,6 +2073,51 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .gh-tile[data-game="stack"] .gh-ico.has-logo{ height:104px; max-width:140px; margin:-4px 0 -2px; }
   /* صفحة العب ضد صديق — مربعين */
   .fhx-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
+  .fhx-card.is-picked{ animation:none; z-index:3; transform:scale(1.14); transition:transform .45s cubic-bezier(.2,1.2,.3,1); box-shadow:0 0 0 6px rgba(255,255,255,.25), 0 24px 50px var(--sh); }
+  .fhx-card.is-away{ animation:none; opacity:0; transform:translateY(46px) scale(.78) rotate(4deg); transition:transform .45s ease, opacity .35s ease; pointer-events:none; }
+  .fhx-wipe{ position:fixed; z-index:2147482000; width:60px; height:60px; border-radius:50%; pointer-events:none; transform:scale(1); transition:transform .56s cubic-bezier(.55,0,.2,1), opacity .5s ease; }
+  /* خطوة أونلاين: مرحلة البوابة */
+  .fhx-stage{ display:flex; flex-direction:column; align-items:stretch; gap:0; padding:4px 2px 24px; }
+  .fhx-orb{ position:relative; width:150px; height:150px; margin:6px auto 4px; display:grid; place-items:center; animation:fhxOrbIn .9s cubic-bezier(.2,1.25,.35,1) backwards; }
+  .fhx-globe{ position:relative; z-index:2; width:78px; height:78px; border-radius:50%; display:grid; place-items:center; font-size:44px; background:radial-gradient(circle at 30% 25%,#7fe3ff,#2f5bff 70%); box-shadow:0 0 34px rgba(79,172,254,.65), inset 0 -6px 12px rgba(0,0,40,.35); animation:fhxSpin 7s ease-in-out infinite; }
+  .fhx-ring{ position:absolute; border-radius:50%; border:2px solid rgba(110,200,255,.55); animation:fhxRipple 3.2s ease-out infinite; }
+  .fhx-ring.r1{ width:90px; height:90px; } .fhx-ring.r2{ width:90px; height:90px; animation-delay:1.05s; } .fhx-ring.r3{ width:90px; height:90px; animation-delay:2.1s; }
+  .fhx-sat{ position:absolute; z-index:3; width:34px; height:34px; border-radius:12px; display:grid; place-items:center; font-style:normal; font-size:18px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+  .fhx-sat.s1{ top:2px; inset-inline-end:10px; animation:fhxFloat 3s ease-in-out infinite; }
+  .fhx-sat.s2{ bottom:14px; inset-inline-start:2px; animation:fhxFloat 3.4s ease-in-out infinite .6s; }
+  .fhx-sat.s3{ bottom:0; inset-inline-end:18px; animation:fhxFloat 2.8s ease-in-out infinite 1.1s; }
+  .fhx-cap{ text-align:center; font-family:'Cairo',sans-serif; font-weight:900; font-size:19px; margin:2px 0 16px; animation:fhxUp .6s ease .35s backwards; }
+  .fhx-door{ position:relative; isolation:isolate; overflow:hidden; display:flex; align-items:center; gap:14px; width:100%; box-sizing:border-box; padding:16px 14px; min-height:104px; border-radius:26px; text-align:right; color:#fff; font-family:inherit; cursor:pointer; border:2px solid transparent;
+    background:linear-gradient(145deg,#1d1856,#120f3a) padding-box, linear-gradient(110deg,var(--c1),var(--c2),var(--c1)) border-box; background-size:auto, 300% 100%; animation:fhxBorder 3.4s linear infinite; box-shadow:0 14px 30px rgba(0,0,0,.35); }
+  .fhx-door::before{ content:""; position:absolute; inset:0; z-index:-1; background:radial-gradient(circle at 85% 0%, color-mix(in srgb,var(--c1) 40%, transparent), transparent 60%); }
+  .fhx-create{ animation:fhxBorder 3.4s linear infinite, fhxFromR .85s cubic-bezier(.2,1.15,.3,1) .55s backwards; }
+  .fhx-join{ animation:fhxBorder 3.4s linear infinite, fhxFromL .85s cubic-bezier(.2,1.15,.3,1) .85s backwards; }
+  .fhx-door:active{ transform:scale(.97); }
+  .fhx-dorb{ position:relative; width:64px; height:64px; min-width:64px; border-radius:50%; display:grid; place-items:center; font-size:30px; background:linear-gradient(145deg,var(--c1),var(--c2)); box-shadow:0 8px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.5); }
+  .fhx-dorb::after{ content:""; position:absolute; inset:-6px; border-radius:50%; border:2px solid var(--c1); opacity:0; animation:fhxPulse 2.4s ease-out infinite; }
+  .fhx-dtx{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .fhx-dtx b{ font-family:'Cairo',sans-serif; font-weight:900; font-size:18px; }
+  .fhx-dtx small{ font-size:12px; line-height:1.5; color:rgba(255,255,255,.72); }
+  .fhx-chips{ display:flex; gap:6px; margin-top:5px; } .fhx-chips em{ font-style:normal; font-size:14px; width:26px; height:26px; display:grid; place-items:center; border-radius:9px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); animation:fhxChip 2.4s ease-in-out infinite; }
+  .fhx-chips em:nth-child(2){ animation-delay:.2s } .fhx-chips em:nth-child(3){ animation-delay:.4s } .fhx-chips em:nth-child(4){ animation-delay:.6s }
+  .fhx-code{ display:flex; gap:6px; margin-top:6px; direction:ltr; justify-content:flex-end; } .fhx-code em{ width:24px; height:30px; border-radius:9px; background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.28); position:relative; }
+  .fhx-code em:last-child::after{ content:""; position:absolute; left:50%; top:6px; bottom:6px; width:2px; margin-left:-1px; background:var(--c1); animation:fhxCaret 1s steps(1) infinite; }
+  .fhx-go{ width:34px; height:34px; min-width:34px; border-radius:50%; display:grid; place-items:center; font-size:24px; line-height:1; background:rgba(255,255,255,.12); color:#fff; }
+  .fhx-or{ display:flex; align-items:center; gap:12px; margin:12px 8px; animation:fhxUp .5s ease .75s backwards; }
+  .fhx-or::before, .fhx-or::after{ content:""; flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent); }
+  .fhx-or span{ font-weight:800; font-size:13px; color:rgba(255,255,255,.72); }
+  @keyframes fhxBorder{ to{ background-position:0 0, 300% 0; } }
+  @keyframes fhxFromR{ from{ opacity:0; transform:translateX(120%) skewX(-8deg); } to{ opacity:1; transform:none; } }
+  @keyframes fhxFromL{ from{ opacity:0; transform:translateX(-120%) skewX(8deg); } to{ opacity:1; transform:none; } }
+  @keyframes fhxOrbIn{ from{ opacity:0; transform:scale(.2) rotate(-120deg); } to{ opacity:1; transform:none; } }
+  @keyframes fhxSpin{ 0%,100%{ transform:rotate(-6deg) scale(1); } 50%{ transform:rotate(6deg) scale(1.06); } }
+  @keyframes fhxRipple{ 0%{ transform:scale(.8); opacity:.9; } 100%{ transform:scale(2.3); opacity:0; } }
+  @keyframes fhxFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-7px); } }
+  @keyframes fhxUp{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:none; } }
+  @keyframes fhxPulse{ 0%{ transform:scale(.9); opacity:.8; } 100%{ transform:scale(1.5); opacity:0; } }
+  @keyframes fhxChip{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+  @keyframes fhxCaret{ 50%{ opacity:0; } }
+  @media (prefers-reduced-motion:reduce){ .fhx-orb,.fhx-globe,.fhx-ring,.fhx-sat,.fhx-cap,.fhx-door,.fhx-dorb::after,.fhx-chips em,.fhx-code em::after,.fhx-or,.fhx-wipe{ animation:none !important; transition:none !important; } }
   .fhx-card{ position:relative; isolation:isolate; overflow:hidden; aspect-ratio:1/1; border-radius:28px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:14px 8px; text-align:center; color:#fff; font-family:inherit; cursor:pointer; border:1px solid rgba(255,255,255,.3); background:var(--g); box-shadow:0 16px 30px var(--sh), inset 0 1px 0 rgba(255,255,255,.45); animation:fhxIn 1.15s cubic-bezier(.2,1.2,.35,1) backwards; animation-delay:calc(.12s + var(--i) * .3s); }
   .fhx-card::before{ content:""; position:absolute; width:90%; height:90%; top:-35%; inset-inline-start:-25%; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.38), transparent 70%); z-index:-1; }
   .fhx-card::after{ content:""; position:absolute; top:0; bottom:0; width:38%; left:-60%; background:linear-gradient(100deg, transparent, rgba(255,255,255,.3), transparent); transform:skewX(-18deg); animation:fhxShine 3.8s ease-in-out infinite; animation-delay:calc(1.6s + var(--i) * .5s); z-index:-1; }
@@ -18193,8 +18238,57 @@ function ghReplayPanels(t){
     els.forEach(el=>{ el.style.animation = ''; });
   }catch(e){}
 }
+let FHX_BUSY = false;
+function fhxPortal(el, cb){
+  if(FHX_BUSY) return; FHX_BUSY = true;
+  const done = ()=>{ FHX_BUSY = false; };
+  let reduce = false; try{ reduce = matchMedia('(prefers-reduced-motion:reduce)').matches; }catch(e){}
+  if(!el || reduce){ try{ cb(); }finally{ done(); } return; }
+  const r = el.getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height/2;
+  const w = document.createElement('div'); w.className = 'fhx-wipe';
+  w.style.cssText = 'left:'+(cx-30)+'px;top:'+(cy-30)+'px;background:'+(el.style.getPropertyValue('--g')||'#4b34d6');
+  document.body.appendChild(w);
+  el.classList.add('is-picked');
+  el.parentNode && el.parentNode.querySelectorAll('.fhx-card').forEach(c=>{ if(c!==el) c.classList.add('is-away'); });
+  void w.offsetWidth;
+  w.style.transform = 'scale('+Math.ceil(Math.max(innerWidth,innerHeight)*2.6/60)+')';
+  setTimeout(()=>{
+    try{ cb(); }catch(e){ console.error(e); }
+    w.style.opacity = '0';
+    setTimeout(()=>{ w.remove(); done(); }, 520);
+  }, 560);
+}
 function renderFriendHub(){
   const step = state.friendStep || null;
+  if(step==='online'){
+    return `
+    <div class="back-row">
+      <button class="icon-btn" data-action="friend-hub-back">${ICO.back}</button>
+      <div class="back-title">أونلاين</div>
+    </div>
+    <div class="fhx-stage">
+      <div class="fhx-orb" aria-hidden="true">
+        <span class="fhx-ring r1"></span><span class="fhx-ring r2"></span><span class="fhx-ring r3"></span>
+        <span class="fhx-globe">🌐</span>
+        <i class="fhx-sat s1">🎮</i><i class="fhx-sat s2">🎲</i><i class="fhx-sat s3">🏆</i>
+      </div>
+      <div class="fhx-cap">ابدأ إزاي؟</div>
+      <button type="button" class="fhx-door fhx-create" style="--c1:#43e97b;--c2:#0ba5a0" data-action="open-rooms">
+        <span class="fhx-dorb">➕</span>
+        <span class="fhx-dtx"><b>إنشاء غرفة</b><small>افتح غرفة وابعت الكود لصاحبك</small>
+          <span class="fhx-chips"><em>♟️</em><em>🎲</em><em>🎯</em><em>🃏</em></span></span>
+        <span class="fhx-go">‹</span>
+      </button>
+      <div class="fhx-or"><span>أو</span></div>
+      <button type="button" class="fhx-door fhx-join" style="--c1:#b96bff;--c2:#5b47fb" data-action="friend-join-show">
+        <span class="fhx-dorb">🔑</span>
+        <span class="fhx-dtx"><b>انضمام لغرفة</b><small>اكتب كود الغرفة اللي بعتهولك صاحبك</small>
+          <span class="fhx-code"><em></em><em></em><em></em><em></em></span></span>
+        <span class="fhx-go">‹</span>
+      </button>
+    </div>`;
+  }
   const card = (g, sh, i, ico, title, sub, action) => `
     <button type="button" class="fhx-card" style="--g:${g}; --sh:${sh}; --i:${i}" data-action="${action}">
       <span class="fhx-ico">${ico}</span>
@@ -38606,16 +38700,18 @@ document.addEventListener('click', (e)=>{
   else if(action==='friend-hub-back'){ if(state.friendStep){ state.friendStep = null; render(); } else goBack(); }
   else if(action==='friend-hub-online'){
     if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; }
-    if(window.__GLV_LOCAL && !window.__GLV_AUTO_LOCAL && confirm('ترجع للوضع الأونلاين الكامل؟ هيتعمل إعادة تحميل للتطبيق.')){ try{ localStorage.setItem('glv-local','off'); localStorage.setItem('glv-local-v','2'); }catch(_){} location.reload(); return; }
-    if(!requireVisaForRooms()) return;
-    state.friendStep = 'online'; render();
+    const goOnlineStep = ()=>{ if(!requireVisaForRooms()) return; fhxPortal(el, ()=>{ state.friendStep = 'online'; render(); }); };
+    if(window.__GLV_LOCAL && !window.__GLV_AUTO_LOCAL){
+      glvAskLocalOff().then(ok=>{ if(ok){ try{ localStorage.setItem('glv-local','off'); localStorage.setItem('glv-local-v','2'); }catch(_){} location.reload(); } else goOnlineStep(); });
+      return;
+    }
+    goOnlineStep();
   }
   else if(action==='friend-hub-local'){
-    if(window.__glvLocalLink){ window.__glvLocalLink(); }
-    else if(confirm('Local Room بيشغّل التطبيق بدون إنترنت وبيربط موبايلك بموبايل صاحبك مباشرة.\n\nالتسجيل والحضور مش هيتبعتوا للأدمن طول ما الوضع ده شغّال، وتقدر ترجع للأونلاين من نفس الصفحة.\n\nهيتعمل إعادة تحميل للتطبيق. تكمّل؟')){
-      try{ localStorage.setItem('glv-local','1'); localStorage.setItem('glv-local-v','2'); }catch(_){}
-      location.reload();
-    }
+    fhxPortal(el, ()=>{
+      if(window.__glvLocalLink){ window.__glvLocalLink(); }
+      else glvAskLocalOn().then(ok=>{ if(ok){ try{ localStorage.setItem('glv-local','1'); localStorage.setItem('glv-local-v','2'); }catch(_){} location.reload(); } });
+    });
   }
   else if(action==='friend-tile-open'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } setFriendTile('mode'); }
   else if(action==='friend-mode-online'){ if(window.__GLV_LOCAL && !window.__GLV_AUTO_LOCAL && confirm('ترجع للوضع الأونلاين الكامل؟ هيتعمل إعادة تحميل للتطبيق.')){ try{ localStorage.setItem('glv-local','off'); localStorage.setItem('glv-local-v','2'); }catch(_){} location.reload(); return; } if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } if(!requireVisaForRooms()) return; setFriendTile('menu'); try{ SND.click(); }catch(_){} }
@@ -55925,6 +56021,54 @@ function start(){
 function boot(){ setTimeout(start,1500); }
 if(document.readyState==='complete') boot(); else window.addEventListener('load',boot);
 window.__ipm={show:function(m){ shown=false; show(m||mode()||'native'); },reset:function(){ try{ localStorage.removeItem(SNZ); localStorage.removeItem('ipm-done'); }catch(e){} }};
+})();
+</script>
+<script id="glv-confirm">
+(function(){
+  var css=document.createElement('style');
+  css.textContent='.glvc-ov{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:20px;direction:rtl;background:rgba(5,4,20,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:glvcFade .22s ease both}'
+  +'.glvc-ov.out{animation:glvcFadeOut .2s ease both}.glvc-ov.out .glvc-card{animation:glvcDown .2s ease both}'
+  +'.glvc-card{position:relative;isolation:isolate;overflow:hidden;width:100%;max-width:400px;box-sizing:border-box;border-radius:30px;padding:0 20px 20px;text-align:center;font-family:Cairo,Tajawal,sans-serif;color:#fff;background:linear-gradient(180deg,#26215f 0%,#171449 100%);border:1px solid rgba(255,255,255,.16);box-shadow:0 30px 70px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.2);animation:glvcPop .42s cubic-bezier(.2,1.15,.35,1) both}'
+  +'.glvc-top{margin:0 -20px 14px;padding:26px 20px 18px;background:var(--glvc-g);position:relative}'
+  +'.glvc-top::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.35),transparent 55%);pointer-events:none}'
+  +'.glvc-ic{position:relative;z-index:1;width:72px;height:72px;margin:0 auto 10px;border-radius:24px;display:grid;place-items:center;font-size:38px;background:rgba(255,255,255,.22);box-shadow:0 10px 20px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.45)}'
+  +'.glvc-t{position:relative;z-index:1;font-weight:900;font-size:20px;line-height:1.3;text-shadow:0 2px 6px rgba(0,0,0,.25)}'
+  +'.glvc-s{font-size:13.5px;line-height:1.8;color:rgba(255,255,255,.82);margin:0 4px 14px}'
+  +'.glvc-list{display:flex;flex-direction:column;gap:8px;margin:0 0 18px;text-align:start}'
+  +'.glvc-li{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);font-size:13px;line-height:1.7;color:rgba(255,255,255,.92)}'
+  +'.glvc-li i{font-style:normal;font-size:17px;line-height:1.5;flex-shrink:0}'
+  +'.glvc-li.warn{background:rgba(255,196,64,.12);border-color:rgba(255,196,64,.32)}'
+  +'.glvc-act{display:flex;flex-direction:column;gap:8px}'
+  +'.glvc-ok{width:100%;padding:14px;border:0;border-radius:18px;font:900 15px Cairo,Tajawal,sans-serif;color:#fff;cursor:pointer;background:var(--glvc-g);box-shadow:0 10px 22px var(--glvc-sh),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .15s}'
+  +'.glvc-ok:active{transform:scale(.97)}'
+  +'.glvc-no{width:100%;padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:18px;font:800 14px Cairo,Tajawal,sans-serif;color:rgba(255,255,255,.85);background:transparent;cursor:pointer}'
+  +'.glvc-no:active{background:rgba(255,255,255,.08)}'
+  +'@keyframes glvcFade{from{opacity:0}to{opacity:1}}@keyframes glvcFadeOut{to{opacity:0}}'
+  +'@keyframes glvcPop{from{opacity:0;transform:translateY(40px) scale(.9)}to{opacity:1;transform:none}}@keyframes glvcDown{to{opacity:0;transform:translateY(30px) scale(.95)}}'
+  +'@media (prefers-reduced-motion:reduce){.glvc-ov,.glvc-card{animation:none!important}}';
+  document.head.appendChild(css);
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  window.glvConfirm=function(o){
+    return new Promise(function(resolve){
+      var ov=document.createElement('div'); ov.className='glvc-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+      ov.style.setProperty('--glvc-g',o.grad||'linear-gradient(145deg,#6C4DFF,#3FDCC9)'); ov.style.setProperty('--glvc-sh',o.shadow||'rgba(108,77,255,.45)');
+      var items=(o.points||[]).map(function(p){ return '<div class="glvc-li'+(p.warn?' warn':'')+'"><i>'+p.i+'</i><span>'+esc(p.t)+'</span></div>'; }).join('');
+      ov.innerHTML='<div class="glvc-card"><div class="glvc-top"><div class="glvc-ic">'+o.icon+'</div><div class="glvc-t">'+esc(o.title)+'</div></div>'
+        +(o.sub?'<div class="glvc-s">'+esc(o.sub)+'</div>':'')+'<div class="glvc-list">'+items+'</div>'
+        +'<div class="glvc-act"><button type="button" class="glvc-ok">'+esc(o.ok||'تأكيد')+'</button><button type="button" class="glvc-no">'+esc(o.cancel||'إلغاء')+'</button></div></div>';
+      var done=false;
+      function close(v){ if(done) return; done=true; document.removeEventListener('keydown',key,true); ov.classList.add('out'); setTimeout(function(){ ov.remove(); resolve(v); },200); }
+      function key(e){ if(e.key==='Escape'){ e.stopPropagation(); close(false); } }
+      ov.addEventListener('click',function(e){ if(e.target===ov) close(false); });
+      ov.querySelector('.glvc-ok').onclick=function(){ close(true); };
+      ov.querySelector('.glvc-no').onclick=function(){ close(false); };
+      document.addEventListener('keydown',key,true); document.body.appendChild(ov);
+    });
+  };
+  window.glvAskLocalOn=function(){ return glvConfirm({icon:'📡',title:'تشغيل Local Room؟',sub:'العب مع صاحبك بدون إنترنت — موبايل لموبايل مباشرة.',grad:'linear-gradient(145deg,#ffb347,#ff2d6f)',shadow:'rgba(255,45,111,.42)',ok:'تشغيل Local Room',cancel:'إلغاء',
+    points:[{i:'📶',t:'مش محتاج إنترنت، الربط بيتم بين الموبايلين مباشرة.'},{i:'⚠️',t:'التسجيل والحضور مش هيوصلوا للأدمن طول ما الوضع ده شغّال.',warn:true},{i:'🔄',t:'التطبيق هيتحمّل من جديد، وتقدر ترجع للأونلاين في أي وقت من نفس الصفحة.'}]}); };
+  window.glvAskLocalOff=function(){ return glvConfirm({icon:'🌐',title:'الرجوع للأونلاين؟',sub:'الوضع المحلي شغّال دلوقتي.',grad:'linear-gradient(145deg,#00d2ff,#3a47d5)',shadow:'rgba(58,71,213,.45)',ok:'رجوع للأونلاين',cancel:'فضّل محلي',
+    points:[{i:'✅',t:'التسجيل والحضور هيرجعوا يوصلوا للأدمن زي الأول.'},{i:'🔄',t:'التطبيق هيتحمّل من جديد.'}]}); };
 })();
 </script>
 <script id="pwa-settings-btn">
