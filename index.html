@@ -42624,8 +42624,12 @@ function aiMarkSvg(variant){
 .glx-dots{display:flex;gap:6px;justify-content:center;margin:4px 0 14px}
 .glx-dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25)}
 .glx-dots i.on{background:var(--gold,#F4B740);width:22px;border-radius:99px}
-.glx-off{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translate(-50%,-140%);z-index:99995;background:#EE4B4B;color:#fff;font-size:12.5px;font-weight:800;padding:8px 14px;border-radius:99px;transition:transform .3s;max-width:92vw;text-align:center}
-.glx-off.on{transform:translate(-50%,0)}
+.glx-off{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);opacity:0;pointer-events:none;z-index:99995;display:flex;align-items:center;gap:10px;background:rgba(24,20,70,.94);color:#fff;border:1.5px solid rgba(255,255,255,.18);font-family:'Cairo',sans-serif;font-size:15px;font-weight:800;line-height:1.5;padding:14px 22px;border-radius:20px;box-shadow:0 18px 44px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:opacity .28s ease,transform .28s cubic-bezier(.2,1.3,.4,1);width:max-content;min-width:230px;max-width:86vw;justify-content:center;text-align:center}
+.glx-off small{display:block}
+.glx-off .ico{font-size:24px;line-height:1}
+.glx-off.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.glx-off.off{border-color:#EE4B4B;box-shadow:0 18px 44px rgba(0,0,0,.5),0 0 0 3px rgba(238,75,75,.28)}
+.glx-off.back{border-color:#3FDCA4;box-shadow:0 18px 44px rgba(0,0,0,.5),0 0 0 3px rgba(63,220,164,.28)}
 @media (prefers-reduced-motion:reduce){.glx-ov,.glx-box,.glx-off{transition:none}}
 </style>
 <script>
@@ -42810,8 +42814,16 @@ document.addEventListener('input', function(e){
   var id=e.target && e.target.id; if(!id || id.indexOf('signup-')!==0 || /pass|photo/.test(id)) return;
   clearTimeout(t0); t0=setTimeout(function(){ var d={}; KEYS.forEach(function(k){ if(SU[k]) d[k]=SU[k]; }); lsSet('glx-su-draft',JSON.stringify(d)); },400);
 }, true);
-var bar=document.createElement('div'); bar.className='glx-off'; bar.textContent='📴 مفيش نت — كمّل الفورم وهنسجّلك أول ما النت يرجع'; document.body.appendChild(bar);
-function net(){ bar.classList.toggle('on', !navigator.onLine); }
+var bar=document.createElement('div'); bar.className='glx-off'; bar.setAttribute('role','status'); bar.setAttribute('aria-live','polite'); document.body.appendChild(bar);
+var netT=null, wasOff=!navigator.onLine;
+function netMsg(off){
+  bar.className='glx-off '+(off?'off':'back');
+  bar.innerHTML=off?'<span class="ico">📴</span><span>إنت أوفلاين دلوقتي<small style="font-weight:700;opacity:.8;font-size:12px">هنكمّل أول ما النت يرجع</small></span>':'<span class="ico">✅</span><span>رجع النت</span>';
+  void bar.offsetWidth; bar.classList.add('on');
+  clearTimeout(netT); netT=setTimeout(function(){ bar.classList.remove('on'); }, off?3800:2200);
+}
+function net(){ var off=!navigator.onLine; if(off===wasOff) return; wasOff=off; netMsg(off); }
+if(!navigator.onLine) setTimeout(function(){ netMsg(true); }, 1200);
 var pending=false, _ds=window.doSignup;
 window.doSignup = function(){
   syncGift(); SNAP={name:SU.name,phone:SU.phone,birth:SU.birth,stage:SU.stage,year:SU.year,confessor:SU.confessor,address:SU.address};
