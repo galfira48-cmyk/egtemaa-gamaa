@@ -45,6 +45,7 @@
 <link rel="dns-prefetch" href="https://firebaseio.com">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
 /* ============================= AUTO-SCALE (TABLET CONSISTENCY) ============================= */
 (function(){
@@ -1799,6 +1800,7 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .bb-head{ display:flex; align-items:center; gap:10px; padding:10px 16px 8px; flex:0 0 auto; }
   .bb-ttl{ flex:1; min-width:0; }
   .bb-ttl h3{ margin:0; font-weight:900; font-size:18px; color:var(--gold-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bb-ptsline{ margin:10px 14px 4px; padding:7px 12px; border-radius:10px; text-align:center; font-size:11.5px; font-weight:800; line-height:1.6; color:var(--gold-2,#FFDE94); background:rgba(244,183,64,.1); border:1px dashed rgba(244,183,64,.4); }
   .bb-crumb{ font-size:11.5px; color:var(--text-muted); font-weight:700; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .bb-ib{ flex:0 0 auto; width:38px; height:38px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text);
     display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; font-weight:900; font-family:inherit; -webkit-tap-highlight-color:transparent; }
@@ -14756,7 +14758,7 @@ function renderRetreatPage(){
       <span><div class="bt">ابدأ خلوة موجّهة</div><div class="bd">صلاة ← قراءة ← تأمل ← التزام — خطوة بخطوة</div></span>
       <span class="bc">${ICO.chev}</span>
     </button>
-    <div class="rt-pts ${khClaimedToday()?'got':''}">${khClaimedToday() ? '✅ خدت نقاط خلوة النهارده' : '🎁 نقاط عن كل يوم تخلّص فيه خلوة موجّهة، وبونص لما تواظب أيام متتالية'}</div>
+    <div class="rt-pts ${khClaimedToday()?'got':''}">${khClaimedToday() ? '✅ خدت نقاط خلوة النهارده' : khRulesText()}</div>
     <button type="button" class="rt-bible-card" data-action="bible-open" aria-label="الكتاب المقدس">
       <span class="bi">📖</span>
       <span><div class="bt">الكتاب المقدس</div><div class="bd">العهد القديم والعهد الجديد — اقرأ بين يدي ربنا</div></span>
@@ -15417,6 +15419,7 @@ setInterval(function(){
     if(typeof BB==='undefined' || !BB.g || BB.g.finished) return;
     if(Date.now()-khLastAct > KH_IDLE_MS) return;          /* ساكت من غير تفاعل */
     BB.g.active = (BB.g.active||0) + 1;
+    try{ var pe = document.getElementById('bb-pts-now'); if(pe) pe.textContent = khLiveHint(BB.g); }catch(e){}
   }catch(e){}
 }, 1000);
 /* ---------- نقاط الخلوة ---------- */
@@ -15424,6 +15427,19 @@ const KH_POINTS = 10;          /* الحد الأدنى لنقاط الخلوة 
 /* نقاط إضافية حسب مدة الخلوة (بالدقايق → نقاط). مش معروضة للمستخدم. بتتحسب من أعلى شريحة وصلها */
 const KH_TIERS = [[20,25],[10,20],[5,15],[3,12]];
 function khPointsFor(secs){ const m = (secs||0)/60; for(const t of KH_TIERS){ if(m>=t[0]) return t[1]; } return KH_POINTS; }
+function khTierLines(){ return KH_TIERS.slice().reverse().map(function(t){ return bbAr(t[0])+' د = '+bbAr(t[1]); }).join(' • '); }
+function khRulesText(){ return '🎁 +'+bbAr(KH_POINTS)+' نقطة عن كل يوم تخلّص فيه خلوة موجّهة، وبتزيد كل ما خلوتك تطول ('+khTierLines()+')، وبونص +'+bbAr(KH_STREAK_BONUS)+' لما تواظب '+bbAr(KH_STREAK_EVERY)+' أيام ورا بعض.'; }
+/* سطر النقاط جوه الخلوة الموجّهة: بيتحدّث كل ثانية حسب المدة الفعلية */
+function khLiveHint(g){
+  if(!g) return '';
+  if(khClaimedToday()) return '✅ نقاط خلوة النهارده اتسجلت قبل كده';
+  var secs = g.active||0, pts = khPointsFor(secs), m = secs/60, nxt = null;
+  for(var i=KH_TIERS.length-1;i>=0;i--){ if(m < KH_TIERS[i][0]){ nxt = KH_TIERS[i]; break; } }
+  var base = '🎁 لو خلّصت دلوقتي: +'+bbAr(pts)+' نقطة';
+  if(nxt){ var left = Math.max(1, Math.ceil(nxt[0]-m)); base += ' • كمّل '+bbAr(left)+' د وتبقى +'+bbAr(nxt[1]); }
+  if(!(g.refl||'').trim() && !(g.commit||'').trim()) base += ' — اكتب تأمّل أو التزام عشان تتسجل';
+  return base;
+}
 const KH_STREAK_EVERY = 7;     /* بونص كل كام يوم متتالي */
 const KH_STREAK_BONUS = 20;    /* قيمة بونص الأيام المتتالية */
 /* وقت السيرفر (مش ساعة الموبايل): بيمنع تغيير تاريخ الجهاز عشان نقاط الخلوة تتكرر */
@@ -15484,9 +15500,9 @@ function bbGuideRender(){
   }
   else if(i===2) body = `<div class="bb-gcard"><div class="gi">💭</div><h4>تأمّل</h4><p class="gp">${escapeHtml(g.q)}</p><textarea id="g-refl" class="bb-ta" placeholder="اكتب تأمّلك…">${escapeHtml(g.refl)}</textarea></div>`;
   else if(i===3) body = `<div class="bb-gcard"><div class="gi">🎯</div><h4>التزام</h4><p class="gp">خطوة عملية واحدة هتعملها النهارده.</p><textarea id="g-commit" class="bb-ta" placeholder="أنا هلتزم بأن…">${escapeHtml(g.commit)}</textarea></div>`;
-  else body = `<div class="bb-gcard"><div class="gi">🎉</div><h4>تمّت خلوتك</h4>${g.refOut?`<p class="gp" style="margin-bottom:10px;">📖 ${escapeHtml(g.refOut)}</p>`:''}<div class="bb-g2"><span>🔥 ${bbAr(bbStreak())} يوم متتالي</span><span>⏱ ${bbAr(Math.max(1,Math.round((g.secs||0)/60)))} دقيقة</span>${g.earned?`<span>🎁 +${bbAr(g.earned)} نقطة</span>`:''}</div>${(!g.earned && khClaimedToday())?'<p class="gp" style="font-size:12px;opacity:.8;">نقاط خلوة النهارده اتسجلت قبل كده ✓</p>':(!g.earned?'<p class="gp" style="font-size:12px;opacity:.8;">اكتب تأمّل أو التزام في الخلوة الجاية عشان النقاط تتسجل.</p>':'')}<p class="gp">«أشكرك يا ربّ على كلمتك. ثبّتني في الخطوة التي التزمت بها، واحفظني في محبتك. آمين.»</p><p class="gp" style="font-size:12px;">اتحفظت في ملاحظاتك وفي سجل خلواتي ✝️</p></div>`;
+  else body = `<div class="bb-gcard"><div class="gi">🎉</div><h4>تمّت خلوتك</h4>${g.refOut?`<p class="gp" style="margin-bottom:10px;">📖 ${escapeHtml(g.refOut)}</p>`:''}<div class="bb-g2"><span>🔥 ${bbAr(bbStreak())} يوم متتالي</span><span>⏱ ${bbAr(Math.max(1,Math.round((g.secs||0)/60)))} دقيقة</span>${g.earned?`<span>🎁 +${bbAr(g.earned)} نقطة${g.earnedBonus?` (منها ${bbAr(g.earnedBonus)} بونص)`:''}</span>`:''}</div>${(!g.earned && khClaimedToday())?'<p class="gp" style="font-size:12px;opacity:.8;">نقاط خلوة النهارده اتسجلت قبل كده ✓</p>':(!g.earned?'<p class="gp" style="font-size:12px;opacity:.8;">اكتب تأمّل أو التزام في الخلوة الجاية عشان النقاط تتسجل.</p>':'')}<p class="gp">«أشكرك يا ربّ على كلمتك. ثبّتني في الخطوة التي التزمت بها، واحفظني في محبتك. آمين.»</p><p class="gp" style="font-size:12px;">اتحفظت في ملاحظاتك وفي سجل خلواتي ✝️</p></div>`;
   const foot = i<4 ? `<div class="bb-foot"><button type="button" class="bb-b" data-g="prev" ${i===0?'disabled':''}>‹ السابق</button><button type="button" class="bb-b pri" data-g="next">${i===3?'إنهاء الخلوة ✓':'التالي ›'}</button></div>` : `<div class="bb-foot"><button type="button" class="bb-b pri" data-g="close">إغلاق</button></div>`;
-  sh.innerHTML = `<div class="bb-grab"></div><div class="bb-head"><div class="bb-ttl"><h3>الخلوة الموجّهة</h3><div class="bb-crumb">الخطوة ${bbAr(i+1)} من ٥ — ${names[i]}</div></div><button type="button" class="bb-ib" data-g="close" aria-label="إغلاق">✕</button></div><div class="bb-prog"><i style="width:${(i+1)*20}%"></i></div><div class="bb-body">${body}</div>${foot}`;
+  sh.innerHTML = `<div class="bb-grab"></div><div class="bb-head"><div class="bb-ttl"><h3>الخلوة الموجّهة</h3><div class="bb-crumb">الخطوة ${bbAr(i+1)} من ٥ — ${names[i]}</div></div><button type="button" class="bb-ib" data-g="close" aria-label="إغلاق">✕</button></div><div class="bb-prog"><i style="width:${(i+1)*20}%"></i></div>${i<4?`<div class="bb-ptsline" id="bb-pts-now">${khLiveHint(g)}</div>`:''}<div class="bb-body">${body}</div>${foot}`;
 }
 
 /* ---------- نافذة القارئ ---------- */
@@ -31187,6 +31203,58 @@ const ADMIN_PASSCODE_LEN = 4;
 let ADMIN_PASSCODE_HASH = "8cca04ee02b8915f60a6b72c1faf19923aa12aafb5af89bc4bfd403dc60a836b";
 const ADMIN_LOCKOUT_MAX_ATTEMPTS = 5;
 const ADMIN_LOCKOUT_MS = 60000;
+/* ===== دخول المنظمين بحساب Firebase (إيميل + باسورد) =====
+   الحساب بيتعمل من Firebase Console ← Authentication ← Users (والتسجيل الجديد يتقفل من Settings ← User actions).
+   ADMIN_EMAILS: قايمة إيميلات مسموح لها بالدخول (اختياري — لو فاضية أي حساب موجود في المشروع يدخل). */
+const ADMIN_EMAILS = [];
+const ADMIN_ALLOW_LEGACY_CODE = false;   /* الكود القديم (4 أرقام) للمنظمين متوقّف — كود مسؤول الفصل شغال زي ما هو */
+let adminLockMode = 'account';           /* account | code (كود مسؤول فصل) */
+function adminAuthErr(e){
+  const c = (e && e.code) || '';
+  if(/invalid-credential|wrong-password|user-not-found|invalid-email|missing-password|missing-email/.test(c)) return 'الإيميل أو الباسورد غلط';
+  if(c==='auth/too-many-requests') return 'محاولات كتير — استنى شوية وجرّب تاني';
+  if(c==='auth/operation-not-allowed') return 'تسجيل الدخول بالإيميل مش مفعّل في Firebase';
+  if(c==='auth/network-request-failed') return 'مفيش اتصال بالنت';
+  if(c==='auth/user-disabled') return 'الحساب ده متوقّف';
+  return 'تعذّر الدخول' + (c ? ' ('+c+')' : '');
+}
+async function doAdminLogin(){
+  if(Date.now() < adminLockedUntil){ render(); return; }
+  const em = ((document.getElementById('admin-email')||{}).value||'').trim().toLowerCase();
+  const pw = (document.getElementById('admin-password')||{}).value||'';
+  const btn = document.getElementById('admin-login-btn');
+  if(!em || !pw){ showToast('اكتب الإيميل والباسورد', true); return; }
+  if(typeof firebase==='undefined' || !firebase.auth){ showToast('خدمة الدخول مش متاحة دلوقتي — اتأكد من النت وجرّب تاني', true); return; }
+  if(btn){ btn.disabled = true; btn.textContent = 'بنتحقق…'; }
+  try{
+    try{ await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION); }catch(_){}
+    const cred = await firebase.auth().signInWithEmailAndPassword(em, pw);
+    const got = ((cred && cred.user && cred.user.email) || '').toLowerCase();
+    if(ADMIN_EMAILS.length && ADMIN_EMAILS.map(x=>String(x).toLowerCase()).indexOf(got)<0){
+      try{ await firebase.auth().signOut(); }catch(_){}
+      throw {code:'auth/invalid-credential'};
+    }
+    adminFailedAttempts = 0;
+    state.adminUnlocked = true; state.clsOnly = null;
+    vibrate(15);
+    render();
+  }catch(e){
+    adminFailedAttempts++;
+    if(adminFailedAttempts >= ADMIN_LOCKOUT_MAX_ATTEMPTS){
+      adminLockedUntil = Date.now() + ADMIN_LOCKOUT_MS; adminFailedAttempts = 0;
+      showToast('اتقفل الدخول مؤقتًا بسبب محاولات كتير غلط', true); vibrate([30,40,30,40,30]);
+      render();
+      setTimeout(()=>{ if(state.view==='admin' && !state.adminUnlocked) render(); }, ADMIN_LOCKOUT_MS + 200);
+      return;
+    }
+    showToast(adminAuthErr(e), true); vibrate([30,40,30]);
+    if(btn){ btn.disabled = false; btn.textContent = 'دخول'; }
+    const pe = document.getElementById('admin-password'); if(pe){ pe.value = ''; pe.focus(); }
+  }
+}
+document.addEventListener('keydown', function(e){
+  if(e.key==='Enter' && e.target && (e.target.id==='admin-password' || e.target.id==='admin-email')){ e.preventDefault(); if(e.target.id==='admin-email'){ const pe=document.getElementById('admin-password'); if(pe) pe.focus(); } else doAdminLogin(); }
+}, true);
 let adminFailedAttempts = 0;
 let adminLockedUntil = 0;
 
@@ -31215,20 +31283,37 @@ function renderAdminLock(){
   const lockMsg = isLocked
     ? `<div class="otp-sub" style="color:var(--danger,#d6473a);margin-top:8px;">محاولات كتير غلط، حاول تاني بعد ${Math.ceil((adminLockedUntil-now)/1000)} ثانية</div>`
     : '';
-  return `
+  const head = `
     <div class="back-row">
       <button class="icon-btn" data-action="back">${ICO.back}</button>
       <div class="back-title">لوحة المنظمين</div>
-    </div>
+    </div>`;
+  if(adminLockMode==='code'){
+    return head + `
     <div class="card otp-card" style="margin-top:10px;">
-      <div class="otp-lock">🛡️</div>
-      <div class="otp-title">دخول محمي</div>
-      <div class="otp-sub">أدخل كود المنظمين</div>
+      <div class="otp-lock">🔑</div>
+      <div class="otp-title">دخول مسؤول فصل</div>
+      <div class="otp-sub">أدخل كود الفصل</div>
       <div class="otp-boxes" id="admin-otp-boxes" dir="ltr">${boxes}</div>
       <div class="otp-progress-track"><div class="otp-progress-fill" id="admin-otp-progress-fill"></div></div>
       <input type="hidden" id="admin-pass-input" />
       ${lockMsg}
       <button type="button" class="btn btn-primary" id="admin-otp-submit-btn" data-action="submit-admin-pass" style="margin-top:20px;" ${isLocked?'disabled':''}>دخول</button>
+      <button type="button" class="btn btn-ghost" data-action="admin-lock-mode" data-m="account" style="margin-top:10px;width:100%;">← دخول المنظمين بالحساب</button>
+    </div>`;
+  }
+  return head + `
+    <div class="card otp-card" style="margin-top:10px;">
+      <div class="otp-lock">🛡️</div>
+      <div class="otp-title">دخول المنظمين</div>
+      <div class="otp-sub">سجّل دخولك بحساب المنظمين</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;text-align:right;">
+        <input class="field" id="admin-email" type="email" dir="ltr" autocomplete="username" inputmode="email" placeholder="الإيميل" ${isLocked?'disabled':''} style="text-align:left;" />
+        <input class="field" id="admin-password" type="password" dir="ltr" autocomplete="current-password" placeholder="الباسورد" ${isLocked?'disabled':''} style="text-align:left;" />
+      </div>
+      ${lockMsg}
+      <button type="button" class="btn btn-primary" id="admin-login-btn" data-action="submit-admin-login" style="margin-top:18px;width:100%;" ${isLocked?'disabled':''}>دخول</button>
+      <button type="button" class="btn btn-ghost" data-action="admin-lock-mode" data-m="code" style="margin-top:10px;width:100%;font-size:12.5px;">🔑 أنا مسؤول فصل (بالكود)</button>
     </div>
   `;
 }
@@ -31494,7 +31579,7 @@ function _renderAdminSettingsAll(){
     </div>
     <div class="admin-section-title"><span>🔐</span><span>الأمان والنسخ الاحتياطي</span></div>
     <div class="card" style="margin-bottom:16px;">
-      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🔒 تغيير كود دخول المنظمين</div>
+      <div style="font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;">🔒 كود المنظمين القديم (متوقّف — الدخول بقى بحساب Firebase)</div>
       <div class="hint" style="margin:2px 0 12px;">كود مكوّن من ${ADMIN_PASSCODE_LEN} أرقام، هيتطلب منك كل مرة تدخل بيها لوحة المنظمين</div>
       <label>الكود الحالي</label>
       <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="${ADMIN_PASSCODE_LEN}" id="admin-pass-current" autocomplete="off" placeholder="••••" />
@@ -32213,7 +32298,7 @@ async function clsAction(a, el){
   const ro = !!state.clsOnly;
   if(a==='cls-open'){ if(ro) return; state.adminTab='classes'; state.adminHub=false; state.clsSel=d.k; state.clsAbsent=false; state.clsMsgOpen=false; state.clsWaText=''; render(); try{ window.scrollTo(0,0); }catch(e){} }
   else if(a==='cls-back'){ if(ro) return; state.clsSel=null; render(); try{ window.scrollTo(0,0); }catch(e){} }
-  else if(a==='cls-exit'){ state.adminUnlocked=false; state.clsOnly=null; state.clsSel=null; render(); }
+  else if(a==='cls-exit'){ try{ if(typeof firebase!=='undefined' && firebase.auth) firebase.auth().signOut(); }catch(_){} state.adminUnlocked=false; state.clsOnly=null; state.clsSel=null; render(); }
   else if(a==='cls-member'){ if(ro) return; state.adminTab='participants'; state.editingParticipantId=d.pid; render(); try{ window.scrollTo(0,0); }catch(e){} }
   else if(a==='cls-view'){ state.clsView=d.v; render(); }
   else if(a==='cls-bd-open'){ state.adminOpen = state.adminOpen || {}; state.adminOpen['cls-bd']=true; render(); setTimeout(()=>{ const e=document.querySelector('[data-k="cls-bd"]'); if(e && e.scrollIntoView) e.scrollIntoView({behavior:'smooth',block:'center'}); },50); }
@@ -33345,7 +33430,7 @@ function render(){
   if(attViewActive()){ attRefresh(); attMaybeAdminInit(); }
   if(state.view==='admin' && state.adminUnlocked && !state.adminHub && state.adminTab==='attendance'){ attDrawAdminQr(); }
   if(state.view==='login'){ attachOtpBoxes(); }
-  if(state.view==='admin' && !state.adminUnlocked){ attachAdminOtpBoxes(); }
+  if(state.view==='admin' && !state.adminUnlocked && adminLockMode==='code'){ attachAdminOtpBoxes(); }
   if(state.view==='admin' && state.adminTab==='participants'){ attachPhotoCropInputs(); }
   if(state.view==='admin' && state.adminTab==='gallery'){ attachGalleryAdminInputs(); }
   if(state.view==='admin' && (state.adminTab==='stickers' || state.adminTab==='cardshop')){ attachStickerAdminInputs(); }
@@ -36250,6 +36335,8 @@ document.addEventListener('click', (e)=>{
   else if(action==='toggle-admin-tools'){ state.adminToolsOpen = !state.adminToolsOpen; render(); }
   else if(action==='reset-demo'){ CHECKINS = {}; saveCheckins(CHECKINS); showToast('تم إعادة تعيين بيانات الحضور'); render(); }
   else if(action==='submit-admin-pass'){ doAdminUnlock(); }
+  else if(action==='submit-admin-login'){ doAdminLogin(); }
+  else if(action==='admin-lock-mode'){ adminLockMode = el.dataset.m==='code' ? 'code' : 'account'; render(); }
   else if(action==='admin-tab'){ state.adminTab = el.dataset.tab; state.editingSessionId = null; state.viewingOpinionId = null; render(); }
   else if(action==='admin-up'){
     const t = state.adminTab;
@@ -39317,7 +39404,7 @@ async function doAdminUnlock(){
   const entered = input.value.trim();
   if(entered.length < ADMIN_PASSCODE_LEN) return;
   const hash = await sha256Hex(entered);
-  if(hash === ADMIN_PASSCODE_HASH){
+  if(ADMIN_ALLOW_LEGACY_CODE && hash === ADMIN_PASSCODE_HASH){
     adminFailedAttempts = 0;
     state.adminUnlocked = true; state.clsOnly = null;
     render();
@@ -39335,7 +39422,7 @@ async function doAdminUnlock(){
       setTimeout(()=>{ if(state.view==='admin' && !state.adminUnlocked) render(); }, ADMIN_LOCKOUT_MS + 200);
       return;
     }
-    showToast('كود المنظمين غير صحيح', true);
+    showToast('كود الفصل غير صحيح', true);
     vibrate([30,40,30]);
     const boxes = document.querySelectorAll('.admin-otp-box');
     boxes.forEach(b=>{ b.value=''; b.classList.remove('filled'); });
