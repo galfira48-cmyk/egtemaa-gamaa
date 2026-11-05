@@ -32708,7 +32708,7 @@ function renderAdmin(){
     const an = state.attNav;
     if(an && an.page==='addtype') pageTitle = 'نشاط جديد';
     else if(an && an.type && ATT_TYPES[an.type]){
-      pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : an.page==='summary' ? 'ملخص اليوم' : an.page==='insights' ? 'التحليلات الذكية' : an.page==='audit' ? 'سجل التدقيق' : ATT_TYPES[an.type].label;
+      pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : an.page==='summary' ? 'ملخص اليوم' : an.page==='insights' ? 'التحليلات الذكية' : an.page==='audit' ? 'سجل التدقيق' : an.page==='days' ? 'الأيام' : ATT_TYPES[an.type].label;
     }
   } else if(tab==='servants'){
     if(state.svEdit) pageTitle = state.svEdit==='new' ? 'إضافة خادم' : ((SV.list.find(x=>x.id===state.svEdit)||{}).name || 'تعديل خادم');
@@ -35318,6 +35318,10 @@ function renderAdminAttendanceTabInner(){
   }).join('');
   const todayWd = new Date().getDay();
   const formHtml = attNewDayFormHtml(type, t, c);
+  if(nav.page==='days'){
+    return `<div class="dr-head" style="margin-top:4px;"><b>الأيام</b><span>${daysAll.length}</span></div>
+    <div class="dr-list">${dayTiles || '<div class="empty-note">لسه مفيش أيام</div>'}</div>`;
+  }
   return `
     <div class="aa-act-head">
       <span class="aa-act-name"><span class="ai" style="background:${t.color}">${t.icon}</span>${escapeHtml(t.label)}</span>
@@ -35329,8 +35333,11 @@ function renderAdminAttendanceTabInner(){
       <span class="at-plus">＋</span>
     </button>
     ${formOpen ? formHtml : ''}
-    <div class="dr-head"><b>الأيام</b><span>${daysAll.length}</span></div>
-    <div class="dr-list">${dayTiles}</div>
+    <button type="button" class="at-bar at-days" style="margin-top:12px;" data-action="att-admin-page" data-page="days" data-type="${type}">
+      <span class="at-ico" style="background:linear-gradient(160deg,#9FB4FF,#6C7CF0)">📅</span>
+      <span class="at-txt"><b>الأيام</b><small>${daysAll.length} يوم · آخر يوم: ${escapeHtml((daysAll[0]&&daysAll[0].name)||'—')}</small></span>
+      <span class="at-plus">‹</span>
+    </button>
     <div class="aa-grid" style="margin-top:14px;">
       <button type="button" class="aa-tile" data-action="att-admin-page" data-page="insights" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#B388FF,#7C4DFF)">🧠</span><b>التحليلات الذكية</b><small>خطر الغياب · توقع · مساعد</small></button>
       <button type="button" class="aa-tile" data-action="att-admin-page" data-page="audit" data-type="${type}"><span class="aa-tile-ico" style="background:linear-gradient(145deg,#FFB86B,#E67E22)">🛡️</span><b>سجل التدقيق</b><small>مين عمل إيه ومتى</small></button>
@@ -36347,7 +36354,7 @@ document.addEventListener('click', (e)=>{
     else if(t==='classes' && state.clsSel){ state.clsSel = null; }
     else if(t==='servants' && state.svEdit){ state.svEdit = null; }
     else if(t==='opinions' && state.viewingOpinionId){ state.viewingOpinionId = null; }
-    else if(t==='attendance' && state.attNav && state.attNav.page && state.attNav.page!=='home' && state.attNav.type){ state.attNav.page = 'home'; }
+    else if(t==='attendance' && state.attNav && state.attNav.page && state.attNav.page!=='home' && state.attNav.type){ state.attNav.page = (state.attNav.page==='day' ? 'days' : 'home'); }
     else if(t==='attendance' && state.attNav && (state.attNav.type || state.attNav.page==='addtype')){ state.attNav = {type:null, page:'home'}; }
     else { state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; }
     render(); try{ window.scrollTo(0,0); }catch(e){}
