@@ -34543,9 +34543,11 @@ function attApplyTypes(arr){
 let ATT_CONFIG = {}, ATT_RECORDS = {}, _attLoading = false, _attLastLoad = 0, _attVer = 0, _attLoadedOnce = false, _attInitBusy = false, _attInitFailedAt = 0;
 
 function attGenCode(type){
-  const a = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let s = '';
-  for(let i=0;i<6;i++) s += a[Math.floor(Math.random()*a.length)];
-  return 'ATT-' + ATT_TYPES[type].pre + '-' + s;
+  /* كود بسيط من 4 حاجات: حرفين + رقمين (مثال: KX47) */
+  const L = 'ABCDEFGHJKMNPQRSTUVWXYZ', D = '23456789'; let s = '';
+  for(let i=0;i<2;i++) s += L[Math.floor(Math.random()*L.length)];
+  for(let i=0;i<2;i++) s += D[Math.floor(Math.random()*D.length)];
+  return s;
 }
 function attNormCode(c){ return String(c||'').trim().toUpperCase().replace(/[^A-Z0-9-]/g,''); }
 function attParseDay(v){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v||''); return m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(); }
@@ -35042,7 +35044,7 @@ function renderAttendanceScanPage(){
       </button>
       <div class="ap-or">أو اكتب الكود يدويًا</div>
       <div class="ap-manual">
-        <input class="field" id="att-manual-input" dir="ltr" placeholder="ATT-XXXX-XXXXXX" autocomplete="off" />
+        <input class="field" id="att-manual-input" dir="ltr" placeholder="مثال: KX47" autocomplete="off" />
         <button type="button" class="btn btn-outline" style="width:auto;padding:0 20px;" data-action="att-manual-submit" data-type="${type}">تأكيد</button>
       </div>
     </div>`;
@@ -35426,53 +35428,57 @@ function attPrintCode(type){
   w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${t.full}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&display=swap" rel="stylesheet">
     <style>
+      @page{ size:A4 portrait; margin:0; }
       *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-      html,body{ margin:0; min-height:100%; }
-      body{ font-family:'Cairo',Tahoma,Arial,sans-serif; display:flex; align-items:center; justify-content:center; padding:22px 14px; color:#1B1A4A;
-        background:radial-gradient(circle at 15% 10%,#FFE9B8 0,transparent 42%),radial-gradient(circle at 90% 85%,#CFC8FF 0,transparent 45%),#F6F1E7; }
-      .poster{ position:relative; width:100%; max-width:380px; border-radius:34px; overflow:hidden; background:#fff; box-shadow:0 30px 60px -24px rgba(27,26,74,.55), 0 0 0 1px rgba(27,26,74,.08); text-align:center; }
-      .head{ position:relative; padding:30px 20px 74px; color:#fff; background:linear-gradient(150deg,#1B1A4A 0%,#2E2C86 60%,#5B4BD6 100%); overflow:hidden; }
-      .head::before{ content:''; position:absolute; inset:0; opacity:.16; background:radial-gradient(circle at 20px 20px,#fff 2px,transparent 2.5px) 0 0/28px 28px; }
-      .head::after{ content:''; position:absolute; left:0; right:0; bottom:-1px; height:46px; background:#fff; border-radius:50% 50% 0 0 / 100% 100% 0 0; }
-      .ico{ position:relative; width:74px; height:74px; margin:0 auto 12px; border-radius:24px; display:grid; place-items:center; font-size:40px; background:${t.color}; box-shadow:0 12px 24px -10px rgba(0,0,0,.6), inset 0 2px 0 rgba(255,255,255,.5); transform:rotate(-6deg); }
-      .ico.logo{ width:92px; height:92px; border-radius:50%; background:#fff; transform:none; overflow:hidden; box-shadow:0 12px 26px -10px rgba(0,0,0,.65), 0 0 0 4px rgba(255,255,255,.35); }
-      .ico.logo img{ width:100%; height:100%; object-fit:contain; padding:6px; display:block; }
-      h1{ position:relative; margin:0; font-size:30px; font-weight:900; letter-spacing:.2px; }
-      .date{ position:relative; display:inline-block; margin-top:10px; padding:5px 16px; border-radius:999px; font-size:14px; font-weight:800; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3); }
-      .body{ position:relative; margin-top:-46px; padding:0 22px 26px; }
-      .qr-wrap{ position:relative; display:inline-block; padding:16px; border-radius:26px; background:#fff; box-shadow:0 18px 36px -16px rgba(27,26,74,.5), 0 0 0 2px #EFE9FF; }
-      .qr-wrap i{ position:absolute; width:30px; height:30px; border:5px solid #5B4BD6; }
-      .qr-wrap i:nth-child(1){ top:-6px; left:-6px; border-right:0; border-bottom:0; border-radius:16px 0 0 0; }
-      .qr-wrap i:nth-child(2){ top:-6px; right:-6px; border-left:0; border-bottom:0; border-radius:0 16px 0 0; }
-      .qr-wrap i:nth-child(3){ bottom:-6px; left:-6px; border-right:0; border-top:0; border-radius:0 0 0 16px; }
-      .qr-wrap i:nth-child(4){ bottom:-6px; right:-6px; border-left:0; border-top:0; border-radius:0 0 16px 0; }
-      #print-qr-holder{ line-height:0; } #print-qr-holder img,#print-qr-holder canvas{ width:240px !important; height:240px !important; max-width:100%; }
-      .scan{ margin:20px 0 4px; font-size:19px; font-weight:900; }
-      .scan span{ color:#5B4BD6; }
-      .hint{ font-size:13px; font-weight:600; color:#6B6A8F; }
-      .steps{ display:flex; justify-content:center; gap:8px; margin:16px 0 4px; }
-      .steps b{ display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:14px; font-size:12px; font-weight:800; background:#F1EEFF; color:#3B33A8; }
-      .steps b em{ font-style:normal; width:20px; height:20px; border-radius:50%; display:grid; place-items:center; font-size:11px; background:#5B4BD6; color:#fff; }
-      .perf{ position:relative; margin:18px -22px 14px; border-top:2px dashed #D9D3F5; }
-      .perf::before,.perf::after{ content:''; position:absolute; top:-13px; width:24px; height:24px; border-radius:50%; background:#F6F1E7; }
-      .perf::before{ right:-12px; } .perf::after{ left:-12px; }
-      .code{ display:inline-block; direction:ltr; padding:8px 18px; border-radius:14px; font-family:'Courier New',monospace; font-weight:800; font-size:16px; letter-spacing:2px; color:#1B1A4A; background:#F6F1E7; border:1px dashed #B9AE90; }
-      @media print{ body{ background:#fff; padding:0; } .poster{ box-shadow:none; border:1px solid #ddd; } }
+      html,body{ margin:0; padding:0; background:#cfcde0; }
+      body{ font-family:'Cairo',Tahoma,Arial,sans-serif; color:#1B1A4A; display:flex; justify-content:center; }
+      .page{ position:relative; width:210mm; height:297mm; overflow:hidden; text-align:center; background:#fff; display:flex; flex-direction:column; }
+      .head{ position:relative; flex:0 0 112mm; padding:16mm 14mm 0; color:#fff; background:linear-gradient(150deg,#1B1A4A 0%,#2E2C86 58%,#5B4BD6 100%); overflow:hidden; }
+      .head::before{ content:''; position:absolute; inset:0; opacity:.16; background:radial-gradient(circle at 5mm 5mm,#fff .5mm,transparent .7mm) 0 0/9mm 9mm; }
+      .head::after{ content:''; position:absolute; left:-10%; right:-10%; bottom:-1px; height:26mm; background:#fff; border-radius:50% 50% 0 0 / 100% 100% 0 0; }
+      .ico{ position:relative; width:34mm; height:34mm; margin:0 auto 6mm; border-radius:50%; display:grid; place-items:center; font-size:20mm; background:#fff; overflow:hidden; box-shadow:0 4mm 8mm -3mm rgba(0,0,0,.6), 0 0 0 1.4mm rgba(255,255,255,.35); }
+      .ico img{ width:100%; height:100%; object-fit:contain; padding:2mm; display:block; }
+      h1{ position:relative; margin:0; font-size:17mm; font-weight:900; line-height:1.15; }
+      .date{ position:relative; display:inline-block; margin-top:6mm; padding:2mm 8mm; border-radius:99mm; font-size:6.2mm; font-weight:800; background:rgba(255,255,255,.16); border:.4mm solid rgba(255,255,255,.35); }
+      .body{ position:relative; flex:1; margin-top:-24mm; padding:0 16mm 12mm; display:flex; flex-direction:column; align-items:center; }
+      .qr-wrap{ position:relative; padding:6mm; border-radius:9mm; background:#fff; box-shadow:0 6mm 12mm -6mm rgba(27,26,74,.5), 0 0 0 .7mm #E6E0FF; }
+      .qr-wrap i{ position:absolute; width:11mm; height:11mm; border:1.6mm solid #5B4BD6; }
+      .qr-wrap i:nth-child(1){ top:-2.2mm; left:-2.2mm; border-right:0; border-bottom:0; border-radius:6mm 0 0 0; }
+      .qr-wrap i:nth-child(2){ top:-2.2mm; right:-2.2mm; border-left:0; border-bottom:0; border-radius:0 6mm 0 0; }
+      .qr-wrap i:nth-child(3){ bottom:-2.2mm; left:-2.2mm; border-right:0; border-top:0; border-radius:0 0 0 6mm; }
+      .qr-wrap i:nth-child(4){ bottom:-2.2mm; right:-2.2mm; border-left:0; border-top:0; border-radius:0 0 6mm 0; }
+      #print-qr-holder{ line-height:0; } #print-qr-holder img,#print-qr-holder canvas{ width:92mm !important; height:92mm !important; display:block; }
+      .scan{ margin:9mm 0 1mm; font-size:9mm; font-weight:900; } .scan span{ color:#5B4BD6; }
+      .hint{ font-size:5mm; font-weight:600; color:#6B6A8F; }
+      .steps{ display:flex; justify-content:center; gap:4mm; margin:7mm 0 0; }
+      .steps b{ display:flex; align-items:center; gap:2.5mm; padding:2.4mm 5mm; border-radius:6mm; font-size:4.6mm; font-weight:800; background:#F1EEFF; color:#3B33A8; }
+      .steps b em{ font-style:normal; width:7mm; height:7mm; border-radius:50%; display:grid; place-items:center; font-size:4.2mm; background:#5B4BD6; color:#fff; }
+      .perf{ position:relative; align-self:stretch; margin:auto -16mm 8mm; border-top:.7mm dashed #D2CBF3; }
+      .perf::before,.perf::after{ content:''; position:absolute; top:-5mm; width:10mm; height:10mm; border-radius:50%; background:#cfcde0; }
+      .perf::before{ right:-5mm; } .perf::after{ left:-5mm; }
+      .codelbl{ font-size:4.6mm; font-weight:800; color:#6B6A8F; margin-bottom:2mm; }
+      .code{ direction:ltr; padding:3mm 14mm; border-radius:8mm; font-family:'Courier New',monospace; font-weight:900; font-size:22mm; line-height:1.1; letter-spacing:4mm; color:#1B1A4A; background:#F6F1E7; border:.7mm dashed #B9AE90; }
+      @media print{ html,body{ background:#fff; } .perf::before,.perf::after{ background:#fff; } }
     </style></head><body>
-    <div class="poster">
-      <div class="head"><div class="ico${lg?' logo':''}">${icoHtml}</div><h1>${t.full}</h1><div class="date">${escapeHtml(c.name||'')}</div></div>
+    <div class="page" id="pg">
+      <div class="head"><div class="ico">${icoHtml}</div><h1>${t.full}</h1><div class="date">${escapeHtml(c.name||'')}</div></div>
       <div class="body">
         <div class="qr-wrap"><i></i><i></i><i></i><i></i><div id="print-qr-holder"></div></div>
         <div class="scan">امسح الكود <span>وسجّل حضورك</span> ✨</div>
         <div class="hint">وجّه كاميرا التطبيق ناحية الكود</div>
         <div class="steps"><b><em>١</em>افتح التطبيق</b><b><em>٢</em>اضغط مسح</b><b><em>٣</em>خلاص!</b></div>
         <div class="perf"></div>
+        <div class="codelbl">أو اكتب الكود يدويًا</div>
         <div class="code">${escapeHtml(c.code)}</div>
       </div>
     </div>
     <script>${QR_LIB_SRC}<\/script>
-    <script>new QRCode(document.getElementById('print-qr-holder'), {text:${JSON.stringify(c.code)}, width:240, height:240, colorDark:'#1B1A4A', colorLight:'#ffffff'});
-      setTimeout(()=>window.print(), 600);
+    <script>new QRCode(document.getElementById('print-qr-holder'), {text:${JSON.stringify(c.code)}, width:520, height:520, colorDark:'#1B1A4A', colorLight:'#ffffff'});
+      function fit(){ var pg=document.getElementById('pg'); var pw=pg.offsetWidth; pg.style.zoom = Math.min(1, window.innerWidth/pw); }
+      fit(); addEventListener('resize',fit);
+      addEventListener('beforeprint',function(){ document.getElementById('pg').style.zoom=1; });
+      addEventListener('afterprint',fit);
+      setTimeout(function(){ window.print(); }, 700);
     <\/script></body></html>`);
   w.document.close();
 }
