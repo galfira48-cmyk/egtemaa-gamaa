@@ -9115,6 +9115,32 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .dr.fresh{ animation:drFresh 1s cubic-bezier(.22,1,.36,1) backwards; }
   .dr.fresh .dr-date{ animation:drPop .7s .25s cubic-bezier(.34,1.56,.64,1) backwards; }
 
+  /* ===== شكل كروت الأيام الكرييتف: تذكرة بحلقة تقدّم ولمسة ميل ===== */
+  .dr-list .dr{ --rc:#B7A6FF; --rc2:#6C7CF0; --tilt:0deg; aspect-ratio:auto; min-height:176px; gap:10px; border-radius:30px; transform:rotate(var(--tilt));
+    background:radial-gradient(120% 70% at 100% 0%,color-mix(in srgb,var(--rc) 26%,transparent),transparent 60%),linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.03) 45%,rgba(255,255,255,.07)),rgba(28,30,84,.5);
+    border:1px solid color-mix(in srgb,var(--rc) 38%,rgba(255,255,255,.12)); }
+  .dr-list .dr:nth-child(odd){ --tilt:.7deg; } .dr-list .dr:nth-child(even){ --tilt:-.7deg; }
+  .dr-list .dr:active{ transform:scale(.96) rotate(0deg); }
+  .dr-list .dr.dr-open{ --rc:#5FE0A4; --rc2:#2FB67C; box-shadow:0 22px 38px -20px rgba(0,0,0,.85), 0 0 30px -6px rgba(95,224,164,.45), inset 0 1px 0 rgba(255,255,255,.4); }
+  .dr-list .dr.dr-shut{ --rc:#FF8D8D; --rc2:#E5484D; }
+  .dr-list .dr.dr-arch{ --rc:#EADFC9; --rc2:#B39B6E; }
+  .dr-list .dr::before{ inset:0 0 auto 0; height:5px; border-radius:0; opacity:1; background:linear-gradient(90deg,var(--rc2),var(--rc),var(--rc2)); }
+  .dr-list .dr::after{ top:auto; bottom:-14px; inset-inline-start:auto; inset-inline-end:-6px; width:auto; aspect-ratio:auto; border-radius:0; background:none; font-size:78px; line-height:1; opacity:.09; transform:rotate(-14deg); filter:grayscale(.3); animation:none !important; }
+  .dr-list .dr.dr-open::after{ content:'✨'; } .dr-list .dr.dr-shut::after{ content:'🔒'; } .dr-list .dr.dr-arch::after{ content:'🗂️'; }
+  .dr-list .dr .dr-date{ align-items:center; gap:10px; }
+  .dr-ring{ position:relative; flex:0 0 auto; width:66px; height:66px; border-radius:50%; display:grid; place-items:center;
+    background:conic-gradient(var(--rc) calc(var(--pc)*1%),rgba(255,255,255,.12) 0); box-shadow:0 0 18px -4px color-mix(in srgb,var(--rc) 60%,transparent), 0 8px 16px -8px rgba(0,0,0,.7); }
+  .dr-ring::before{ content:''; position:absolute; inset:6px; border-radius:50%; background:radial-gradient(circle at 30% 25%,rgba(60,64,150,.95),rgba(22,24,72,.98)); box-shadow:inset 0 2px 6px rgba(0,0,0,.5); }
+  .dr-list .dr .dr-ring b{ position:relative; font-size:28px; line-height:1; filter:none; }
+  .dr-dcol{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .dr-dcol small{ font-size:13px; font-weight:900; opacity:1; color:var(--rc); }
+  .dr-pc{ font-style:normal; font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px; align-self:flex-start; background:color-mix(in srgb,var(--rc) 18%,transparent); color:var(--rc); border:1px solid color-mix(in srgb,var(--rc) 35%,transparent); }
+  .dr-list .dr .dr-body{ position:relative; padding-top:10px; }
+  .dr-list .dr .dr-body::before{ content:''; position:absolute; top:0; inset-inline:-4px; border-top:1.5px dashed rgba(255,255,255,.22); }
+  .dr-list .dr .dr-bar{ display:none; }
+  .dr-list .dr .dr-name{ font-size:15px; }
+  .dr-list .dr.fresh .dr-ring{ animation:drPop .7s .25s cubic-bezier(.34,1.56,.64,1) backwards; }
+
   /* صفحة اليوم */
   .dp{ border-radius:26px; padding:18px 16px 16px; background:var(--card,rgba(255,255,255,.06)); border:1px solid var(--border,rgba(255,255,255,.12)); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); animation:drRise .55s cubic-bezier(.22,1,.36,1) backwards; }
   .dp-top{ display:flex; align-items:center; gap:16px; }
@@ -32708,7 +32734,7 @@ function renderAdmin(){
     const an = state.attNav;
     if(an && an.page==='addtype') pageTitle = 'نشاط جديد';
     else if(an && an.type && ATT_TYPES[an.type]){
-      pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : an.page==='summary' ? 'ملخص اليوم' : an.page==='insights' ? 'التحليلات الذكية' : an.page==='audit' ? 'سجل التدقيق' : an.page==='days' ? 'الأيام' : ATT_TYPES[an.type].label;
+      pageTitle = an.page==='new' ? 'إضافة يوم جديد' : an.page==='manual' ? 'تسجيل يدوي' : an.page==='who' ? 'مين حضر' : an.page==='summary' ? 'ملخص اليوم' : an.page==='insights' ? 'التحليلات الذكية' : an.page==='audit' ? 'سجل التدقيق' : an.page==='days' ? 'الأيام' : an.page==='closed-days' ? 'الأيام المقفولة' : ATT_TYPES[an.type].label;
     }
   } else if(tab==='servants'){
     if(state.svEdit) pageTitle = state.svEdit==='new' ? 'إضافة خادم' : ((SV.list.find(x=>x.id===state.svEdit)||{}).name || 'تعديل خادم');
@@ -35305,22 +35331,29 @@ function renderAdminAttendanceTabInner(){
   const daysAll = [{sid:c.sessionId, name:c.name, t:c.startedAt, cur:true}].concat((c.history||[]).slice().reverse().map(h=>({sid:h.sessionId, name:h.name, t:h.startedAt, cur:false})));
   const _dk = type+':'+(formOpen ? 'home' : (nav.page||'home')); const playAll = _dk!==_attDaysKey; _attDaysKey = _dk;
   const fresh = state.attFreshSid || ''; state.attFreshSid = null;
-  const dayTiles = daysAll.map((d,i)=>{
+  const dayTilesArr = daysAll.map((d,i)=>{
     let wd='', dn='', mo='';
     try{ const dt = new Date(d.t); wd = dt.toLocaleDateString('ar-EG',{weekday:'long'}); dn = dt.toLocaleDateString('ar-EG',{day:'numeric'}); mo = dt.toLocaleDateString('ar-EG',{month:'short'}); }catch(e){}
     const n = cntSid(d.sid), pc = total ? Math.min(100, Math.round(n/total*100)) : 0;
     const st = d.cur ? (c.open ? ['open','مفتوح'] : ['shut','مقفول']) : ['arch','أرشيف'];
-    return `<button type="button" class="dr${d.cur?' cur':''}${d.sid===fresh?' fresh':(playAll?' in':'')}" style="--i:${i}" data-action="att-admin-day" data-type="${type}" data-sid="${escapeHtml(d.sid)}" aria-label="${escapeHtml(d.name||'')}">
-      <span class="dr-date"><b>${escapeHtml(dn)}</b><small>${escapeHtml(mo)}</small></span>
+    return {closed:!(d.cur && c.open), html:`<button type="button" class="dr dr-${st[0]}${d.cur?' cur':''}${d.sid===fresh?' fresh':(playAll?' in':'')}" style="--i:${i};--pc:${pc}" data-action="att-admin-day" data-type="${type}" data-sid="${escapeHtml(d.sid)}" aria-label="${escapeHtml(d.name||'')}">
+      <span class="dr-date"><span class="dr-ring"><b>${escapeHtml(dn)}</b></span><span class="dr-dcol"><small>${escapeHtml(mo)}</small><em class="dr-pc">${pc}%</em></span></span>
       <span class="dr-body"><span class="dr-name">${escapeHtml(d.name||wd)}</span><span class="dr-sub">${escapeHtml(wd)} · ${n} من ${total}</span><u class="dr-bar"><i style="width:${pc}%"></i></u></span>
       <span class="dr-side"><span class="dr-chip st-${st[0]}"><i></i>${st[1]}</span><svg class="dr-go" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></span>
-    </button>`;
-  }).join('');
+    </button>`};
+  });
+  const openTiles = dayTilesArr.filter(x=>!x.closed).map(x=>x.html).join('');
+  const closedTiles = dayTilesArr.filter(x=>x.closed).map(x=>x.html).join('');
+  const openCnt = dayTilesArr.filter(x=>!x.closed).length, closedCnt = dayTilesArr.length - openCnt;
   const todayWd = new Date().getDay();
   const formHtml = attNewDayFormHtml(type, t, c);
   if(nav.page==='days'){
-    return `<div class="dr-head" style="margin-top:4px;"><b>الأيام</b><span>${daysAll.length}</span></div>
-    <div class="dr-list">${dayTiles || '<div class="empty-note">لسه مفيش أيام</div>'}</div>`;
+    return `<div class="dr-head" style="margin-top:4px;"><b>الأيام</b><span>${openCnt}</span></div>
+    <div class="dr-list">${openTiles || '<div class="empty-note">مفيش أيام مفتوحة دلوقتي</div>'}</div>`;
+  }
+  if(nav.page==='closed-days'){
+    return `<div class="dr-head" style="margin-top:4px;"><b>الأيام المقفولة</b><span>${closedCnt}</span></div>
+    <div class="dr-list">${closedTiles || '<div class="empty-note">مفيش أيام مقفولة لسه</div>'}</div>`;
   }
   return `
     <div class="aa-act-head">
@@ -35335,7 +35368,12 @@ function renderAdminAttendanceTabInner(){
     ${formOpen ? formHtml : ''}
     <button type="button" class="at-bar at-days" style="margin-top:12px;" data-action="att-admin-page" data-page="days" data-type="${type}">
       <span class="at-ico" style="background:linear-gradient(160deg,#9FB4FF,#6C7CF0)">📅</span>
-      <span class="at-txt"><b>الأيام</b><small>${daysAll.length} يوم · آخر يوم: ${escapeHtml((daysAll[0]&&daysAll[0].name)||'—')}</small></span>
+      <span class="at-txt"><b>الأيام</b><small>${openCnt} يوم مفتوح${openCnt?' · '+escapeHtml((daysAll.find(d=>d.cur)||{}).name||''):''}</small></span>
+      <span class="at-plus">‹</span>
+    </button>
+    <button type="button" class="at-bar at-days" style="margin-top:12px;" data-action="att-admin-page" data-page="closed-days" data-type="${type}">
+      <span class="at-ico" style="background:linear-gradient(160deg,#C9C3B8,#8F887B)">🔒</span>
+      <span class="at-txt"><b>الأيام المقفولة</b><small>${closedCnt} يوم</small></span>
       <span class="at-plus">‹</span>
     </button>
     <div class="aa-grid" style="margin-top:14px;">
@@ -35381,19 +35419,60 @@ function attToggleAdminQr(btn){
 }
 function attPrintCode(type){
   const t = ATT_TYPES[type], c = attCfg(type); if(!t || !c) return;
+  const lg = (typeof attLogoOf==='function') ? attLogoOf(type) : null;
+  const icoHtml = lg ? `<img src="${lg.img}" alt="" style="${(lg.z && lg.z!==100)?'transform:scale('+(lg.z/100)+');':''}">` : t.icon;
   const w = window.open('', '_blank');
   if(!w){ showToast('يرجى السماح بالنوافذ المنبثقة لطباعة الكود', true); return; }
-  w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${t.full}</title>
+  w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${t.full}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&display=swap" rel="stylesheet">
     <style>
-      body{ font-family:Tahoma,Arial,sans-serif; text-align:center; padding:30px; }
-      .box{ display:inline-flex; flex-direction:column; align-items:center; gap:14px; border:2px dashed #999; padding:28px; border-radius:16px; }
-      h1{ margin:0; font-size:28px; } .sub{ font-size:15px; color:#555; } .code{ font-size:13px; direction:ltr; color:#777; }
+      *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      html,body{ margin:0; min-height:100%; }
+      body{ font-family:'Cairo',Tahoma,Arial,sans-serif; display:flex; align-items:center; justify-content:center; padding:22px 14px; color:#1B1A4A;
+        background:radial-gradient(circle at 15% 10%,#FFE9B8 0,transparent 42%),radial-gradient(circle at 90% 85%,#CFC8FF 0,transparent 45%),#F6F1E7; }
+      .poster{ position:relative; width:100%; max-width:380px; border-radius:34px; overflow:hidden; background:#fff; box-shadow:0 30px 60px -24px rgba(27,26,74,.55), 0 0 0 1px rgba(27,26,74,.08); text-align:center; }
+      .head{ position:relative; padding:30px 20px 74px; color:#fff; background:linear-gradient(150deg,#1B1A4A 0%,#2E2C86 60%,#5B4BD6 100%); overflow:hidden; }
+      .head::before{ content:''; position:absolute; inset:0; opacity:.16; background:radial-gradient(circle at 20px 20px,#fff 2px,transparent 2.5px) 0 0/28px 28px; }
+      .head::after{ content:''; position:absolute; left:0; right:0; bottom:-1px; height:46px; background:#fff; border-radius:50% 50% 0 0 / 100% 100% 0 0; }
+      .ico{ position:relative; width:74px; height:74px; margin:0 auto 12px; border-radius:24px; display:grid; place-items:center; font-size:40px; background:${t.color}; box-shadow:0 12px 24px -10px rgba(0,0,0,.6), inset 0 2px 0 rgba(255,255,255,.5); transform:rotate(-6deg); }
+      .ico.logo{ width:92px; height:92px; border-radius:50%; background:#fff; transform:none; overflow:hidden; box-shadow:0 12px 26px -10px rgba(0,0,0,.65), 0 0 0 4px rgba(255,255,255,.35); }
+      .ico.logo img{ width:100%; height:100%; object-fit:contain; padding:6px; display:block; }
+      h1{ position:relative; margin:0; font-size:30px; font-weight:900; letter-spacing:.2px; }
+      .date{ position:relative; display:inline-block; margin-top:10px; padding:5px 16px; border-radius:999px; font-size:14px; font-weight:800; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3); }
+      .body{ position:relative; margin-top:-46px; padding:0 22px 26px; }
+      .qr-wrap{ position:relative; display:inline-block; padding:16px; border-radius:26px; background:#fff; box-shadow:0 18px 36px -16px rgba(27,26,74,.5), 0 0 0 2px #EFE9FF; }
+      .qr-wrap i{ position:absolute; width:30px; height:30px; border:5px solid #5B4BD6; }
+      .qr-wrap i:nth-child(1){ top:-6px; left:-6px; border-right:0; border-bottom:0; border-radius:16px 0 0 0; }
+      .qr-wrap i:nth-child(2){ top:-6px; right:-6px; border-left:0; border-bottom:0; border-radius:0 16px 0 0; }
+      .qr-wrap i:nth-child(3){ bottom:-6px; left:-6px; border-right:0; border-top:0; border-radius:0 0 0 16px; }
+      .qr-wrap i:nth-child(4){ bottom:-6px; right:-6px; border-left:0; border-top:0; border-radius:0 0 16px 0; }
+      #print-qr-holder{ line-height:0; } #print-qr-holder img,#print-qr-holder canvas{ width:240px !important; height:240px !important; max-width:100%; }
+      .scan{ margin:20px 0 4px; font-size:19px; font-weight:900; }
+      .scan span{ color:#5B4BD6; }
+      .hint{ font-size:13px; font-weight:600; color:#6B6A8F; }
+      .steps{ display:flex; justify-content:center; gap:8px; margin:16px 0 4px; }
+      .steps b{ display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:14px; font-size:12px; font-weight:800; background:#F1EEFF; color:#3B33A8; }
+      .steps b em{ font-style:normal; width:20px; height:20px; border-radius:50%; display:grid; place-items:center; font-size:11px; background:#5B4BD6; color:#fff; }
+      .perf{ position:relative; margin:18px -22px 14px; border-top:2px dashed #D9D3F5; }
+      .perf::before,.perf::after{ content:''; position:absolute; top:-13px; width:24px; height:24px; border-radius:50%; background:#F6F1E7; }
+      .perf::before{ right:-12px; } .perf::after{ left:-12px; }
+      .code{ display:inline-block; direction:ltr; padding:8px 18px; border-radius:14px; font-family:'Courier New',monospace; font-weight:800; font-size:16px; letter-spacing:2px; color:#1B1A4A; background:#F6F1E7; border:1px dashed #B9AE90; }
+      @media print{ body{ background:#fff; padding:0; } .poster{ box-shadow:none; border:1px solid #ddd; } }
     </style></head><body>
-    <div class="box"><h1>${t.icon} ${t.full}</h1><div class="sub">${escapeHtml(c.name||'')}</div>
-      <div id="print-qr-holder"></div><div class="code">${escapeHtml(c.code)}</div></div>
+    <div class="poster">
+      <div class="head"><div class="ico${lg?' logo':''}">${icoHtml}</div><h1>${t.full}</h1><div class="date">${escapeHtml(c.name||'')}</div></div>
+      <div class="body">
+        <div class="qr-wrap"><i></i><i></i><i></i><i></i><div id="print-qr-holder"></div></div>
+        <div class="scan">امسح الكود <span>وسجّل حضورك</span> ✨</div>
+        <div class="hint">وجّه كاميرا التطبيق ناحية الكود</div>
+        <div class="steps"><b><em>١</em>افتح التطبيق</b><b><em>٢</em>اضغط مسح</b><b><em>٣</em>خلاص!</b></div>
+        <div class="perf"></div>
+        <div class="code">${escapeHtml(c.code)}</div>
+      </div>
+    </div>
     <script>${QR_LIB_SRC}<\/script>
-    <script>new QRCode(document.getElementById('print-qr-holder'), {text:${JSON.stringify(c.code)}, width:240, height:240, colorDark:'#000000', colorLight:'#ffffff'});
-      setTimeout(()=>window.print(), 300);
+    <script>new QRCode(document.getElementById('print-qr-holder'), {text:${JSON.stringify(c.code)}, width:240, height:240, colorDark:'#1B1A4A', colorLight:'#ffffff'});
+      setTimeout(()=>window.print(), 600);
     <\/script></body></html>`);
   w.document.close();
 }
@@ -35786,7 +35865,7 @@ async function attAdminAction(action, el){
   const saveToast = (ok, msg)=>{ showToast(ok ? msg : 'تعذر الحفظ — تحقق من الاتصال وحاول مرة أخرى', !ok); render(); };
   
   if(action==='att-admin-open'){ state.attNav = {type:el.dataset.type, page:'home'}; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
-  if(action==='att-admin-day'){ state.attNav = {type, page:'day', sid:el.dataset.sid}; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
+  if(action==='att-admin-day'){ state.attNav = {type, page:'day', sid:el.dataset.sid, from:(state.attNav&&(state.attNav.page==='days'||state.attNav.page==='closed-days'))?state.attNav.page:'days'}; render(); try{ window.scrollTo(0,0); }catch(e){} return; }
   if(action==='att-admin-delday'){
     const sid = el.dataset.sid;
     showConfirmDialog('هتحذف اليوم ده وكل تسجيلات الحضور اللي فيه (والنقاط بتاعتها). الخطوة دي مش بترجع. متأكد؟', async ()=>{
@@ -36354,7 +36433,7 @@ document.addEventListener('click', (e)=>{
     else if(t==='classes' && state.clsSel){ state.clsSel = null; }
     else if(t==='servants' && state.svEdit){ state.svEdit = null; }
     else if(t==='opinions' && state.viewingOpinionId){ state.viewingOpinionId = null; }
-    else if(t==='attendance' && state.attNav && state.attNav.page && state.attNav.page!=='home' && state.attNav.type){ state.attNav.page = (state.attNav.page==='day' ? 'days' : 'home'); }
+    else if(t==='attendance' && state.attNav && state.attNav.page && state.attNav.page!=='home' && state.attNav.type){ state.attNav.page = (state.attNav.page==='day' ? (state.attNav.from||'days') : 'home'); }
     else if(t==='attendance' && state.attNav && (state.attNav.type || state.attNav.page==='addtype')){ state.attNav = {type:null, page:'home'}; }
     else { state.adminHub = true; state.adminDayId = null; state.viewingOpinionId = null; }
     render(); try{ window.scrollTo(0,0); }catch(e){}
