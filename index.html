@@ -40312,13 +40312,18 @@ async function doAdminResetPass(pid){
   const np = await uiAskPassword('كلمة مرور جديدة', 'اكتب كلمة المرور الجديدة للمخدوم: '+(cp.name||''));
   if(np === null) return;
   const pw = await passHash(cp.phone, np);
+  let found = false;
   const res = await window.storage.update(PARTICIPANTS_KEY, (cur)=>{
     let arr = []; try{ arr = cur ? JSON.parse(cur) : []; }catch(e){ arr = []; }
-    const r = arr.find(x=>String(x.id)===String(pid)); if(!r) return undefined;
-    r.pw = pw; r.pwAt = Date.now(); return JSON.stringify(arr);
+    if(!Array.isArray(arr)) arr = [];
+    const r = arr.find(x=>String(x.id)===String(pid));
+    found = !!r;
+    if(r){ r.pw = pw; r.pwAt = Date.now(); }
+    return JSON.stringify(arr); /* القيمة الأولى ممكن تبقى فاضية: Firebase بيعيد المحاولة بالقيمة الحقيقية (لو رجّعنا undefined العملية بتتلغي) */
   }, true);
-  if(res){ cp.pw = pw; showToast('اتغيّرت كلمة المرور ✅ — قولهالو يدخل بيها'); }
-  else showToast('معرفتش أحفظ، جرّب تاني', true);
+  if(res && found){ cp.pw = pw; cp.pwAt = Date.now(); showToast('اتغيّرت كلمة المرور ✅ — قولهالو يدخل بيها'); }
+  else if(res && !found) showToast('الحساب ده مش موجود على السيرفر — اتأكد إنه لسه مسجّل', true);
+  else showToast('معرفتش أحفظ، اتأكد من النت وجرّب تاني', true);
 }
 async function doToggleSignupOpen(){
   CONF_SETTINGS.signupClosed = !CONF_SETTINGS.signupClosed;
