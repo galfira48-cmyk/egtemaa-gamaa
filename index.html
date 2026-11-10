@@ -55435,7 +55435,8 @@ function jupd(fn){
       try{ o = cur ? (typeof cur==='string' ? JSON.parse(cur) : cur) : null; }catch(e){}
       if(!o || !Array.isArray(o.list)) o = {list:[]};
       var r = fn(o);
-      return r===undefined ? undefined : JSON.stringify(r || o);
+      /* ما نرجّعش undefined: Firebase بيبدأ المعاملة بقيمة فاضية، والإلغاء كان بيمنع إعادة المحاولة بالبيانات الحقيقية */
+      return JSON.stringify(r || o);
     }, true);
   }catch(e){ return Promise.resolve(null); }
 }
@@ -55566,12 +55567,14 @@ async function savePass(){
     var th = rec ? rec.tok : '';
     if(!rec || rec.status!=='approved' || Date.now()>(rec.exp||0)){ note('الإذن انتهى أو اتلغى — ابعت طلب جديد', true); await refresh(true); return; }
     var pw = await passHash(S.phone, p1);
+    var applied = false;
     var res = await window.storage.update(PARTICIPANTS_KEY, function(cur){
       var arr = []; try{ arr = cur ? JSON.parse(cur) : []; }catch(e){ arr = []; }
-      var r = arr.find(function(x){ return x.ph===S.ph; }); if(!r) return undefined;
-      r.pw = pw; return JSON.stringify(arr);
+      var r = arr.find(function(x){ return x.ph===S.ph; });
+      applied = !!r; if(r) r.pw = pw;
+      return JSON.stringify(arr); /* القيمة الأولى ممكن تبقى فاضية: Firebase بيعيد المحاولة بالحقيقية */
     }, true);
-    if(!res){ note('معرفتش أحفظ، اتأكد من النت وجرّب تاني', true); return; }
+    if(!res || !applied){ note('معرفتش أحفظ، اتأكد من النت وجرّب تاني', true); return; }
     var cp = CUSTOM_PARTICIPANTS.find(function(x){ return x.ph===S.ph; }); if(cp) cp.pw = pw;
     await jupd(function(o2){ var r = o2.list.find(function(x){ return x.ph===S.ph && x.tok===th; }); if(r){ r.status = 'done'; r.doneAt = Date.now(); } return o2; });
     S.step = 'done'; paint();
@@ -55581,7 +55584,7 @@ async function savePass(){
 /* ---------- لوحة الأدمن ---------- */
 function setStatus(ph, tok, st){
   return jupd(function(o){
-    var r = o.list.find(function(x){ return x.ph===ph && x.tok===tok; }); if(!r) return undefined;
+    var r = o.list.find(function(x){ return x.ph===ph && x.tok===tok; }); if(!r) return o;
     r.status = st; r.apAt = Date.now(); r.by = 'admin';
     if(st==='approved') r.exp = Date.now()+TTL;
     return o;
