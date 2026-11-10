@@ -55455,6 +55455,7 @@ function ingest(o){
   if(state.adminUnlocked && lastPend>=0 && n>lastPend){ toast('🔐 طلب جديد لتغيير الباسورد'); try{ if(navigator.vibrate) navigator.vibrate([80,60,80]); }catch(e){} }
   lastPend = n;
   if(relevant()){ var a = document.activeElement; if(!(a && /^(INPUT|TEXTAREA)$/.test(a.tagName))){ try{ render(); }catch(e){} } }
+  try{ notifyCheck(); }catch(e){}
   if(document.getElementById('pwr-sheet') && S.ph && (S.step==='wait' || S.step==='request')){ S.rec = P.list.find(function(r){ return r.ph===S.ph; }) || null; applyStatus(); }
 }
 function listen(){ /* تحديث لحظي من Firebase: الطلب والموافقة بيظهروا في ثانية من غير تحديث */
@@ -55465,6 +55466,37 @@ function listen(){ /* تحديث لحظي من Firebase: الطلب والموا
   }catch(e){ lis = null; }
 }
 function unlisten(){ if(lis){ try{ lis.ref.off('value', lis.cb); }catch(e){} lis = null; } }
+/* ---------- إشعار المشارك لما الأدمن يوافق ---------- */
+function waitGet(){ try{ return JSON.parse(localStorage.getItem('pwr-wait')||'null'); }catch(e){ return null; } }
+function notifyCheck(){
+  var w = waitGet(); if(!w || !w.ph || state.pid) return;
+  var r = P.list.find(function(x){ return x.ph===w.ph; }); if(!r) return;
+  var st = liveStatus(r);
+  var lab = document.querySelector('[data-pwr="open"]');
+  if(st==='approved'){
+    if(lab) lab.textContent = '✅ تمت الموافقة — اضغط لتجديد الباسورد';
+    var key = w.ph+':'+r.exp, seen = ''; try{ seen = localStorage.getItem('pwr-ntf')||''; }catch(e){}
+    if(seen!==key && !document.getElementById('pwr-ntf') && !document.getElementById('pwr-sheet')){
+      try{ localStorage.setItem('pwr-ntf', key); }catch(e){}
+      showApproved(w);
+    }
+  } else if(st==='rejected'){
+    var k2 = w.ph+':rej:'+(r.apAt||0), s2 = ''; try{ s2 = localStorage.getItem('pwr-ntf')||''; }catch(e){}
+    if(s2!==k2){ try{ localStorage.setItem('pwr-ntf', k2); localStorage.removeItem('pwr-wait'); }catch(e){} toast('⛔ المنظم رفض طلب تغيير الباسورد — كلّمه أو ابعت طلب جديد', true); }
+  } else if(st==='done' || st==='expired'){ try{ localStorage.removeItem('pwr-wait'); }catch(e){} }
+}
+function showApproved(w){
+  var o = document.createElement('div'); o.id = 'pwr-ntf'; o.className = 'su-sheet';
+  o.innerHTML = '<div class="su-sheet-bg"></div><div class="su-sheet-box" role="dialog" aria-modal="true"><div class="su-grab"></div>'
+    + '<div style="text-align:center;font-size:44px;margin-top:4px;">✅</div>'
+    + '<div class="su-sheet-title" style="text-align:center;">تمت الموافقة على طلبك</div>'
+    + '<div class="su-opt-sub" style="text-align:center;line-height:1.9;">أهلًا '+esc(w.name||'')+'، المنظم وافق على طلبك.<br>اضغط على <b>«نسيت الباسورد؟»</b> لتجديد الباسورد.<br><span style="opacity:.7;font-size:12px;">الموافقة صالحة لمدة 24 ساعة ولمرة واحدة.</span></div>'
+    + '<div class="su-sheet-act"><button type="button" class="btn btn-primary" data-pwr="ntf-go">🔑 تجديد الباسورد الآن</button><button type="button" class="btn btn-outline" data-pwr="ntf-x">لاحقًا</button></div></div>';
+  document.body.appendChild(o); document.body.style.overflow = 'hidden';
+  o.querySelector('.su-sheet-bg').addEventListener('click', closeNtf);
+  try{ if(navigator.vibrate) navigator.vibrate([120,60,120]); }catch(e){}
+}
+function closeNtf(){ var o = document.getElementById('pwr-ntf'); if(!o) return; document.body.style.overflow=''; o.remove(); }
 function pendingCount(){ return P.list.filter(function(r){ return r.status==='pending'; }).length; }
 window.pwResetPending = function(){ if(state.adminUnlocked) load(false); return pendingCount(); };
 
@@ -55568,6 +55600,7 @@ async function send(){
     });
     if(!ok){ toast('معرفتش أبعت الطلب، اتأكد من النت وجرّب تاني', true); return; }
     tokSet(S.ph, tok);
+    try{ localStorage.setItem('pwr-wait', JSON.stringify({ph:S.ph, phone:S.phone, name:S.name})); }catch(e){}
     toast('اتبعت الطلب للمنظمين ✅');
     await refresh(true);
   } finally { S.busy = false; }
@@ -55592,7 +55625,7 @@ async function savePass(){
     if(!res || !applied){ note('معرفتش أحفظ، اتأكد من النت وجرّب تاني', true); return; }
     var cp = CUSTOM_PARTICIPANTS.find(function(x){ return x.ph===S.ph; }); if(cp){ cp.pw = pw; cp.pwAt = Date.now(); }
     await jupd(function(o2){ var r = o2.list.find(function(x){ return x.ph===S.ph && x.tok===th; }); if(r){ r.status = 'done'; r.doneAt = Date.now(); } return o2; });
-    S.newPass = p1; S.step = 'done'; paint();
+    S.newPass = p1; S.step = 'done'; try{ localStorage.removeItem('pwr-wait'); }catch(e){} paint();
   } finally { S.busy = false; }
 }
 
@@ -55671,6 +55704,8 @@ document.addEventListener('click', function(e){
   else if(a==='send') send();
   else if(a==='refresh') refresh(false);
   else if(a==='save') savePass();
+  else if(a==='ntf-x') closeNtf();
+  else if(a==='ntf-go'){ var w2 = waitGet(); closeNtf(); openSheet(); var pi = document.getElementById('pwr-phone'); if(pi && w2){ pi.value = w2.phone || ''; check(); } }
   else if(a==='eye'){ var f1 = document.getElementById('pwr-p1'), f2 = document.getElementById('pwr-p2'); if(f1){ var tt = f1.type==='password' ? 'text' : 'password'; f1.type = tt; if(f2) f2.type = tt; } }
   else if(a==='login'){ var ph3 = S.phone, np = S.newPass; closeSheet(); var i3 = document.getElementById('login-phone'), p3 = document.getElementById('login-pass'); if(i3 && p3){ i3.value = ph3; p3.value = np; try{ doLogin(); }catch(x){} } }
   else if(a==='finish'){ var ph = S.phone; closeSheet(); var i = document.getElementById('login-phone'); if(i){ i.value = ph; var p = document.getElementById('login-pass'); if(p) try{ p.focus(); }catch(x){} } }
@@ -55721,7 +55756,9 @@ setTimeout(guard, 6000);
 if(typeof ADMIN_HUB_ITEMS!=='undefined'){
   ADMIN_HUB_ITEMS.push({group:'people', tab:'pwreset', short:'موافقة على تغيير الباسورد', desc:'طلبات المشاركين اللي نسيوا الباسورد — وافق عشان يقدروا يغيّروه', icon:'🔐', label:'نسيت الباسورد', color:'linear-gradient(145deg,#F4B740,#FF6B6B)'});
 }
-setInterval(function(){ if(navigator.onLine===false) return; if(state.adminUnlocked){ listen(); load(true); } else if(!document.getElementById('pwr-sheet')) unlisten(); }, 8000);
+setInterval(function(){ if(navigator.onLine===false) return; if(state.adminUnlocked){ listen(); load(true); } else if(waitGet() && !state.pid){ listen(); load(true); } else if(!document.getElementById('pwr-sheet')) unlisten(); }, 8000);
+document.addEventListener('visibilitychange', function(){ if(!document.hidden && waitGet() && !state.pid){ listen(); load(true); } });
+setTimeout(function(){ if(waitGet() && !state.pid){ listen(); load(true); } }, 2500);
 setTimeout(function(){ load(true); }, 4000);
 window.pwrLoad = load;
 })();
