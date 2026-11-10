@@ -43095,7 +43095,7 @@ window.doSignup=function(){
 var _rl=window.renderLogin;
 window.renderLogin=function(){
   var h=_rl.apply(this,arguments);
-  return h.replace('data-action="submit-login" style="margin-top:16px;width:100%;">دخول</button>','data-action="submit-login" style="margin-top:16px;width:100%;">دخول</button><button type="button" class="glx-link" data-glx-forgot="1">نسيت كلمة المرور؟</button>');
+  return h; /* الرابط القديم «نسيت كلمة المرور؟» اتشال — البديل: «نسيت الباسورد؟» بموافقة الأدمن */
 };
 document.addEventListener('click',function(e){
   if(!(e.target.closest&&e.target.closest('[data-glx-forgot]'))) return;
