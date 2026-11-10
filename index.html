@@ -13414,6 +13414,7 @@ function renderLogin(){
         <input type="tel" id="login-phone" class="field" inputmode="tel" autocomplete="tel" placeholder="رقم الموبايل" style="margin-top:14px;text-align:center;" dir="ltr" />
         <input type="password" id="login-pass" class="field" autocomplete="current-password" placeholder="الباسورد" style="margin-top:10px;text-align:center;" dir="ltr" />
         <button type="button" class="btn btn-primary" id="otp-submit-btn" data-action="submit-login" style="margin-top:16px;width:100%;">دخول</button>
+        <button type="button" class="sa-back" data-pwr="open" style="margin-top:10px;">🔑 نسيت الباسورد؟</button>
         ${(state._loginOther && savedAccountsGet().length) ? `<button type="button" class="sa-back" data-action="login-back-cards">رجوع لحسابك المحفوظ</button>` : ''}
       </div>` : ''}
       ${CONF_SETTINGS.signupClosed ? '' : `<div class="signup-cta"><span>أول مرة تدخل؟</span><button type="button" class="btn btn-outline" data-action="go-signup" style="width:100%;margin-top:8px;">✨ أنشئ حسابك بنفسك</button></div>`}
@@ -32589,7 +32590,8 @@ function renderAdminHub(){
   const pendingR = REPORTS.filter(r=>!r.resolved).length;
   const pendingQ = QUESTIONS.filter(q=>!q.answered).length;
   const pendingCC = (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
-  const badgeOf = tab => tab==='mymeeting' ? (window.myMeetingPending?window.myMeetingPending():0) : tab==='askfather' ? (window.askFatherPending?window.askFatherPending():0) : tab==='questions' ? pendingQ : tab==='reports' ? pendingR : tab==='trash' ? TRASH.length : tab==='cardshop' ? pendingCC : 0;
+  const pendingPW = window.pwResetPending ? window.pwResetPending() : 0;
+  const badgeOf = tab => tab==='mymeeting' ? (window.myMeetingPending?window.myMeetingPending():0) : tab==='askfather' ? (window.askFatherPending?window.askFatherPending():0) : tab==='questions' ? pendingQ : tab==='reports' ? pendingR : tab==='trash' ? TRASH.length : tab==='cardshop' ? pendingCC : tab==='pwreset' ? pendingPW : 0;
   const tile = it=>{
     const b = badgeOf(it.tab);
     return `<button type="button" class="admin-hub-tile adm3-tile" data-action="admin-hub-tile" data-tab="${it.tab}" data-search="${escapeHtml((it.label+' '+(it.desc||'')+' '+(it.short||'')).toLowerCase())}">
@@ -32612,7 +32614,8 @@ function renderAdminHub(){
   const openAtt = ATT_KEYS.filter(k=>{ const c=attCfg(k); return c && c.open; }).map(k=>ATT_TYPES[k].label);
   const attn = [
     {tab:'reports',  icon:'🛠️', lab:'بلاغات مفتوحة',     n:pendingR},
-    {tab:'cardshop', icon:'💳', lab:'طلبات كروت مخصصة', n:pendingCC}
+    {tab:'cardshop', icon:'💳', lab:'طلبات كروت مخصصة', n:pendingCC},
+    {tab:'pwreset',  icon:'🔐', lab:'طلبات نسيان الباسورد', n:pendingPW}
   ].filter(a=>a.n>0);
   const attnHtml = attn.length ? `<section class="adm-attn">
       <div class="adm-sec-head"><span class="adm-pulse"></span>يحتاج انتباهك الآن</div>
@@ -32671,6 +32674,7 @@ function adminPendingBadge(tab){
   if(tab==='questions') return QUESTIONS.filter(q=>!q.answered).length;
   if(tab==='reports') return REPORTS.filter(r=>!r.resolved).length;
   if(tab==='cardshop') return (CUSTOM_CARD_REQUESTS||[]).filter(r=>r.status==='pending').length;
+  if(tab==='pwreset') return window.pwResetPending ? window.pwResetPending() : 0;
   return 0;
 }
 function renderAdminSiblingNav(){
@@ -55402,6 +55406,246 @@ window.openMatchsticksGame=open;
       }, {icon:'🎮', confirmLabel:'حفظ', sub:'التغيير بيأثر على أي فوز جاي من دلوقتي.'});
     }
   });
+})();
+</script>
+
+<script id="pwreset-module">
+/* ===== نسيت الباسورد: المشارك يطلب من شاشة الدخول → الأدمن يوافق → المشارك يحط باسورد جديد (مرة واحدة، من نفس الجهاز، خلال 24 ساعة) ===== */
+(function(){
+'use strict';
+if(window.__pwReset) return; window.__pwReset = 1;
+var KEY = 'glavera-pwreset-v1', TTL = 24*3600*1000;
+var P = {list:[], t:0, sig:''};
+var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+var toast = function(m, err){ try{ showToast(m, !!err); }catch(e){} };
+
+/* ---------- تخزين مشترك ---------- */
+async function jget(){
+  try{
+    var r = await window.storage.get(KEY, true);
+    if(!r || r.value==null) return {list:[]};
+    var o = typeof r.value==='string' ? JSON.parse(r.value) : r.value;
+    return (o && Array.isArray(o.list)) ? o : {list:[]};
+  }catch(e){ return null; }
+}
+function jupd(fn){
+  try{
+    return window.storage.update(KEY, function(cur){
+      var o = null;
+      try{ o = cur ? (typeof cur==='string' ? JSON.parse(cur) : cur) : null; }catch(e){}
+      if(!o || !Array.isArray(o.list)) o = {list:[]};
+      var r = fn(o);
+      return r===undefined ? undefined : JSON.stringify(r || o);
+    }, true);
+  }catch(e){ return Promise.resolve(null); }
+}
+function relevant(){ return state.view==='admin' && state.adminUnlocked && state.adminTab==='pwreset'; }
+async function load(force){
+  if(!force && Date.now()-P.t < 15000) return;
+  var o = await jget(); if(!o) return;
+  var sig = JSON.stringify(o.list), ch = sig!==P.sig;
+  P.list = o.list; P.sig = sig; P.t = Date.now();
+  if(ch && relevant()){
+    var a = document.activeElement; if(a && /^(INPUT|TEXTAREA)$/.test(a.tagName)) return;
+    try{ render(); }catch(e){}
+  }
+}
+function pendingCount(){ return P.list.filter(function(r){ return r.status==='pending'; }).length; }
+window.pwResetPending = pendingCount;
+
+/* ---------- أدوات ---------- */
+function rnd(){ var a = new Uint8Array(16); try{ crypto.getRandomValues(a); }catch(e){ for(var i=0;i<16;i++) a[i] = Math.floor(Math.random()*256); } return Array.prototype.map.call(a, function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
+function tokGet(ph){ try{ return localStorage.getItem('pwr-tok-'+ph) || ''; }catch(e){ return ''; } }
+function tokSet(ph, v){ try{ localStorage.setItem('pwr-tok-'+ph, v); }catch(e){} }
+function tokHash(t){ return sha256Hex(AUTH_SALT+':pwr:'+t); }
+function fmtT(ts){ try{ return new Date(ts).toLocaleString('ar-EG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}); }catch(e){ return ''; } }
+function liveStatus(r){ if(r && r.status==='approved' && Date.now() > (r.exp||0)) return 'expired'; return r ? r.status : 'none'; }
+
+/* ---------- شاشة المشارك ---------- */
+var S = {ph:'', phone:'', name:'', step:'phone', rec:null, poll:null, busy:false};
+function closeSheet(){
+  clearInterval(S.poll); S.poll = null;
+  var w = document.getElementById('pwr-sheet'); if(!w) return;
+  w.classList.add('out'); document.body.style.overflow=''; setTimeout(function(){ w.remove(); }, 280);
+}
+function openSheet(){
+  if(document.getElementById('pwr-sheet') || document.getElementById('su-sheet')) return;
+  S = {ph:'', phone:'', name:'', step:'phone', rec:null, poll:null, busy:false};
+  var w = document.createElement('div'); w.id = 'pwr-sheet'; w.className = 'su-sheet';
+  w.innerHTML = '<div class="su-sheet-bg"></div><div class="su-sheet-box" role="dialog" aria-modal="true"><div class="su-grab"></div><div id="pwr-body"></div></div>';
+  document.body.appendChild(w); document.body.style.overflow = 'hidden';
+  w.querySelector('.su-sheet-bg').addEventListener('click', closeSheet);
+  paint();
+  var pre = document.getElementById('login-phone'); if(pre && pre.value){ var i = document.getElementById('pwr-phone'); if(i){ i.value = pre.value; } }
+  setTimeout(function(){ var i = document.getElementById('pwr-phone'); if(i) try{ i.focus(); }catch(e){} }, 340);
+}
+function paint(){
+  var b = document.getElementById('pwr-body'); if(!b) return;
+  var T = function(t, sub){ return '<div class="su-sheet-title">'+t+'</div><div class="su-opt-sub">'+sub+'</div>'; };
+  var h = '';
+  if(S.step==='phone'){
+    h = T('نسيت الباسورد؟', 'اكتب رقم موبايلك المسجّل، وهنبعت طلب للمنظمين يفتحوا لك تغيير الباسورد بعد موافقتهم')
+      + '<div class="su-askrow"><input type="tel" id="pwr-phone" class="su-askin" dir="ltr" inputmode="tel" autocomplete="tel" placeholder="رقم الموبايل" /></div>'
+      + '<div class="su-asknote" id="pwr-note"></div>'
+      + '<div class="su-sheet-act"><button type="button" class="btn btn-primary" data-pwr="check">متابعة</button><button type="button" class="btn btn-outline" data-pwr="close">إلغاء</button></div>';
+  } else if(S.step==='request'){
+    var rej = S.rec && S.rec.status==='rejected';
+    h = T('إرسال طلب للمنظمين', (rej ? '⚠️ الطلب اللي فات اتّرفض. ' : '') + 'الحساب: <b>'+esc(S.name)+'</b><br>المنظم هيتأكد إنك صاحب الحساب وبعدين يوافق، ولازم تفتح الصفحة دي من نفس الجهاز ده.')
+      + '<div class="su-sheet-act"><button type="button" class="btn btn-primary" data-pwr="send">📨 إرسال الطلب</button><button type="button" class="btn btn-outline" data-pwr="close">إلغاء</button></div>';
+  } else if(S.step==='wait'){
+    h = T('⏳ الطلب عند المنظمين', 'استنى موافقة المنظم على حساب <b>'+esc(S.name)+'</b> — الصفحة بتتحدّث لوحدها، أو كلّمه عشان يوافق بسرعة.')
+      + '<div class="su-asknote" id="pwr-note"></div>'
+      + '<div class="su-sheet-act"><button type="button" class="btn btn-primary" data-pwr="refresh">🔄 تحديث الحالة</button><button type="button" class="btn btn-outline" data-pwr="close">إغلاق</button></div>';
+  } else if(S.step==='newpass'){
+    h = T('✅ اتوافق على طلبك', 'اكتب الباسورد الجديد لحساب <b>'+esc(S.name)+'</b> (الإذن بيشتغل مرة واحدة)')
+      + '<div class="su-askrow"><input type="password" id="pwr-p1" class="su-askin" dir="ltr" autocomplete="new-password" placeholder="الباسورد الجديد" /></div>'
+      + '<div class="su-askrow" style="margin-top:8px;"><input type="password" id="pwr-p2" class="su-askin" dir="ltr" autocomplete="new-password" placeholder="أكّد الباسورد" /></div>'
+      + '<div class="su-asknote" id="pwr-note">'+SU_PASS_MIN+' خانات على الأقل</div>'
+      + '<div class="su-sheet-act"><button type="button" class="btn btn-primary" data-pwr="save">حفظ الباسورد</button><button type="button" class="btn btn-outline" data-pwr="close">إلغاء</button></div>';
+  } else if(S.step==='done'){
+    h = T('🎉 اتغيّر الباسورد', 'ادخل دلوقتي بالباسورد الجديد.')
+      + '<div class="su-sheet-act"><button type="button" class="btn btn-primary" data-pwr="finish">تمام</button></div>';
+  }
+  b.innerHTML = h;
+}
+function note(msg, bad){ var n = document.getElementById('pwr-note'); if(!n) return; n.textContent = msg; n.classList.toggle('bad', !!bad); }
+async function applyStatus(){
+  var rec = S.rec, st = liveStatus(rec);
+  var mine = rec && rec.tok && (await tokHash(tokGet(S.ph)))===rec.tok;
+  if(st==='pending' && mine){ S.step = 'wait'; }
+  else if(st==='approved' && mine){ S.step = 'newpass'; clearInterval(S.poll); S.poll = null; }
+  else { S.step = 'request'; }
+  paint();
+  if(S.step==='wait' && !S.poll){ S.poll = setInterval(function(){ refresh(true); }, 6000); }
+}
+async function check(){
+  var inp = document.getElementById('pwr-phone'); if(!inp) return;
+  var phone = normalizePhone(inp.value);
+  if(phone.length < 10){ note('اكتب رقم موبايلك صح', true); return; }
+  if(S.busy) return; S.busy = true; note('...');
+  try{
+    var ph = await phoneKeyHash(phone);
+    var acc = CUSTOM_PARTICIPANTS.find(function(x){ return x.ph===ph; });
+    if(!acc){ try{ await glvSyncParticipants(true); }catch(e){} acc = CUSTOM_PARTICIPANTS.find(function(x){ return x.ph===ph; }); }
+    if(!acc){ note('الرقم ده مش مسجّل — أنشئ حسابك الأول', true); return; }
+    var o = await jget(); if(!o){ note('معرفتش أوصل للسيرفر، جرّب تاني', true); return; }
+    S.ph = ph; S.phone = phone; S.name = acc.name || ''; S.rec = o.list.find(function(r){ return r.ph===ph; }) || null;
+    await applyStatus();
+  } finally { S.busy = false; }
+}
+async function refresh(silent){
+  var o = await jget(); if(!o) { if(!silent) note('معرفتش أوصل للسيرفر', true); return; }
+  S.rec = o.list.find(function(r){ return r.ph===S.ph; }) || null;
+  var was = S.step; await applyStatus();
+  if(!silent && S.step===was && was==='wait') note('لسه مستني موافقة المنظم');
+}
+async function send(){
+  if(S.busy) return; S.busy = true;
+  try{
+    var tok = rnd(), th = await tokHash(tok), acc = CUSTOM_PARTICIPANTS.find(function(x){ return x.ph===S.ph; });
+    var ok = await jupd(function(o){
+      var cur = o.list.find(function(r){ return r.ph===S.ph; });
+      if(cur && cur.status==='pending' && cur.tok===th) return undefined;
+      o.list = o.list.filter(function(r){ return r.ph!==S.ph; });
+      o.list.push({id: acc ? String(acc.id) : '', ph: S.ph, name: S.name, tok: th, status:'pending', ts: Date.now()});
+      return o;
+    });
+    if(!ok){ toast('معرفتش أبعت الطلب، اتأكد من النت وجرّب تاني', true); return; }
+    tokSet(S.ph, tok);
+    toast('اتبعت الطلب للمنظمين ✅');
+    await refresh(true);
+  } finally { S.busy = false; }
+}
+async function savePass(){
+  var p1 = (document.getElementById('pwr-p1')||{}).value || '', p2 = (document.getElementById('pwr-p2')||{}).value || '';
+  if(p1.length < SU_PASS_MIN){ note('الباسورد لازم يكون '+SU_PASS_MIN+' خانات على الأقل', true); return; }
+  if(p1!==p2){ note('الباسوردين مش زي بعض', true); return; }
+  if(S.busy) return; S.busy = true; note('...');
+  try{
+    var th = await tokHash(tokGet(S.ph));
+    var o = await jget(); var rec = o && o.list.find(function(r){ return r.ph===S.ph; });
+    if(!rec || rec.status!=='approved' || rec.tok!==th || Date.now()>(rec.exp||0)){ note('الإذن انتهى أو اتلغى — ابعت طلب جديد', true); await refresh(true); return; }
+    var pw = await passHash(S.phone, p1);
+    var res = await window.storage.update(PARTICIPANTS_KEY, function(cur){
+      var arr = []; try{ arr = cur ? JSON.parse(cur) : []; }catch(e){ arr = []; }
+      var r = arr.find(function(x){ return x.ph===S.ph; }); if(!r) return undefined;
+      r.pw = pw; return JSON.stringify(arr);
+    }, true);
+    if(!res){ note('معرفتش أحفظ، اتأكد من النت وجرّب تاني', true); return; }
+    var cp = CUSTOM_PARTICIPANTS.find(function(x){ return x.ph===S.ph; }); if(cp) cp.pw = pw;
+    await jupd(function(o2){ var r = o2.list.find(function(x){ return x.ph===S.ph && x.tok===th; }); if(r){ r.status = 'done'; r.doneAt = Date.now(); } return o2; });
+    S.step = 'done'; paint();
+  } finally { S.busy = false; }
+}
+
+/* ---------- لوحة الأدمن ---------- */
+function setStatus(ph, tok, st){
+  return jupd(function(o){
+    var r = o.list.find(function(x){ return x.ph===ph && x.tok===tok; }); if(!r) return undefined;
+    r.status = st; r.apAt = Date.now(); r.by = 'admin';
+    if(st==='approved') r.exp = Date.now()+TTL;
+    return o;
+  }).then(function(ok){ if(!ok) toast('معرفتش أحفظ، جرّب تاني', true); return load(true); }).then(function(){ try{ render(); }catch(e){} });
+}
+function card(r){
+  var st = liveStatus(r);
+  var map = {pending:['⏳','مستني موافقتك','#F4B740'], approved:['✅','موافَق عليه — ينتهي '+fmtT(r.exp),'#5FE0A4'], rejected:['⛔','مرفوض','#FF6B6B'], expired:['⌛','الموافقة انتهت','#8A8A9A'], done:['🔐','اتغيّر الباسورد '+fmtT(r.doneAt||r.apAt),'#5FE0A4']};
+  var m = map[st] || map.pending, btns = '';
+  var d = 'data-pwr="adm" data-ph="'+esc(r.ph)+'" data-tok="'+esc(r.tok)+'"';
+  if(st==='pending') btns = '<button type="button" class="btn btn-primary" style="flex:1;" '+d+' data-v="approved">✅ موافقة</button><button type="button" class="btn btn-ghost" style="flex:1;color:var(--danger);" '+d+' data-v="rejected">✕ رفض</button>';
+  else if(st==='approved') btns = '<button type="button" class="btn btn-ghost" style="flex:1;color:var(--danger);" '+d+' data-v="rejected">إلغاء الموافقة</button>';
+  return '<div class="card" style="margin-bottom:10px;border-inline-start:4px solid '+m[2]+';">'
+    + '<div style="display:flex;align-items:center;gap:8px;"><b style="flex:1;font-size:15px;">'+esc(r.name||'مشارك')+'</b><span style="font-size:11.5px;opacity:.7;">'+(r.id?('#'+esc(r.id)):'')+'</span></div>'
+    + '<div style="font-size:12.5px;margin-top:4px;">'+m[0]+' '+m[1]+'</div>'
+    + '<div style="font-size:11.5px;opacity:.65;margin-top:2px;">اتطلب '+fmtT(r.ts)+'</div>'
+    + (btns ? '<div style="display:flex;gap:8px;margin-top:10px;">'+btns+'</div>' : '') + '</div>';
+}
+window.FXADMIN = window.FXADMIN || {};
+window.FXADMIN.pwreset = function(){
+  load(false);
+  var L = P.list.slice().sort(function(a,b){ return b.ts-a.ts; });
+  var pend = L.filter(function(r){ return r.status==='pending'; });
+  var appr = L.filter(function(r){ return liveStatus(r)==='approved'; });
+  var rest = L.filter(function(r){ return pend.indexOf(r)<0 && appr.indexOf(r)<0; });
+  var kp = adminKpis([{num:pend.length, lab:'مستنية موافقتك', cls:pend.length?'is-alert':''},{num:appr.length, lab:'موافَق عليها'},{num:rest.length, lab:'سابقة'}]);
+  var hint = '<div class="card" style="font-size:12.5px;line-height:1.8;margin-bottom:10px;">🔐 قبل ما توافق، اتأكد إن صاحب الحساب هو اللي طالب (اتصال أو معرفة شخصية). الموافقة بتفتح له تغيير الباسورد <b>مرة واحدة</b> ولمدة <b>24 ساعة</b> ومن <b>نفس الجهاز</b> اللي بعت الطلب.</div>';
+  if(!L.length) return kp + hint + adminEmptyState('🔐','مفيش طلبات','لما مشارك ينسى الباسورد ويطلب من شاشة الدخول هيظهر طلبه هنا');
+  return kp + hint + pend.concat(appr, rest).map(card).join('');
+};
+
+/* ---------- الأحداث ---------- */
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter') return; var t = e.target;
+  if(t && t.id==='pwr-phone'){ e.preventDefault(); check(); }
+  else if(t && (t.id==='pwr-p1' || t.id==='pwr-p2')){ e.preventDefault(); savePass(); }
+});
+document.addEventListener('click', function(e){
+  var el = e.target.closest && e.target.closest('[data-pwr]'); if(!el) return;
+  var a = el.dataset.pwr;
+  if(a==='open') openSheet();
+  else if(a==='close') closeSheet();
+  else if(a==='check') check();
+  else if(a==='send') send();
+  else if(a==='refresh') refresh(false);
+  else if(a==='save') savePass();
+  else if(a==='finish'){ var ph = S.phone; closeSheet(); var i = document.getElementById('login-phone'); if(i){ i.value = ph; var p = document.getElementById('login-pass'); if(p) try{ p.focus(); }catch(x){} } }
+  else if(a==='adm'){
+    if(!state.adminUnlocked) return;
+    var v = el.dataset.v, ph2 = el.dataset.ph, tok = el.dataset.tok;
+    var r = P.list.find(function(x){ return x.ph===ph2 && x.tok===tok; });
+    var nm = r ? r.name : '';
+    if(v==='approved') showConfirmDialog('توافق إن '+nm+' يغيّر الباسورد؟', function(){ setStatus(ph2, tok, 'approved'); }, {icon:'🔐', confirmLabel:'موافقة', sub:'اتأكد إنه صاحب الحساب. الإذن لمرة واحدة ولمدة 24 ساعة.'});
+    else setStatus(ph2, tok, 'rejected');
+  }
+});
+
+/* ---------- القوائم والتحميل ---------- */
+if(typeof ADMIN_HUB_ITEMS!=='undefined'){
+  ADMIN_HUB_ITEMS.push({group:'people', tab:'pwreset', short:'موافقة على تغيير الباسورد', desc:'طلبات المشاركين اللي نسيوا الباسورد — وافق عشان يقدروا يغيّروه', icon:'🔐', label:'نسيت الباسورد', color:'linear-gradient(145deg,#F4B740,#FF6B6B)'});
+}
+setInterval(function(){ if(navigator.onLine===false) return; if(state.adminUnlocked) load(true); }, 20000);
+setTimeout(function(){ load(true); }, 4000);
+window.pwrLoad = load;
 })();
 </script>
 
