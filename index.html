@@ -46,6 +46,72 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<!-- ===== OneSignal: إشعارات حقيقية على الموبايل ===== -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script id="glv-onesignal">
+/* ضع هنا بيانات OneSignal (من لوحة التحكم) — لحد ما تتملّى الإشعارات الخارجية بتفضل متوقفة والموقع يشتغل عادي */
+window.GLV_PUSH = {
+  APP_ID: '6f612b5d-fa58-4944-afa4-bca7dc7810c4',              /* OneSignal → Settings → Keys & IDs → App ID */
+  ENDPOINT: 'https://spring-flower-ba9c.gogojoker929.workers.dev/'        /* رابط الـ Worker اللي بيبعت الإشعار (انظر push-worker.js) */
+};
+(function(){
+  var C = window.GLV_PUSH;
+  var ready = function(){ return C.APP_ID && C.APP_ID.indexOf('PUT-')!==0; };
+  var sendable = function(){ return ready() && C.ENDPOINT && C.ENDPOINT.indexOf('PUT-')!==0; };
+  var base = location.pathname.replace(/[^\/]*$/,'');
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  if(ready()){
+    OneSignalDeferred.push(async function(OS){
+      try{
+        await OS.init({
+          appId: C.APP_ID,
+          serviceWorkerPath: base+'onesignal/OneSignalSDKWorker.js',
+          serviceWorkerParam: { scope: base+'onesignal/' },
+          allowLocalhostAsSecureOrigin: true,
+          notifyButton: { enable: false }
+        });
+        window.__osReady = true;
+      }catch(e){ console.warn('OneSignal init failed', e); }
+    });
+  }
+  /* ربط الجهاز بحساب المستخدم (external id = pid) وطلب الإذن بعد الدخول */
+  var lastPid = null, asked = false;
+  setInterval(function(){
+    try{
+      if(!ready() || !window.__osReady) return;
+      var pid = (typeof state!=='undefined' && state && state.pid) ? String(state.pid) : null;
+      if(pid === lastPid) return;
+      lastPid = pid;
+      OneSignalDeferred.push(async function(OS){
+        try{
+          if(pid){
+            await OS.login(pid);
+            if(!asked && OS.Notifications.permission===false){ asked = true; setTimeout(function(){ try{ OS.Slidedown.promptPush(); }catch(e){} }, 2500); }
+          } else { await OS.logout(); }
+        }catch(e){}
+      });
+    }catch(e){}
+  }, 2000);
+  /* إرسال الإشعارات: بنجمّع الرسائل المتشابهة (إعلان لكل المشاركين) في طلب واحد */
+  var q = {}, timer = null;
+  function flush(){
+    timer = null; var batch = q; q = {};
+    Object.keys(batch).forEach(function(k){
+      var b = batch[k];
+      try{
+        fetch(C.ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, keepalive:true,
+          body: JSON.stringify({ ids:b.ids, title:'اجتماع جامعة', body:b.text, url:location.origin+location.pathname }) }).catch(function(){});
+      }catch(e){}
+    });
+  }
+  window.glvRemotePush = function(pid, text){
+    if(!sendable() || !pid || !text) return;
+    var k = String(text);
+    (q[k] = q[k] || { text:k, ids:[] }).ids.push(String(pid));
+    if(!timer) timer = setTimeout(flush, 600);
+  };
+})();
+</script>
 <script>
 /* ============================= AUTO-SCALE (TABLET CONSISTENCY) ============================= */
 (function(){
@@ -12788,6 +12854,7 @@ function pushNotification(pid, text, icon){
   const _now = Date.now();
   extra.notifs = extra.notifs.filter(n=>_now - (n.ts||0) < NOTIF_KEEP_MS).slice(0, 50);
   saveProfileExtra(PROFILE_EXTRA);
+  try{ if(window.glvRemotePush) window.glvRemotePush(pid, text); }catch(e){}
 }
 const NOTIF_TTL_MS = 24*3600*1000, NOTIF_KEEP_MS = 30*24*3600*1000;
 function recentNotifs(pid){
