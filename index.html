@@ -86,7 +86,6 @@ window.GLV_PUSH = {
         try{
           if(pid){
             await OS.login(pid);
-            if(!asked && OS.Notifications.permission===false){ asked = true; setTimeout(function(){ try{ OS.Slidedown.promptPush(); }catch(e){} }, 2500); }
           } else { await OS.logout(); }
         }catch(e){}
       });
@@ -104,6 +103,35 @@ window.GLV_PUSH = {
       }catch(e){}
     });
   }
+  /* حالة الإشعارات على الجهاز: granted / denied / default / unsupported */
+  window.glvPushState = function(){
+    try{
+      if(typeof Notification==='undefined') return 'unsupported';
+      return Notification.permission;
+    }catch(e){ return 'unsupported'; }
+  };
+  /* زرار التفعيل: بيطلب الإذن ويشترك الجهاز في OneSignal */
+  window.glvPushEnable = async function(){
+    if(typeof Notification==='undefined') return 'unsupported';
+    var perm = Notification.permission;
+    if(window.__osReady){
+      try{
+        await new Promise(function(res){ OneSignalDeferred.push(async function(OS){
+          try{
+            await OS.Notifications.requestPermission();
+            if(OS.Notifications.permission){ try{ await OS.User.PushSubscription.optIn(); }catch(e){} }
+            var pid = (typeof state!=='undefined' && state && state.pid) ? String(state.pid) : null;
+            if(pid){ try{ await OS.login(pid); }catch(e){} }
+          }catch(e){}
+          res();
+        }); });
+      }catch(e){}
+      perm = Notification.permission;
+    } else {
+      try{ perm = await Notification.requestPermission(); }catch(e){}
+    }
+    return perm;
+  };
   window.glvRemotePush = function(pid, text){
     if(!sendable() || !pid || !text) return;
     var k = String(text);
@@ -36585,6 +36613,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='export-pdf'){ doExportJourneyPdf(); }
   else if(action==='share-card'){ doShareCard(); }
   else if(action==='open-notifs'){ openNotifPanel(); }
+  else if(action==='push-enable'){ glvPushEnableUi(); }
   else if(action==='close-notifs'){ closeNotifPanel(); }
   else if(action==='notif-history'){ notifShow('history'); }
   else if(action==='notif-back'){ notifShow('recent'); }
@@ -36728,7 +36757,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='vtx-csv'){ vtxDownloadCsv(); }
   else if(action==='vtx-copy'){ vtxCopyStatement(); }
   else if(action==='vtx-print'){ vtxPrintStatement(); }
-  else if(action==='vtx-notif'){ vtxEnableNotifs(); }
+  else if(action==='vtx-notif'){ glvPushEnableUi(); }
   else if(action==='visa-tab'){ state.visaTab = el.dataset.t; render(); }
   else if(action==='visa-fill'){ const i=document.getElementById('visa-amt'); if(i) i.value = el.dataset.v; }
   else if(action==='visa-theme'){ if(!visaEditOpen(state.pid)) return; const g=id=>((document.getElementById(id)||{}).value||''); state.visaDraft = Object.assign({}, state.visaDraft||{}, {theme:el.dataset.k, holder:g('visa-holder'), _p1:g('visa-edit-pin'), _p2:g('visa-edit-pin2')}); render(); }
@@ -39087,6 +39116,22 @@ function notifGroup(label, list, hist, extra){
   let i = 0;
   return `${label ? `<div class="nr-sec"><span>${label}</span>${extra||''}</div>` : ''}<div class="nr-group">${list.map(n=>notifRowHtml(n, hist, i++)).join('')}</div>`;
 }
+function glvPushBannerHtml(){
+  let st = 'unsupported'; try{ st = window.glvPushState ? window.glvPushState() : 'unsupported'; }catch(e){}
+  if(st==='granted') return '';
+  if(st==='denied') return '<div class="vst-notif"><span>🔕 إشعارات الموبايل متقفلة — افتح إعدادات المتصفح ← إعدادات الموقع ← الإشعارات ← سماح</span></div>';
+  if(st==='unsupported') return '<div class="vst-notif"><span>📲 عشان توصلك الإشعارات على موبايلك: ثبّت الموقع على الشاشة الرئيسية الأول (من قائمة المتصفح ← إضافة إلى الشاشة الرئيسية) وافتحه منها</span></div>';
+  return '<div class="vst-notif"><span>🔔 فعّل إشعارات الموبايل عشان توصلك رسائل الموقع حتى لو مقفول</span><button type="button" data-action="push-enable">تفعيل الإشعارات</button></div>';
+}
+async function glvPushEnableUi(){
+  const perm = await window.glvPushEnable();
+  if(perm==='granted') showToast('✅ تم تفعيل الإشعارات على موبايلك');
+  else if(perm==='denied') showToast('الإشعارات متقفلة من إعدادات المتصفح', true);
+  else if(perm==='unsupported') showToast('الجهاز ده مش بيدعم الإشعارات', true);
+  else showToast('لم يتم السماح بالإشعارات', true);
+  try{ notifShow('recent'); }catch(e){}
+  if(state.view==='visa-history') render();
+}
 function notifPanelInner(mode){
   const pid = state.pid;
   const X = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
@@ -39114,6 +39159,7 @@ function notifPanelInner(mode){
         <button type="button" class="np-x" data-action="close-notifs" aria-label="إغلاق">${X}</button>
         <div class="np-ttl"><b>الإشعارات</b><span>${fresh.length ? fresh.length+' جديد · ' : ''}آخر 24 ساعة</span></div>
       </div>
+      ${glvPushBannerHtml()}
       ${body}
       ${hasAny ? '<button type="button" class="np-hist" data-action="notif-history"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>سجل الإشعارات</button>' : ''}`;
 }
