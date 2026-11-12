@@ -71,7 +71,7 @@ window.GLV_PUSH = {
           notifyButton: { enable: false }
         });
         window.__osReady = true;
-      }catch(e){ console.warn('OneSignal init failed', e); }
+      }catch(e){ window.__osErr = 'init: '+(e&&e.message?e.message:e); console.warn('OneSignal init failed', e); }
     });
   }
   /* ربط الجهاز بحساب المستخدم (external id = pid) وطلب الإذن بعد الدخول */
@@ -91,7 +91,7 @@ window.GLV_PUSH = {
               if(typeof Notification!=='undefined' && Notification.permission==='granted' && !offFlag()){
                 if(!OS.User.PushSubscription.optedIn || !OS.User.PushSubscription.token){ await OS.User.PushSubscription.optIn(); }
               }
-            }catch(e){}
+            }catch(e){ window.__osErr = 'optIn: '+(e&&e.message?e.message:e); }
           } else { await OS.logout(); }
         }catch(e){}
       });
@@ -118,6 +118,32 @@ window.GLV_PUSH = {
       if(p==='granted') return offFlag() ? 'off' : 'on';
       return p;
     }catch(e){ return 'unsupported'; }
+  };
+  /* فحص الحالة الفعلية للإشعارات (للتشخيص) */
+  window.glvPushDiag = async function(){
+    var L = [];
+    try{ L.push('permission: '+(typeof Notification!=='undefined' ? Notification.permission : 'غير مدعوم')); }catch(e){}
+    L.push('APP_ID مضبوط: '+(ready()?'نعم':'لا'));
+    L.push('SDK جاهز: '+(window.__osReady?'نعم':'لا'));
+    if(window.__osErr) L.push('خطأ: '+window.__osErr);
+    try{ L.push('سكربت OneSignal اتحمّل: '+(window.OneSignal && window.OneSignal.User ? 'نعم' : 'لا')); }catch(e){}
+    try{
+      var regs = await navigator.serviceWorker.getRegistrations();
+      L.push('service workers: '+(regs.map(function(r){ return r.scope.replace(location.origin,''); }).join(' | ')||'مفيش'));
+    }catch(e){ L.push('service workers: خطأ'); }
+    if(window.__osReady){
+      await new Promise(function(res){ OneSignalDeferred.push(async function(OS){
+        try{
+          var ps = OS.User.PushSubscription;
+          L.push('optedIn: '+ps.optedIn);
+          L.push('token: '+(ps.token ? ps.token.slice(0,12)+'…' : 'مفيش'));
+          L.push('subscription id: '+(ps.id||'مفيش'));
+          L.push('external id: '+(OS.User.externalId||'مفيش'));
+        }catch(e){ L.push('خطأ في القراءة: '+(e&&e.message?e.message:e)); }
+        res();
+      }); });
+    }
+    return L.join('\n');
   };
   /* إيقاف الإشعارات على الجهاز ده (من غير ما نلمس إذن المتصفح) */
   window.glvPushDisable = async function(){
@@ -36636,6 +36662,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='open-notifs'){ openNotifPanel(); }
   else if(action==='push-enable'){ glvPushEnableUi(); }
   else if(action==='push-disable'){ glvPushDisableUi(); }
+  else if(action==='push-diag'){ window.glvPushDiag().then(function(t){ alert(t); }); }
   else if(action==='close-notifs'){ closeNotifPanel(); }
   else if(action==='notif-history'){ notifShow('history'); }
   else if(action==='notif-back'){ notifShow('recent'); }
@@ -39141,7 +39168,7 @@ function notifGroup(label, list, hist, extra){
 function glvPushBannerHtml(){
   let st = 'unsupported'; try{ st = window.glvPushState ? window.glvPushState() : 'unsupported'; }catch(e){}
   const ghost = 'background:transparent;color:inherit;border:1px solid var(--border);box-shadow:none';
-  if(st==='on') return `<div class="vst-notif"><span>✅ إشعارات الموبايل مفعّلة</span><button type="button" data-action="push-disable" style="${ghost}">إيقاف</button></div>`;
+  if(st==='on') return `<div class="vst-notif"><span>✅ إشعارات الموبايل مفعّلة</span><button type="button" data-action="push-disable" style="${ghost}">إيقاف</button></div><button type="button" data-action="push-diag" style="background:none;border:0;color:var(--muted,#9aa);font-size:11px;text-decoration:underline;margin:-6px 0 10px;cursor:pointer">🔧 فحص الإشعارات</button>`;
   if(st==='off') return '<div class="vst-notif"><span>🔕 إشعارات الموبايل متوقفة</span><button type="button" data-action="push-enable">تفعيل</button></div>';
   if(st==='denied') return '<div class="vst-notif"><span>🔕 إشعارات الموبايل متقفلة — افتح إعدادات المتصفح ← إعدادات الموقع ← الإشعارات ← سماح</span></div>';
   if(st==='unsupported') return '<div class="vst-notif"><span>📲 عشان توصلك الإشعارات على موبايلك: ثبّت الموقع على الشاشة الرئيسية الأول (من قائمة المتصفح ← إضافة إلى الشاشة الرئيسية) وافتحه منها</span></div>';
