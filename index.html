@@ -59,6 +59,11 @@ window.GLV_PUSH = {
   var ready = function(){ return C.APP_ID && C.APP_ID.indexOf('PUT-')!==0; };
   var sendable = function(){ return ready() && C.ENDPOINT && C.ENDPOINT.indexOf('PUT-')!==0; };
   var base = location.pathname.replace(/[^\/]*$/,'');
+  /* أدوات الفحص مخفية عن المشاركين: بتتفعّل على جهازك بس بفتح الرابط بـ ?pushdebug=1 وتتقفل بـ ?pushdebug=0 */
+  try{
+    var __q = new URLSearchParams(location.search);
+    if(__q.has('pushdebug')){ if(__q.get('pushdebug')==='0') localStorage.removeItem('glv-push-debug'); else localStorage.setItem('glv-push-debug','1'); }
+  }catch(e){}
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   if(ready()){
     OneSignalDeferred.push(async function(OS){
@@ -39178,7 +39183,8 @@ function notifGroup(label, list, hist, extra){
 function glvPushBannerHtml(){
   let st = 'unsupported'; try{ st = window.glvPushState ? window.glvPushState() : 'unsupported'; }catch(e){}
   const ghost = 'background:transparent;color:inherit;border:1px solid var(--border);box-shadow:none';
-  if(st==='on') return `<div class="vst-notif"><span>✅ إشعارات الموبايل مفعّلة</span><button type="button" data-action="push-disable" style="${ghost}">إيقاف</button></div><button type="button" data-action="push-diag" style="background:none;border:0;color:var(--muted,#9aa);font-size:11px;text-decoration:underline;margin:-6px 0 10px;cursor:pointer">🔧 فحص الإشعارات</button> <button type="button" data-action="push-test" style="background:none;border:0;color:var(--muted,#9aa);font-size:11px;text-decoration:underline;margin:-6px 0 10px;cursor:pointer">📨 إرسال إشعار تجريبي لنفسي</button>`;
+  let dbg = ''; try{ if(localStorage.getItem('glv-push-debug')==='1') dbg = `<div style="margin:-6px 0 10px"><button type="button" data-action="push-diag" style="background:none;border:0;color:var(--muted,#9aa);font-size:11px;text-decoration:underline;cursor:pointer">🔧 فحص الإشعارات</button> <button type="button" data-action="push-test" style="background:none;border:0;color:var(--muted,#9aa);font-size:11px;text-decoration:underline;cursor:pointer">📨 إرسال إشعار تجريبي لنفسي</button></div>`; }catch(e){}
+  if(st==='on') return `<div class="vst-notif"><span>✅ إشعارات الموبايل مفعّلة</span><button type="button" data-action="push-disable" style="${ghost}">إيقاف</button></div>${dbg}`;
   if(st==='off') return '<div class="vst-notif"><span>🔕 إشعارات الموبايل متوقفة</span><button type="button" data-action="push-enable">تفعيل</button></div>';
   if(st==='denied') return '<div class="vst-notif"><span>🔕 إشعارات الموبايل متقفلة — افتح إعدادات المتصفح ← إعدادات الموقع ← الإشعارات ← سماح</span></div>';
   if(st==='unsupported') return '<div class="vst-notif"><span>📲 عشان توصلك الإشعارات على موبايلك: ثبّت الموقع على الشاشة الرئيسية الأول (من قائمة المتصفح ← إضافة إلى الشاشة الرئيسية) وافتحه منها</span></div>';
