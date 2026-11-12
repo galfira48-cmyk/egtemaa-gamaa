@@ -86,6 +86,12 @@ window.GLV_PUSH = {
         try{
           if(pid){
             await OS.login(pid);
+            /* لو المستخدم كان سمح بالإشعارات قبل كده لكن الجهاز لسه مش مشترك في OneSignal: اشتراك تلقائي */
+            try{
+              if(typeof Notification!=='undefined' && Notification.permission==='granted'){
+                if(!OS.User.PushSubscription.optedIn || !OS.User.PushSubscription.token){ await OS.User.PushSubscription.optIn(); }
+              }
+            }catch(e){}
           } else { await OS.logout(); }
         }catch(e){}
       });
