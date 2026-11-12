@@ -88,7 +88,7 @@ window.GLV_PUSH = {
             await OS.login(pid);
             /* لو المستخدم كان سمح بالإشعارات قبل كده لكن الجهاز لسه مش مشترك في OneSignal: اشتراك تلقائي */
             try{
-              if(typeof Notification!=='undefined' && Notification.permission==='granted'){
+              if(typeof Notification!=='undefined' && Notification.permission==='granted' && !offFlag()){
                 if(!OS.User.PushSubscription.optedIn || !OS.User.PushSubscription.token){ await OS.User.PushSubscription.optIn(); }
               }
             }catch(e){}
@@ -109,16 +109,31 @@ window.GLV_PUSH = {
       }catch(e){}
     });
   }
-  /* حالة الإشعارات على الجهاز: granted / denied / default / unsupported */
+  var offFlag = function(){ try{ return localStorage.getItem('glv-push-off')==='1'; }catch(e){ return false; } };
+  /* حالة الإشعارات: on (مفعّلة) / off (أوقفها المستخدم) / denied (مقفولة من المتصفح) / default / unsupported */
   window.glvPushState = function(){
     try{
       if(typeof Notification==='undefined') return 'unsupported';
-      return Notification.permission;
+      var p = Notification.permission;
+      if(p==='granted') return offFlag() ? 'off' : 'on';
+      return p;
     }catch(e){ return 'unsupported'; }
+  };
+  /* إيقاف الإشعارات على الجهاز ده (من غير ما نلمس إذن المتصفح) */
+  window.glvPushDisable = async function(){
+    try{ localStorage.setItem('glv-push-off','1'); }catch(e){}
+    if(window.__osReady){
+      await new Promise(function(res){ OneSignalDeferred.push(async function(OS){
+        try{ await OS.User.PushSubscription.optOut(); }catch(e){}
+        res();
+      }); });
+    }
+    return 'off';
   };
   /* زرار التفعيل: بيطلب الإذن ويشترك الجهاز في OneSignal */
   window.glvPushEnable = async function(){
     if(typeof Notification==='undefined') return 'unsupported';
+    try{ localStorage.removeItem('glv-push-off'); }catch(e){}
     var perm = Notification.permission;
     if(window.__osReady){
       try{
@@ -36620,6 +36635,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='share-card'){ doShareCard(); }
   else if(action==='open-notifs'){ openNotifPanel(); }
   else if(action==='push-enable'){ glvPushEnableUi(); }
+  else if(action==='push-disable'){ glvPushDisableUi(); }
   else if(action==='close-notifs'){ closeNotifPanel(); }
   else if(action==='notif-history'){ notifShow('history'); }
   else if(action==='notif-back'){ notifShow('recent'); }
@@ -39124,10 +39140,17 @@ function notifGroup(label, list, hist, extra){
 }
 function glvPushBannerHtml(){
   let st = 'unsupported'; try{ st = window.glvPushState ? window.glvPushState() : 'unsupported'; }catch(e){}
-  if(st==='granted') return '';
+  const ghost = 'background:transparent;color:inherit;border:1px solid var(--border);box-shadow:none';
+  if(st==='on') return `<div class="vst-notif"><span>✅ إشعارات الموبايل مفعّلة</span><button type="button" data-action="push-disable" style="${ghost}">إيقاف</button></div>`;
+  if(st==='off') return '<div class="vst-notif"><span>🔕 إشعارات الموبايل متوقفة</span><button type="button" data-action="push-enable">تفعيل</button></div>';
   if(st==='denied') return '<div class="vst-notif"><span>🔕 إشعارات الموبايل متقفلة — افتح إعدادات المتصفح ← إعدادات الموقع ← الإشعارات ← سماح</span></div>';
   if(st==='unsupported') return '<div class="vst-notif"><span>📲 عشان توصلك الإشعارات على موبايلك: ثبّت الموقع على الشاشة الرئيسية الأول (من قائمة المتصفح ← إضافة إلى الشاشة الرئيسية) وافتحه منها</span></div>';
   return '<div class="vst-notif"><span>🔔 فعّل إشعارات الموبايل عشان توصلك رسائل الموقع حتى لو مقفول</span><button type="button" data-action="push-enable">تفعيل الإشعارات</button></div>';
+}
+async function glvPushDisableUi(){
+  await window.glvPushDisable();
+  showToast('🔕 تم إيقاف إشعارات الموبايل');
+  try{ notifShow('recent'); }catch(e){}
 }
 async function glvPushEnableUi(){
   const perm = await window.glvPushEnable();
