@@ -55954,5 +55954,209 @@ window.pwrLoad = load;
 })();
 </script>
 
+<!-- ===== كارت تفعيل الإشعارات (انيميشن) ===== -->
+<style id="glv-promo-css">
+.gp-back{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:18px;
+  background:radial-gradient(120% 90% at 50% 20%,rgba(244,183,64,.16),rgba(8,7,28,.82));-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+  opacity:0;animation:gp-fade .35s ease forwards;direction:rtl;font-family:'Cairo','Tajawal',sans-serif}
+.gp-back.gp-out{animation:gp-fadeout .28s ease forwards}
+.gp-card{position:relative;width:100%;max-width:380px;border-radius:30px;padding:0 22px 22px;text-align:center;color:var(--text);overflow:hidden;
+  background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid color-mix(in srgb,var(--gold) 38%,var(--border));
+  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04) inset,0 0 60px color-mix(in srgb,var(--gold) 22%,transparent);
+  transform:translateY(40px) scale(.86);opacity:0;animation:gp-pop .7s cubic-bezier(.2,1.25,.3,1) .08s forwards}
+.gp-card:before{content:"";position:absolute;inset:-40% -20% auto -20%;height:80%;pointer-events:none;
+  background:conic-gradient(from 0deg,transparent,color-mix(in srgb,var(--gold) 26%,transparent),transparent 30%,transparent);animation:gp-spin 9s linear infinite;opacity:.55}
+.gp-card > *{position:relative}
+.gp-x{position:absolute;top:12px;left:12px;width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text-muted);font-size:20px;line-height:1;cursor:pointer;z-index:3}
+.gp-stage{position:relative;height:178px;margin:6px -22px 4px}
+.gp-glow{position:absolute;left:50%;top:52%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--gold) 55%,transparent),transparent 68%);filter:blur(6px);animation:gp-breathe 2.8s ease-in-out infinite}
+.gp-ring{position:absolute;left:50%;top:52%;width:92px;height:92px;margin:-46px 0 0 -46px;border-radius:50%;border:2px solid var(--gold);opacity:0;animation:gp-ripple 3s ease-out infinite}
+.gp-ring.r2{animation-delay:1s}.gp-ring.r3{animation-delay:2s}
+.gp-bell{position:absolute;left:50%;top:52%;width:84px;height:84px;margin:-42px 0 0 -42px;transform-origin:50% 12%;animation:gp-ring 3s ease-in-out infinite;filter:drop-shadow(0 10px 18px rgba(244,183,64,.45))}
+.gp-bell svg{width:100%;height:100%;overflow:visible}
+.gp-badge{transform-origin:47px 15px;animation:gp-badge 1.5s ease-in-out infinite}
+.gp-chip{position:absolute;display:flex;align-items:center;gap:7px;padding:8px 13px 8px 11px;border-radius:16px;font-size:12px;font-weight:800;white-space:nowrap;
+  background:color-mix(in srgb,var(--surface) 82%,#fff 6%);border:1px solid var(--border);box-shadow:0 10px 24px rgba(0,0,0,.35);opacity:0;animation:gp-chip 6.6s ease-in-out infinite}
+.gp-chip b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:8px;font-size:13px;background:linear-gradient(145deg,var(--gold),var(--gold-2))}
+.gp-chip.c1{right:16px;top:12px;animation-delay:.3s}
+.gp-chip.c2{left:14px;top:66px;animation-delay:2.5s}
+.gp-chip.c3{right:26px;bottom:4px;animation-delay:4.7s}
+.gp-spark{position:absolute;color:var(--gold-2);font-size:14px;opacity:0;animation:gp-twinkle 2.6s ease-in-out infinite}
+.gp-spark.s1{left:24%;top:18%}.gp-spark.s2{right:22%;top:46%;animation-delay:.9s;font-size:11px}.gp-spark.s3{left:30%;bottom:14%;animation-delay:1.7s;font-size:12px}
+.gp-card h3{margin:0 0 6px;font-size:21px;font-weight:900;letter-spacing:.2px}
+.gp-card h3 em{font-style:normal;background:linear-gradient(90deg,var(--gold-2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.gp-card p{margin:0 auto 16px;max-width:290px;font-size:13.5px;line-height:1.75;color:var(--text-muted);font-weight:600}
+.gp-go{position:relative;display:block;width:100%;border:0;border-radius:18px;padding:15px 12px;font-family:inherit;font-size:16px;font-weight:900;color:#2a1c00;cursor:pointer;overflow:hidden;
+  background:linear-gradient(145deg,var(--gold-2),var(--gold));box-shadow:0 12px 30px color-mix(in srgb,var(--gold) 45%,transparent),0 1px 0 rgba(255,255,255,.5) inset;animation:gp-cta 2.2s ease-in-out infinite}
+.gp-go:before{content:"";position:absolute;top:0;bottom:0;width:46%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-18deg);animation:gp-shine 2.8s ease-in-out infinite}
+.gp-go:active{transform:scale(.97)}
+.gp-go[disabled]{opacity:.7;animation:none}
+.gp-later{display:block;margin:12px auto 0;background:none;border:0;color:var(--text-muted);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.gp-done-ic{display:none;position:absolute;left:50%;top:52%;width:92px;height:92px;margin:-46px 0 0 -46px}
+.gp-done-ic circle{fill:color-mix(in srgb,var(--good) 20%,transparent);stroke:var(--good);stroke-width:3;stroke-dasharray:290;stroke-dashoffset:290}
+.gp-done-ic path{fill:none;stroke:var(--good);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60}
+.gp-card.gp-done .gp-bell,.gp-card.gp-done .gp-chip,.gp-card.gp-done .gp-ring,.gp-card.gp-done .gp-spark{display:none}
+.gp-card.gp-done .gp-done-ic{display:block}
+.gp-card.gp-done .gp-done-ic circle{animation:gp-draw .6s ease forwards}
+.gp-card.gp-done .gp-done-ic path{animation:gp-draw .45s ease .5s forwards}
+.gp-card.gp-done .gp-go,.gp-card.gp-done .gp-later{display:none}
+.gp-conf{position:absolute;left:50%;top:52%;width:9px;height:14px;border-radius:2px;opacity:0;pointer-events:none;animation:gp-conf 1.5s cubic-bezier(.15,.7,.3,1) forwards}
+
+.gp-steps{list-style:none;margin:0 0 14px;padding:0;display:none;text-align:right}
+.gp-denied .gp-steps{display:block}
+.gp-steps li{display:flex;align-items:center;gap:10px;margin:7px 0;padding:9px 12px;border-radius:14px;font-size:13px;font-weight:700;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);opacity:0;transform:translateX(18px);animation:gp-step .55s cubic-bezier(.2,1.2,.3,1) forwards}
+.gp-steps li:nth-child(1){animation-delay:.55s}.gp-steps li:nth-child(2){animation-delay:.8s}.gp-steps li:nth-child(3){animation-delay:1.05s}
+.gp-steps li i{flex:0 0 auto;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;font-style:normal;font-size:12px;font-weight:900;color:#2a1c00;background:linear-gradient(145deg,var(--gold-2),var(--gold))}
+.gp-steps li b{color:var(--gold-2)}
+.gp-slash{display:none}
+.gp-denied .gp-slash{display:block;stroke-dasharray:70;stroke-dashoffset:70;animation:gp-draw .7s ease .45s forwards}
+.gp-denied .gp-badge{display:none}
+.gp-denied .gp-bell{filter:drop-shadow(0 10px 18px rgba(255,90,95,.35)) saturate(.8)}
+.gp-denied .gp-glow{background:radial-gradient(circle,rgba(255,90,95,.4),transparent 68%)}
+.gp-denied .gp-ring{border-color:#ff5a5f}
+.gp-denied .gp-p{margin-bottom:10px}
+.gp-note{min-height:0;margin:-4px 0 12px;font-size:12px;font-weight:800;color:#ff8f94}
+.gp-shake{animation:gp-shake .45s ease}
+@keyframes gp-step{to{opacity:1;transform:none}}
+@keyframes gp-shake{0%,100%{transform:none}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+@keyframes gp-fade{to{opacity:1}} @keyframes gp-fadeout{to{opacity:0}}
+@keyframes gp-pop{to{transform:none;opacity:1}}
+@keyframes gp-spin{to{transform:rotate(360deg)}}
+@keyframes gp-breathe{0%,100%{transform:scale(.85);opacity:.7}50%{transform:scale(1.15);opacity:1}}
+@keyframes gp-ripple{0%{transform:scale(.7);opacity:.55}100%{transform:scale(2.5);opacity:0}}
+@keyframes gp-ring{0%,52%,100%{transform:rotate(0)}6%{transform:rotate(16deg)}12%{transform:rotate(-14deg)}18%{transform:rotate(11deg)}24%{transform:rotate(-8deg)}30%{transform:rotate(5deg)}36%{transform:rotate(-3deg)}42%{transform:rotate(0)}}
+@keyframes gp-badge{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
+@keyframes gp-chip{0%{opacity:0;transform:translateY(12px) scale(.7)}9%{opacity:1;transform:translateY(0) scale(1)}34%{opacity:1;transform:translateY(-4px) scale(1)}46%{opacity:0;transform:translateY(-14px) scale(.9)}100%{opacity:0}}
+@keyframes gp-twinkle{0%,100%{opacity:0;transform:scale(.4) rotate(0)}50%{opacity:1;transform:scale(1.2) rotate(90deg)}}
+@keyframes gp-cta{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+@keyframes gp-shine{0%{left:-60%}55%,100%{left:130%}}
+@keyframes gp-draw{to{stroke-dashoffset:0}}
+@keyframes gp-conf{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))}}
+@media (prefers-reduced-motion:reduce){.gp-card *,.gp-card:before{animation-duration:.01s!important;animation-iteration-count:1!important}.gp-chip{opacity:1!important}}
+</style>
+<script id="glv-promo-js">
+(function(){
+  var DAY = 86400000;
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  var force = false, forceMode = 'default';
+  try{ var __pq = new URLSearchParams(location.search); if(__pq.has('promo')){ force = true; var __pv = __pq.get('promo'); if(__pv==='denied'||__pv==='off') forceMode = __pv; } }catch(e){}
+  function curState(){ try{ return window.glvPushState ? window.glvPushState() : ''; }catch(e){ return ''; } }
+  var okTicks = 0;
+  function eligible(){
+    if(typeof state==='undefined' || !state || !state.pid) return false;
+    var v = state.view||'';
+    if(/^(splash|login|signup|welcome|admin|game-|room-|watch-)/.test(v)) return false;
+    if(state.adminOpen || window.__tourOn) return false;
+    if(document.visibilityState!=='visible') return false;
+    if(document.getElementById('glv-promo') || document.querySelector('.notif-overlay')) return false;
+    if(force) return true;
+    var st = curState();
+    if(st!=='default' && st!=='denied' && st!=='off') return false;
+    if(Date.now() < parseInt(lsGet('glv-promo-until')||'0',10)) return false;
+    return true;
+  }
+  function close(snooze){
+    var el = document.getElementById('glv-promo'); if(!el) return;
+    if(snooze){
+      var n = parseInt(lsGet('glv-promo-n')||'0',10)+1; lsSet('glv-promo-n', String(n));
+      lsSet('glv-promo-until', String(Date.now() + (n>=3 ? 14 : 3)*DAY));
+    }
+    el.classList.add('gp-out'); setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 300);
+  }
+  function confetti(card){
+    var stage = card.querySelector('.gp-stage'); if(!stage) return;
+    var cols = ['#F4B740','#FFDE94','#5FE0A4','#7aa7ff','#ff8fa3','#ffffff'];
+    for(var i=0;i<26;i++){
+      var c = document.createElement('i'); c.className='gp-conf';
+      var a = Math.random()*Math.PI*2, d = 70+Math.random()*95;
+      c.style.setProperty('--dx', Math.cos(a)*d+'px'); c.style.setProperty('--dy', (Math.sin(a)*d-30)+'px'); c.style.setProperty('--rot', (Math.random()*720-360)+'deg');
+      c.style.background = cols[i%cols.length]; c.style.animationDelay = (Math.random()*.15)+'s';
+      stage.appendChild(c);
+    }
+  }
+  function show(){
+    var mode = force ? forceMode : curState();
+    var d = document.createElement('div'); d.id='glv-promo'; d.className='gp-back'; d.setAttribute('role','dialog'); d.setAttribute('aria-modal','true');
+    d.innerHTML =
+    '<div class="gp-card">'+
+      '<button type="button" class="gp-x" aria-label="إغلاق">×</button>'+
+      '<div class="gp-stage">'+
+        '<i class="gp-glow"></i><i class="gp-ring r1"></i><i class="gp-ring r2"></i><i class="gp-ring r3"></i>'+
+        '<div class="gp-bell"><svg viewBox="0 0 64 64"><defs><linearGradient id="gpg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE9B0"/><stop offset="1" stop-color="#F4B740"/></linearGradient></defs>'+
+          '<path d="M32 6c-2.2 0-4 1.8-4 4v1.6C20.6 13.6 16 20 16 27.5V38l-5 6v3h42v-3l-5-6V27.5C48 20 43.4 13.6 36 11.6V10c0-2.2-1.8-4-4-4z" fill="url(#gpg)"/>'+
+          '<path d="M24 50a8 8 0 0 0 16 0z" fill="#E0A02A"/>'+
+          '<line class="gp-slash" x1="12" y1="10" x2="54" y2="56" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity=".9"/><line class="gp-slash" x1="12" y1="10" x2="54" y2="56" stroke="#FF5A5F" stroke-width="5" stroke-linecap="round"/>'+
+          '<g class="gp-badge"><circle cx="47" cy="15" r="8" fill="#FF5A5F" stroke="#fff" stroke-width="2"/><text x="47" y="19" text-anchor="middle" font-size="11" font-weight="900" fill="#fff" font-family="Cairo,sans-serif">1</text></g></svg></div>'+
+        '<svg class="gp-done-ic" viewBox="0 0 92 92"><circle cx="46" cy="46" r="42"/><path d="M27 48l13 13 25-29"/></svg>'+
+        '<span class="gp-chip c1"><b>💰</b>وصلك نقط في فيزتك</span>'+
+        '<span class="gp-chip c2"><b>📢</b>تنبيه جديد من الأدمن</span>'+
+        '<span class="gp-chip c3"><b>🕊</b>ميعاد خلوتك جه</span>'+
+        '<i class="gp-spark s1">✦</i><i class="gp-spark s2">✦</i><i class="gp-spark s3">✦</i>'+
+      '</div>'+
+      '<h3 class="gp-h">خلّي الإشعارات <em>توصلك لحد عندك</em></h3>'+
+      '<p class="gp-p">أي رسالة من الخدام، تحويل نقط، تنبيه اجتماع أو تذكير خلوة هيوصلك على موبايلك فورًا حتى لو الموقع مقفول.</p>'+
+      '<ol class="gp-steps"><li><i>1</i><span>اضغط على 🔒 أو ⓘ جنب رابط الموقع فوق</span></li><li><i>2</i><span>اختار <b>الإشعارات</b> ← <b>سماح</b></span></li><li><i>3</i><span>ارجع هنا واضغط الزرار تحت</span></li></ol>'+
+      '<div class="gp-note"></div>'+
+      '<button type="button" class="gp-go">🔔 فعّل الإشعارات</button>'+
+      '<button type="button" class="gp-later">مش دلوقتي</button>'+
+    '</div>';
+    document.body.appendChild(d);
+    var card = d.querySelector('.gp-card'), h = d.querySelector('.gp-h'), p = d.querySelector('.gp-p'), go = d.querySelector('.gp-go'), note = d.querySelector('.gp-note');
+    if(mode==='off'){
+      h.innerHTML = 'الإشعارات <em>متوقفة</em> عندك';
+      p.textContent = 'فعّلها تاني عشان توصلك رسايل الخدام والتحويلات وتنبيهات الاجتماع حتى لو الموقع مقفول.';
+    } else if(mode==='denied'){
+      card.classList.add('gp-denied');
+      h.innerHTML = 'الإشعارات <em>متقفلة</em> من المتصفح 🔕';
+      p.textContent = 'المتصفح مانع الإشعارات للموقع ده، وعشان توصلك لازم تفتحها بنفسك في 3 خطوات بسيطة:';
+      go.textContent = '✅ فعّلتها — تحقّق';
+    }
+    var onVis = function(){
+      if(mode==='denied' && document.visibilityState==='visible' && document.getElementById('glv-promo') && typeof Notification!=='undefined' && Notification.permission==='granted' && !go.disabled) go.click();
+    };
+    document.addEventListener('visibilitychange', onVis);
+    d.querySelector('.gp-x').onclick = d.querySelector('.gp-later').onclick = function(){ close(!force); };
+    d.addEventListener('click', function(e){ if(e.target===d) close(!force); });
+    go.onclick = async function(){
+      if(mode==='denied' && !card.classList.contains('gp-done')){
+        var cur = (typeof Notification!=='undefined') ? Notification.permission : 'denied';
+        if(cur!=='granted'){
+          note.textContent = 'لسه متقفلة — اتأكد إنك اخترت «سماح» وجرّب تاني';
+          try{ card.animate([{translate:'0'},{translate:'-9px'},{translate:'8px'},{translate:'-6px'},{translate:'4px'},{translate:'0'}],{duration:450,easing:'ease'}); }catch(e){}
+          return;
+        }
+        card.classList.remove('gp-denied');
+      }
+      note.textContent = '';
+      go.disabled = true; go.textContent = '… لحظة';
+      var perm = 'default';
+      try{ perm = await window.glvPushEnable(); }catch(e){}
+      if(perm==='granted'){
+        card.classList.add('gp-done'); h.innerHTML = 'تمام! <em>الإشعارات شغّالة</em> 🎉';
+        p.textContent = 'هتوصلك كل التنبيهات على موبايلك. تقدر توقفها في أي وقت من الجرس 🔔.';
+        confetti(card);
+        try{ if(typeof notifShow==='function' && document.getElementById('notif-inner')) notifShow('recent'); }catch(e){}
+        setTimeout(function(){ close(false); }, 2600);
+      } else {
+        go.disabled = false; go.textContent = 'تمام';
+        go.onclick = function(){ close(true); };
+        p.textContent = (perm==='denied')
+          ? 'الإشعارات متقفلة من إعدادات المتصفح. افتح إعدادات الموقع ← الإشعارات ← سماح، وبعدها ارجع الجرس 🔔 وفعّلها.'
+          : 'الجهاز أو المتصفح ده مش بيدعم الإشعارات. على iPhone ثبّت الموقع على الشاشة الرئيسية الأول وافتحه منها.';
+      }
+    };
+  }
+  setInterval(function(){
+    try{
+      if(eligible()){ okTicks++; if(okTicks>=2){ okTicks = 0; show(); } }
+      else okTicks = 0;
+    }catch(e){}
+  }, 3500);
+})();
+</script>
+
 </body>
 </html>
