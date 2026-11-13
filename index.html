@@ -57403,6 +57403,9 @@ function inAdmin(){ return state.view==='admin' && state.adminUnlocked && state.
 function typing(){ var a = document.activeElement; return !!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); }
 function byId(id){ return S.list.find(function(x){ return x.id===id; }); }
 function myRes(id){ return ((S.res||{})[id]||{})[me()]; }
+/* صلاحية الرؤية: allow فاضية/مش موجودة = كل المشاركين، غير كده = المختارين بس */
+function canSee(q){ var a = q && q.allow; return !a || !a.length || a.map(String).indexOf(me())>-1; }
+function isOpenForMe(q){ return !!(q && q.open && canSee(q)); }
 
 async function doLoad(){
   var a = await jg(K, {list:[]}), b = await jg(KR, {});
@@ -57429,7 +57432,7 @@ function head(title, back){
 }
 function cardHtml(qz, i){
   var c = COLS[(qz.col||0)%COLS.length], r = myRes(qz.id), tot = qz.qs.length*(qz.pts||2), done = r && r.done;
-  var st = done ? '<span class="qz-st ok">✅ '+(r.score||0)+' / '+qz.qs.length+'</span>' : (r && r.st ? '<span class="qz-st">⏳ مش مكتمل</span>' : (qz.open ? '<span class="qz-st go">ابدأ الآن ▶</span>' : '<span class="qz-st">🔒 مقفول</span>'));
+  var st = done ? '<span class="qz-st ok">✅ '+(r.score||0)+' / '+qz.qs.length+'</span>' : (r && r.st ? '<span class="qz-st">⏳ مش مكتمل</span>' : (isOpenForMe(qz) ? '<span class="qz-st go">ابدأ الآن ▶</span>' : '<span class="qz-st">🔒 مقفول</span>'));
   var dt = ''; try{ dt = qz.date ? new Date(qz.date+'T00:00:00').toLocaleDateString('ar-EG',{weekday:'long', day:'numeric', month:'long'}) : ''; }catch(e){}
   return '<button type="button" class="qz-card" style="--c1:'+c[0]+';--c2:'+c[1]+';animation-delay:'+(i*70)+'ms" data-qz="open" data-id="'+esc(qz.id)+'">'
     + '<span class="qz-shine"></span><span class="qz-ico">'+esc(qz.ic||'🧠')+'</span>'
@@ -57437,7 +57440,7 @@ function cardHtml(qz, i){
     + '<span class="qz-meta"><i>❓ '+qz.qs.length+' سؤال</i><i>⏱ '+(qz.sec||20)+' ث</i><i>⭐ '+tot+' نقطة</i></span></span>'+st+'</button>';
 }
 function listView(){
-  var items = S.list.filter(function(q){ return q.open || myRes(q.id); }).sort(function(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.at||0)-(a.at||0); });
+  var items = S.list.filter(function(q){ return (q.open && canSee(q)) || myRes(q.id); }).sort(function(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.at||0)-(a.at||0); });
   var done = items.filter(function(q){ var r = myRes(q.id); return r && r.done; }).length;
   return head('أسئلة الاجتماع')
     + '<div class="qz-hero"><span class="e">🧠</span><div><b>اختبر معلوماتك!</b><small>كارت لكل اجتماع — جاوب بسرعة واكسب نقاط</small></div><span class="qz-hc">'+done+'/'+items.length+'</span></div>'
@@ -57452,7 +57455,7 @@ function introView(qz){
     body = '<div class="qz-rules">'
       + '<div><i>❓</i><b>'+qz.qs.length+' سؤال</b></div><div><i>⏱</i><b>'+(qz.sec||20)+' ثانية لكل سؤال</b></div><div><i>⭐</i><b>'+(qz.pts||2)+' درجات لكل إجابة صح</b></div><div><i>1️⃣</i><b>محاولة واحدة بس</b></div></div>'
       + '<div class="qz-warn">لو خرجت في النص أو الوقت خلص، السؤال بيتحسب غلط. اتأكد من النت وركّز 💪</div>'
-      + (qz.open ? '<button type="button" class="qz-go" data-qz="start">🚀 يلا نبدأ</button>' : '<div class="empty-note">الأسئلة دي مقفولة دلوقتي 🔒</div>')
+      + (isOpenForMe(qz) ? '<button type="button" class="qz-go" data-qz="start">🚀 يلا نبدأ</button>' : '<div class="empty-note">الأسئلة دي مقفولة دلوقتي 🔒</div>')
       + (r && r.st ? '<div class="qz-warn" style="margin-top:10px">فيه محاولة اتفتحت قبل كده ومخلصتش — هتتحسب بإجاباتها.</div>' : '');
   }
   return head(qz.title, true)
@@ -57511,7 +57514,7 @@ window.FXVIEWS.quiz = function(){
 /* ---------- منطق الاختبار ---------- */
 function stopTimer(){ if(Q.timer){ clearInterval(Q.timer); Q.timer = null; } }
 async function start(){
-  var qz = byId(Q.id); if(!qz || !qz.open) return; var m = me(), r = myRes(qz.id);
+  var qz = byId(Q.id); if(!qz || !isOpenForMe(qz)) return; var m = me(), r = myRes(qz.id);
   if(r && r.done) return;
   if(r && r.st){ await finish(qz); return; }   /* محاولة سابقة مش مكتملة */
   var res = await ju(KR, function(o){ o = o||{}; o[qz.id] = o[qz.id]||{}; if(!o[qz.id][m]) o[qz.id][m] = {st:Date.now(), ans:[], done:0}; return o; });
@@ -57579,8 +57582,8 @@ function qEditor(q, i){
 }
 function adminCard(q){
   var res = (S.res||{})[q.id]||{}, n = Object.keys(res).length, done = Object.keys(res).filter(function(p){ return res[p].done; }).length;
-  return '<div class="card" style="padding:12px;margin-bottom:10px"><div style="display:flex;gap:10px;align-items:center"><span style="font-size:30px">'+esc(q.ic||'🧠')+'</span><div style="flex:1"><b>'+esc(q.title)+'</b><div class="fx-hint">'+esc(q.date||'')+' · '+q.qs.length+' سؤال · '+(q.sec||20)+' ث · '+(q.pts||2)+' نقطة/سؤال</div><div class="fx-hint">'+done+' خلّصوا · '+(n-done)+' بدأوا ومخلصوش · '+(q.open?'🟢 مفتوح':'🔒 مقفول')+'</div></div></div>'
-    + '<div class="sar-actions" style="margin-top:10px;flex-wrap:wrap"><button type="button" class="btn btn-ghost" data-qz="aresults" data-id="'+esc(q.id)+'">📊 النتائج</button><button type="button" class="btn btn-ghost" data-qz="atoggle" data-id="'+esc(q.id)+'">'+(q.open?'🔒 اقفل':'🔓 افتح')+'</button><button type="button" class="btn btn-ghost" data-qz="aedit" data-id="'+esc(q.id)+'">✏️ تعديل</button><button type="button" class="btn btn-ghost" data-qz="adel" data-id="'+esc(q.id)+'">🗑️</button></div></div>';
+  return '<div class="card" style="padding:12px;margin-bottom:10px"><div style="display:flex;gap:10px;align-items:center"><span style="font-size:30px">'+esc(q.ic||'🧠')+'</span><div style="flex:1"><b>'+esc(q.title)+'</b><div class="fx-hint">'+esc(q.date||'')+' · '+q.qs.length+' سؤال · '+(q.sec||20)+' ث · '+(q.pts||2)+' نقطة/سؤال</div><div class="fx-hint">'+done+' خلّصوا · '+(n-done)+' بدأوا ومخلصوش · '+(q.open?'🟢 مفتوح':'🔒 مقفول')+' · '+((q.allow&&q.allow.length)?'👥 لـ '+q.allow.length+' مشارك بس':'🌍 لكل المشاركين')+'</div></div></div>'
+    + '<div class="sar-actions" style="margin-top:10px;flex-wrap:wrap"><button type="button" class="btn btn-ghost" data-qz="aresults" data-id="'+esc(q.id)+'">📊 النتائج</button><button type="button" class="btn btn-ghost" data-qz="atoggle" data-id="'+esc(q.id)+'">'+(q.open?'🔒 اقفل':'🔓 افتح')+'</button><button type="button" class="btn btn-ghost" data-qz="aallow" data-id="'+esc(q.id)+'">👥 مين يشوفها</button><button type="button" class="btn btn-ghost" data-qz="aedit" data-id="'+esc(q.id)+'">✏️ تعديل</button><button type="button" class="btn btn-ghost" data-qz="adel" data-id="'+esc(q.id)+'">🗑️</button></div></div>';
 }
 window.FXADMIN = window.FXADMIN || {};
 window.FXADMIN.quiz = function(){
@@ -57625,6 +57628,36 @@ async function asave(){
   } finally { S.busy = false; }
   await load(true); render();
 }
+function showAllow(id){
+  var qz = byId(id); if(!qz) return;
+  var sel = {}; (qz.allow||[]).forEach(function(x){ sel[String(x)] = 1; });
+  var old = document.getElementById('qz-sheet'); if(old) old.remove();
+  var o = document.createElement('div'); o.id = 'qz-sheet'; o.className = 'qz-ov';
+  var list = PARTICIPANTS.slice().sort(function(a,b){ return String(a.name).localeCompare(String(b.name),'ar'); });
+  function cnt(){ return Object.keys(sel).length; }
+  function sum(){ var n = cnt(); return n ? '👥 المختارين بس هيشوفوها ('+n+') — الباقي مش هتظهرلهم' : '🌍 مفيش حد متحدد — الأسئلة ظاهرة لكل المشاركين'; }
+  o.innerHTML = '<div class="qz-pnl"><div class="qz-ph"><b>👥 مين يشوف «'+esc(qz.title)+'»</b><button class="qz-x" id="qz-cl">✕</button></div>'
+    + '<div class="fx-hint" id="qz-asum">'+sum()+'</div>'
+    + '<input type="text" class="field" id="qz-asr" placeholder="🔍 دوّر على مشارك..." style="margin:8px 0">'
+    + '<div class="sar-actions" style="margin-bottom:8px"><button type="button" class="btn btn-ghost" id="qz-aall">☑️ الكل</button><button type="button" class="btn btn-ghost" id="qz-anone">🌍 مسح (للكل)</button></div>'
+    + '<div id="qz-alist" style="max-height:48vh;overflow:auto">'+list.map(function(p){ var k = String(p.id); return '<label class="qz-lr qz-arow" data-n="'+esc(String(p.name).toLowerCase())+'" style="cursor:pointer"><input type="checkbox" data-aid="'+esc(k)+'" '+(sel[k]?'checked':'')+' style="width:20px;height:20px;margin-inline-end:10px"><b>'+esc(p.name)+'</b></label>'; }).join('')+'</div>'
+    + '<button type="button" class="btn btn-primary" id="qz-asv" style="width:100%;margin-top:12px">💾 حفظ</button></div>';
+  o.addEventListener('click', function(e){ if(e.target===o || e.target.id==='qz-cl') o.remove(); });
+  document.body.appendChild(o);
+  function refresh(){ var s2 = document.getElementById('qz-asum'); if(s2) s2.textContent = sum(); }
+  o.addEventListener('change', function(e){ var t = e.target; if(t && t.dataset && t.dataset.aid!=null){ if(t.checked) sel[t.dataset.aid] = 1; else delete sel[t.dataset.aid]; refresh(); } });
+  o.querySelector('#qz-asr').addEventListener('input', function(e){ var v = e.target.value.trim().toLowerCase(); o.querySelectorAll('.qz-arow').forEach(function(r){ r.style.display = (!v || r.dataset.n.indexOf(v)>-1) ? '' : 'none'; }); });
+  o.querySelector('#qz-aall').addEventListener('click', function(){ o.querySelectorAll('input[data-aid]').forEach(function(c){ c.checked = true; sel[c.dataset.aid] = 1; }); refresh(); });
+  o.querySelector('#qz-anone').addEventListener('click', function(){ o.querySelectorAll('input[data-aid]').forEach(function(c){ c.checked = false; }); sel = {}; refresh(); });
+  o.querySelector('#qz-asv').addEventListener('click', async function(){
+    var ids = Object.keys(sel), btn = this; btn.disabled = true;
+    var ok = await ju(K, function(c){ c = c||{list:[]}; (c.list||[]).forEach(function(x){ if(x.id===id){ if(ids.length) x.allow = ids; else delete x.allow; } }); return c; });
+    btn.disabled = false;
+    if(!ok){ showToast('معرفتش أحفظ — جرّب تاني', true); return; }
+    o.remove(); showToast(ids.length ? 'اتحفظ — '+ids.length+' مشارك بس هيشوفوها ✅' : 'اتحفظ — ظاهرة لكل المشاركين ✅');
+    await load(true); render();
+  });
+}
 function showResults(id){
   var qz = byId(id); if(!qz) return; var res = (S.res||{})[id]||{};
   var rows = Object.keys(res).map(function(p){ return {p:p, r:res[p]}; }).sort(function(a,b){ return ((b.r.score||0)-(a.r.score||0)) || (((a.r.fin||1e15)-(a.r.st||0))-((b.r.fin||1e15)-(b.r.st||0))); });
@@ -57657,6 +57690,7 @@ document.addEventListener('click', function(ev){
   else if(a==='atoggle') ju(K, function(o){ (o.list||[]).forEach(function(x){ if(x.id===id) x.open = !x.open; }); return o; }).then(function(){ return load(true); }).then(render);
   else if(a==='adel'){ if(confirm('تحذف الاجتماع ده ونتايجه؟')) ju(K, function(o){ o.list = (o.list||[]).filter(function(x){ return x.id!==id; }); return o; }).then(function(){ return ju(KR, function(o){ delete (o||{})[id]; return o||{}; }); }).then(function(){ return load(true); }).then(render); }
   else if(a==='aresults') showResults(id);
+  else if(a==='aallow') showAllow(id);
 });
 document.addEventListener('input', function(ev){
   var t = ev.target; if(!t || !t.dataset) return; var d = S.d; if(!d) return;
