@@ -44331,25 +44331,13 @@ button.glx-cb.go{display:block;width:100%;padding:11px;border-radius:14px;border
     };
   }
 
-  /* ---- الصفحة الرئيسية للمشارك: زرار البحث مكان زرار الخروج ---- */
+  /* ---- الصفحة الرئيسية للمشارك: البحث ملغي (زرار الخروج في مكانه) ---- */
   var prevHome = window.renderProfile;
   if(typeof prevHome === 'function'){
     window.renderProfile = function(){
       var h = prevHome.apply(this, arguments);
       if(typeof h !== 'string') return h;
-      var logoutRe = /<button class="icon-btn" data-action="logout">[\s\S]*?<\/button>/;
-      if(!logoutRe.test(h) || h.indexOf('<div class="top-bar">')<0) return h;
-      var btn = '<button type="button" class="icon-btn msr-btn" data-me-search aria-label="بحث" aria-expanded="'+(S.open?'true':'false')+'">'+SV_S+'</button>';
-      var field = '<div class="msr-field" role="search">'+SV_S+
-        '<input id="msr-q" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="بحث" placeholder="ابحث عن قسم أو جلسة أو زميل…" value="'+E(S.q)+'">'+
-        '<button type="button" class="msr-clear" data-me-search-clear aria-label="مسح"'+(S.q?'':' hidden')+'>'+SV_X+'</button></div>'+
-        '<button type="button" class="msr-cancel" data-me-search-close>إلغاء</button>';
-      var anchor = '<div class="msr-anchor"><div class="msr-panel" id="msr-panel" role="listbox">'+(S.open?panelHtml():'')+'</div></div>';
-      var out = h.replace('<div class="top-bar">','<div class="top-bar msr-row'+(S.open?' msr-open':'')+'">')
-                 .replace(logoutRe, btn)
-                 .replace(/(data-me-search aria-label="بحث"[^>]*>[\s\S]*?<\/button>\s*<\/div>\s*)<\/div>/, function(m,a){ return a+field+'</div>'+anchor; });
-      if(out.indexOf('msr-field')<0) return h;
-      return out.replace(/<button type="button" class="glx-sbar" data-glx-search="1"[^>]*>[\s\S]*?<\/button>/, '');
+      return h.replace(/<button type="button" class="glx-sbar" data-glx-search="1"[^>]*>[\s\S]*?<\/button>/, '');
     };
   }
 
@@ -56317,7 +56305,7 @@ var VIEW_BLOCK = /^(splash|login|signup|welcome|admin|game-|room-|watch-)/;
 var DEMO = null;
 try{
   var q = new URLSearchParams(location.search);
-  if(q.has('gift')){ DEMO = {name:'هدية تجريبية', pts: Math.max(1, parseInt(q.get('pts'),10) || 25), msg:'ده شكل الهدية عند المشاركين 💛', demo:true}; }
+  if(q.has('gift')){ DEMO = {name:'هدية تجريبية', pts: Math.max(1, parseInt(q.get('pts'),10) || 25), msg:'ده شكل الهدية عند المشاركين 💛', demo:true, leg:q.has('leg')}; }
 }catch(e){}
 var dismissedKey = function(){ try{ return sessionStorage.getItem('glv-gift-dismiss'); }catch(e){ return null; } };
 function todayGift(){
@@ -56343,7 +56331,7 @@ function streakBefore(pid){
   var n = 0, k = addDays(dk(), -1), guard = 0;
   while(guard++ < 90){
     var g = D.days[k];
-    if(g && g.pts>0){ if(g.claimed && g.claimed[pid]) n++; else break; }
+    if(g && g.pts>0){ if(covered(pid,k)) n++; else break; }
     k = addDays(k, -1);
   }
   return n;
@@ -56376,22 +56364,50 @@ function chestSvg(){
     + '<g class="gr-body"><rect x="14" y="62" width="192" height="76" rx="10" fill="url(#grb)" stroke="#59606f" stroke-width="2.5"/><rect x="26" y="78" width="168" height="10" rx="5" fill="#111319"/><rect x="26" y="78" width="168" height="10" rx="5" class="gr-led"/><circle cx="34" cy="116" r="4" fill="#59606f"/><circle cx="186" cy="116" r="4" fill="#59606f"/><rect x="92" y="98" width="36" height="30" rx="6" fill="#111319" stroke="#59606f" stroke-width="2"/><circle cx="110" cy="112" r="6" class="gr-lock"/></g>'
     + '<g class="gr-lid"><path d="M14 66 Q14 24 62 22 L158 22 Q206 24 206 66 Z" fill="url(#grl)" stroke="#59606f" stroke-width="2.5"/><rect x="28" y="34" width="164" height="8" rx="4" fill="#111319" opacity=".6"/><rect x="28" y="34" width="164" height="8" rx="4" class="gr-led"/></g></svg>';
 }
+var opening = false;
 function showGift(manual){
+  if(opening || document.getElementById('glv-gift')) return; opening = true;
+  g2load(true).then(function(){ opening = false; buildGift(manual); }, function(){ opening = false; buildGift(manual); });
+}
+function buildGift(manual){
   if(document.getElementById('glv-gift')) return;
   var g = todayGift(), none = !g, was = !none && !DEMO && iClaimed(); if(none) g = {pts:0,name:'',msg:''};
-  var tier = tierOf(g.pts), col = GR_C[tier-1];
+  var se = safe(window.glvSeasonNow), fe = safe(window.glvFeastToday);
   var s0 = DEMO ? 0 : streakBefore(state.pid), sShow = was ? s0+1 : s0;
-  function segs(n){ var f = n%7, h = ''; if(n>0 && f===0) f = 7; for(var i=0;i<7;i++) h += '<i class="'+(i<f?'on':(i===f?'nx':''))+'"></i>'; return h; }
+  var leg = !none && !was && (DEMO ? !!DEMO.leg : ((s0+1)%7===0));
+  var u = G2.d || g2def(), hasX = u.x2>0 && !none && !was && !DEMO, useX = false;
+  var baseMult = 1 + (leg?1:0) + (fe?1:0), expPts = g.pts*baseMult;
+  var tier = leg ? 3 : tierOf(expPts), col = GR_C[tier-1];
+  var mi = DEMO ? null : missInfo();
+  function segs(n){ var f = n%7, h = ''; if(n>0 && f===0) f = 7; for(var i=0;i<7;i++) h += '<i class="'+(i<f?'on':(i===f?'nx':''))+(i===6?' lg':'')+'"></i>'; return h; }
+  var title = fe ? fe.e+' هدية '+fe.n : se ? se.e+' هدية '+se.n : 'الهدية اليومية';
+  var bn = '';
+  if(leg) bn += '<div class="gr-bn lg">👑 النهارده اليوم السابع! نقط ×٢ + درع سلسلة مضمون 🛡️</div>';
+  if(fe && !none) bn += '<div class="gr-bn fe">'+fe.e+' '+esc(fe.n)+' — نقط الهدية ×٢ النهارده!</div>';
+  else if(se) bn += '<div class="gr-bn se">'+se.e+' موسم '+esc(se.n)+' — شاركك بالحضور والأسئلة وافتح شارات الموسم</div>';
+  var miss = '';
+  if(mi){
+    var dl = mi.day; try{ var pp = mi.day.split('-'); dl = new Date(+pp[0],+pp[1]-1,+pp[2]).toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'}); }catch(e){}
+    miss = u.sh>0 ? '<div class="gr-ms"><span>🛡️ فاتك هدية '+esc(dl)+' وسلسلتك ('+mi.chain+' 🔥) هتتقطع.</span><button type="button" class="gr-mb">استخدم درع (عندك '+u.sh+')</button></div>'
+      : '<div class="gr-ms off"><span>⚠️ فاتك هدية '+esc(dl)+' وسلسلتك ('+mi.chain+' 🔥) اتقطعت. الدرع 🛡️ بيحميها — بتكسبه من الصناديق.</span></div>';
+  }
   var el = document.createElement('div'); el.id = 'glv-gift'; el.className = 'gr-back'; el.style.setProperty('--gc', col);
+  if(se){ var sc = se.c.split(','); el.style.setProperty('--s1', sc[0]); el.style.setProperty('--s2', sc[1]); el.classList.add('gr-se'); }
   el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true');
+  var odds = BO.filter(function(o){ return o[0]!=='none'; }).map(function(o){ return BI[o[0]][0]+' '+o[1]+'٪'; }).join(' · ');
   el.innerHTML = '<div class="gr-sheet"><div class="gr-grab"></div>'
-    + '<div class="gr-hd"><span class="gr-hi">🎁</span><b>الهدية اليومية</b><button type="button" class="gr-x" aria-label="إغلاق">✕</button></div>'
-    + '<div class="gr-stage"><div class="gr-chw">'+chestSvg()+'<div class="gr-beam"></div></div><div class="gr-reel" style="display:none"><div class="gr-mk"></div><div class="gr-trk"></div></div><div class="gr-win" style="display:none"></div><div class="gr-flash"></div></div>'
-    + '<div class="gr-rar">'+GR_N.map(function(n,i){ return '<span><i style="background:'+GR_C[i]+'"></i>'+n+'</span>'; }).join('')+'<em>'+esc(g.name||'هدية اليوم')+' · '+(tier===3?'أسطورية':tier===2?'نادرة':'عادية')+'</em></div>'
+    + '<div class="gr-hd"><span class="gr-hi">'+(fe?fe.e:se?se.e:'🎁')+'</span><b>'+esc(title)+'</b><button type="button" class="gr-x" aria-label="إغلاق">✕</button></div>'
+    + '<div class="gr-stage"><div class="gr-chw'+(leg?' leg':'')+'">'+chestSvg()+'<div class="gr-beam"></div></div><div class="gr-reel" style="display:none"><div class="gr-mk"></div><div class="gr-trk"></div></div><div class="gr-win" style="display:none"></div><div class="gr-flash"></div></div>'
+    + bn
+    + '<div class="gr-rar">'+GR_N.map(function(n,i){ return '<span><i style="background:'+GR_C[i]+'"></i>'+n+'</span>'; }).join('')+'<em>'+esc(g.name||'هدية اليوم')+'</em></div>'
+    + '<div class="gr-od">🎲 فرصة مكافأة إضافية في الصندوق: '+odds+'</div>'
     + '<div class="gr-ds">'+esc(g.msg || 'افتح هديتك اليومية وكسّب نقاط! كل يوم بتفتح فيه بتزوّد سلسلتك 🔥')+'</div>'
-    + '<div class="gr-st"><span class="gr-fi">🔥</span><div><b class="gr-sn">x'+sShow+' يوم</b><small>متتالي</small></div><div class="gr-sg">'+segs(sShow)+'</div></div>'
-    + '<button type="button" class="gr-btn">🎁 استلم الآن</button>'
-    + '<div class="gr-ft">استلمها قبل نهاية اليوم — فاضل <b class="gr-cd">'+untilReset()+'</b></div></div>';
+    + miss
+    + (hasX ? '<button type="button" class="gr-x2">⚡ استخدم كارت ×٢ (عندك '+u.x2+') — يزوّد نقاط هديتك</button>' : '')
+    + '<div class="gr-st"><span class="gr-fi">🔥</span><div><b class="gr-sn">x'+sShow+' يوم</b><small>متتالي'+(u.sh?' · 🛡️'+u.sh:'')+'</small></div><div class="gr-sg">'+segs(sShow)+'</div></div>'
+    + '<button type="button" class="gr-btn">🎁 استلم الآن'+(expPts>g.pts&&!none?' (+'+expPts+')':'')+'</button>'
+    + '<div class="gr-ft">استلمها قبل نهاية اليوم — فاضل <b class="gr-cd">'+untilReset()+'</b></div>'
+    + '<button type="button" class="gr-my" data-action="tile-nav" data-page="mygifts">📜 هداياي'+(inboxNew().length?' <u>'+inboxNew().length+' جديدة</u>':'')+'</button></div>';
   document.body.appendChild(el);
   var $ = function(s){ return el.querySelector(s); }, btn = $('.gr-btn'), cd = $('.gr-cd'), busy = false, opened = false;
   var timer = setInterval(function(){ if(!document.body.contains(el)){ clearInterval(timer); return; } cd.textContent = untilReset(); }, 1000);
@@ -56400,7 +56416,7 @@ function showGift(manual){
     btn.disabled = true; btn.textContent = none ? 'مفيش هدية النهارده' : 'استلمت ✓';
     $('.gr-ds').textContent = none ? 'مفيش هدية النهارده — بكرة ممكن تلاقي مفاجأة 🎁' : 'استلمت هدية النهارده 💛 ارجع بكرة تكمّل سلسلتك';
     $('.gr-ft').innerHTML = 'الهدية الجاية بعد <b class="gr-cd">'+untilReset()+'</b>'; cd = $('.gr-cd');
-    if(none){ var em = $('.gr-rar em'); if(em) em.style.display = 'none'; }
+    if(none){ var em = $('.gr-rar em'); if(em) em.style.display = 'none'; var od = $('.gr-od'); if(od) od.style.display = 'none'; }
   }
   function close(dismiss){
     if(dismiss && !opened && !DEMO){ try{ sessionStorage.setItem('glv-gift-dismiss', dk()); }catch(e){} }
@@ -56408,25 +56424,37 @@ function showGift(manual){
     setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); if(opened && !DEMO){ try{ render(); }catch(e){} } }, 320);
   }
   $('.gr-x').onclick = function(){ if(!busy) close(true); };
-  el.addEventListener('click', function(e){ if(e.target===el && !busy) close(!opened); });
-  function mkCard(pts, em, win){
-    var t = tierOf(pts), c = GR_C[t-1];
-    return '<div class="gr-cd2'+(win?' w':'')+'" style="--cc:'+c+'"><span class="e">'+em+'</span><b>+'+pts+'</b><i></i></div>';
+  el.addEventListener('click', function(e){ if(e.target===el && !busy) close(!opened); if(e.target.closest && e.target.closest('.gr-my')) close(false); });
+  var xb = $('.gr-x2'); if(xb) xb.onclick = function(){ useX = !useX; xb.classList.toggle('on', useX); var m2 = baseMult+(useX?1:0); btn.textContent = '🎁 استلم الآن (+'+(g.pts*m2)+')'; };
+  var mb = $('.gr-mb'); if(mb) mb.onclick = async function(){
+    if(busy) return; busy = true; mb.disabled = true; var ok = await useShield(mi.day); busy = false;
+    if(ok){ toast('🛡️ الدرع حمى سلسلتك!'); fxCall('coin'); close(false); setTimeout(function(){ showGift(manual); }, 360); }
+    else { mb.disabled = false; toast('معرفتش أستخدم الدرع', true); }
+  };
+  function mkCard(label, em, tr, win){
+    var c = GR_C[tr-1];
+    return '<div class="gr-cd2'+(win?' w':'')+'" style="--cc:'+c+'"><span class="e">'+em+'</span><b>'+label+'</b><i></i></div>';
+  }
+  function decoy(){
+    if(Math.random()<.32){ var ks = ['f','t','x2','sh','pts']; var k = ks[Math.floor(Math.random()*ks.length)]; var b = k==='pts'?{k:k,v:10}:{k:k}; return mkCard(bonusLabel(b), BI[k][0], bonusTier(b), false); }
+    var rp = GR_PTS[Math.floor(Math.random()*GR_PTS.length)]; return mkCard('+'+rp, GR_EM[Math.floor(Math.random()*GR_EM.length)], tierOf(rp), false);
   }
   async function go(){
     if(busy || opened) return; busy = true; btn.disabled = true; btn.textContent = 'جاري الفتح…';
     el.classList.add('charge'); vib([30,40,30,40,30,40,40,40,60]); fxCall('coin');
-    var t0 = Date.now(), r = await (DEMO ? Promise.resolve({ok:true, pts:g.pts, demo:true}) : claim(g));
+    var plan = {mult: baseMult+(useX?1:0), useX: useX, bonus: leg ? {k:'sh'} : rollBonus(), leg: leg, fe: !!fe, ns: s0+1, tier: tier};
+    var t0 = Date.now(), r = await (DEMO ? Promise.resolve({ok:true, pts:g.pts*plan.mult+(plan.bonus.k==='pts'?plan.bonus.v:0), base:g.pts*plan.mult, bonus:plan.bonus, mult:plan.mult}) : claim(g, plan));
     var wait = 1500-(Date.now()-t0); if(wait>0) await new Promise(function(ok){ setTimeout(ok, wait); });
     if(!r.ok){ el.classList.remove('charge'); busy = false; btn.disabled = false; btn.textContent = '🎁 استلم الآن'; toast('معرفناش نفتح الهدية — اتأكد من النت وجرّب تاني', true); return; }
     if(r.already){ opened = true; busy = false; el.classList.remove('charge'); btn.disabled = false; btn.textContent = 'تمام 💛'; btn.onclick = function(){ close(false); }; $('.gr-ds').textContent = 'استلمت هدية النهارده قبل كده 💛'; return; }
-    /* لفة الكروت */
+    var item = r.bonus && r.bonus.k!=='none' ? r.bonus : null, ftier = leg ? 3 : Math.max(tierOf(r.pts), item ? bonusTier(item) : 1), fcol = GR_C[ftier-1];
     el.classList.add('flash'); setTimeout(function(){ el.classList.remove('flash'); }, 500);
     $('.gr-chw').style.display = 'none'; var reel = $('.gr-reel'), trk = $('.gr-trk'); reel.style.display = '';
     var N = 46, W = 38, STEP = 94, cards = '';
+    var gem = leg ? '👑' : ftier===3 ? '👑' : ftier===2 ? '🏆' : '🎁';
     for(var i=0;i<N;i++){
-      if(i===W) cards += mkCard(r.pts, tier===3?'👑':tier===2?'🏆':'🎁', true);
-      else { var rp = GR_PTS[Math.floor(Math.random()*GR_PTS.length)]; cards += mkCard(rp, GR_EM[Math.floor(Math.random()*GR_EM.length)], false); }
+      if(i===W) cards += item ? mkCard(bonusLabel(item), BI[item.k][0], bonusTier(item), true) : mkCard('+'+r.pts, gem, ftier, true);
+      else cards += decoy();
     }
     trk.innerHTML = cards; trk.style.paddingLeft = (reel.clientWidth/2-42)+'px';
     var jit = (Math.random()-.5)*50, target = -(W*STEP)+jit;
@@ -56435,14 +56463,16 @@ function showGift(manual){
     (function watch(){ try{ var x = new DOMMatrix(getComputedStyle(trk).transform).m41, idx = Math.floor(-x/STEP+.5); if(idx!==last){ last = idx; tick(); } }catch(e){} raf = requestAnimationFrame(watch); })();
     an.onfinish = function(){
       cancelAnimationFrame(raf); opened = true; busy = false; vib([40,30,80]);
-      reel.style.display = 'none'; var wn = $('.gr-win'); wn.style.display = '';
-      wn.innerHTML = '<div class="gr-wc" style="--cc:'+col+'"><div class="gr-tg">'+(tier===3?'أسطورية':tier===2?'نادرة':'هدية')+'</div><div class="gr-we">'+(tier===3?'👑':tier===2?'🏆':'🎁')+'</div><div class="gr-wn">'+esc(g.name||'هدية اليوم')+'</div><div class="gr-wp">+<b class="gr-num">0</b> نقطة</div></div>';
-      countUp($('.gr-num'), r.pts, 900);
-      var br = el.getBoundingClientRect(); burst(el, br.width/2, br.height*.42, tier);
+      el.style.setProperty('--gc', fcol); reel.style.display = 'none'; var wn = $('.gr-win'); wn.style.display = '';
+      var bl = item ? (item.k==='pts' ? '🪙 +'+item.v+' نقطة إضافية' : BI[item.k][0]+' '+BI[item.k][1]+' اتضاف لمخزنك') : '';
+      wn.innerHTML = '<div class="gr-wc" style="--cc:'+fcol+'"><div class="gr-tg">'+(leg?'صندوق اليوم السابع':ftier===3?'أسطورية':ftier===2?'نادرة':'هدية')+'</div><div class="gr-we">'+(item&&item.k!=='pts'?BI[item.k][0]:gem)+'</div><div class="gr-wn">'+esc(g.name||'هدية اليوم')+(r.mult>1?' ×'+r.mult:'')+'</div><div class="gr-wp">+<b class="gr-num">0</b> نقطة</div>'+(bl?'<div class="gr-wb">'+bl+'</div>':'')+'</div>';
+      countUp($('.gr-num'), r.base + (item&&item.k==='pts'?item.v:0), 900);
+      var br = el.getBoundingClientRect(); burst(el, br.width/2, br.height*.42, ftier);
       fxCall('coin');
       var ns = DEMO ? 1 : s0+1; $('.gr-sn').textContent = 'x'+ns+' يوم'; $('.gr-sg').innerHTML = segs(ns);
-      el.classList.remove('charge'); $('.gr-ds').textContent = '+'+r.pts+' نقطة اتضافت لنقاطك ✨';
+      el.classList.remove('charge'); $('.gr-ds').textContent = '+'+(r.base+(item&&item.k==='pts'?item.v:0))+' نقطة اتضافت لنقاطك ✨';
       var tomorrow = D.days[addDays(dk(),1)]; $('.gr-ft').innerHTML = (!DEMO && tomorrow && tomorrow.pts>0 ? '🎁 فيه هدية مستنياك بكرة — ' : '')+'الهدية الجاية بعد <b class="gr-cd">'+untilReset()+'</b>'; cd = $('.gr-cd');
+      var x2 = $('.gr-x2'); if(x2) x2.style.display = 'none';
       btn.disabled = false; btn.textContent = 'تمام 🎉'; btn.onclick = function(){ close(false); };
     };
   }
@@ -56451,7 +56481,7 @@ function showGift(manual){
 window.glvGiftBtn = function(){
   try{
     if(typeof state==='undefined' || !state || !state.pid) return '';
-    var g = todayGift(), dot = !!g && !iClaimed();
+    g2load(false); var g = todayGift(), dot = (!!g && !iClaimed()) || inboxNew().length>0;
     return '<button class="icon-btn gr-top'+(g?'':' off')+'" data-gfopen="1" title="الهدية اليومية" aria-label="الهدية اليومية"><span style="font-size:18px;line-height:1">🎁</span>'+(dot?'<span class="gr-dot"></span>':'')+'</button>';
   }catch(e){ return ''; }
 };
@@ -56479,7 +56509,19 @@ function gfCss(){
   + '.gr-ds{font-size:14px;line-height:1.7;color:#e7eaf0;margin:6px 2px 12px;min-height:44px}.gr-st{display:flex;align-items:center;gap:10px;margin-bottom:14px}.gr-fi{font-size:26px}.gr-st b{display:block;font-size:15px}.gr-st small{color:#8f97a6;font-size:12px}.gr-sg{display:flex;gap:5px;flex:1;direction:ltr}.gr-sg i{flex:1;height:18px;transform:skewX(-20deg);border-radius:3px;background:#2a2f3a}.gr-sg i.on{background:linear-gradient(#5fffa8,#1fcf73);box-shadow:0 0 8px rgba(46,232,139,.5)}.gr-sg i.nx{background:transparent;border:2px solid #5fffa8;animation:grNx 1.2s infinite}@keyframes grNx{50%{opacity:.35}}'
   + '.gr-btn{width:100%;padding:15px;border:0;border-radius:14px;background:linear-gradient(#6bff3a,#3fd60f);color:#0b1a05;font:inherit;font-size:17px;font-weight:900;cursor:pointer}.gr-btn:disabled{background:#222730;color:#555d6b;cursor:default}.gr-ft{text-align:center;font-size:12.5px;color:#8f97a6;margin-top:10px}.gr-ft b{color:#fff;font-variant-numeric:tabular-nums}'
   + '.gr-top{position:relative}.gr-top.off{opacity:.45}.gr-dot{position:absolute;top:3px;right:3px;width:10px;height:10px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 0 2px var(--surface,#12151b);animation:grDot 1.4s infinite}@keyframes grDot{50%{transform:scale(1.35)}}'
-  + '.gr-pt{position:absolute;pointer-events:none}';
+  + '.gr-pt{position:absolute;pointer-events:none}'
+  + '.gr-bn{margin-top:10px;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.6;background:rgba(255,255,255,.07)}.gr-bn.lg{background:linear-gradient(135deg,rgba(255,176,32,.25),rgba(255,107,157,.2));color:#FFD66B;font-weight:800}.gr-bn.fe{background:rgba(255,94,126,.18);color:#FFB3C1;font-weight:800}.gr-bn.se{background:linear-gradient(135deg,color-mix(in srgb,var(--s1,#888) 30%,transparent),color-mix(in srgb,var(--s2,#888) 25%,transparent));font-size:12.5px}'
+  + '.gr-od{font-size:11.5px;color:#8f97a6;margin:0 2px 4px}.gr-se .gr-stage{background:radial-gradient(ellipse at 50% 85%,color-mix(in srgb,var(--s1) 38%,transparent),transparent 70%),linear-gradient(#000,#07090d)}'
+  + '.gr-chw.leg .gr-chest{filter:drop-shadow(0 0 22px #FFB020) drop-shadow(0 12px 18px rgba(0,0,0,.7))}.gr-sg i.lg{border:2px solid #FFB020;background:rgba(255,176,32,.2)}.gr-sg i.lg.on{background:linear-gradient(#FFD66B,#FFB020);box-shadow:0 0 10px #FFB020}'
+  + '.gr-ms{display:flex;align-items:center;gap:8px;margin:2px 0 10px;padding:10px 12px;border-radius:12px;background:rgba(91,141,239,.16);font-size:12.5px;line-height:1.6}.gr-ms.off{background:rgba(255,255,255,.06);color:#c9ced8}.gr-ms span{flex:1}.gr-mb{border:0;border-radius:10px;padding:8px 12px;background:#5B8DEF;color:#fff;font:inherit;font-weight:800;cursor:pointer;white-space:nowrap}.gr-mb:disabled{opacity:.5}'
+  + '.gr-x2{width:100%;margin:0 0 10px;padding:10px;border-radius:12px;border:1.5px dashed #FFB020;background:transparent;color:#FFD66B;font:inherit;font-weight:800;cursor:pointer}.gr-x2.on{background:rgba(255,176,32,.2);border-style:solid}'
+  + '.gr-wb{margin-top:6px;font-size:12.5px;color:#fff;background:rgba(255,255,255,.1);border-radius:10px;padding:5px 8px}.gr-my{width:100%;margin-top:10px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:transparent;color:#fff;font:inherit;font-weight:800;cursor:pointer}.gr-my u{text-decoration:none;background:#ff3b5c;border-radius:99px;padding:1px 8px;font-size:11px;margin-inline-start:6px}'
+  + '.gf2-kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0}.gf2-kp div{padding:10px 4px;border-radius:14px;background:rgba(255,255,255,.07);text-align:center;font-size:12px;color:var(--text-muted)}.gf2-kp b{display:block;font-size:20px;color:var(--text)}.gf2-inv{display:flex;gap:8px;margin-bottom:10px}.gf2-inv span{flex:1;text-align:center;padding:8px;border-radius:12px;background:rgba(255,176,32,.12);font-size:13px}'
+  + '.gf2-card{padding:14px;margin-bottom:10px}.gf2-t{font-weight:900;font-size:15px;margin-bottom:8px}.gf2-hint{font-size:12.5px;color:var(--text-muted);line-height:1.8;margin:4px 0}.gf2-ok{padding:10px;border-radius:12px;background:rgba(46,232,139,.12);color:#2EE88B;font-size:13px}.gf2-res{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.gf2-pp{padding:7px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font:inherit;font-size:13px;cursor:pointer}.gf2-pp.on{background:linear-gradient(135deg,#FFB020,#FF6B9D);color:#fff;border-color:transparent}.gf2-sel{font-size:13px;margin:6px 0}'
+  + '.gf2-r{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}.gf2-r:last-child{border:0}.gf2-r small{display:block;color:var(--text-muted);font-size:12px}.gf2-r i{font-style:normal;color:var(--text-muted);font-size:12px}'
+  + '.gf2-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.gf2-dn{text-align:center;font-size:10.5px;color:var(--text-muted)}.gf2-c{aspect-ratio:1;border-radius:10px;background:rgba(255,255,255,.05);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;line-height:1.2}.gf2-c.out{background:none}.gf2-c b{font-weight:700;color:var(--text-muted)}.gf2-c span{font-size:13px}.gf2-c.ok{background:rgba(46,232,139,.18)}.gf2-c.sh{background:rgba(91,141,239,.2)}.gf2-c.ms{background:rgba(255,94,126,.12);opacity:.7}.gf2-c.td{background:rgba(255,176,32,.25);animation:grDot 1.4s infinite}.gf2-c.now{outline:2px solid var(--gold,#F4B740)}.gf2-lg{display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:11.5px;color:var(--text-muted)}'
+  + '.gf2-ov{position:fixed;inset:0;z-index:100030;background:rgba(3,5,10,.75);display:flex;align-items:center;justify-content:center}.gf2-pop{width:80%;max-width:320px;text-align:center;padding:22px 16px;border-radius:22px;background:#0f1218;color:#fff;border:2px solid #FFB020;animation:grPop .5s}.gf2-bx{font-size:72px}.gf2-bx.sh{animation:grShake .12s linear infinite}.gf2-fr{margin-top:6px;font-size:16px}.gf2-mg{margin:8px 0;color:#FFD66B}.gf2-pt{font-size:22px;color:#FFD66B;margin:10px 0;opacity:0}.gf2-pop.rv .gf2-pt{opacity:1}'
+;
   document.head.appendChild(s);
 }
 gfCss();
@@ -56512,31 +56554,218 @@ function burst(root, cx, cy, tier){
 }
 
 /* استلام الهدية: خطوة ذرّية على Firebase عشان محدش ياخدها مرتين (حتى من جهازين) */
-async function claim(g){
-  var pid = state.pid, key = dk(), won = false, pts = 0;
+async function claim(g, plan){
+  plan = plan || {mult:1, bonus:{k:'none'}};
+  var pid = state.pid, key = dk(), won = false, base = 0, usedX = false;
+  if(plan.useX){
+    await g2upd(function(o){ usedX = false; if(o.x2>0){ o.x2--; usedX = true; } });
+    if(!usedX) plan.mult = Math.max(1, plan.mult-1);
+  }
+  async function refundX(){ if(usedX){ usedX = false; await g2upd(function(o){ o.x2++; }); } }
   var res = await jupd(function(o){
-    var d = o.days[key]; if(!d || !(d.pts>0)) return o;
+    won = false; var d = o.days[key]; if(!d || !(d.pts>0)) return o;
     d.claimed = d.claimed || {};
     if(d.claimed[pid]) return o;
-    d.claimed[pid] = Date.now(); won = true; pts = d.pts; return o;
+    d.claimed[pid] = Date.now(); won = true; base = d.pts*plan.mult; return o;
   });
-  if(!res) return {ok:false};
-  if(!won){ await load(true); return {ok:true, already:true}; }
-  var saved = false;
+  if(!res){ await refundX(); return {ok:false}; }
+  if(!won){ await refundX(); await load(true); return {ok:true, already:true}; }
+  var b = plan.bonus || {k:'none'}, extra = b.k==='pts' ? b.v : 0, total = base+extra, saved = false;
   try{
-    var b = await loadBonus(); if(b && !b.__stale) BONUS = b;
-    BONUS[pid] = (BONUS[pid]||0) + pts;
+    var bb = await loadBonus(); if(bb && !bb.__stale) BONUS = bb;
+    BONUS[pid] = (BONUS[pid]||0) + total;
     saved = await saveBonus(BONUS);
   }catch(e){ saved = false; }
   if(!saved){
-    try{ BONUS[pid] = (BONUS[pid]||0) - pts; }catch(e){}
+    try{ BONUS[pid] = (BONUS[pid]||0) - total; }catch(e){}
     await jupd(function(o){ var d = o.days[key]; if(d && d.claimed) delete d.claimed[pid]; return o; });
-    return {ok:false};
+    await refundX(); return {ok:false};
   }
-  try{ pushNotification(pid, '🎁 استلمت هدية «'+(g.name||'اليوم')+'» وكسبت +'+pts+' نقطة', '🎁'); }catch(e){}
+  var logged = await g2upd(function(o){
+    if(b.k==='sh') o.sh++; else if(b.k==='x2') o.x2++;
+    o.log = o.log.filter(function(x){ return x.d!==key; });
+    o.log.unshift({d:key, p:total, t:plan.tier||1, k:b.k, v:b.v||0, l:plan.leg?1:0, f:plan.fe?1:0});
+    o.log = o.log.slice(0,30); if((plan.ns||0)>o.best) o.best = plan.ns;
+  });
+  if(!logged) toast('النقط اتضافت لكن مكافأة الصندوق ما اتسجلتش — كلّم الأدمن', true);
+  else { if(b.k==='f') await quizAdd(1,0); else if(b.k==='t') await quizAdd(0,1); }
+  try{ pushNotification(pid, '🎁 استلمت هدية «'+(g.name||'اليوم')+'» وكسبت +'+total+' نقطة'+(b.k&&b.k!=='none'&&b.k!=='pts' ? ' + '+BI[b.k][1] : ''), '🎁'); }catch(e){}
   await load(true);
-  return {ok:true, pts:pts};
+  return {ok:true, pts:total, base:base, bonus:b, mult:plan.mult};
 }
+
+/* ====================== مخزن المشارك: درع، كروت، سجل، إهداء ====================== */
+var KU = function(pid){ return 'glavera-gift2-u-'+pid; };
+var KSEND = 'glavera-gift2-send-v1', KQI = 'glavera-quiz-inv-v1';
+var G2 = {pid:null, d:null, t:0, p:null, send:[], sig:''};
+function g2def(){ return {sh:0, x2:0, log:[], best:0, used:{}, sent:{}}; }
+function safe(f){ try{ return typeof f==='function' ? f() : null; }catch(e){ return null; } }
+function weekKey(){ var n = new Date(), off = (n.getDay()+1)%7; return dk(new Date(n.getFullYear(), n.getMonth(), n.getDate()-off)); }
+function uid2(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+async function sget(k, def){ try{ var r = await window.storage.get(k, true); if(!r || r.value==null || r.value==='') return def; return typeof r.value==='string' ? JSON.parse(r.value) : r.value; }catch(e){ return def; } }
+function supd(k, fn){
+  try{ return window.storage.update(k, function(cur){ var o = null; try{ o = cur ? (typeof cur==='string' ? JSON.parse(cur) : cur) : null; }catch(e){} return JSON.stringify(fn(o)); }, true); }
+  catch(e){ return Promise.resolve(null); }
+}
+function g2upd(fn){
+  var pid = state.pid, snap = null;
+  try{
+    return window.storage.update(KU(pid), function(cur){
+      var o = null; try{ o = cur ? (typeof cur==='string' ? JSON.parse(cur) : cur) : null; }catch(e){}
+      o = Object.assign(g2def(), o||{}); o.used = o.used||{}; o.sent = o.sent||{}; o.log = o.log||[];
+      fn(o); snap = JSON.parse(JSON.stringify(o)); return JSON.stringify(o);
+    }, true).then(function(r){ if(r && snap){ G2.pid = pid; G2.d = snap; G2.t = Date.now(); } return r; });
+  }catch(e){ return Promise.resolve(null); }
+}
+function sendUpd(fn){ return supd(KSEND, function(o){ o = o||{list:[]}; o.list = o.list||[]; return fn(o)||o; }); }
+async function addPtsMe(pts){
+  var m = state.pid;
+  try{ var b = await loadBonus(); if(b && !b.__stale) BONUS = b; BONUS[m] = (BONUS[m]||0)+pts; var ok = await saveBonus(BONUS); if(!ok) BONUS[m] = Math.max(0,(BONUS[m]||0)-pts); return !!ok; }
+  catch(e){ try{ BONUS[m] = Math.max(0,(BONUS[m]||0)-pts); }catch(e2){} return false; }
+}
+function g2load(force){
+  var pid = state.pid; if(!pid) return Promise.resolve();
+  if(G2.pid!==pid){ G2.pid = pid; G2.d = null; G2.send = []; G2.sig = ''; }
+  if(!force && G2.d && Date.now()-G2.t < 25000) return Promise.resolve();
+  if(G2.p) return G2.p;
+  G2.p = (async function(){
+    var u = await sget(KU(pid), null), s = await sget(KSEND, {list:[]});
+    G2.d = Object.assign(g2def(), u||{}); G2.d.used = G2.d.used||{}; G2.d.sent = G2.d.sent||{}; G2.d.log = G2.d.log||[];
+    G2.send = (s && s.list) || []; G2.t = Date.now();
+    var sig = JSON.stringify([G2.d, G2.send.length, inboxNew().length]); var ch = sig!==G2.sig; G2.sig = sig;
+    settleSent();
+    if(ch && !document.getElementById('glv-gift') && (state.view==='mygifts' || state.view==='profile')){ var a = document.activeElement; if(!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))){ try{ render(); }catch(e){} } }
+  })().then(function(){ G2.p = null; }, function(){ G2.p = null; });
+  return G2.p;
+}
+function inbox(){ return G2.send.filter(function(x){ return String(x.to)===String(state.pid); }).sort(function(a,b){ return b.t-a.t; }); }
+function inboxNew(){ return inbox().filter(function(x){ return !x.op; }); }
+var settling = false;
+async function settleSent(){
+  if(settling) return; var me = String(state.pid); var todo = G2.send.filter(function(x){ return String(x.from)===me && x.op && !x.sp; }); if(!todo.length) return; settling = true;
+  try{
+    var ids = {}, n = 0;
+    var ok = await sendUpd(function(o){ ids = {}; n = 0; o.list.forEach(function(x){ if(String(x.from)===me && x.op && !x.sp){ x.sp = 1; ids[x.id] = 1; n++; } }); return o; });
+    if(!ok || !n) return;
+    if(!(await addPtsMe(3*n))){ await sendUpd(function(o){ o.list.forEach(function(x){ if(ids[x.id]) delete x.sp; }); return o; }); return; }
+    try{ pushNotification(me, '🎁 صاحبك فتح هديتك — +'+(3*n)+' نقطة ليك', '🎁'); }catch(e){}
+  } finally { settling = false; }
+}
+/* ---------- سلسلة + درع ---------- */
+function covered(pid, k){ var g = D.days[k]; return !!((g && g.claimed && g.claimed[pid]) || (String(pid)===String(G2.pid) && G2.d && G2.d.used && G2.d.used[k])); }
+function missInfo(){
+  var pid = state.pid; if(!pid || !G2.d) return null;
+  var k = addDays(dk(),-1), guard = 0, miss = null;
+  while(guard++ < 30){ var g = D.days[k]; if(g && g.pts>0){ if(!covered(pid,k)){ miss = k; } break; } k = addDays(k,-1); }
+  if(!miss) return null;
+  var n = 0; k = addDays(miss,-1); guard = 0;
+  while(guard++ < 90){ var g2 = D.days[k]; if(g2 && g2.pts>0){ if(covered(pid,k)) n++; else break; } k = addDays(k,-1); }
+  return n>0 ? {day:miss, chain:n} : null;
+}
+async function useShield(day){
+  var ok = false;
+  var r = await g2upd(function(o){ ok = false; if(o.sh>0 && !o.used[day]){ o.sh--; o.used[day] = 1; ok = true; } });
+  return !!(r && ok);
+}
+/* ---------- مكافآت ---------- */
+var BO = [['none',38],['pts',22],['f',10],['t',10],['x2',10],['sh',10]];
+var BI = {pts:['🪙','نقط إضافية'], f:['✂️','كارت 50/50'], t:['⏱️','كارت +10 ثواني'], x2:['⚡','كارت ×٢'], sh:['🛡️','درع السلسلة']};
+function rollBonus(){
+  var r = Math.random()*100, acc = 0, k = 'none';
+  for(var i=0;i<BO.length;i++){ acc += BO[i][1]; if(r<acc){ k = BO[i][0]; break; } }
+  return k==='pts' ? {k:k, v:[5,10,10,15][Math.floor(Math.random()*4)]} : {k:k};
+}
+function bonusTier(b){ return b.k==='sh'||b.k==='x2' ? 3 : b.k==='f'||b.k==='t' ? 2 : (b.k==='pts'?1:1); }
+function bonusLabel(b){ return b.k==='pts' ? '+'+b.v : b.k==='f' ? '50/50' : b.k==='t' ? '+10ث' : b.k==='x2' ? '×٢' : 'درع'; }
+async function quizAdd(f, t){
+  try{ var pid = state.pid; await window.storage.update(KQI, function(cur){ var o = null; try{ o = cur ? (typeof cur==='string' ? JSON.parse(cur) : cur) : null; }catch(e){} o = o||{}; var m = o[pid] = o[pid]||{}; m.f = (m.f||0)+f; m.t = (m.t||0)+t; return JSON.stringify(o); }, true); }catch(e){}
+}
+
+/* ====================== صفحة هداياي ====================== */
+var M = {q:'', to:null, msg:'', busy:false, tab:'mine'};
+function nmOf(pid){ var p = (PARTICIPANTS||[]).filter(function(x){ return String(x.id)===String(pid); })[0]; return p ? (p.name||p.fullName||'مشارك') : 'مشارك'; }
+function normA(s){ return String(s||'').replace(/[ً-ٰٟ\s]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase(); }
+function peopleHtml(){
+  var q = normA(M.q); if(!q) return '<div class="gf2-hint">اكتب اسم صاحبك…</div>';
+  var l = (PARTICIPANTS||[]).filter(function(p){ return String(p.id)!==String(state.pid) && normA(p.name||p.fullName).indexOf(q)>-1; }).slice(0,6);
+  return l.length ? l.map(function(p){ return '<button type="button" class="gf2-pp'+(String(M.to)===String(p.id)?' on':'')+'" data-gf2="pick" data-id="'+esc(p.id)+'">'+esc(p.name||p.fullName)+'</button>'; }).join('') : '<div class="gf2-hint">مفيش حد بالاسم ده</div>';
+}
+function calHtml(){
+  var n = new Date(), y = n.getFullYear(), m = n.getMonth(), pid = state.pid, today = dk();
+  var first = new Date(y,m,1), days = new Date(y,m+1,0).getDate(), off = (first.getDay()+1)%7;
+  var head = ['سبت','أحد','إثنين','تلات','أربع','خميس','جمعة'].map(function(x){ return '<div class="gf2-dn">'+x+'</div>'; }).join(''), cells = '';
+  for(var i=0;i<off;i++) cells += '<div class="gf2-c out"></div>';
+  for(var d=1; d<=days; d++){
+    var key = y+'-'+pad(m+1)+'-'+pad(d), g = D.days[key], has = g && g.pts>0, st = '', ic = '';
+    if(has){ if(g.claimed && g.claimed[pid]){ st = 'ok'; ic = '✓'; } else if(G2.d && G2.d.used[key]){ st = 'sh'; ic = '🛡️'; } else if(key<today){ st = 'ms'; ic = '✗'; } else if(key===today){ st = 'td'; ic = '🎁'; } else { st = 'fu'; ic = '•'; } }
+    cells += '<div class="gf2-c '+st+(key===today?' now':'')+'"><b>'+d+'</b><span>'+ic+'</span></div>';
+  }
+  return '<div class="gf2-cal">'+head+cells+'</div>';
+}
+function myGiftsView(){
+  g2load(false); load(false);
+  var pid = state.pid, head = '<div class="back-row"><button class="icon-btn" data-action="back" aria-label="رجوع"><svg></svg></button><div class="back-title">هداياي</div></div>';
+  try{ head = '<div class="back-row"><button class="icon-btn" data-action="back" aria-label="رجوع">'+ICO.back+'</button><div class="back-title">هداياي</div></div>'; }catch(e){}
+  if(!pid) return head+'<div class="empty-note">سجّل دخولك الأول 💛</div>';
+  var u = G2.d || g2def(), total = 0; Object.keys(D.days).forEach(function(k){ var g = D.days[k]; if(g && g.claimed && g.claimed[pid]) total++; });
+  var cur = streakBefore(pid) + (iClaimed() ? 1 : 0), best = Math.max(u.best||0, cur);
+  var kp = '<div class="gf2-kp"><div><b>'+cur+'🔥</b>سلسلتك</div><div><b>'+best+'</b>أطول سلسلة</div><div><b>'+total+'</b>هدية فتحتها</div></div>'
+    + '<div class="gf2-inv"><span>🛡️ <b>'+u.sh+'</b> درع</span><span>⚡ <b>'+u.x2+'</b> ×٢</span></div>';
+  var wk = weekKey(), sentDone = !!u.sent[wk];
+  var snd = '<div class="card gf2-card"><div class="gf2-t">🎁 أهدي صاحبك</div>'
+    + (sentDone ? '<div class="gf2-ok">✅ أهديت هدية الأسبوع ده. الأسبوع الجاي فيه هدية جديدة.</div>'
+    : '<div class="gf2-hint">هدية كل أسبوع: صاحبك ياخد <b>١٠ نقاط</b> وإنت تاخد <b>٣</b> لما يفتحها.</div><input class="field" id="gf2-q" maxlength="30" placeholder="🔍 دوّر على اسمه" value="'+esc(M.q)+'"><div class="gf2-res" id="gf2-res">'+peopleHtml()+'</div>'
+      + (M.to ? '<div class="gf2-sel">إلى: <b>'+esc(nmOf(M.to))+'</b></div>' : '')
+      + '<input class="field" id="gf2-m" maxlength="60" placeholder="رسالة قصيرة (اختياري) 💛" value="'+esc(M.msg)+'"><button type="button" class="btn btn-primary" style="width:100%;margin-top:8px" data-gf2="send"'+(M.to?'':' disabled')+'>📤 ابعت الهدية</button>')
+    + '</div>';
+  var inb = inbox(), ibx = '<div class="card gf2-card"><div class="gf2-t">📬 هدايا وصلتلك</div>' + (inb.length ? inb.slice(0,10).map(function(x){
+    return '<div class="gf2-r"><div><b>'+esc(nmOf(x.from))+'</b>'+(x.msg?'<small>«'+esc(x.msg)+'»</small>':'')+'</div>'+(x.op?'<i>اتفتحت ✓</i>':'<button type="button" class="btn btn-primary" data-gf2="open" data-id="'+esc(x.id)+'">افتح 🎁</button>')+'</div>'; }).join('') : '<div class="gf2-hint">لسه محدش بعتلك هدية.</div>') + '</div>';
+  var lg = (u.log||[]).slice(0,12).map(function(x){
+    var it = x.k && x.k!=='none' ? (x.k==='pts' ? '🪙 +'+x.v : BI[x.k][0]+' '+BI[x.k][1]) : '';
+    var dd = x.d; try{ var pp = x.d.split('-'); dd = new Date(+pp[0],+pp[1]-1,+pp[2]).toLocaleDateString('ar-EG',{day:'numeric',month:'short'}); }catch(e){}
+    return '<div class="gf2-r"><div><b>+'+x.p+' نقطة'+(x.l?' 👑':'')+(x.f?' 🎉':'')+'</b>'+(it?'<small>'+it+'</small>':'')+'</div><i>'+dd+'</i></div>'; }).join('');
+  var hist = '<div class="card gf2-card"><div class="gf2-t">📜 آخر مكافآتي</div>'+(lg||'<div class="gf2-hint">لسه ما فتحتش هدايا.</div>')+'</div>';
+  var cal = '<div class="card gf2-card"><div class="gf2-t">🗓️ الشهر ده</div>'+calHtml()+'<div class="gf2-lg"><span>✓ استلمت</span><span>🛡️ درع</span><span>✗ فاتت</span></div></div>';
+  return head + kp + cal + ibx + snd + hist;
+}
+async function sendGift(){
+  if(M.busy || !M.to) return; M.busy = true; var wk = weekKey(), ok1 = false, to = M.to, msg = (M.msg||'').trim().slice(0,60);
+  await g2upd(function(o){ ok1 = false; if(!o.sent[wk]){ o.sent[wk] = 1; ok1 = true; } });
+  if(!ok1){ M.busy = false; toast('أهديت هدية الأسبوع ده قبل كده'); try{ render(); }catch(e){} return; }
+  var rec = {id:uid2(), from:String(state.pid), to:String(to), msg:msg, t:Date.now(), op:0};
+  var r = await sendUpd(function(o){ o.list = o.list.filter(function(x){ return !(x.op && Date.now()-(x.ot||x.t) > 30*864e5); }); o.list.push(rec); o.list = o.list.slice(-300); return o; });
+  if(!r){ await g2upd(function(o){ delete o.sent[wk]; }); M.busy = false; toast('معرفتش أبعت الهدية — جرّب تاني', true); return; }
+  G2.send.push(rec); try{ pushNotification(to, '🎁 '+nmOf(state.pid)+' بعتلك هدية! افتحها من «هداياي»', '🎁'); }catch(e){}
+  M.q = ''; M.to = null; M.msg = ''; M.busy = false; fxCall('ok'); toast('اتبعتت الهدية 🎁'); try{ render(); }catch(e){}
+}
+async function openRecv(id){
+  if(M.busy) return; M.busy = true; var ok = false, rec = null;
+  await sendUpd(function(o){ ok = false; var x = o.list.filter(function(z){ return z.id===id; })[0]; if(x && String(x.to)===String(state.pid) && !x.op){ x.op = 1; x.ot = Date.now(); ok = true; rec = x; } return o; });
+  if(!ok){ M.busy = false; await g2load(true); try{ render(); }catch(e){} return; }
+  if(!(await addPtsMe(10))){ await sendUpd(function(o){ var x = o.list.filter(function(z){ return z.id===id; })[0]; if(x){ x.op = 0; delete x.ot; } return o; }); M.busy = false; toast('معرفتش أفتح الهدية — جرّب تاني', true); return; }
+  M.busy = false; var cc = G2.send.filter(function(z){ return z.id===id; })[0]; if(cc){ cc.op = 1; }
+  var ov = document.createElement('div'); ov.className = 'gf2-ov';
+  ov.innerHTML = '<div class="gf2-pop"><div class="gf2-bx">🎁</div><div class="gf2-fr">من <b>'+esc(nmOf(rec.from))+'</b></div>'+(rec.msg?'<div class="gf2-mg">«'+esc(rec.msg)+'»</div>':'')+'<div class="gf2-pt">+<b class="gr-num">0</b> نقطة</div><button type="button" class="btn btn-primary">تمام 💛</button></div>';
+  document.body.appendChild(ov); var bx = ov.querySelector('.gf2-bx'); bx.classList.add('sh'); vib([30,30,60]);
+  setTimeout(function(){ bx.classList.remove('sh'); bx.textContent = '🎉'; ov.querySelector('.gf2-pop').classList.add('rv'); countUp(ov.querySelector('.gr-num'), 10, 800); fxCall('coin'); try{ burst(ov, window.innerWidth/2, window.innerHeight*.4, 2); }catch(e){} }, 900);
+  ov.querySelector('.btn').onclick = function(){ ov.remove(); try{ render(); }catch(e){} };
+  try{ pushNotification(state.pid, '🎁 فتحت هدية '+nmOf(rec.from)+' — +10 نقطة', '🎁'); }catch(e){}
+}
+document.addEventListener('click', function(e){
+  var el = e.target.closest && e.target.closest('[data-gf2]'); if(!el || el.disabled) return;
+  var a = el.dataset.gf2;
+  if(a==='pick'){ M.to = el.dataset.id; try{ render(); }catch(x){} }
+  else if(a==='send') sendGift();
+  else if(a==='open') openRecv(el.dataset.id);
+});
+document.addEventListener('input', function(e){
+  var t = e.target; if(!t) return;
+  if(t.id==='gf2-q'){ M.q = t.value; var r = document.getElementById('gf2-res'); if(r) r.innerHTML = peopleHtml(); }
+  else if(t.id==='gf2-m') M.msg = t.value;
+});
+window.FXVIEWS = window.FXVIEWS || {}; window.FXVIEWS.mygifts = myGiftsView;
+if(typeof NAV_TILE_ITEMS!=='undefined') NAV_TILE_ITEMS.push({page:'mygifts',icon:'🎁',labelKey:'هداياي',subKey:'سلسلة ودرع وهدايا الأصحاب',color:'linear-gradient(145deg,#FFB020,#FF6B9D)'});
+if(typeof BNAV_VIEW_TAB!=='undefined') BNAV_VIEW_TAB.mygifts = 'capabilities';
 
 /* ====================== الأحداث والتشغيل ====================== */
 document.addEventListener('click', function(e){
@@ -59821,6 +60050,11 @@ function seasonsView(){
   }).join('');
   return head('شارات المواسم')+'<div class="fn-hint" style="margin:0 4px 10px">كل موسم كنسي (صوم أو عيد) فيه ٣ شارات بتفتحها بحضورك وأسئلة الاجتماع.</div>'+cards;
 }
+
+/* تصدير لوحدة الهدايا: الموسم الحالي + عيد النهارده */
+window.glvSeasonNow=function(){ try{ var n=Date.now(); var s=allSeasons().filter(function(x){ return n>=x.a.getTime() && n<addD(x.b,1).getTime(); })[0]; return s?{n:s.n,e:s.e,c:s.c}:null; }catch(e){ return null; } };
+function feastsOf(y){ var E=orthEaster(y); return [['عيد القيامة المجيد','🌅',E],['أحد الشعانين','🌴',addD(E,-7)],['عيد الصعود','☁️',addD(E,39)],['عيد العنصرة','🔥',addD(E,49)],['عيد الميلاد المجيد','🎄',new Date(y,0,7)],['عيد الغطاس','💧',new Date(y,0,19)],['عيد البشارة','👼',new Date(y,3,7)],['عيد التجلي','✨',new Date(y,7,19)],['عيد النيروز','🍇',new Date(y,8,11)],['عيد الصليب','✝️',new Date(y,8,27)]]; }
+window.glvFeastToday=function(){ try{ var d=new Date(),k=dkey(d),l=feastsOf(d.getFullYear()); for(var i=0;i<l.length;i++){ if(dkey(l[i][2])===k) return {n:l[i][0],e:l[i][1]}; } }catch(e){} return null; };
 
 /* ================= 15) ملخص الأدمن الذكي ================= */
 function digest(){
