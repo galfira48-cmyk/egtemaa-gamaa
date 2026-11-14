@@ -58781,6 +58781,724 @@ st.textContent = ''
 document.head.appendChild(st);
 })();
 </script>
+<!-- ===== أدوات الأدمن: لوحة الاهتمام + رسائل مخصصة + تقرير أسبوعي ===== -->
+<script id="care-module">
+(function(){
+'use strict';
+if(window.__glvCare) return; window.__glvCare = 1;
+var KL = 'glavera-care-log-v1';
+var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+async function jg(k, d){ try{ var r = await window.storage.get(k, true); if(!r || r.value==null || r.value==='') return d; return typeof r.value==='string' ? JSON.parse(r.value) : r.value; }catch(e){ return d; } }
+function ju(k, fn){ try{ return window.storage.update(k, function(cur){ var o=null; try{ o = cur ? (typeof cur==='string'?JSON.parse(cur):cur) : null; }catch(e){} return JSON.stringify(fn(o)); }, true); }catch(e){ return Promise.resolve(null); } }
+function typing(){ var a = document.activeElement; return !!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); }
+var C = {log:{}, t:0, p:null, tab:'all', m:{aud:'all', text:'يا {الاسم} وحشتنا! 💛 عندنا اجتماع الخميس وهنكون مبسوطين لو جيت.', busy:false}, rep:null};
+var DAY = 864e5;
+function stats(){ try{ clsEnsure(); }catch(e){} try{ return clsStats(); }catch(e){ return null; } }
+function all(S){ var out = []; Object.keys(S.byClass).forEach(function(k){ S.byClass[k].list.forEach(function(m){ out.push(m); }); }); return out; }
+async function doLoad(){ var a = await jg(KL, {}); var ch = JSON.stringify(a)!==JSON.stringify(C.log); C.log = a || {}; C.t = Date.now(); if(ch && state.view==='admin' && state.adminTab==='care' && !typing()) render(); }
+function load(force){ if(!force && Date.now()-C.t < 15000) return Promise.resolve(); if(C.p) return C.p; C.p = doLoad().then(function(){ C.p = null; }, function(){ C.p = null; }); return C.p; }
+function clsLabel(k){ try{ return clsDef(k).label; }catch(e){ return k; } }
+function first(n){ return String(n||'').split(' ')[0]; }
+function waNum(ph){ var d = String(ph||'').replace(/\D/g,''); if(!d) return ''; if(d.indexOf('00')===0) d = d.slice(2); else if(d.charAt(0)==='0') d = '20'+d.slice(1); return d; }
+function done(m){ var r = C.log[m.id]; return r && r.at && r.at > (m.lastTs||0) ? r : null; }
+function suggest(m){
+  var n = first(m.name);
+  if(m.absent) return 'وحشتنا يا '+n+' 💛 بقالك '+(m.daysAway>=900?'فترة':m.daysAway+' يوم')+' مش معانا. نفسنا نشوفك! تعالى الخميس الجاي ونتقابل 🙏';
+  if(m.risk) return 'إزيك يا '+n+'؟ 💛 لاحظنا إنك مش بتيجي زي الأول — لو فيه حاجة نقدر نساعدك فيها قولنا. ومستنينك في الاجتماع!';
+  return 'أهلاً يا '+n+' 💛 ربنا يفرّح قلبك. عاملين اجتماع حلو ومستنينك!';
+}
+function prio(m){ return (m.absent ? 100 : m.risk ? 60 : 20) + Math.min(m.daysAway>=900?40:m.daysAway, 60)/2 + (m.rate||0)/4; }
+
+/* ---------- لوحة الاهتمام ---------- */
+window.FXADMIN = window.FXADMIN || {};
+window.FXADMIN.care = function(){
+  load(false); var S = stats(); if(!S) return '<div class="empty-note">بيانات الفصول لسه بتتحمّل…</div>';
+  var mem = all(S), now = Date.now(), nw = mem.filter(function(m){ var j = m.joined ? Date.parse(m.joined) : 0; return j && now-j < 30*DAY; });
+  var tabs = [['all','🎯 الكل'],['absent','🔴 غايبين'],['risk','🟠 معرّضين'],['new','🆕 جدد'],['up','📈 صاعدين'],['msg','💌 رسائل'],['rep','📊 تقرير']];
+  var h = adminKpis([{num:mem.filter(function(m){ return m.absent; }).length, lab:'غايب'},{num:mem.filter(function(m){ return m.risk; }).length, lab:'معرّض للانقطاع'},{num:nw.length, lab:'جدد (٣٠ يوم)'},{num:mem.filter(function(m){ return m.up; }).length, lab:'صاعد'}])
+    + '<div class="cr-tabs">'+tabs.map(function(t){ return '<button type="button" class="'+(C.tab===t[0]?'on':'')+'" data-cr="tab" data-t="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div>';
+  if(C.tab==='msg') return h + msgTab(S, mem);
+  if(C.tab==='rep') return h + repTab(S, mem);
+  var list = mem.filter(function(m){ return C.tab==='absent' ? m.absent : C.tab==='risk' ? m.risk : C.tab==='new' ? nw.indexOf(m)>=0 : C.tab==='up' ? m.up : (m.absent || m.risk); });
+  list.sort(function(a,b){ return (done(a)?1:0)-(done(b)?1:0) || prio(b)-prio(a); });
+  if(!list.length) return h + adminEmptyState('🎉','مفيش حد هنا','الأمور تمام في القسم ده.');
+  return h + '<div class="fx-hint" style="margin:6px 4px">مرتبين بالأولوية: اللي كان مواظب وغاب مدة أطول بييجي الأول.</div>' + list.slice(0,80).map(function(m){
+    var d = done(m), p = prio(m), badge = m.absent ? '🔴' : m.risk ? '🟠' : m.up ? '📈' : '🆕', wa = waNum(m.phone);
+    return '<div class="card cr-m'+(d?' dn':'')+'"><div class="cr-h"><span>'+badge+'</span><div><b>'+esc(m.name)+'</b><small>'+esc(clsLabel(m.cls))+' · حضور '+m.rate+'% · '+(m.daysAway>=900?'ماحضرش لسه':'غايب '+m.daysAway+' يوم')+'</small></div>'+(d?'<i>✅ اتفتقد</i>':'')+'</div>'
+      + '<div class="cr-ac">'+(m.phone?'<a href="tel:'+esc(m.phone)+'">📞 اتصل</a>':'')+(wa?'<a target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+encodeURIComponent(suggest(m))+'">💬 واتساب</a>':'')+'<button type="button" data-cr="push" data-id="'+esc(m.id)+'">🔔 إشعار</button><button type="button" data-cr="done" data-id="'+esc(m.id)+'">✅ تم</button></div></div>';
+  }).join('');
+};
+
+/* ---------- رسائل مخصصة ---------- */
+function audience(mem, aud){
+  var now = Date.now();
+  if(aud==='all') return mem;
+  if(aud==='absent') return mem.filter(function(m){ return m.absent; });
+  if(aud==='risk') return mem.filter(function(m){ return m.risk; });
+  if(aud==='new') return mem.filter(function(m){ var j = m.joined ? Date.parse(m.joined) : 0; return j && now-j < 30*DAY; });
+  if(aud==='bday') return mem.filter(function(m){ return m.bday!==null && m.bday<=7; });
+  if(aud.indexOf('c:')===0) return mem.filter(function(m){ return m.cls===aud.slice(2); });
+  return mem;
+}
+function fill(t, m){ return String(t).replace(/\{الاسم\}/g, first(m.name)).replace(/\{الاسم كامل\}/g, m.name).replace(/\{الفرقة\}/g, clsLabel(m.cls)).replace(/\{أيام\}/g, m.daysAway>=900?'فترة':String(m.daysAway)); }
+var TPL = [['💛 وحشتنا','يا {الاسم} وحشتنا! 💛 بقالك {أيام} يوم مش معانا. مستنينك الخميس الجاي 🙏'],['📣 تذكير','يا {الاسم} فكّرك: اجتماع الخميس النهارده الساعة 6 — ما تفوتوش! ⏰'],['🎉 تشجيع','برافو يا {الاسم}! حضورك بيفرّح قلوبنا 🌟 كمّل بنفس الحماس'],['🆕 ترحيب','أهلاً بيك يا {الاسم} في اجتماع جامعة! 🤝 فرحانين بيك']];
+function msgTab(S, mem){
+  var m = C.m, aud = audience(mem, m.aud), sample = aud[0];
+  var opts = [['all','الكل'],['absent','🔴 الغايبين'],['risk','🟠 المعرّضين للانقطاع'],['new','🆕 الجدد'],['bday','🎂 أعياد ميلاد الأسبوع']].concat(CLS_DEFS.filter(function(c){ return c.k!=='none'; }).map(function(c){ return ['c:'+c.k, c.icon+' '+c.label]; }));
+  return '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">💌 رسالة مخصصة بالاسم</div><label class="emp-lab">الجمهور</label><select class="field" data-crf="aud">'+opts.map(function(o){ return '<option value="'+esc(o[0])+'"'+(m.aud===o[0]?' selected':'')+'>'+esc(o[1])+'</option>'; }).join('')+'</select>'
+    + '<div class="cr-tp">'+TPL.map(function(t,i){ return '<button type="button" data-cr="tpl" data-i="'+i+'">'+esc(t[0])+'</button>'; }).join('')+'</div>'
+    + '<label class="emp-lab">نص الرسالة — استخدم {الاسم} {الفرقة} {أيام}</label><textarea class="field" rows="4" maxlength="240" data-crf="text">'+esc(m.text)+'</textarea>'
+    + '<div class="cr-pv"><small>معاينة'+(sample?' ('+esc(first(sample.name))+')':'')+':</small><div>'+(sample ? esc(fill(m.text, sample)) : 'مفيش حد في الجمهور ده')+'</div></div>'
+    + '<button type="button" class="btn btn-primary" style="width:100%;margin-top:10px" data-cr="send" '+(aud.length?'':'disabled')+'>📨 ابعت لـ '+aud.length+' مشارك (إشعار على موبايلاتهم)</button></div>';
+}
+async function sendMsg(){
+  var S = stats(); if(!S || C.m.busy) return; var aud = audience(all(S), C.m.aud); if(!aud.length || !String(C.m.text).trim()) return;
+  if(!confirm('تبعت الرسالة لـ '+aud.length+' مشارك؟')) return; C.m.busy = true;
+  aud.forEach(function(x){ try{ pushNotification(x.id, fill(C.m.text, x), '💌'); }catch(e){} });
+  C.m.busy = false; showToast('اتبعتت لـ '+aud.length+' مشارك 💌');
+}
+
+/* ---------- تقرير أسبوعي ---------- */
+function buildReport(S, mem){
+  var now = S.now || Date.now(), a = now-7*DAY, b = now-14*DAY, T = S.sessTs || {};
+  var sessThis = Object.keys(T).filter(function(k){ return T[k]>=a; }).length, sessPrev = Object.keys(T).filter(function(k){ return T[k]>=b && T[k]<a; }).length;
+  function att(lo, hi){ return mem.filter(function(m){ return Object.keys(m.mine||{}).some(function(k){ var t = m.mine[k]; return t>=lo && t<hi; }); }); }
+  var aThis = att(a, now+1), aPrev = att(b, a), tot = mem.length || 1, pct = Math.round(aThis.length/tot*100), pctPrev = Math.round(aPrev.length/tot*100);
+  var topM = mem.map(function(m){ return {n:m.name, c:Object.keys(m.mine||{}).filter(function(k){ return m.mine[k]>=a; }).length}; }).filter(function(x){ return x.c>0; }).sort(function(x,y){ return y.c-x.c; }).slice(0,3);
+  var nw = mem.filter(function(m){ var j = m.joined ? Date.parse(m.joined) : 0; return j && now-j < 7*DAY; });
+  var abs = mem.filter(function(m){ return m.absent; }).length, risk = mem.filter(function(m){ return m.risk; }).length;
+  var qz = 0, qs = 0, Q = window.__glvQuizAPI; if(Q){ Q.S.list.forEach(function(q){ var rs = Q.S.res[q.id]||{}; Object.keys(rs).forEach(function(p){ var r = rs[p]; if(r && r.done && r.fin>=a){ qz++; qs += (r.score||0)/(q.qs.length||1); } }); }); }
+  var best = null; if(S.ranking && S.ranking.length){ var k = S.ranking[0].k; best = clsLabel(k); }
+  var tips = []; if(pct < pctPrev-10) tips.push('الحضور قلّ عن الأسبوع اللي فات ('+pctPrev+'% ← '+pct+'%) — فكّر في رسالة تذكير قبل الاجتماع.'); else if(pct > pctPrev+10) tips.push('الحضور زاد! كمّل بنفس الأسلوب 👏');
+  if(abs) tips.push(abs+' غايبين محتاجين افتقاد — افتح «لوحة الاهتمام» وابعتلهم.'); if(risk) tips.push(risk+' معرّضين للانقطاع — كلّمهم قبل ما يبعدوا.'); if(nw.length) tips.push('رحّب بالـ'+nw.length+' عضو جديد بشخصيًا.'); if(!tips.length) tips.push('الوضع مستقر — استمر 🙏');
+  var d1 = new Date(a).toLocaleDateString('ar-EG',{day:'numeric',month:'long'}), d2 = new Date(now).toLocaleDateString('ar-EG',{day:'numeric',month:'long'});
+  var lines = ['📊 تقرير الأسبوع ('+d1+' – '+d2+')','','• الأنشطة المسجلة: '+sessThis+(sessPrev?' (الأسبوع اللي فات '+sessPrev+')':''),'• الحضور: '+aThis.length+' من '+tot+' ('+pct+'%)'+(aPrev.length?' — الأسبوع اللي فات '+pctPrev+'%':''),'• الأكتر مواظبة: '+(topM.length?topM.map(function(x){ return x.n+' ('+x.c+')'; }).join('، '):'—'),'• أعضاء جدد: '+(nw.length?nw.map(function(x){ return x.name; }).join('، '):'لا يوجد'),'• أسئلة الاجتماع: '+qz+' مشاركة'+(qz?' (متوسط '+Math.round(qs/qz*100)+'%)':''),'• محتاجين افتقاد: '+abs+' غايب · '+risk+' معرّض','• أفضل فرقة: '+(best||'—'),'','💡 توصيات:'].concat(tips.map(function(t){ return '— '+t; }));
+  return {text:lines.join('\n'), lines:lines, pct:pct, pctPrev:pctPrev, aThis:aThis.length, tot:tot};
+}
+function repTab(S, mem){
+  var r = buildReport(S, mem); C.rep = r;
+  return '<div class="card"><div class="cr-rp">'+r.lines.map(function(l){ return l ? '<div>'+esc(l)+'</div>' : '<br>'; }).join('')+'</div>'
+    + '<div class="cr-bar"><i style="width:'+r.pct+'%"></i></div><div class="sar-actions" style="margin-top:10px"><button type="button" class="btn btn-primary" data-cr="rcopy">📋 انسخ / شارك</button><button type="button" class="btn btn-ghost" data-cr="rimg">🖼️ صورة</button></div><div class="fx-hint" style="margin-top:8px">التقرير بيتحسب لحظياً كل ما تفتح الصفحة، من حضور آخر ٧ أيام وأسئلة الاجتماع.</div></div>';
+}
+function reportImage(){
+  var r = C.rep; if(!r) return; var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350; var x = cv.getContext('2d'); var g = x.createLinearGradient(0,0,0,1350); g.addColorStop(0,'#1a1033'); g.addColorStop(1,'#35197a'); x.fillStyle = g; x.fillRect(0,0,1080,1350);
+  x.direction = 'rtl'; x.textAlign = 'right'; x.fillStyle = '#FFD66B'; x.font = 'bold 58px Cairo, Tahoma, Arial, sans-serif'; x.fillText(r.lines[0], 1000, 120);
+  x.fillStyle = '#fff'; x.font = '40px Cairo, Tahoma, Arial, sans-serif'; var y = 210; r.lines.slice(2).forEach(function(l){ if(!l){ y += 24; return; } var words = l.split(' '), cur = ''; words.forEach(function(w){ var t = cur ? cur+' '+w : w; if(x.measureText(t).width>920 && cur){ x.fillText(cur, 1000, y); y += 62; cur = w; } else cur = t; }); if(cur){ x.fillText(cur, 1000, y); y += 62; } });
+  cv.toBlob(function(b){ if(!b) return; var f = null; try{ f = new File([b],'weekly.png',{type:'image/png'}); }catch(e){} if(f && navigator.canShare && navigator.canShare({files:[f]})){ navigator.share({files:[f], title:'تقرير الأسبوع'}).catch(function(){}); return; } var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'تقرير-الأسبوع.png'; document.body.appendChild(a); a.click(); a.remove(); });
+}
+
+document.addEventListener('click', function(ev){
+  var el = ev.target.closest && ev.target.closest('[data-cr]'); if(!el) return; var a = el.dataset.cr, id = el.dataset.id;
+  if(a==='tab'){ C.tab = el.dataset.t; render(); }
+  else if(a==='push'){ var S = stats(), m = S && all(S).find(function(x){ return String(x.id)===String(id); }); if(!m) return; var t = prompt('نص الإشعار لـ '+first(m.name)+':', suggest(m)); if(t && t.trim()){ try{ pushNotification(m.id, t.trim(), '💛'); showToast('اتبعت الإشعار 🔔'); }catch(e){ showToast('معرفتش أبعت', true); } } }
+  else if(a==='done'){ ju(KL, function(o){ o = o||{}; o[id] = {at:Date.now()}; return o; }).then(function(ok){ if(!ok){ showToast('معرفتش أحفظ', true); return; } showToast('اتسجّل الافتقاد ✅'); return load(true).then(render); }); }
+  else if(a==='tpl'){ C.m.text = TPL[+el.dataset.i][1]; render(); }
+  else if(a==='send') sendMsg();
+  else if(a==='rcopy'){ var tx = C.rep && C.rep.text; if(!tx) return; if(navigator.share){ navigator.share({text:tx}).catch(function(){}); } else if(navigator.clipboard){ navigator.clipboard.writeText(tx).then(function(){ showToast('اتنسخ التقرير 📋'); }); } }
+  else if(a==='rimg') reportImage();
+});
+document.addEventListener('input', function(ev){ var t = ev.target; if(t && t.dataset && t.dataset.crf==='text'){ C.m.text = t.value; var pv = document.querySelector('.cr-pv div'); var S = stats(); if(pv && S){ var s = audience(all(S), C.m.aud)[0]; if(s) pv.textContent = fill(C.m.text, s); } } });
+document.addEventListener('change', function(ev){ var t = ev.target; if(t && t.dataset && t.dataset.crf==='aud'){ C.m.aud = t.value; render(); } });
+
+if(typeof ADMIN_HUB_ITEMS!=='undefined'){ ADMIN_HUB_ITEMS.push({group:'people', tab:'care', short:'افتقاد ذكي ورسائل وتقرير', desc:'مين محتاج افتقاد، رسائل مخصصة بالاسم، وتقرير أسبوعي جاهز', icon:'🎯', label:'لوحة الاهتمام', color:'linear-gradient(145deg,#FF5E7E,#F4B740)'}); }
+
+var st = document.createElement('style');
+st.textContent = ''
++ '.cr-tabs{display:flex;gap:6px;overflow-x:auto;margin:6px 0 12px;padding-bottom:4px}.cr-tabs button{flex:none;padding:8px 14px;border-radius:99px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font:inherit;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap}.cr-tabs button.on{background:linear-gradient(135deg,#FF5E7E,#F4B740);color:#fff;border-color:transparent}'
++ '.cr-m{padding:12px;margin-bottom:8px}.cr-m.dn{opacity:.55}.cr-h{display:flex;align-items:center;gap:10px}.cr-h>span{font-size:24px}.cr-h div{flex:1}.cr-h b{display:block}.cr-h small{color:var(--text-muted);font-size:12px}.cr-h i{font-style:normal;font-size:12px;color:#2EE88B;font-weight:800}'
++ '.cr-ac{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.cr-ac a,.cr-ac button{padding:8px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font:inherit;font-size:13px;font-weight:800;text-decoration:none;cursor:pointer}'
++ '.cr-tp{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.cr-tp button{padding:6px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font:inherit;font-size:12.5px;cursor:pointer}.cr-pv{margin-top:10px;padding:10px 12px;border-radius:14px;background:rgba(255,214,107,.1);border:1px dashed rgba(255,214,107,.45);line-height:1.8;font-size:13.5px}.cr-pv small{color:var(--text-muted)}'
++ '.cr-rp{line-height:2;font-size:14px}.cr-bar{height:12px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:10px}.cr-bar i{display:block;height:100%;background:linear-gradient(90deg,#3FDCC9,#2EE88B)}';
+document.head.appendChild(st);
+})();
+</script>
+<!-- ===== متجر النقط + حفل نهاية الشهر ===== -->
+<script id="shop-module">
+(function(){
+'use strict';
+if(window.__glvShop) return; window.__glvShop = 1;
+var KS = 'glavera-shop-v1', KC = 'glavera-ceremony-v1';
+var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+var me = function(){ return state.pid ? String(state.pid) : ''; };
+function person(pid){ return PARTICIPANTS.find(function(p){ return String(p.id)===String(pid); }); }
+function nm(pid){ var p = person(pid); return p ? p.name : 'مشارك'; }
+async function jg(k, d){ try{ var r = await window.storage.get(k, true); if(!r || r.value==null || r.value==='') return d; return typeof r.value==='string' ? JSON.parse(r.value) : r.value; }catch(e){ return d; } }
+function ju(k, fn){ try{ return window.storage.update(k, function(cur){ var o=null; try{ o = cur ? (typeof cur==='string'?JSON.parse(cur):cur) : null; }catch(e){} return JSON.stringify(fn(o)); }, true); }catch(e){ return Promise.resolve(null); } }
+function typing(){ var a = document.activeElement; return !!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); }
+function pad(n){ return String(n).padStart(2,'0'); }
+var H = {shop:{items:[],orders:[]}, cer:{list:[]}, t:0, p:null, sg:'', id:null, d:null, ym:'', prev:null, busy:false, show:null};
+function total(pid){ try{ return participantTotal(pid); }catch(e){ return 0; } }
+function spent(pid, orders){ return (orders||H.shop.orders||[]).reduce(function(s,o){ return s + (o.pid===pid && o.st!=='cancel' ? (+o.cost||0) : 0); }, 0); }
+function balance(pid){ return Math.max(0, total(pid) - spent(pid)); }
+
+async function doLoad(){
+  var a = await jg(KS, {items:[],orders:[]}), b = await jg(KC, {list:[]});
+  H.shop = a || {items:[],orders:[]}; H.shop.items = H.shop.items||[]; H.shop.orders = H.shop.orders||[]; H.cer = b || {list:[]}; H.cer.list = H.cer.list||[];
+  var sg = JSON.stringify([H.shop, H.cer]), ch = sg!==H.sg; H.sg = sg; H.t = Date.now();
+  if(ch && !typing() && !H.busy && (state.view==='shop' || state.view==='ceremony' || (state.view==='admin' && state.adminUnlocked && (state.adminTab==='shop'||state.adminTab==='ceremony')))) render();
+}
+function load(force){ if(!force && Date.now()-H.t < 15000) return Promise.resolve(); if(H.p) return H.p; H.p = doLoad().then(function(){ H.p = null; }, function(){ H.p = null; }); return H.p; }
+function head(title){ return '<div class="back-row"><button class="icon-btn" data-action="back" aria-label="رجوع">'+ICO.back+'</button><div class="back-title">'+esc(title)+'</div></div>'; }
+
+/* ---------- المتجر: المشارك ---------- */
+window.FXVIEWS = window.FXVIEWS || {};
+window.FXVIEWS.shop = function(){
+  load(false); if(!me()) return head('متجر النقط') + '<div class="empty-note">سجّل دخولك الأول 💛</div>';
+  var bal = balance(me()), items = H.shop.items.filter(function(i){ return i.open; }), mine = H.shop.orders.filter(function(o){ return o.pid===me(); }).sort(function(a,b){ return b.at-a.at; });
+  return head('متجر النقط 🛍️')
+    + '<div class="sh-bal"><span>💰</span><div><b>'+bal+'</b><small>رصيدك للصرف (من إجمالي '+total(me())+' نقطة)</small></div></div>'
+    + '<div class="sh-note">لما تشتري حاجة رصيدك بينقص، لكن ترتيبك في المسابقة بيفضل زي ما هو ✅</div>'
+    + (items.length ? '<div class="sh-grid">'+items.map(function(i){
+        var out = i.stock!=null && i.stock<=0, can = bal>=i.cost && !out;
+        return '<div class="sh-it'+(out?' out':'')+'"><div class="sh-ie">'+esc(i.ic||'🎁')+'</div><b>'+esc(i.name)+'</b>'+(i.desc?'<small>'+esc(i.desc)+'</small>':'')+'<div class="sh-cost">⭐ '+i.cost+'</div>'+(i.stock!=null?'<small>'+(out?'خلص 😔':'متبقي '+i.stock)+'</small>':'')
+          + '<button type="button" '+(can?'':'disabled')+' data-sh="buy" data-id="'+esc(i.id)+'">'+(out?'خلص':can?'🛒 اشتري':'ناقصك '+(i.cost-bal))+'</button></div>';
+      }).join('')+'</div>' : '<div class="empty-note">المتجر فاضي دلوقتي — ترقّب جوايز جديدة 🎁</div>')
+    + (mine.length ? '<div class="sh-sec">🧾 طلباتي</div>'+mine.map(function(o){ return '<div class="sh-or"><span>'+esc(o.ic||'🎁')+'</span><div><b>'+esc(o.name)+'</b><small>⭐ '+o.cost+' · '+new Date(o.at).toLocaleDateString('ar-EG',{day:'numeric',month:'long'})+'</small></div><i class="'+o.st+'">'+(o.st==='done'?'✅ اتسلّم':o.st==='cancel'?'↩️ اتلغى واترد':'⏳ قيد التجهيز')+'</i></div>'; }).join('') : '');
+};
+async function buy(id){
+  if(H.busy) return; var it = H.shop.items.find(function(x){ return x.id===id; }); if(!it) return;
+  if(!confirm('تشتري «'+it.name+'» بـ '+it.cost+' نقطة؟')) return;
+  H.busy = true; var m = me(), res = '', oid = 'o'+Date.now().toString(36)+Math.floor(Math.random()*1296).toString(36);
+  var ok = await ju(KS, function(o){
+    o = o||{items:[],orders:[]}; o.items = o.items||[]; o.orders = o.orders||[]; var x = o.items.find(function(y){ return y.id===id; });
+    if(!x || !x.open){ res = 'closed'; return o; } if(x.stock!=null && x.stock<=0){ res = 'out'; return o; }
+    if(Math.max(0,total(m)-spent(m,o.orders)) < x.cost){ res = 'poor'; return o; }
+    if(x.stock!=null) x.stock--; o.orders.push({id:oid, pid:m, item:id, name:x.name, ic:x.ic, cost:x.cost, at:Date.now(), st:'new'}); res = 'ok'; return o;
+  });
+  H.busy = false;
+  if(!ok){ showToast('معرفتش أكمّل — جرّب تاني', true); return; }
+  await load(true);
+  if(res==='ok'){ try{ pushNotification(m, '🛍️ طلبت «'+it.name+'» بـ '+it.cost+' نقطة — هيتجهز ويوصلك', '🛍️'); }catch(e){} try{ window.glvFx && window.glvFx.big('تم الطلب!', it.name); }catch(e){} }
+  else showToast(res==='out' ? 'الكمية خلصت 😔' : res==='poor' ? 'رصيدك مش كفاية' : 'الجايزة دي اتقفلت', true);
+  render();
+}
+
+/* ---------- المتجر: الأدمن ---------- */
+function sd(){ return H.d || (H.d = {id:null, name:'', ic:'🎁', cost:100, stock:'', desc:''}); }
+window.FXADMIN = window.FXADMIN || {};
+window.FXADMIN.shop = function(){
+  load(false); var d = sd(), items = H.shop.items, orders = H.shop.orders.slice().sort(function(a,b){ return b.at-a.at; }), nw = orders.filter(function(o){ return o.st==='new'; });
+  var h = adminKpis([{num:items.length, lab:'جايزة'},{num:nw.length, lab:'طلب جديد'},{num:orders.filter(function(o){ return o.st==='done'; }).length, lab:'اتسلّم'}]) + (window.glvTileVisBtn ? window.glvTileVisBtn('shop') : '');
+  h += '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">'+(d.id?'✏️ تعديل جايزة':'🎁 جايزة جديدة')+'</div>'
+    + '<div style="display:flex;gap:8px"><div style="width:84px"><label class="emp-lab">إيموجي</label><input class="field" maxlength="4" data-shf="ic" value="'+esc(d.ic)+'"></div><div style="flex:1"><label class="emp-lab">اسم الجايزة</label><input class="field" maxlength="50" data-shf="name" placeholder="مثال: كتاب / وجبة / رحلة" value="'+esc(d.name)+'"></div></div>'
+    + '<div style="display:flex;gap:8px"><div style="flex:1"><label class="emp-lab">السعر (نقطة)</label><input class="field" type="number" min="1" data-shf="cost" value="'+esc(d.cost)+'"></div><div style="flex:1"><label class="emp-lab">الكمية (فاضي = بلا حد)</label><input class="field" type="number" min="0" data-shf="stock" value="'+esc(d.stock)+'"></div></div>'
+    + '<label class="emp-lab">وصف صغير (اختياري)</label><input class="field" maxlength="80" data-shf="desc" value="'+esc(d.desc)+'">'
+    + '<div class="sar-actions" style="margin-top:10px"><button type="button" class="btn btn-primary" data-sh="asave">'+(d.id?'💾 احفظ':'➕ أضف للمتجر')+'</button>'+(d.id?'<button type="button" class="btn btn-ghost" data-sh="acancel">إلغاء</button>':'')+'</div></div>';
+  if(items.length) h += '<div class="fx-sep">الجوايز</div>'+items.map(function(i){ return '<div class="card" style="padding:12px;margin-bottom:8px;display:flex;gap:10px;align-items:center"><span style="font-size:30px">'+esc(i.ic)+'</span><div style="flex:1"><b>'+esc(i.name)+'</b><div class="fx-hint">⭐ '+i.cost+' · '+(i.stock==null?'بلا حد':'متبقي '+i.stock)+' · '+(i.open?'🟢 ظاهرة':'🔒 مخفية')+'</div></div><button type="button" class="btn btn-ghost" data-sh="atoggle" data-id="'+esc(i.id)+'">'+(i.open?'🔒':'🔓')+'</button><button type="button" class="btn btn-ghost" data-sh="aedit" data-id="'+esc(i.id)+'">✏️</button><button type="button" class="btn btn-ghost" data-sh="adel" data-id="'+esc(i.id)+'">🗑️</button></div>'; }).join('');
+  h += '<div class="fx-sep">🧾 الطلبات ('+orders.length+')</div>' + (orders.length ? orders.slice(0,60).map(function(o){ return '<div class="card" style="padding:12px;margin-bottom:8px"><div style="display:flex;gap:10px;align-items:center"><span style="font-size:26px">'+esc(o.ic||'🎁')+'</span><div style="flex:1"><b>'+esc(nm(o.pid))+'</b> — '+esc(o.name)+'<div class="fx-hint">⭐ '+o.cost+' · '+new Date(o.at).toLocaleString('ar-EG',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+' · '+(o.st==='done'?'✅ اتسلّم':o.st==='cancel'?'↩️ اتلغى':'⏳ جديد')+'</div></div></div>'+(o.st==='new' ? '<div class="sar-actions" style="margin-top:8px"><button type="button" class="btn btn-primary" data-sh="odone" data-id="'+esc(o.id)+'">✅ تم التسليم</button><button type="button" class="btn btn-ghost" data-sh="ocancel" data-id="'+esc(o.id)+'">↩️ إلغاء واسترداد</button></div>' : '')+'</div>'; }).join('') : adminEmptyState('🧾','مفيش طلبات لسه','لما المشاركين يشتروا هتظهر هنا.'));
+  return h;
+};
+async function saveItem(){
+  var d = sd(); if(!d.name.trim()){ showToast('اكتب اسم الجايزة', true); return; } var cost = Math.max(1, Math.round(+d.cost||0)); if(!cost){ showToast('اكتب السعر', true); return; }
+  var stock = String(d.stock).trim()==='' ? null : Math.max(0, Math.round(+d.stock||0)), id = d.id || ('i'+Date.now().toString(36)), isNew = !d.id;
+  var base = {name:d.name.trim().slice(0,50), ic:(d.ic||'🎁').slice(0,4), cost:cost, stock:stock, desc:(d.desc||'').trim().slice(0,80)};
+  var ok = await ju(KS, function(o){ o = o||{items:[],orders:[]}; o.items = o.items||[]; var x = o.items.find(function(y){ return y.id===id; }); if(x){ for(var k in base) x[k] = base[k]; } else { base.id = id; base.open = true; base.at = Date.now(); o.items.push(base); } return o; });
+  if(!ok){ showToast('معرفتش أحفظ — جرّب تاني', true); return; }
+  H.d = null; showToast(isNew ? 'اتضافت للمتجر 🛍️' : 'اتحفظ التعديل ✅');
+  if(isNew){ PARTICIPANTS.forEach(function(p){ try{ pushNotification(p.id, '🛍️ جايزة جديدة في المتجر: '+base.name+' ('+base.cost+' نقطة)', '🛍️'); }catch(e){} }); }
+  await load(true); render();
+}
+async function orderAct(id, st){
+  var who = null, nmx = '';
+  var ok = await ju(KS, function(o){ o = o||{items:[],orders:[]}; var x = (o.orders||[]).find(function(y){ return y.id===id; }); if(x && x.st==='new'){ x.st = st; who = x.pid; nmx = x.name; if(st==='cancel'){ var it = (o.items||[]).find(function(y){ return y.id===x.item; }); if(it && it.stock!=null) it.stock++; } } return o; });
+  if(!ok){ showToast('معرفتش أنفّذ', true); return; }
+  if(who){ try{ pushNotification(who, st==='done' ? '🎁 «'+nmx+'» جاهزة ومتسلّمة لك — مبروك!' : '↩️ طلب «'+nmx+'» اتلغى ونقاطك اترجعت', st==='done'?'🎁':'↩️'); }catch(e){} }
+  await load(true); render();
+}
+
+/* ---------- حفل نهاية الشهر ---------- */
+var MN = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+function ymLabel(ym){ var p = ym.split('-'); return MN[(+p[1])-1]+' '+p[0]; }
+function defYm(){ var t = new Date(); t.setDate(1); t.setMonth(t.getMonth()-1); return t.getFullYear()+'-'+pad(t.getMonth()+1); }
+function compute(ym){
+  var p = ym.split('-'), a = new Date(+p[0], +p[1]-1, 1).getTime(), b = new Date(+p[0], +p[1], 1).getTime();
+  var pts = {}, att = {}, qsc = {}, qms = {}, qn = {}, rid = {};
+  Object.values((typeof ATT_RECORDS!=='undefined' && ATT_RECORDS) || {}).forEach(function(x){ if(x && x.pid && x.ts>=a && x.ts<b){ pts[x.pid] = (pts[x.pid]||0) + (+x.pts||0); att[x.pid] = (att[x.pid]||0)+1; } });
+  var Q = window.__glvQuizAPI; if(Q){ Q.S.list.forEach(function(qz){ var rs = Q.S.res[qz.id]||{}; Object.keys(rs).forEach(function(pid){ var r = rs[pid]; if(!r || !r.done || !(r.fin>=a && r.fin<b)) return;
+    pts[pid] = (pts[pid]||0) + (r.pts!=null ? r.pts : (r.score||0)*(qz.pts||2)); qsc[pid] = (qsc[pid]||0) + (r.score||0); qms[pid] = (qms[pid]||0) + Math.max(0, r.fin-(r.st||r.fin)); qn[pid] = (qn[pid]||0) + qz.qs.length;
+    qz.qs.forEach(function(q,i){ if(q.t==='riddle' && r.ans && r.ans[i]===q.a) rid[pid] = (rid[pid]||0)+1; }); }); }); }
+  function top(map, filt, fmt, asc){ var arr = Object.keys(map).filter(function(k){ return filt ? filt(k, map[k]) : map[k]>0; }).map(function(k){ return {pid:k, n:nm(k), val:map[k], v:fmt(map[k])}; }); arr.sort(function(x,y){ return asc ? x.val-y.val : y.val-x.val; }); return arr.slice(0,3); }
+  var avgms = {}; Object.keys(qms).forEach(function(k){ if(qn[k]>=2) avgms[k] = qms[k]/qn[k]/1000; });
+  var cl = {}; PARTICIPANTS.forEach(function(pp){ var k = (typeof clsOf==='function') ? clsOf(pp.id) : 'none'; if(k==='none') return; var c = cl[k] = cl[k]||{s:0,n:0}; c.n++; c.s += (pts[pp.id]||0); });
+  var clsRows = Object.keys(cl).filter(function(k){ return cl[k].s>0; }).map(function(k){ var def = (typeof CLS_BASE!=='undefined' && CLS_BASE.find(function(c){ return c.k===k; })) || {label:k}; return {pid:'', n:def.label, val:cl[k].s/cl[k].n, v:(cl[k].s/cl[k].n).toFixed(1)+' نقطة/فرد'}; }).sort(function(x,y){ return y.val-x.val; }).slice(0,3);
+  var cats = [
+    {ic:'🌟', t:'نجم الشهر', s:'أكتر نقط اتكسبت', rows:top(pts, null, function(v){ return v+' نقطة'; })},
+    {ic:'🕐', t:'المواظب', s:'أكتر حضور', rows:top(att, null, function(v){ return v+' حضور'; })},
+    {ic:'🧠', t:'عبقري الأسئلة', s:'أكتر إجابات صح', rows:top(qsc, null, function(v){ return v+' إجابة صح'; })},
+    {ic:'⚡', t:'الأسرع', s:'أقل وقت للسؤال', rows:top(avgms, function(k,v){ return v>0; }, function(v){ return v.toFixed(1)+' ث/سؤال'; }, true)},
+    {ic:'🕵️', t:'ملك الألغاز', s:'أكتر ألغاز اتحلت', rows:top(rid, null, function(v){ return v+' لغز'; })},
+    {ic:'🏛️', t:'أفضل فرقة', s:'متوسط النقط للفرد', rows:clsRows}
+  ].filter(function(c){ return c.rows.length; });
+  return {id:ym, ym:ym, label:ymLabel(ym), at:Date.now(), cats:cats};
+}
+window.FXADMIN.ceremony = function(){
+  load(false); try{ if(typeof attRefresh==='function' && !(typeof _attLoadedOnce!=='undefined' && _attLoadedOnce)) attRefresh(false); }catch(e){} try{ window.__glvQuizAPI && window.__glvQuizAPI.load(false); }catch(e){}
+  if(!H.ym) H.ym = defYm(); var cer = H.prev;
+  var h = adminKpis([{num:H.cer.list.length, lab:'حفل منشور'}]) + (window.glvTileVisBtn ? window.glvTileVisBtn('ceremony') : '')
+    + '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">🏆 حفل نهاية الشهر</div><div class="fx-hint">بيتحسب من الحضور المسجل ونتايج أسئلة الاجتماع في الشهر المختار. اعرض المعاينة، وبعدين انشره للمشاركين.</div>'
+    + '<label class="emp-lab">الشهر</label><input class="field" type="month" data-shf="ym" value="'+esc(H.ym)+'">'
+    + '<button type="button" class="btn btn-primary" style="width:100%;margin-top:10px" data-sh="cprev">🔍 احسب المعاينة</button></div>';
+  if(cer){
+    h += '<div class="card fx-form" style="margin-top:12px"><div class="fx-sep" style="margin-top:0">معاينة «'+esc(cer.label)+'»</div>'+(cer.cats.length ? cer.cats.map(function(c){ return '<div class="sh-cp"><b>'+c.ic+' '+esc(c.t)+'</b>'+c.rows.map(function(r,i){ return '<div>'+['🥇','🥈','🥉'][i]+' '+esc(r.n)+' <small>'+esc(r.v)+'</small></div>'; }).join('')+'</div>'; }).join('') : '<div class="empty-note">مفيش بيانات في الشهر ده</div>')
+      + (cer.cats.length ? '<div class="sar-actions" style="margin-top:10px;flex-wrap:wrap"><button type="button" class="btn btn-ghost" data-sh="cplay">▶ شغّل الحفل</button><button type="button" class="btn btn-primary" data-sh="cpub">📣 انشر وابعت إشعار</button></div>' : '')+'</div>';
+  }
+  if(H.cer.list.length) h += '<div class="fx-sep">المنشورة</div>'+H.cer.list.slice().reverse().map(function(c,i){ return '<div class="card" style="padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px"><span style="font-size:26px">🏆</span><b style="flex:1">'+esc(c.label)+'</b><button type="button" class="btn btn-ghost" data-sh="cshow" data-id="'+esc(c.id)+'">▶</button><button type="button" class="btn btn-ghost" data-sh="cdel" data-id="'+esc(c.id)+'">🗑️</button></div>'; }).join('');
+  return h;
+};
+window.FXVIEWS.ceremony = function(){
+  load(false); var l = H.cer.list.slice().reverse();
+  return head('حفل نهاية الشهر 🏆') + (l.length ? '<div class="sh-note">شوف مين فاز بألقاب الشهر 🎉</div>' + l.map(function(c){ return '<button type="button" class="sh-cer" data-sh="cshow" data-id="'+esc(c.id)+'"><span>🏆</span><div><b>حفل '+esc(c.label)+'</b><small>'+c.cats.length+' ألقاب</small></div><i>شغّل ▶</i></button>'; }).join('') : '<div class="empty-note">لسه مفيش حفل منشور — الحفل بيتنشر في آخر كل شهر 🏆</div>');
+};
+async function publish(){
+  var c = H.prev; if(!c || !c.cats.length) return; if(!confirm('تنشر حفل «'+c.label+'» وتبعت إشعار للكل؟')) return;
+  var ok = await ju(KC, function(o){ o = o||{list:[]}; o.list = (o.list||[]).filter(function(x){ return x.id!==c.id; }); o.list.push(c); o.list = o.list.slice(-6); return o; });
+  if(!ok){ showToast('معرفتش أنشر', true); return; }
+  PARTICIPANTS.forEach(function(p){ try{ pushNotification(p.id, '🏆 حفل نهاية شهر '+c.label+' اتنشر — شوف مين فاز بالألقاب!', '🏆'); }catch(e){} });
+  c.cats.forEach(function(cat){ var w = cat.rows[0]; if(w && w.pid){ try{ pushNotification(w.pid, '🏅 مبروك! إنت فزت بلقب «'+cat.t+'» في شهر '+c.label, '🏅'); }catch(e){} } });
+  showToast('اتنشر الحفل 🏆'); await load(true); render();
+}
+/* عرض الحفل */
+function playCeremony(c){
+  closeCer(); var slides = [{k:'intro'}].concat(c.cats.map(function(x){ return {k:'cat', c:x}; })).concat([{k:'end'}]), i = 0;
+  var el = document.createElement('div'); el.id = 'cm-ov'; H.show = {el:el, t:null};
+  function paint(){
+    var s = slides[i], body = '';
+    if(s.k==='intro') body = '<div class="cm-e">🏆</div><h1>حفل شهر '+esc(c.label)+'</h1><p>لحظة التكريم… جاهزين؟ ✨</p>';
+    else if(s.k==='end') body = '<div class="cm-e">💛</div><h1>مبروك للجميع!</h1><p>وكل شهر وإنتم أقرب لربنا وأحلى في المحبة 🙏</p>';
+    else { var r = s.c.rows; body = '<div class="cm-e">'+s.c.ic+'</div><h1>'+esc(s.c.t)+'</h1><small>'+esc(s.c.s)+'</small><div class="cm-pod">'+[1,0,2].map(function(k){ var x = r[k]; return x ? '<div class="p'+k+'"><span>'+['🥇','🥈','🥉'][k]+'</span><b>'+esc(x.n)+'</b><em>'+esc(x.v)+'</em></div>' : ''; }).join('')+'</div>'; }
+    el.innerHTML = '<div class="cm-bg"><div class="cm-sl" key="'+i+'">'+body+'</div><div class="cm-ft"><button data-cm="prev">›</button><span>'+(i+1)+' / '+slides.length+'</span><button data-cm="next">‹</button><button data-cm="share">🖼️</button><button data-cm="x">✕</button></div></div>';
+    if(window.glvFx){ if(s.k==='cat'){ window.glvFx.burst(['🎉','⭐','✨','🏆'], 24); window.glvFx.win(); } else if(s.k==='end') window.glvFx.big('', ''); }
+  }
+  function go(d){ i = Math.max(0, Math.min(slides.length-1, i+d)); paint(); clearTimeout(H.show.t); if(i<slides.length-1) H.show.t = setTimeout(function(){ go(1); }, 7000); }
+  el.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('[data-cm]'); if(!b) return; var a = b.dataset.cm; if(a==='next') go(1); else if(a==='prev') go(-1); else if(a==='x') closeCer(); else if(a==='share') shareCer(c); });
+  document.body.appendChild(el); paint(); H.show.t = setTimeout(function(){ go(1); }, 7000);
+}
+function closeCer(){ if(H.show){ clearTimeout(H.show.t); H.show.el.remove(); H.show = null; } }
+function shareCer(c){
+  try{
+    var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350; var x = cv.getContext('2d'); var g = x.createLinearGradient(0,0,1080,1350); g.addColorStop(0,'#2a1360'); g.addColorStop(1,'#7B4FD6'); x.fillStyle = g; x.fillRect(0,0,1080,1350);
+    x.direction = 'rtl'; x.textAlign = 'center'; x.fillStyle = '#FFD66B'; x.font = 'bold 76px Cairo, Tahoma, Arial, sans-serif'; x.fillText('🏆 لوحة شرف '+c.label, 540, 140);
+    var y = 250; c.cats.forEach(function(cat){ var w = cat.rows[0]; if(!w) return; x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(80, y-62, 920, 150); x.fillStyle = '#fff'; x.font = 'bold 48px Cairo, Tahoma, Arial, sans-serif'; x.fillText(cat.ic+' '+cat.t, 540, y); x.fillStyle = '#FFD66B'; x.font = 'bold 54px Cairo, Tahoma, Arial, sans-serif'; x.fillText(w.n+' — '+w.v, 540, y+70); y += 175; });
+    x.fillStyle = 'rgba(255,255,255,.8)'; x.font = '34px Cairo, Tahoma, Arial, sans-serif'; x.fillText('اجتماع جامعة ✝', 540, 1290);
+    cv.toBlob(function(b){ if(!b) return; var f = null; try{ f = new File([b],'honor.png',{type:'image/png'}); }catch(e){} if(f && navigator.canShare && navigator.canShare({files:[f]})){ navigator.share({files:[f], title:'لوحة الشرف'}).catch(function(){}); return; } var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'لوحة-الشرف.png'; document.body.appendChild(a); a.click(); a.remove(); });
+  }catch(e){ showToast('معرفتش أعمل الصورة', true); }
+}
+
+document.addEventListener('click', function(ev){
+  var el = ev.target.closest && ev.target.closest('[data-sh]'); if(!el) return; var a = el.dataset.sh, id = el.dataset.id;
+  if(a==='buy') buy(id);
+  else if(a==='asave') saveItem();
+  else if(a==='acancel'){ H.d = null; render(); }
+  else if(a==='atoggle') ju(KS, function(o){ (o.items||[]).forEach(function(x){ if(x.id===id) x.open = !x.open; }); return o; }).then(function(){ return load(true); }).then(render);
+  else if(a==='aedit'){ var x = H.shop.items.find(function(y){ return y.id===id; }); if(x){ H.d = {id:x.id, name:x.name, ic:x.ic, cost:x.cost, stock:x.stock==null?'':x.stock, desc:x.desc||''}; render(); window.scrollTo(0,0); } }
+  else if(a==='adel'){ if(confirm('تحذف الجايزة دي؟')) ju(KS, function(o){ o.items = (o.items||[]).filter(function(y){ return y.id!==id; }); return o; }).then(function(){ return load(true); }).then(render); }
+  else if(a==='odone') orderAct(id, 'done');
+  else if(a==='ocancel'){ if(confirm('تلغي الطلب وترجّع النقط؟')) orderAct(id, 'cancel'); }
+  else if(a==='cprev'){ el.disabled = true; Promise.resolve().then(function(){ return (typeof attRefresh==='function') ? attRefresh(true) : null; }).catch(function(){}).then(function(){ return window.__glvQuizAPI ? window.__glvQuizAPI.load(true) : null; }).then(function(){ H.prev = compute(H.ym || defYm()); render(); }); }
+  else if(a==='cplay'){ if(H.prev) playCeremony(H.prev); }
+  else if(a==='cpub') publish();
+  else if(a==='cshow'){ var c = H.cer.list.find(function(y){ return y.id===id; }); if(c) playCeremony(c); }
+  else if(a==='cdel'){ if(confirm('تحذف الحفل ده؟')) ju(KC, function(o){ o.list = (o.list||[]).filter(function(y){ return y.id!==id; }); return o; }).then(function(){ return load(true); }).then(render); }
+});
+document.addEventListener('input', function(ev){ var t = ev.target; if(!t || !t.dataset || !t.dataset.shf) return; var f = t.dataset.shf; if(f==='ym'){ H.ym = t.value; H.prev = null; } else sd()[f] = t.value; });
+
+if(typeof NAV_TILE_ITEMS!=='undefined'){
+  NAV_TILE_ITEMS.push({page:'shop', icon:'🛍️', labelKey:'متجر النقط', subKey:'اصرف نقطك على جوايز', color:'linear-gradient(145deg,#FF9F43,#FF5E7E)'});
+  NAV_TILE_ITEMS.push({page:'ceremony', icon:'🏆', labelKey:'حفل نهاية الشهر', subKey:'ألقاب وأوائل الشهر', color:'linear-gradient(145deg,#F4B740,#7B4FD6)'});
+}
+if(typeof BNAV_VIEW_TAB!=='undefined'){ BNAV_VIEW_TAB.shop = 'capabilities'; BNAV_VIEW_TAB.ceremony = 'capabilities'; }
+if(typeof ADMIN_HUB_ITEMS!=='undefined'){
+  ADMIN_HUB_ITEMS.push({group:'games', tab:'shop', short:'متجر الجوايز والطلبات', desc:'ضيف جوايز بأسعار بالنقط وسلّم طلبات المشاركين', icon:'🛍️', label:'متجر النقط', color:'linear-gradient(145deg,#FF9F43,#FF5E7E)'});
+  ADMIN_HUB_ITEMS.push({group:'games', tab:'ceremony', short:'ألقاب وأوائل الشهر', desc:'احسب ألقاب الشهر وشغّل الحفل وانشره للمشاركين', icon:'🏆', label:'حفل نهاية الشهر', color:'linear-gradient(145deg,#F4B740,#7B4FD6)'});
+}
+window.addEventListener('pagehide', closeCer);
+
+var st = document.createElement('style');
+st.textContent = ''
++ '.sh-bal{display:flex;align-items:center;gap:12px;padding:16px;margin:2px 0 8px;border-radius:22px;background:linear-gradient(135deg,rgba(255,159,67,.3),rgba(255,94,126,.26));border:1px solid rgba(255,255,255,.14)}.sh-bal span{font-size:36px}.sh-bal b{display:block;font-size:30px;font-weight:900;color:#FFD66B;line-height:1}.sh-bal small{font-size:12.5px;opacity:.9}'
++ '.sh-note{margin:8px 0 12px;padding:9px 12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border);font-size:12.5px;text-align:center;line-height:1.8}.sh-sec{margin:16px 4px 8px;font-weight:900}'
++ '.sh-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sh-it{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 10px;border-radius:20px;background:var(--surface-2);border:1px solid var(--border);text-align:center}.sh-it.out{opacity:.55}.sh-ie{font-size:38px}.sh-it b{font-size:14.5px}.sh-it small{color:var(--text-muted);font-size:11.5px;line-height:1.6}.sh-cost{font-weight:900;color:#FFD66B}.sh-it button{margin-top:4px;width:100%;padding:9px;border:0;border-radius:12px;background:linear-gradient(135deg,#FFD66B,#FF9F43);color:#3a2200;font:inherit;font-weight:900;cursor:pointer}.sh-it button:disabled{background:rgba(255,255,255,.12);color:var(--text-muted)}'
++ '.sh-or{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border)}.sh-or>span{font-size:26px}.sh-or div{flex:1}.sh-or b{display:block;font-size:14px}.sh-or small{color:var(--text-muted);font-size:11.5px}.sh-or i{font-style:normal;font-size:12px;font-weight:800;padding:5px 10px;border-radius:99px;background:rgba(255,214,107,.15);color:#FFD66B}.sh-or i.done{background:rgba(46,232,139,.16);color:#2EE88B}.sh-or i.cancel{background:rgba(255,255,255,.1);color:var(--text-muted)}'
++ '.sh-cp{padding:10px;margin-top:8px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border);line-height:1.9}.sh-cp small{color:#FFD66B;font-weight:800;margin-inline-start:6px}'
++ '.sh-cer{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:10px;padding:16px;border-radius:20px;border:0;color:#fff;font:inherit;text-align:start;cursor:pointer;background:linear-gradient(135deg,#7B4FD6,#FF6B9D)}.sh-cer span{font-size:32px}.sh-cer div{flex:1}.sh-cer b{display:block}.sh-cer small{opacity:.9}.sh-cer i{font-style:normal;font-weight:900;background:rgba(0,0,0,.25);padding:6px 12px;border-radius:99px}'
++ '#cm-ov{position:fixed;inset:0;z-index:100040;direction:rtl;color:#fff}.cm-bg{width:100%;height:100%;display:flex;flex-direction:column;background:radial-gradient(circle at 50% 20%,#5b2fb0,#1a1033 65%,#0b0820)}.cm-sl{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;animation:qz-qin .6s ease}.cm-e{font-size:96px;animation:qz-bob 2.4s ease-in-out infinite}.cm-sl h1{font-size:clamp(28px,6vw,54px);margin:10px 0}.cm-sl p,.cm-sl small{font-size:clamp(15px,2.4vw,24px);opacity:.9}'
++ '.cm-pod{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin-top:22px;width:100%;max-width:560px}.cm-pod div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 6px;border-radius:18px 18px 0 0;background:rgba(255,255,255,.14);animation:qz-pop .7s cubic-bezier(.2,1.4,.4,1) backwards}.cm-pod .p0{min-height:190px;background:linear-gradient(180deg,#FFD66B66,#FF9F4333);animation-delay:.5s}.cm-pod .p1{min-height:140px;animation-delay:.25s}.cm-pod .p2{min-height:110px;animation-delay:.05s}.cm-pod span{font-size:44px}.cm-pod b{font-size:clamp(14px,2.6vw,22px)}.cm-pod em{font-style:normal;color:#FFD66B;font-weight:900;font-size:13px}'
++ '.cm-ft{display:flex;gap:10px;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,.35)}.cm-ft button{min-width:46px;height:46px;border:0;border-radius:14px;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:20px;cursor:pointer}';
+document.head.appendChild(st);
+})();
+</script>
+<!-- ===== شخصيتي: ثيمات + أفاتار + مناسبات + أصوات ===== -->
+<script id="daily-module">
+(function(){
+'use strict';
+if(window.__glvDaily) return; window.__glvDaily = 1;
+var KS = 'glavera-style-v1', KC = 'glavera-daily-cfg-v1';
+var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+var me = function(){ return state.pid ? String(state.pid) : ''; };
+function person(pid){ return PARTICIPANTS.find(function(p){ return String(p.id)===String(pid); }); }
+function nm(pid){ var p = person(pid); return p ? p.name : 'مشارك'; }
+async function jg(k, d){ try{ var r = await window.storage.get(k, true); if(!r || r.value==null || r.value==='') return d; return typeof r.value==='string' ? JSON.parse(r.value) : r.value; }catch(e){ return d; } }
+function ju(k, fn){ try{ return window.storage.update(k, function(cur){ var o=null; try{ o = cur ? (typeof cur==='string'?JSON.parse(cur):cur) : null; }catch(e){} return JSON.stringify(fn(o)); }, true); }catch(e){ return Promise.resolve(null); } }
+function ls(k, v){ try{ if(v===undefined) return localStorage.getItem(k); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k, v); }catch(e){} return null; }
+function pad(n){ return String(n).padStart(2,'0'); }
+var S = {all:{}, cfg:{occ:[]}, t:0, p:null, tab:'theme', loaded:false, occDone:false, dr:null, od:null};
+function total(){ try{ return participantTotal(me()); }catch(e){ return 0; } }
+
+/* ---------- الثيمات ---------- */
+var THEMES = [
+ {k:'def', n:'الأساسي', e:'🌙', need:0},
+ {k:'sea', n:'البحر', e:'🌊', need:0, v:['#04202c','#073a4c','#0b4a60','#0f5f7a','#5FE0E8','#B5F5F7','#7BC9FF']},
+ {k:'forest', n:'الغابة', e:'🌲', need:0, v:['#0a1f14','#10301f','#164229','#1d5a37','#9BE15D','#D5F5A6','#5FE0A4']},
+ {k:'royal', n:'الملكي', e:'👑', need:150, v:['#1a0b3a','#2a1360','#35197a','#46219c','#FFC933','#FFE491','#C9A6FF']},
+ {k:'rose', n:'الوردي', e:'🌸', need:300, v:['#2a0a1e','#40112e','#521640','#6c1d54','#FF8FC1','#FFC7E1','#FFB07A']},
+ {k:'sunset', n:'الغروب', e:'🌅', need:600, v:['#2a0f0a','#431a10','#58230f','#72300f','#FF9F43','#FFD08A','#FF6B6B']},
+ {k:'gold', n:'الذهبي', e:'🏆', need:1200, v:['#0c0c0e','#1a1812','#24211a','#322d22','#F4C542','#FFE08A','#E8B04A']}
+];
+function applyTheme(k){
+  var el = document.getElementById('glv-th-css'); if(!el){ el = document.createElement('style'); el.id = 'glv-th-css'; document.head.appendChild(el); }
+  var t = THEMES.find(function(x){ return x.k===k; });
+  if(!t || !t.v){ el.textContent = ''; return; }
+  var v = t.v, sel = 'html:not([data-theme="light"])';
+  el.textContent = sel+'{--bg:'+v[0]+';--bg-2:'+v[1]+';--surface:'+v[2]+';--surface-2:'+v[3]+';--gold:'+v[4]+';--gold-2:'+v[5]+';--violet:'+v[6]+'}'
+    + sel+' body{background:radial-gradient(circle at 18% 8%,'+v[4]+'1c,transparent 40%),radial-gradient(circle at 85% 18%,'+v[6]+'1c,transparent 42%),linear-gradient(180deg,'+v[0]+' 0%,'+v[1]+' 45%,'+v[0]+' 100%)}';
+}
+function mine(){ return (S.all||{})[me()] || {}; }
+try{ var lt = ls('glv-th'); if(lt) applyTheme(lt); }catch(e){}
+
+/* ---------- الأفاتار ---------- */
+var BG = [['#7B4FD6','#FF6B9D',0],['#2CB67D','#3FDCC9',0],['#FF9F43','#FF5E7E',0],['#5B8DEF','#B79CFF',80],['#E0486B','#F4B740',200],['#0b4a60','#5FE0E8',400],['#1a1812','#F4C542',900]];
+var FACE = [['😀',0],['😎',0],['🤓',0],['😇',50],['🥳',120],['🤠',250],['🧐',400],['😌',700]];
+var ACC = [['',0],['👑',500],['🎩',150],['🎧',100],['🧢',60],['🎓',300],['🌸',40]];
+var PET = [['',0],['🐑',0],['🕶️',90],['🕊️',180],['🦁',350],['🐈',60],['🐢',30]];
+var FRM = [['',0],['#F4B740',100],['#3FDCC9',200],['#FF6B9D',350],['#fff',700]];
+function composed(a, size, extra){
+  if(!a) return '';
+  var b = BG[a.b||0] || BG[0], f = (FACE[a.f||0]||FACE[0])[0], c = (ACC[a.a||0]||ACC[0])[0], p = (PET[a.p||0]||PET[0])[0], fr = (FRM[a.r||0]||FRM[0])[0];
+  return {bg:'linear-gradient(135deg,'+b[0]+','+b[1]+')', ring: fr ? 'box-shadow:0 0 0 3px '+fr+',0 0 14px '+fr+'88;' : '',
+    svg:'<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block;overflow:visible"><text x="50" y="70" font-size="62" text-anchor="middle">'+f+'</text>'+(c?'<text x="50" y="28" font-size="40" text-anchor="middle">'+c+'</text>':'')+(p?'<text x="86" y="96" font-size="30" text-anchor="middle">'+p+'</text>':'')+'</svg>'};
+}
+function avHtml(pid, size){
+  var a = ((S.all||{})[pid]||{}).av; if(!a || !a.on) return null; var c = composed(a);
+  return '<div class="avatar glv-av" style="width:'+(size||44)+'px;height:'+(size||44)+'px;background:'+c.bg+';'+c.ring+'">'+c.svg+'</div>';
+}
+window.glvAvatar = avHtml;
+(function(){
+  var oa = window.avatarHtml, om = window.meAvatarHtml;
+  if(typeof oa==='function') window.avatarHtml = function(p, extra){
+    try{ var a = p && ((S.all||{})[p.id]||{}).av; if(a && a.on){ var c = composed(a); return '<div class="avatar glv-av" style="background:'+c.bg+';'+c.ring+(extra||'')+'">'+c.svg+'</div>'; } }catch(e){}
+    return oa.apply(this, arguments);
+  };
+  if(typeof om==='function') window.meAvatarHtml = function(p, cls){
+    try{ var a = p && ((S.all||{})[p.id]||{}).av; if(a && a.on){ var c = composed(a); return '<div class="'+esc(cls)+' glv-av" style="background:'+c.bg+';'+c.ring+'">'+c.svg+'</div>'; } }catch(e){}
+    return om.apply(this, arguments);
+  };
+})();
+
+/* ---------- التحميل ---------- */
+async function doLoad(){
+  var a = await jg(KS, {}), c = await jg(KC, {occ:[]}); var sg = JSON.stringify(a); var ch = sg!==S.sg; S.sg = sg;
+  S.all = a || {}; S.cfg = c || {occ:[]}; S.cfg.occ = S.cfg.occ||[]; S.t = Date.now(); S.loaded = true;
+  var th = (S.all[me()]||{}).th; if(me() && th!==undefined && th!==ls('glv-th')){ ls('glv-th', th||''); applyTheme(th||''); }
+  if(ch && state.view==='mystyle' && !document.activeElement.matches('input,textarea')) render();
+}
+function load(force){ if(!force && Date.now()-S.t < 20000) return Promise.resolve(); if(S.p) return S.p; S.p = doLoad().then(function(){ S.p = null; }, function(){ S.p = null; }); return S.p; }
+
+/* ---------- الصفحة ---------- */
+function head(title){ return '<div class="back-row"><button class="icon-btn" data-action="back" aria-label="رجوع">'+ICO.back+'</button><div class="back-title">'+esc(title)+'</div></div>'; }
+window.FXVIEWS = window.FXVIEWS || {};
+window.FXVIEWS.mystyle = function(){
+  load(false); if(!me()) return head('شخصيتي') + '<div class="empty-note">سجّل دخولك الأول 💛</div>';
+  var t = [['theme','🎨','ثيمات'],['avatar','🧑‍🎨','أفاتار'],['sound','🔊','صوت']];
+  return head('شخصيتي 🎨') + '<div class="ds-pts">⭐ رصيدك: <b>'+total()+'</b> نقطة — كل ما تكسب نقط بتفتح حاجات أكتر</div><div class="ds-tabs">'+t.map(function(x){ return '<button type="button" class="'+(S.tab===x[0]?'on':'')+'" data-ds="tab" data-t="'+x[0]+'"><span>'+x[1]+'</span>'+x[2]+'</button>'; }).join('')+'</div>'
+    + (S.tab==='avatar' ? avatarTab() : S.tab==='sound' ? soundTab() : themeTab());
+};
+function themeTab(){
+  var cur = ls('glv-th') || '', pts = total();
+  return '<div class="ds-grid">'+THEMES.map(function(t){
+    var lock = pts < t.need, v = t.v || ['#0E0D2B','#171449','#1D1A52','#262161','#F4B740'];
+    return '<button type="button" class="ds-th'+((cur===t.k||(!cur&&t.k==='def'))?' on':'')+(lock?' lock':'')+'" data-ds="theme" data-k="'+t.k+'" style="background:linear-gradient(135deg,'+v[0]+','+v[3]+')"><span class="e">'+t.e+'</span><b>'+esc(t.n)+'</b><i style="background:'+v[4]+'"></i><small>'+(lock?'🔒 '+t.need+' نقطة':'متاح')+'</small></button>';
+  }).join('')+'</div><div class="ds-note">الثيم بيتحفظ لحسابك وبيظهر على أي جهاز تفتح منه. (الوضع الفاتح بيفضل زي ما هو.)</div>';
+}
+function avatarTab(){
+  var m = mine(), a = S.dr || m.av || {f:0,a:0,p:0,b:0,r:0,on:1}, pts = total(), c = composed(a);
+  function row(label, key, arr, kind){
+    return '<div class="ds-sec">'+label+'</div><div class="ds-opts">'+arr.map(function(it,i){
+      var need = it[kind==='bg'?2:1], lock = pts < need, on = (a[key]||0)===i;
+      var inner = kind==='bg' ? '<span style="display:block;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,'+it[0]+','+it[1]+')"></span>' : kind==='frm' ? '<span style="display:block;width:26px;height:26px;border-radius:50%;border:3px solid '+(it[0]||'rgba(255,255,255,.25)')+'"></span>' : (it[0]||'∅');
+      return '<button type="button" class="'+(on?'on':'')+(lock?' lock':'')+'" data-ds="av" data-key="'+key+'" data-i="'+i+'">'+inner+(lock?'<small>🔒'+need+'</small>':'')+'</button>';
+    }).join('')+'</div>';
+  }
+  return '<div class="ds-prev"><div class="avatar glv-av" style="width:120px;height:120px;background:'+c.bg+';'+c.ring+'">'+c.svg+'</div></div>'
+    + row('الخلفية','b',BG,'bg') + row('الوش','f',FACE,'f') + row('اللي على الراس','a',ACC,'a') + row('رفيق','p',PET,'p') + row('الإطار','r',FRM,'frm')
+    + '<label class="ds-chk"><input type="checkbox" id="ds-on" '+(a.on?'checked':'')+'> استخدم الأفاتار ده كصورة لحسابي (بدل الصورة/الحروف)</label>'
+    + '<button type="button" class="qz-go" data-ds="avsave">💾 احفظ الأفاتار</button>';
+}
+function soundTab(){
+  var mt = window.glvFx && window.glvFx.muted();
+  return '<div class="ds-note" style="text-align:start">أصوات وحركات الإنجازات: لما تكسب درجة كاملة أو جايزة أو تنتصر في تحدّي.</div>'
+    + '<label class="ds-chk"><input type="checkbox" id="ds-snd" '+(mt?'':'checked')+'> 🔊 شغّل أصوات الإنجازات</label>'
+    + '<div class="ds-opts" style="margin-top:12px"><button type="button" data-ds="t1">🎵 جرّب صوت صغير</button><button type="button" data-ds="t2">🎉 جرّب إنجاز كبير</button></div>';
+}
+async function savePref(fn){ var m = me(); return ju(KS, function(o){ o = o||{}; var x = o[m] = o[m]||{}; fn(x); return o; }); }
+
+/* ---------- المناسبات ---------- */
+function orthEaster(y){
+  var a = y%4, b = y%7, c = y%19, d = (19*c+15)%30, e = (2*a+4*b-d+34)%7, mo = Math.floor((d+e+114)/31), da = ((d+e+114)%31)+1;
+  return new Date(y, mo-1, da+13);
+}
+function sameDay(a, b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+function addDays(d, n){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()+n); }
+function occasionsToday(){
+  var t = new Date(), y = t.getFullYear(), md = pad(t.getMonth()+1)+'-'+pad(t.getDate()), out = [], E = orthEaster(y);
+  var fixed = {'01-01':['🎆','سنة جديدة سعيدة','كل سنة وإنت طيب — سنة مليانة نعمة وفرح'],'01-07':['🎄','عيد الميلاد المجيد','كل سنة وإنت طيب — المجد لله في الأعالي!'],'01-19':['💧','عيد الغطاس المجيد','كل سنة وإنت طيب بعيد الظهور الإلهي'],'04-07':['🕊️','عيد البشارة','كل سنة وإنت طيب'],'09-11':['🍯','النيروز — رأس السنة القبطية','كل سنة وإنت طيب وسنة قبطية مباركة'],'09-27':['✝️','عيد الصليب المجيد','كل سنة وإنت طيب']};
+  if(fixed[md]) out.push({e:fixed[md][0], t:fixed[md][1], m:fixed[md][2]});
+  if(sameDay(t, E)) out.push({e:'🌅', t:'المسيح قام!', m:'بالحقيقة قام — كل سنة وإنت طيب بعيد القيامة المجيد', big:1});
+  if(sameDay(t, addDays(E,-7))) out.push({e:'🌿', t:'أحد الشعانين', m:'أوصنا في الأعالي — كل سنة وإنت طيب'});
+  if(sameDay(t, addDays(E,-2))) out.push({e:'🕯️', t:'الجمعة العظيمة', m:'يوم الصلب — نصلّي ونتأمل في محبة المسيح', calm:1});
+  if(sameDay(t, addDays(E,39))) out.push({e:'☁️', t:'عيد الصعود المجيد', m:'كل سنة وإنت طيب'});
+  if(sameDay(t, addDays(E,49))) out.push({e:'🔥', t:'عيد العنصرة', m:'حلول الروح القدس — كل سنة وإنت طيب'});
+  (S.cfg.occ||[]).forEach(function(o){ if(o && o.md===md) out.push({e:o.e||'🎉', t:o.t||'مناسبة', m:o.m||''}); });
+  var cp = null; try{ cp = cpOf(me()); }catch(e){} var bd = ''; try{ bd = (myExtra(me()).birth) || (cp && cp.birth) || ''; }catch(e){}
+  if(bd && bd.slice(5)===md) out.unshift({e:'🎂', t:'كل سنة وإنت طيب يا '+(nm(me()).split(' ')[0]), m:'النهارده عيد ميلادك — ربنا يفرّح قلبك ويبارك سنتك الجديدة 🎉', big:1});
+  return out;
+}
+function showOccasion(){
+  var list = occasionsToday(); if(!list.length) return; var key = 'glv-occ-'+me()+'-'+new Date().toDateString(); if(ls(key)) return; ls(key, '1');
+  var o = list[0], ov = document.createElement('div'); ov.className = 'ds-occ'; ov.innerHTML = '<div class="ds-oc"><div class="ds-oe">'+o.e+'</div><h2>'+esc(o.t)+'</h2><p>'+esc(o.m)+'</p>'+(list.length>1?'<small>+ '+list.slice(1).map(function(x){ return esc(x.e+' '+x.t); }).join(' · ')+'</small>':'')+'<button type="button">تمام 💛</button></div>';
+  ov.addEventListener('click', function(e){ if(e.target===ov || e.target.tagName==='BUTTON') ov.remove(); });
+  document.body.appendChild(ov);
+  if(window.glvFx && !o.calm){ var em = {'🎂':['🎂','🎉','🎈','🎁','✨'],'🎄':['🎄','⭐','❄️','🎁','✨'],'🌅':['🌅','✝️','🕊️','✨','🌷']}[o.e] || ['🎉','✨','🌟','💛']; window.glvFx.burst(em, 40); if(o.big) window.glvFx.big(o.t, ''); else window.glvFx.win(); }
+}
+
+/* ---------- الأدمن: مناسبات مخصصة ---------- */
+window.FXADMIN = window.FXADMIN || {};
+window.FXADMIN.mystyle = function(){
+  load(false); var d = S.od || (S.od = {md:'', e:'🎉', t:'', m:''}), occ = S.cfg.occ||[], today = occasionsToday();
+  return adminKpis([{num:occ.length, lab:'مناسبة مخصصة'},{num:today.length, lab:'مناسبات النهارده'}]) + (window.glvTileVisBtn ? window.glvTileVisBtn('mystyle') : '')
+    + '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">🎊 مناسبة مخصصة</div><div class="fx-hint">الأعياد القبطية الكبرى (الميلاد، الغطاس، القيامة…) وأعياد ميلاد المشاركين بتتحسب تلقائي. هنا تضيف مناسباتك (مثلاً يوم الاجتماع السنوي).</div>'
+    + '<div style="display:flex;gap:8px"><div style="flex:1"><label class="emp-lab">اليوم (شهر-يوم)</label><input class="field" placeholder="مثال: 03-21" maxlength="5" data-dsf="md" value="'+esc(d.md)+'"></div><div style="width:90px"><label class="emp-lab">إيموجي</label><input class="field" maxlength="4" data-dsf="e" value="'+esc(d.e)+'"></div></div>'
+    + '<label class="emp-lab">العنوان</label><input class="field" maxlength="50" data-dsf="t" value="'+esc(d.t)+'"><label class="emp-lab">الرسالة</label><input class="field" maxlength="120" data-dsf="m" value="'+esc(d.m)+'">'
+    + '<button type="button" class="btn btn-primary" style="width:100%;margin-top:10px" data-ds="osave">➕ أضف المناسبة</button></div>'
+    + (occ.length ? '<div class="fx-sep">المناسبات</div>'+occ.map(function(o,i){ return '<div class="card" style="padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:10px"><span style="font-size:26px">'+esc(o.e)+'</span><div style="flex:1"><b>'+esc(o.t)+'</b><div class="fx-hint">'+esc(o.md)+' · '+esc(o.m)+'</div></div><button type="button" class="qz-x" data-ds="odel" data-i="'+i+'">🗑️</button></div>'; }).join('') : '');
+};
+document.addEventListener('click', function(ev){
+  var el = ev.target.closest && ev.target.closest('[data-ds]'); if(!el) return; var a = el.dataset.ds;
+  if(a==='tab'){ S.tab = el.dataset.t; render(); }
+  else if(a==='theme'){ var k = el.dataset.k, t = THEMES.find(function(x){ return x.k===k; }); if(!t) return; if(total() < t.need){ showToast('الثيم ده بيتفتح عند '+t.need+' نقطة 🔒', true); return; } ls('glv-th', k==='def' ? '' : k); applyTheme(k==='def'?'':k); savePref(function(x){ x.th = (k==='def'?'':k); }); try{ window.glvFx && window.glvFx.ok(); }catch(e){} render(); }
+  else if(a==='av'){ var key = el.dataset.key, i = +el.dataset.i, arr = {b:BG,f:FACE,a:ACC,p:PET,r:FRM}[key], it = arr[i], need = it[key==='b'?2:1]; if(total() < need){ showToast('بيتفتح عند '+need+' نقطة 🔒', true); return; } S.dr = Object.assign({f:0,a:0,p:0,b:0,r:0,on:1}, mine().av||{}, S.dr||{}); S.dr[key] = i; render(); }
+  else if(a==='avsave'){ var d = Object.assign({f:0,a:0,p:0,b:0,r:0,on:1}, mine().av||{}, S.dr||{}); d.on = (document.getElementById('ds-on')||{}).checked ? 1 : 0; savePref(function(x){ x.av = d; }).then(function(ok){ if(!ok){ showToast('معرفتش أحفظ — جرّب تاني', true); return; } S.dr = null; showToast('اتحفظ الأفاتار ✨'); window.glvFx && window.glvFx.win(); return load(true).then(render); }); }
+  else if(a==='t1') window.glvFx && window.glvFx.ok();
+  else if(a==='t2') window.glvFx && window.glvFx.big('إنجاز جديد!', 'جرّبت الصوت 🎉');
+  else if(a==='osave'){ var o = S.od; if(!o || !/^\d\d-\d\d$/.test(o.md) || !o.t.trim()){ showToast('اكتب اليوم بصيغة 03-21 والعنوان', true); return; } ju(KC, function(c){ c = c||{occ:[]}; c.occ = c.occ||[]; c.occ.push({md:o.md, e:o.e||'🎉', t:o.t.trim(), m:(o.m||'').trim()}); return c; }).then(function(ok){ if(!ok){ showToast('معرفتش أحفظ', true); return; } S.od = null; showToast('اتضافت المناسبة 🎊'); return load(true).then(render); }); }
+  else if(a==='odel'){ var ix = +el.dataset.i; ju(KC, function(c){ c = c||{occ:[]}; (c.occ||[]).splice(ix,1); return c; }).then(function(){ return load(true); }).then(render); }
+});
+document.addEventListener('change', function(ev){ var t = ev.target; if(t && t.id==='ds-snd' && window.glvFx){ window.glvFx.setMuted(!t.checked); if(t.checked) window.glvFx.ok(); } });
+document.addEventListener('input', function(ev){ var t = ev.target; if(t && t.dataset && t.dataset.dsf && S.od) S.od[t.dataset.dsf] = t.value; });
+
+/* ---------- تشغيل أولي ---------- */
+setInterval(function(){
+  if(!S.loaded && !S.p) load(true);
+  else if(Date.now()-S.t > 90000 && document.visibilityState==='visible') load(true);
+  if(me() && S.loaded && !S.occDone){ S.occDone = true; setTimeout(function(){ try{ showOccasion(); }catch(e){} }, 2500); }
+}, 2000);
+if(typeof NAV_TILE_ITEMS!=='undefined'){ NAV_TILE_ITEMS.push({page:'mystyle', icon:'🎨', labelKey:'شخصيتي', subKey:'ثيمات · أفاتار · أصوات', color:'linear-gradient(145deg,#FF6B9D,#7B4FD6)'}); }
+if(typeof BNAV_VIEW_TAB!=='undefined'){ BNAV_VIEW_TAB.mystyle = 'capabilities'; }
+if(typeof ADMIN_HUB_ITEMS!=='undefined'){ ADMIN_HUB_ITEMS.push({group:'games', tab:'mystyle', short:'مناسبات وثيمات', desc:'مناسبات مخصصة وأعياد تلقائية، والثيمات والأفاتار للأعضاء', icon:'🎨', label:'مناسبات وشخصيتي', color:'linear-gradient(145deg,#FF6B9D,#7B4FD6)'}); }
+
+var st = document.createElement('style');
+st.textContent = ''
++ '.ds-pts{margin:4px 0 10px;padding:10px 12px;border-radius:14px;background:rgba(255,214,107,.12);border:1px dashed rgba(255,214,107,.45);text-align:center;font-size:13px}.ds-pts b{color:#FFD66B;font-size:16px}'
++ '.ds-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}.ds-tabs button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px;border-radius:14px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}.ds-tabs span{font-size:22px}.ds-tabs button.on{background:linear-gradient(135deg,#FF6B9D,#7B4FD6);color:#fff;border-color:transparent}'
++ '.ds-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ds-th{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 8px;border-radius:20px;border:2px solid rgba(255,255,255,.14);color:#fff;font:inherit;cursor:pointer;transition:transform .15s}.ds-th:active{transform:scale(.96)}.ds-th .e{font-size:32px}.ds-th i{display:block;width:34px;height:6px;border-radius:99px}.ds-th small{opacity:.85;font-size:11.5px}.ds-th.on{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.25)}.ds-th.lock{opacity:.55}'
++ '.ds-note{margin:12px 0;padding:10px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border);font-size:12.5px;line-height:1.9;text-align:center;color:var(--text-muted)}'
++ '.ds-prev{display:flex;justify-content:center;margin:8px 0 14px}.ds-sec{margin:12px 4px 6px;font-weight:900;font-size:13.5px}.ds-opts{display:flex;flex-wrap:wrap;gap:8px}.ds-opts button{position:relative;min-width:50px;height:50px;padding:0 10px;border-radius:14px;border:2px solid var(--border);background:var(--surface-2);color:var(--text);font:inherit;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}.ds-opts button.on{border-color:#FFD66B;transform:scale(1.08)}.ds-opts button.lock{opacity:.5}.ds-opts button small{position:absolute;bottom:-9px;font-size:9.5px;background:#222;border-radius:99px;padding:1px 5px;color:#fff}'
++ '.ds-chk{display:flex;gap:8px;align-items:center;margin:16px 2px;font-size:14px}.glv-av{overflow:visible!important}'
++ '.ds-occ{position:fixed;inset:0;z-index:100030;background:rgba(5,5,15,.78);display:flex;align-items:center;justify-content:center;padding:20px;direction:rtl;animation:qz-qin .35s ease}.ds-oc{width:100%;max-width:360px;text-align:center;padding:28px 20px;border-radius:30px;background:linear-gradient(145deg,#7B4FD6,#FF6B9D);color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5)}.ds-oe{font-size:76px;animation:qz-bob 2.4s ease-in-out infinite}.ds-oc h2{margin:6px 0;font-size:23px;font-weight:900}.ds-oc p{line-height:1.9;margin:6px 0 14px}.ds-oc small{display:block;opacity:.85;margin-bottom:12px}.ds-oc button{padding:12px 34px;border:0;border-radius:99px;background:#fff;color:#4a2a8a;font:inherit;font-weight:900;font-size:16px;cursor:pointer}';
+document.head.appendChild(st);
+})();
+</script>
+<!-- ===== تقييم الاجتماع + أعياد الميلاد + تذكيرات تلقائية ===== -->
+<script id="rate-module">
+(function(){
+'use strict';
+if(window.__glvRate) return; window.__glvRate = 1;
+var KR = 'glavera-rate-v1', KB = 'glavera-bday-v1', KC = 'glavera-remind-cfg-v1', KS = 'glavera-remind-sent-v1';
+var esc = function(s){ return escapeHtml(String(s==null?'':s)); };
+var me = function(){ return state.pid ? String(state.pid) : ''; };
+function person(pid){ return PARTICIPANTS.find(function(p){ return String(p.id)===String(pid); }); }
+function nm(pid){ var p = person(pid); return p ? p.name : 'مشارك'; }
+async function jg(k, d){ try{ var r = await window.storage.get(k, true); if(!r || r.value==null || r.value==='') return d; return typeof r.value==='string' ? JSON.parse(r.value) : r.value; }catch(e){ return d; } }
+function ju(k, fn){ try{ return window.storage.update(k, function(cur){ var o=null; try{ o = cur ? (typeof cur==='string'?JSON.parse(cur):cur) : null; }catch(e){} return JSON.stringify(fn(o)); }, true); }catch(e){ return Promise.resolve(null); } }
+function typing(){ var a = document.activeElement; return !!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function hash(s){ var h = 7; s = String(s); for(var i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) >>> 0; return h.toString(36); }
+var R = {rate:{meets:[],r:{}}, bd:{}, cfg:{}, sent:{}, t:0, p:null, sg:'', sel:null, star:0, tags:[], busy:false, d:null, cd:null, rid:null};
+var TAGS = ['👌 الشرح واضح','⏱️ الوقت مناسب','😍 استمتعت','🤝 جو جميل','🔧 محتاج تحسين','🎤 الصوت/المكان'];
+
+async function doLoad(){
+  var a = await jg(KR, {meets:[],r:{}}), b = await jg(KB, {}), c = await jg(KC, {}), d = await jg(KS, {});
+  R.rate = a || {meets:[],r:{}}; R.rate.meets = R.rate.meets||[]; R.rate.r = R.rate.r||{}; R.bd = b || {}; R.cfg = c || {}; R.sent = d || {};
+  var sg = JSON.stringify([R.rate, R.bd, R.cfg, R.sent]), ch = sg!==R.sg; R.sg = sg; R.t = Date.now();
+  if(ch && !typing() && !R.busy && (['rate','bday'].indexOf(state.view)>=0 || (state.view==='admin' && state.adminUnlocked && (state.adminTab==='rate'||state.adminTab==='remind')))) render();
+}
+function load(force){ if(!force && Date.now()-R.t < 15000) return Promise.resolve(); if(R.p) return R.p; R.p = doLoad().then(function(){ R.p = null; }, function(){ R.p = null; }); return R.p; }
+function head(title){ return '<div class="back-row"><button class="icon-btn" data-action="back" aria-label="رجوع">'+ICO.back+'</button><div class="back-title">'+esc(title)+'</div></div>'; }
+async function addPts(pts){
+  var m = me();
+  try{ var b = await loadBonus(); if(b && !b.__stale) BONUS = b; BONUS[m] = (BONUS[m]||0) + pts; var ok = await saveBonus(BONUS); if(!ok) BONUS[m] = Math.max(0,(BONUS[m]||0)-pts); return !!ok; }
+  catch(e){ try{ BONUS[m] = Math.max(0,(BONUS[m]||0)-pts); }catch(e2){} return false; }
+}
+
+/* ---------- تقييم الاجتماع: المشارك ---------- */
+function key(id){ return hash(me()+'|'+id); }
+function myRating(id){ return ((R.rate.r||{})[id]||{})[key(id)]; }
+window.FXVIEWS = window.FXVIEWS || {};
+window.FXVIEWS.rate = function(){
+  load(false); if(!me()) return head('قيّم الاجتماع') + '<div class="empty-note">سجّل دخولك الأول 💛</div>';
+  var ms = R.rate.meets.filter(function(m){ return m.open || myRating(m.id); }).sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+  if(R.sel){ var m = ms.find(function(x){ return x.id===R.sel; }); if(m) return ratePage(m); R.sel = null; }
+  return head('قيّم الاجتماع ⭐') + '<div class="rt-note">رأيك مهم! التقييم بيوصل للأدمن بدون اسمك، وبتاخد <b>+٢ نقطة</b> على كل تقييم 💛</div>'
+    + (ms.length ? ms.map(function(m){ var r = myRating(m.id); return '<button type="button" class="rt-card" data-rt="open" data-id="'+esc(m.id)+'"><span>🗓️</span><div><b>'+esc(m.title)+'</b><small>'+esc(m.date||'')+'</small></div><i>'+(r ? '✅ '+'⭐'.repeat(r.s) : 'قيّم ▶')+'</i></button>'; }).join('') : '<div class="empty-note">مفيش اجتماع مفتوح للتقييم دلوقتي</div>');
+}
+function ratePage(m){
+  var r = myRating(m.id);
+  var h = head('قيّم الاجتماع ⭐') + '<button type="button" class="rt-bk" data-rt="back">← كل الاجتماعات</button><div class="rt-t">'+esc(m.title)+'</div>';
+  if(r) return h + '<div class="rt-done"><div>'+'⭐'.repeat(r.s)+'</div><b>شكراً على تقييمك 💛</b>'+(r.tg&&r.tg.length?'<small>'+r.tg.map(esc).join(' · ')+'</small>':'')+'</div>';
+  return h + '<div class="rt-stars">'+[1,2,3,4,5].map(function(n){ return '<button type="button" class="'+(R.star>=n?'on':'')+'" data-rt="star" data-n="'+n+'">★</button>'; }).join('')+'</div><div class="rt-lab">'+(['','😞 ضعيف','😐 مقبول','🙂 كويس','😃 حلو أوي','🤩 ممتاز'][R.star]||'اختار تقييمك')+'</div>'
+    + '<div class="rt-tags">'+TAGS.map(function(t,i){ return '<button type="button" class="'+(R.tags.indexOf(i)>=0?'on':'')+'" data-rt="tag" data-i="'+i+'">'+esc(t)+'</button>'; }).join('')+'</div>'
+    + '<textarea class="field" id="rt-c" rows="3" maxlength="300" placeholder="تعليق أو اقتراح (اختياري) — مجهول الاسم"></textarea><button type="button" class="qz-go" style="margin-top:12px" data-rt="send" '+(R.star?'':'disabled')+'>📨 ابعت التقييم</button>';
+}
+async function sendRating(){
+  var m = R.rate.meets.find(function(x){ return x.id===R.sel; }); if(!m || !R.star || R.busy) return; R.busy = true;
+  var k = key(m.id), c = ((document.getElementById('rt-c')||{}).value||'').trim().slice(0,300), tg = R.tags.map(function(i){ return TAGS[i]; }), s = R.star, got = false;
+  var ok = await ju(KR, function(o){ o = o||{meets:[],r:{}}; o.r = o.r||{}; var x = o.r[m.id] = o.r[m.id]||{}; if(!x[k]){ x[k] = {s:s, c:c, tg:tg, at:Date.now(), pd:1}; got = true; } return o; });
+  if(!ok){ R.busy = false; showToast('معرفتش أبعت — جرّب تاني', true); return; }
+  var saved = got ? await addPts(2) : true;
+  if(got && !saved){ await ju(KR, function(o){ if(o && o.r && o.r[m.id] && o.r[m.id][k]) o.r[m.id][k].pd = 0; return o||{meets:[],r:{}}; }); }
+  R.busy = false; R.star = 0; R.tags = []; await load(true);
+  if(got){ try{ window.glvFx && window.glvFx.big('شكراً لتقييمك!', saved ? '+٢ نقطة' : ''); }catch(e){} }
+  render();
+}
+
+/* ---------- تقييم: الأدمن ---------- */
+function md(){ return R.d || (R.d = {title:'', date:new Date().toISOString().slice(0,10)}); }
+window.FXADMIN = window.FXADMIN || {};
+window.FXADMIN.rate = function(){
+  load(false); var d = md(), ms = R.rate.meets.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+  var tot = 0, sum = 0; ms.forEach(function(m){ Object.values((R.rate.r||{})[m.id]||{}).forEach(function(x){ tot++; sum += x.s; }); });
+  var h = adminKpis([{num:ms.length, lab:'اجتماع'},{num:tot, lab:'تقييم'},{num:tot?(sum/tot).toFixed(1):'—', lab:'المتوسط'}]) + (window.glvTileVisBtn ? window.glvTileVisBtn('rate') : '')
+    + '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">🗓️ افتح تقييم لاجتماع</div><label class="emp-lab">اسم/موضوع الاجتماع</label><input class="field" maxlength="60" data-rtf="title" placeholder="مثال: اجتماع الخميس — قصة يوسف" value="'+esc(d.title)+'"><label class="emp-lab">التاريخ</label><input class="field" type="date" data-rtf="date" value="'+esc(d.date)+'"><button type="button" class="btn btn-primary" style="width:100%;margin-top:10px" data-rt="asave">📤 افتح التقييم وابعت إشعار</button></div>';
+  h += ms.map(function(m){
+    var rs = Object.values((R.rate.r||{})[m.id]||{}), n = rs.length, avg = n ? rs.reduce(function(a,x){ return a+x.s; },0)/n : 0, hist = [1,2,3,4,5].map(function(s){ return rs.filter(function(x){ return x.s===s; }).length; }), mx = Math.max.apply(null, hist.concat([1])), tc = {};
+    rs.forEach(function(x){ (x.tg||[]).forEach(function(t){ tc[t] = (tc[t]||0)+1; }); });
+    return '<div class="card" style="padding:14px;margin-top:12px"><div style="display:flex;align-items:center;gap:8px"><b style="flex:1">'+esc(m.title)+'</b><span class="fx-hint">'+esc(m.date||'')+'</span></div><div class="rt-avg"><b>'+(n?avg.toFixed(1):'—')+'</b><span>⭐ من '+n+' تقييم</span></div>'
+      + '<div class="rt-hist">'+[4,3,2,1,0].map(function(i){ return '<div><span>'+(i+1)+'★</span><i style="width:'+Math.round(hist[i]/mx*100)+'%"></i><em>'+hist[i]+'</em></div>'; }).join('')+'</div>'
+      + (Object.keys(tc).length ? '<div class="rt-tgs">'+Object.keys(tc).sort(function(a,b){ return tc[b]-tc[a]; }).map(function(t){ return '<span>'+esc(t)+' <b>'+tc[t]+'</b></span>'; }).join('')+'</div>' : '')
+      + rs.filter(function(x){ return x.c; }).sort(function(a,b){ return b.at-a.at; }).slice(0,12).map(function(x){ return '<div class="rt-cm">«'+esc(x.c)+'» <small>'+'⭐'.repeat(x.s)+'</small></div>'; }).join('')
+      + '<div class="sar-actions" style="margin-top:10px"><button type="button" class="btn btn-ghost" data-rt="atoggle" data-id="'+esc(m.id)+'">'+(m.open?'🔒 اقفل التقييم':'🔓 افتح')+'</button><button type="button" class="btn btn-ghost" data-rt="adel" data-id="'+esc(m.id)+'">🗑️</button></div></div>';
+  }).join('');
+  return h;
+};
+
+/* ---------- جدار أعياد الميلاد ---------- */
+function birthOf(pid){ var b = ''; try{ b = (myExtra(pid).birth) || ((cpOf(pid)||{}).birth) || ''; }catch(e){} return /^\d{4}-\d{2}-\d{2}$/.test(b) ? b : ''; }
+function daysTo(iso){ var m = iso.split('-'), t = new Date(), today = new Date(t.getFullYear(), t.getMonth(), t.getDate()), n = new Date(t.getFullYear(), +m[1]-1, +m[2]); if(n<today) n = new Date(t.getFullYear()+1, +m[1]-1, +m[2]); return Math.round((n-today)/864e5); }
+var AR_MON = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+function bdList(){
+  return PARTICIPANTS.map(function(p){ var b = birthOf(p.id); return b ? {pid:String(p.id), n:p.name, d:daysTo(b), md:b.slice(5), day:+b.slice(8), mon:+b.slice(5,7)} : null; }).filter(Boolean).filter(function(x){ return x.d<=30; }).sort(function(a,b){ return a.d-b.d; });
+}
+window.FXVIEWS.bday = function(){
+  load(false); var l = bdList(), yr = String(new Date().getFullYear()), gm = (R.bd[yr]||{});
+  var h = head('أعياد الميلاد 🎂');
+  if(!l.length) return h + '<div class="empty-note">مفيش أعياد ميلاد في الـ٣٠ يوم الجايين 🎈</div>';
+  var today = l.filter(function(x){ return x.d===0; });
+  if(today.length) h += '<div class="bd-today"><div>🎉🎂🎈</div>'+today.map(function(x){ return '<b>'+esc(x.n)+'</b>'; }).join(' · ')+'<small>النهارده عيد ميلاده — ابعتله تهنئة!</small></div>';
+  h += l.map(function(x){
+    var gs = (gm[x.pid]||[]), sent = gs.indexOf(me())>=0, self = x.pid===me();
+    return '<div class="bd-row'+(x.d===0?' now':'')+'"><div class="bd-dt"><b>'+x.day+'</b><small>'+AR_MON[x.mon-1]+'</small></div><div class="bd-i"><b>'+esc(x.n)+'</b><small>'+(x.d===0?'🎂 النهارده!':x.d===1?'بكرة':'بعد '+x.d+' يوم')+(gs.length?' · 💌 '+gs.length+' تهنئة':'')+'</small></div>'+(self ? '<i>🎁</i>' : '<button type="button" '+(sent?'disabled':'')+' data-rt="greet" data-id="'+esc(x.pid)+'">'+(sent?'✅ اتبعتت':'🎉 هنّيه')+'</button>')+'</div>';
+  }).join('');
+  return h;
+};
+async function greet(pid){
+  if(R.busy) return; R.busy = true; var yr = String(new Date().getFullYear()), m = me(), got = false;
+  var ok = await ju(KB, function(o){ o = o||{}; var y = o[yr] = o[yr]||{}; var a = y[pid] = y[pid]||[]; if(a.indexOf(m)<0){ a.push(m); got = true; } Object.keys(o).forEach(function(k){ if(k!==yr) delete o[k]; }); return o; });
+  R.busy = false; if(!ok){ showToast('معرفتش أبعت', true); return; }
+  if(got){ var msgs = ['كل سنة وإنت طيب! ربنا يفرّح قلبك ويبارك سنتك الجديدة','عيد ميلاد سعيد! إنت نعمة في الاجتماع، ربنا يحفظك','كل سنة وإنت أقرب لربنا وأحلى في المحبة'], t = msgs[Math.floor(Math.random()*msgs.length)];
+    try{ pushNotification(pid, '🎂 '+nm(m)+' بيقولك: '+t, '🎂'); }catch(e){} showToast('اتبعتت التهنئة 🎉'); try{ window.glvFx && window.glvFx.win(); }catch(e){} }
+  await load(true); render();
+}
+
+/* ---------- التذكيرات التلقائية (الأدمن) ---------- */
+var DOW = ['الأحد','الإثنين','التلات','الأربع','الخميس','الجمعة','السبت'];
+function cd(){ if(!R.cd){ var c = R.cfg||{}; R.cd = {on:c.on?1:0, dow:c.dow==null?4:c.dow, time:c.time||'15:00', topic:c.topic||'', place:c.place||'', vOn:c.vOn?1:0, vTime:c.vTime||'08:00'}; } return R.cd; }
+window.FXADMIN.remind = function(){
+  load(false); var d = cd(), sent = R.sent||{}, keys = Object.keys(sent).sort().slice(-6).reverse();
+  return adminKpis([{num:R.cfg&&R.cfg.on?'شغّال':'مقفول', lab:'تذكير الاجتماع'},{num:R.cfg&&R.cfg.vOn?'شغّال':'مقفول', lab:'آية اليوم التلقائية'}])
+    + '<div class="card fx-form"><div class="fx-sep" style="margin-top:0">⏰ تذكير الاجتماع</div><div class="fx-hint">الموقع مش بيشتغل والتطبيق مقفول، فالتذكير بيتبعت تلقائي <b>أول ما أي مشارك يفتح الموقع</b> بعد الميعاد في اليوم ده، ومرة واحدة بس. لو عايزه مضمون، افتح الموقع انت في الميعاد أو استخدم زرار «ابعت دلوقتي».</div>'
+    + '<label class="chk-row" style="display:flex;gap:8px;align-items:center;margin:10px 0"><input type="checkbox" data-rtf="on" '+(d.on?'checked':'')+'> فعّل تذكير الاجتماع</label>'
+    + '<div style="display:flex;gap:8px"><div style="flex:1"><label class="emp-lab">اليوم</label><select class="field" data-rtf="dow">'+DOW.map(function(n,i){ return '<option value="'+i+'"'+(+d.dow===i?' selected':'')+'>'+n+'</option>'; }).join('')+'</select></div><div style="flex:1"><label class="emp-lab">الساعة (تبعت بعدها)</label><input class="field" type="time" data-rtf="time" value="'+esc(d.time)+'"></div></div>'
+    + '<label class="emp-lab">موضوع الاجتماع (اختياري)</label><input class="field" maxlength="80" data-rtf="topic" value="'+esc(d.topic)+'"><label class="emp-lab">المكان (اختياري)</label><input class="field" maxlength="80" data-rtf="place" value="'+esc(d.place)+'">'
+    + '<div class="fx-sep">📖 آية اليوم التلقائية</div><label class="chk-row" style="display:flex;gap:8px;align-items:center;margin:6px 0"><input type="checkbox" data-rtf="vOn" '+(d.vOn?'checked':'')+'> ابعت آية اليوم كل يوم</label><label class="emp-lab">الساعة</label><input class="field" type="time" data-rtf="vTime" value="'+esc(d.vTime)+'">'
+    + '<button type="button" class="btn btn-primary" style="width:100%;margin-top:12px" data-rt="csave">💾 احفظ الإعدادات</button><button type="button" class="btn btn-ghost" style="width:100%;margin-top:8px" data-rt="cnow">📣 ابعت تذكير الاجتماع دلوقتي</button></div>'
+    + (keys.length ? '<div class="fx-sep">آخر ما اتبعت</div>'+keys.map(function(k){ return '<div class="card" style="padding:10px;margin-bottom:6px;font-size:13px">'+(k.indexOf('rem')===0?'⏰ تذكير الاجتماع':'📖 آية اليوم')+' — '+esc(k.split('-').slice(1).join('-'))+' <small class="fx-hint">('+new Date(sent[k]).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})+')</small></div>'; }).join('') : '');
+};
+function remText(c){ var d = new Date(), t = (c.time||'').split(':'); return '⏰ النهارده '+DOW[d.getDay()]+' اجتماع'+(c.topic?' «'+c.topic+'»':'')+(c.place?' في '+c.place:'')+' — ما تفوتوش! 🙏'; }
+async function broadcast(text, icon){ PARTICIPANTS.forEach(function(p){ try{ pushNotification(p.id, text, icon); }catch(e){} }); }
+async function claimAndSend(key, text, icon){
+  var got = false; var ok = await ju(KS, function(o){ o = o||{}; Object.keys(o).forEach(function(k){ if(Date.now()-o[k] > 14*864e5) delete o[k]; }); if(!o[key]){ o[key] = Date.now(); got = true; } return o; });
+  if(ok && got){ R.sent[key] = Date.now(); await broadcast(text, icon); return true; } return false;
+}
+var watching = false;
+async function watch(){
+  if(watching || !me() || document.visibilityState!=='visible') return; watching = true;
+  try{
+    await load(true); var c = R.cfg||{}, now = new Date(), ds = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate()), mins = now.getHours()*60+now.getMinutes();
+    function after(t, win){ var p = String(t||'').split(':'); if(p.length<2) return false; var m = +p[0]*60 + +p[1]; return mins>=m && mins<m+(win||480); }
+    if(c.on && now.getDay()===+c.dow && after(c.time, 600) && !(R.sent['rem-'+ds])) await claimAndSend('rem-'+ds, remText(c), '⏰');
+    if(c.vOn && after(c.vTime, 600) && !(R.sent['votd-'+ds])){ var v = window.glvVotd ? window.glvVotd() : null; if(v) await claimAndSend('votd-'+ds, '📖 آية اليوم: «'+v.t+'» — '+v.r, '📖'); }
+  }catch(e){} watching = false;
+}
+setInterval(watch, 60000); setTimeout(watch, 9000);
+
+/* ---------- أحداث ---------- */
+document.addEventListener('click', function(ev){
+  var el = ev.target.closest && ev.target.closest('[data-rt]'); if(!el) return; var a = el.dataset.rt, id = el.dataset.id;
+  if(a==='open'){ R.sel = id; R.star = 0; R.tags = []; render(); }
+  else if(a==='back'){ R.sel = null; render(); }
+  else if(a==='star'){ R.star = +el.dataset.n; render(); }
+  else if(a==='tag'){ var i = +el.dataset.i, k = R.tags.indexOf(i); if(k>=0) R.tags.splice(k,1); else R.tags.push(i); render(); }
+  else if(a==='send') sendRating();
+  else if(a==='greet') greet(id);
+  else if(a==='asave'){ var d = md(); if(!d.title.trim()){ showToast('اكتب اسم الاجتماع', true); return; } var mid = 'm'+Date.now().toString(36); ju(KR, function(o){ o = o||{meets:[],r:{}}; o.meets = o.meets||[]; o.meets.push({id:mid, title:d.title.trim().slice(0,60), date:d.date||'', open:true, at:Date.now()}); o.meets = o.meets.slice(-40); return o; }).then(function(ok){ if(!ok){ showToast('معرفتش أحفظ', true); return; } showToast('اتفتح التقييم ⭐'); PARTICIPANTS.forEach(function(p){ try{ pushNotification(p.id, '⭐ قيّم «'+d.title.trim()+'» — رأيك مهم وبتاخد +٢ نقطة!', '⭐'); }catch(e){} }); R.d = null; return load(true).then(render); }); }
+  else if(a==='atoggle') ju(KR, function(o){ (o.meets||[]).forEach(function(m){ if(m.id===id) m.open = !m.open; }); return o; }).then(function(){ return load(true); }).then(render);
+  else if(a==='adel'){ if(confirm('تحذف الاجتماع وكل تقييماته؟')) ju(KR, function(o){ o.meets = (o.meets||[]).filter(function(m){ return m.id!==id; }); if(o.r) delete o.r[id]; return o; }).then(function(){ return load(true); }).then(render); }
+  else if(a==='csave'){ var c = cd(); ju(KC, function(){ return {on:c.on?1:0, dow:+c.dow, time:c.time, topic:c.topic, place:c.place, vOn:c.vOn?1:0, vTime:c.vTime}; }).then(function(ok){ if(!ok){ showToast('معرفتش أحفظ', true); return; } R.cd = null; showToast('اتحفظت الإعدادات ✅'); return load(true).then(render); }); }
+  else if(a==='cnow'){ var c2 = cd(); if(confirm('تبعت التذكير لكل المشاركين دلوقتي؟')){ broadcast(remText(c2), '⏰'); showToast('اتبعت 📣'); } }
+});
+document.addEventListener('input', function(ev){ var t = ev.target; if(!t || !t.dataset || !t.dataset.rtf) return; var f = t.dataset.rtf; if(f==='title'||f==='date') md()[f] = t.value; else cd()[f] = (t.type==='checkbox') ? (t.checked?1:0) : t.value; });
+document.addEventListener('change', function(ev){ var t = ev.target; if(!t || !t.dataset || !t.dataset.rtf) return; var f = t.dataset.rtf; if(t.type==='checkbox' || t.tagName==='SELECT'){ if(f==='title'||f==='date') return; cd()[f] = (t.type==='checkbox') ? (t.checked?1:0) : t.value; } });
+
+if(typeof NAV_TILE_ITEMS!=='undefined'){
+  NAV_TILE_ITEMS.push({page:'rate', icon:'⭐', labelKey:'قيّم الاجتماع', subKey:'رأيك مجهول ومهم', color:'linear-gradient(145deg,#F4B740,#FF5E7E)'});
+  NAV_TILE_ITEMS.push({page:'bday', icon:'🎂', labelKey:'أعياد الميلاد', subKey:'هنّي صحابك', color:'linear-gradient(145deg,#FF6B9D,#B79CFF)'});
+}
+if(typeof BNAV_VIEW_TAB!=='undefined'){ BNAV_VIEW_TAB.rate = 'capabilities'; BNAV_VIEW_TAB.bday = 'capabilities'; }
+if(typeof ADMIN_HUB_ITEMS!=='undefined'){
+  ADMIN_HUB_ITEMS.push({group:'games', tab:'rate', short:'تقييمات الاجتماعات', desc:'افتح تقييم لاجتماع واقرا النتايج والتعليقات', icon:'⭐', label:'تقييم الاجتماع', color:'linear-gradient(145deg,#F4B740,#FF5E7E)'});
+  ADMIN_HUB_ITEMS.push({group:'games', tab:'remind', short:'تذكير الاجتماع وآية اليوم', desc:'إشعارات تلقائية في ميعادها', icon:'⏰', label:'تذكيرات تلقائية', color:'linear-gradient(145deg,#3FDCC9,#5B8DEF)'});
+}
+
+var st = document.createElement('style');
+st.textContent = ''
++ '.rt-note{margin:6px 0 12px;padding:10px 12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border);font-size:13px;text-align:center;line-height:1.9}.rt-card{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:10px;padding:14px;border-radius:20px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font:inherit;text-align:start;cursor:pointer}.rt-card>span{font-size:28px}.rt-card div{flex:1}.rt-card b{display:block}.rt-card small{color:var(--text-muted)}.rt-card i{font-style:normal;font-weight:900;font-size:12.5px;padding:6px 12px;border-radius:99px;background:rgba(255,214,107,.18);color:#FFD66B}'
++ '.rt-bk{border:0;background:transparent;color:var(--text-muted);font:inherit;cursor:pointer}.rt-t{font-size:18px;font-weight:900;text-align:center;margin:6px 0 10px}.rt-stars{display:flex;justify-content:center;gap:6px;direction:ltr}.rt-stars button{border:0;background:transparent;font-size:46px;color:rgba(255,255,255,.2);cursor:pointer;transition:transform .15s}.rt-stars button.on{color:#FFD66B;transform:scale(1.12);text-shadow:0 0 14px rgba(255,214,107,.6)}.rt-lab{text-align:center;font-weight:900;margin:2px 0 12px;min-height:24px}'
++ '.rt-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px}.rt-tags button{padding:8px 12px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface-2);color:var(--text);font:inherit;font-size:13px;cursor:pointer}.rt-tags button.on{border-color:#FFD66B;background:rgba(255,214,107,.18)}.rt-done{text-align:center;padding:22px;border-radius:22px;background:rgba(46,232,139,.12);border:1px solid rgba(46,232,139,.35);font-size:28px}.rt-done b{display:block;font-size:17px;margin-top:6px}.rt-done small{display:block;font-size:12.5px;color:var(--text-muted);margin-top:6px}'
++ '.rt-avg{display:flex;align-items:baseline;gap:8px;margin:8px 0}.rt-avg b{font-size:34px;color:#FFD66B}.rt-hist div{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:12px}.rt-hist span{width:26px}.rt-hist i{display:block;height:10px;border-radius:99px;background:linear-gradient(90deg,#FFD66B,#FF9F43);min-width:3px}.rt-hist em{font-style:normal;color:var(--text-muted)}.rt-tgs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.rt-tgs span{padding:5px 10px;border-radius:99px;background:var(--surface-2);font-size:12px}.rt-cm{padding:8px 10px;margin-top:6px;border-radius:12px;background:var(--surface-2);font-size:13px;line-height:1.8}'
++ '.bd-today{margin:6px 0 12px;padding:18px;border-radius:24px;text-align:center;background:linear-gradient(135deg,#FF6B9D,#B79CFF);color:#fff;animation:qz-pulse 2s ease-in-out infinite}.bd-today div{font-size:34px}.bd-today b{font-size:20px}.bd-today small{display:block;margin-top:4px;opacity:.92}'
++ '.bd-row{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:8px;border-radius:18px;background:var(--surface-2);border:1px solid var(--border)}.bd-row.now{border-color:#FF6B9D;background:rgba(255,107,157,.12)}.bd-dt{flex:none;width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#FF6B9D,#B79CFF);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}.bd-dt b{font-size:20px}.bd-dt small{font-size:10.5px}.bd-i{flex:1}.bd-i b{display:block}.bd-i small{color:var(--text-muted);font-size:12px}.bd-row button{padding:8px 14px;border:0;border-radius:99px;background:linear-gradient(135deg,#FFD66B,#FF9F43);color:#3a2200;font:inherit;font-weight:900;cursor:pointer}.bd-row button:disabled{background:rgba(255,255,255,.12);color:var(--text-muted)}.bd-row i{font-style:normal;font-size:22px}';
+document.head.appendChild(st);
+})();
+</script>
 
 <!-- ===== إظهار / إخفاء الخانات من الأدمن ===== -->
 <script id="tilevis-module">
