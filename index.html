@@ -15889,6 +15889,7 @@ function renderProfile(){
         <div class="brand-title" style="font-size:18px;">اجتماع جامعة</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
+        ${window.glvGiftBtn?window.glvGiftBtn():''}
         <button class="icon-btn theme-toggle-btn" data-action="toggle-theme" title="الوضع الليلي/النهاري"><span class="tt-ico">${(extra.mode==='light')?'☀️':'🌙'}</span></button>
         <button class="icon-btn" data-action="tile-nav" data-page="settings" title="الإعدادات" aria-label="الإعدادات">${ICO.gear}</button>
         <button class="icon-btn notif-btn ${unreadNotifCount(p.id)>0?'has-unread':''}" data-action="open-notifs">${ICO.bell}${unreadNotifCount(p.id)>0?`<span class="notif-dot">${unreadNotifCount(p.id)>9?'9+':unreadNotifCount(p.id)}</span>`:''}</button>
@@ -56352,77 +56353,136 @@ function giftSvg(){
   return '<div class="gf-svg" aria-hidden="true"><img class="gf-body-g gf-im gf-im-b" alt="" draggable="false" src="'+u+'"><img class="gf-lid-g gf-im gf-im-l" alt="" draggable="false" src="'+u+'"></div>';
 }
 function vib(p){ try{ if(typeof vibrate==='function') vibrate(p); else if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
-function showGift(){
-  var g = todayGift(); if(!g) return;
-  var tier = tierOf(g.pts);
-  var el = document.createElement('div'); el.id = 'glv-gift'; el.className = 'gf-back gf-t'+tier;
+var GR_EM = ['⭐','🎁','🏆','👑','💎','🪙','🎮','🔥','🎯','🍀','🎉','🌟'];
+var GR_PTS = [5,5,10,10,10,15,15,20,20,25,30,50,75,100];
+var GR_N = ['عادية','نادرة','أسطورية'], GR_C = ['#9AA3B2','#5B8DEF','#FFB020'];
+function untilReset(){
+  var n = new Date(), t = new Date(n.getFullYear(), n.getMonth(), n.getDate()+1), s = Math.max(0, Math.floor((t-n)/1000));
+  return pad(Math.floor(s/3600))+':'+pad(Math.floor(s%3600/60))+':'+pad(s%60);
+}
+function tick(){
+  try{
+    var mu = window.glvFx && window.glvFx.muted; if(typeof mu==='function') mu = mu(); if(mu) return;
+    var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+    var cx = window.__grcx || (window.__grcx = new AC()); if(cx.state==='suspended') cx.resume();
+    var o = cx.createOscillator(), g = cx.createGain(); o.type = 'triangle'; o.frequency.value = 760+Math.random()*120;
+    g.gain.setValueAtTime(.05, cx.currentTime); g.gain.exponentialRampToValueAtTime(.001, cx.currentTime+.05);
+    o.connect(g); g.connect(cx.destination); o.start(); o.stop(cx.currentTime+.06);
+  }catch(e){}
+}
+function fxCall(n, a){ try{ window.glvFx && window.glvFx[n] && window.glvFx[n](a); }catch(e){} }
+function chestSvg(){
+  return '<svg class="gr-chest" viewBox="0 0 220 150" aria-hidden="true"><defs><linearGradient id="grb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3f4b"/><stop offset="1" stop-color="#1a1d24"/></linearGradient><linearGradient id="grl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a505e"/><stop offset="1" stop-color="#2a2e38"/></linearGradient></defs>'
+    + '<g class="gr-body"><rect x="14" y="62" width="192" height="76" rx="10" fill="url(#grb)" stroke="#59606f" stroke-width="2.5"/><rect x="26" y="78" width="168" height="10" rx="5" fill="#111319"/><rect x="26" y="78" width="168" height="10" rx="5" class="gr-led"/><circle cx="34" cy="116" r="4" fill="#59606f"/><circle cx="186" cy="116" r="4" fill="#59606f"/><rect x="92" y="98" width="36" height="30" rx="6" fill="#111319" stroke="#59606f" stroke-width="2"/><circle cx="110" cy="112" r="6" class="gr-lock"/></g>'
+    + '<g class="gr-lid"><path d="M14 66 Q14 24 62 22 L158 22 Q206 24 206 66 Z" fill="url(#grl)" stroke="#59606f" stroke-width="2.5"/><rect x="28" y="34" width="164" height="8" rx="4" fill="#111319" opacity=".6"/><rect x="28" y="34" width="164" height="8" rx="4" class="gr-led"/></g></svg>';
+}
+function showGift(manual){
+  if(document.getElementById('glv-gift')) return;
+  var g = todayGift(), none = !g, was = !none && !DEMO && iClaimed(); if(none) g = {pts:0,name:'',msg:''};
+  var tier = tierOf(g.pts), col = GR_C[tier-1];
+  var s0 = DEMO ? 0 : streakBefore(state.pid), sShow = was ? s0+1 : s0;
+  function segs(n){ var f = n%7, h = ''; if(n>0 && f===0) f = 7; for(var i=0;i<7;i++) h += '<i class="'+(i<f?'on':(i===f?'nx':''))+'"></i>'; return h; }
+  var el = document.createElement('div'); el.id = 'glv-gift'; el.className = 'gr-back'; el.style.setProperty('--gc', col);
   el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true');
-  var sp = '';
-  [[16,18,'✦',16],[82,26,'✦',12],[10,62,'✧',14],[90,66,'✦',18],[24,92,'✧',12],[76,96,'✦',14]].forEach(function(s,i){
-    sp += '<i class="gf-spk" style="left:'+s[0]+'%;top:'+s[1]+'%;font-size:'+s[3]+'px;animation-delay:'+(i*.45)+'s;font-style:normal">'+s[2]+'</i>';
-  });
-  el.innerHTML =
-    '<div class="gf-rays"></div><i class="gf-deco d1">🎮</i><i class="gf-deco d2">👑</i><i class="gf-deco d3">⭐</i><i class="gf-deco d4">🏆</i><div class="gf-flash"></div>'
-    + '<button type="button" class="gf-x" aria-label="إغلاق">×</button>'
-    + '<div class="gf-stage">'
-    +   '<span class="gf-chip">🎁 هدية اليوم</span>'
-    +   '<h2 class="gf-name"><em>'+esc(g.name||'هدية اليوم')+'</em></h2>'
-    +   '<div class="gf-box" role="button" tabindex="0" aria-label="افتح الهدية">'
-    +     '<div class="gf-halo"></div>'+sp+'<div class="gf-pod"></div><div class="gf-shadow"></div>'
-    +     '<div class="gf-float">'+giftSvg()+'<div class="gf-leak"></div><div class="gf-beam"></div></div>'
-    +     '<div class="gf-res"><div><b class="gf-num">0</b><small>نقطة</small></div></div>'
-    +   '</div>'
-    +   '<div class="gf-hint"><i>👆</i> اضغط على الهدية عشان تفتحها</div>'
-    +   '<div class="gf-after"></div>'
-    + '</div>';
+  el.innerHTML = '<div class="gr-sheet"><div class="gr-grab"></div>'
+    + '<div class="gr-hd"><span class="gr-hi">🎁</span><b>الهدية اليومية</b><button type="button" class="gr-x" aria-label="إغلاق">✕</button></div>'
+    + '<div class="gr-stage"><div class="gr-chw">'+chestSvg()+'<div class="gr-beam"></div></div><div class="gr-reel" style="display:none"><div class="gr-mk"></div><div class="gr-trk"></div></div><div class="gr-win" style="display:none"></div><div class="gr-flash"></div></div>'
+    + '<div class="gr-rar">'+GR_N.map(function(n,i){ return '<span><i style="background:'+GR_C[i]+'"></i>'+n+'</span>'; }).join('')+'<em>'+esc(g.name||'هدية اليوم')+' · '+(tier===3?'أسطورية':tier===2?'نادرة':'عادية')+'</em></div>'
+    + '<div class="gr-ds">'+esc(g.msg || 'افتح هديتك اليومية وكسّب نقاط! كل يوم بتفتح فيه بتزوّد سلسلتك 🔥')+'</div>'
+    + '<div class="gr-st"><span class="gr-fi">🔥</span><div><b class="gr-sn">x'+sShow+' يوم</b><small>متتالي</small></div><div class="gr-sg">'+segs(sShow)+'</div></div>'
+    + '<button type="button" class="gr-btn">🎁 استلم الآن</button>'
+    + '<div class="gr-ft">استلمها قبل نهاية اليوم — فاضل <b class="gr-cd">'+untilReset()+'</b></div></div>';
   document.body.appendChild(el);
-  var box = el.querySelector('.gf-box'), busy = false, opened = false;
+  var $ = function(s){ return el.querySelector(s); }, btn = $('.gr-btn'), cd = $('.gr-cd'), busy = false, opened = false;
+  var timer = setInterval(function(){ if(!document.body.contains(el)){ clearInterval(timer); return; } cd.textContent = untilReset(); }, 1000);
+  requestAnimationFrame(function(){ el.classList.add('in'); });
+  if(none || was){
+    btn.disabled = true; btn.textContent = none ? 'مفيش هدية النهارده' : 'استلمت ✓';
+    $('.gr-ds').textContent = none ? 'مفيش هدية النهارده — بكرة ممكن تلاقي مفاجأة 🎁' : 'استلمت هدية النهارده 💛 ارجع بكرة تكمّل سلسلتك';
+    $('.gr-ft').innerHTML = 'الهدية الجاية بعد <b class="gr-cd">'+untilReset()+'</b>'; cd = $('.gr-cd');
+    if(none){ var em = $('.gr-rar em'); if(em) em.style.display = 'none'; }
+  }
   function close(dismiss){
     if(dismiss && !opened && !DEMO){ try{ sessionStorage.setItem('glv-gift-dismiss', dk()); }catch(e){} }
-    el.classList.add('gf-out'); setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); if(opened && !DEMO){ try{ render(); }catch(e){} } }, 320);
+    clearInterval(timer); el.classList.remove('in'); el.classList.add('gr-out');
+    setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); if(opened && !DEMO){ try{ render(); }catch(e){} } }, 320);
   }
-  el.querySelector('.gf-x').onclick = function(){ close(true); };
-  el.addEventListener('click', function(e){ if(e.target===el && (opened || !busy)) close(!opened); });
+  $('.gr-x').onclick = function(){ if(!busy) close(true); };
+  el.addEventListener('click', function(e){ if(e.target===el && !busy) close(!opened); });
+  function mkCard(pts, em, win){
+    var t = tierOf(pts), c = GR_C[t-1];
+    return '<div class="gr-cd2'+(win?' w':'')+'" style="--cc:'+c+'"><span class="e">'+em+'</span><b>+'+pts+'</b><i></i></div>';
+  }
   async function go(){
-    if(busy || opened) return; busy = true; box.classList.add('gf-busy');
-    el.classList.add('gf-charge'); box.classList.add('gf-shaking');
-    vib([30,40,30,40,30,40,40,40,60]);
-    var t0 = Date.now(), claimP = DEMO ? Promise.resolve({ok:true, pts:g.pts, demo:true}) : claim(g);
-    var r = await claimP;
-    var wait = 1350 - (Date.now()-t0); if(wait>0) await new Promise(function(ok){ setTimeout(ok, wait); });
-    if(!r.ok){
-      box.classList.remove('gf-shaking','gf-busy'); el.classList.remove('gf-charge'); busy = false;
-      toast('معرفناش نفتح الهدية — اتأكد من النت وجرّب تاني', true); return;
+    if(busy || opened) return; busy = true; btn.disabled = true; btn.textContent = 'جاري الفتح…';
+    el.classList.add('charge'); vib([30,40,30,40,30,40,40,40,60]); fxCall('coin');
+    var t0 = Date.now(), r = await (DEMO ? Promise.resolve({ok:true, pts:g.pts, demo:true}) : claim(g));
+    var wait = 1500-(Date.now()-t0); if(wait>0) await new Promise(function(ok){ setTimeout(ok, wait); });
+    if(!r.ok){ el.classList.remove('charge'); busy = false; btn.disabled = false; btn.textContent = '🎁 استلم الآن'; toast('معرفناش نفتح الهدية — اتأكد من النت وجرّب تاني', true); return; }
+    if(r.already){ opened = true; busy = false; el.classList.remove('charge'); btn.disabled = false; btn.textContent = 'تمام 💛'; btn.onclick = function(){ close(false); }; $('.gr-ds').textContent = 'استلمت هدية النهارده قبل كده 💛'; return; }
+    /* لفة الكروت */
+    el.classList.add('flash'); setTimeout(function(){ el.classList.remove('flash'); }, 500);
+    $('.gr-chw').style.display = 'none'; var reel = $('.gr-reel'), trk = $('.gr-trk'); reel.style.display = '';
+    var N = 46, W = 38, STEP = 94, cards = '';
+    for(var i=0;i<N;i++){
+      if(i===W) cards += mkCard(r.pts, tier===3?'👑':tier===2?'🏆':'🎁', true);
+      else { var rp = GR_PTS[Math.floor(Math.random()*GR_PTS.length)]; cards += mkCard(rp, GR_EM[Math.floor(Math.random()*GR_EM.length)], false); }
     }
-    if(r.already){
-      box.classList.remove('gf-shaking'); opened = true; busy = false;
-      var hn = el.querySelector('.gf-hint'); if(hn) hn.textContent = 'استلمت هدية النهارده قبل كده 💛';
-      setTimeout(function(){ close(false); }, 1600); return;
-    }
-    reveal(r.pts);
+    trk.innerHTML = cards; trk.style.paddingLeft = (reel.clientWidth/2-42)+'px';
+    var jit = (Math.random()-.5)*50, target = -(W*STEP)+jit;
+    var an = trk.animate([{transform:'translateX(0)'},{transform:'translateX('+target+'px)'}], {duration:5600, easing:'cubic-bezier(.1,.6,.1,1)', fill:'forwards'});
+    var last = -1, raf = 0;
+    (function watch(){ try{ var x = new DOMMatrix(getComputedStyle(trk).transform).m41, idx = Math.floor(-x/STEP+.5); if(idx!==last){ last = idx; tick(); } }catch(e){} raf = requestAnimationFrame(watch); })();
+    an.onfinish = function(){
+      cancelAnimationFrame(raf); opened = true; busy = false; vib([40,30,80]);
+      reel.style.display = 'none'; var wn = $('.gr-win'); wn.style.display = '';
+      wn.innerHTML = '<div class="gr-wc" style="--cc:'+col+'"><div class="gr-tg">'+(tier===3?'أسطورية':tier===2?'نادرة':'هدية')+'</div><div class="gr-we">'+(tier===3?'👑':tier===2?'🏆':'🎁')+'</div><div class="gr-wn">'+esc(g.name||'هدية اليوم')+'</div><div class="gr-wp">+<b class="gr-num">0</b> نقطة</div></div>';
+      countUp($('.gr-num'), r.pts, 900);
+      var br = el.getBoundingClientRect(); burst(el, br.width/2, br.height*.42, tier);
+      fxCall('coin');
+      var ns = DEMO ? 1 : s0+1; $('.gr-sn').textContent = 'x'+ns+' يوم'; $('.gr-sg').innerHTML = segs(ns);
+      el.classList.remove('charge'); $('.gr-ds').textContent = '+'+r.pts+' نقطة اتضافت لنقاطك ✨';
+      var tomorrow = D.days[addDays(dk(),1)]; $('.gr-ft').innerHTML = (!DEMO && tomorrow && tomorrow.pts>0 ? '🎁 فيه هدية مستنياك بكرة — ' : '')+'الهدية الجاية بعد <b class="gr-cd">'+untilReset()+'</b>'; cd = $('.gr-cd');
+      btn.disabled = false; btn.textContent = 'تمام 🎉'; btn.onclick = function(){ close(false); };
+    };
   }
-  function reveal(pts){
-    opened = true; busy = false;
-    box.classList.remove('gf-shaking'); box.classList.add('gf-opening'); el.classList.add('gf-opened');
-    vib([40,30,80]);
-    try{ if(typeof SND!=='undefined' && SND.coinChime) SND.coinChime(); }catch(e){}
-    var chip = el.querySelector('.gf-chip'); if(chip) chip.textContent = '🎉 مبروك!';
-    var hint = el.querySelector('.gf-hint'); if(hint) hint.style.display = 'none';
-    var br = box.getBoundingClientRect(), er = el.getBoundingClientRect();
-    burst(el, br.left-er.left+br.width/2, br.top-er.top+br.height*.42, tier);
-    countUp(el.querySelector('.gf-num'), pts, 1100);
-    var st = DEMO ? 0 : streakBefore(state.pid)+1, tags = '';
-    tags += '<span class="gf-tag">+'+pts+' نقطة اتضافت لنقاطك ✨</span>';
-    if(st>=2) tags += '<span class="gf-tag">🔥 '+st+' أيام متتالية</span>';
-    var tomorrow = D.days[addDays(dk(),1)];
-    if(!DEMO && tomorrow && tomorrow.pts>0) tags += '<span class="gf-tag">🎁 فيه هدية مستنياك بكرة</span>';
-    var after = el.querySelector('.gf-after');
-    after.innerHTML = (g.msg ? '<div class="gf-msg">'+esc(g.msg)+'</div>' : '') + '<div class="gf-tags">'+tags+'</div><button type="button" class="gf-ok">تمام 🎉</button>';
-    after.querySelector('.gf-ok').onclick = function(){ close(false); };
-  }
-  box.addEventListener('click', go);
-  box.addEventListener('keydown', function(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); go(); } });
+  btn.onclick = go;
 }
+window.glvGiftBtn = function(){
+  try{
+    if(typeof state==='undefined' || !state || !state.pid) return '';
+    var g = todayGift(), dot = !!g && !iClaimed();
+    return '<button class="icon-btn gr-top'+(g?'':' off')+'" data-gfopen="1" title="الهدية اليومية" aria-label="الهدية اليومية"><span style="font-size:18px;line-height:1">🎁</span>'+(dot?'<span class="gr-dot"></span>':'')+'</button>';
+  }catch(e){ return ''; }
+};
+document.addEventListener('click', function(e){
+  var b = e.target.closest && e.target.closest('[data-gfopen]'); if(!b) return;
+  e.stopPropagation(); load(true).then(function(){ showGift(true); }, function(){ showGift(true); });
+}, true);
+function gfCss(){
+  if(document.getElementById('gr-css')) return;
+  var s = document.createElement('style'); s.id = 'gr-css';
+  s.textContent = ''
+  + '.gr-back{position:fixed;inset:0;z-index:100020;background:rgba(3,5,10,.62);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .3s}.gr-back.in{opacity:1}.gr-back.gr-out{opacity:0}'
+  + '.gr-sheet{width:100%;max-width:480px;background:#0f1218;color:#fff;border-radius:22px 22px 0 0;padding:8px 16px 20px;transform:translateY(100%);transition:transform .38s cubic-bezier(.2,.8,.2,1);box-shadow:0 -10px 40px rgba(0,0,0,.5)}.gr-back.in .gr-sheet{transform:none}.gr-back.gr-out .gr-sheet{transform:translateY(100%)}'
+  + '.gr-grab{width:42px;height:4px;border-radius:9px;background:rgba(255,255,255,.2);margin:4px auto 10px}.gr-hd{display:flex;align-items:center;gap:8px;padding:2px 2px 12px;font-size:17px}.gr-hd b{flex:1}.gr-hi{font-size:20px}.gr-x{background:none;border:0;color:#fff;font-size:20px;cursor:pointer;opacity:.8;padding:4px 8px}'
+  + '.gr-stage{position:relative;height:210px;border-radius:14px;background:radial-gradient(ellipse at 50% 60%,rgba(var(--gcr,255,176,32),.0),transparent),linear-gradient(#000,#07090d);border:1px solid rgba(255,255,255,.08);overflow:hidden;display:flex;align-items:center;justify-content:center}'
+  + '.gr-chw{position:relative;width:62%;max-width:240px;animation:grIdle 3s ease-in-out infinite}.gr-chest{width:100%;display:block;filter:drop-shadow(0 12px 18px rgba(0,0,0,.7))}@keyframes grIdle{50%{transform:translateY(-5px)}}'
+  + '.gr-led,.gr-lock{fill:var(--gc);opacity:.55}.gr-back.charge .gr-led,.gr-back.charge .gr-lock{opacity:1;filter:drop-shadow(0 0 6px var(--gc))}.gr-back.charge .gr-chw{animation:grShake .12s linear infinite}@keyframes grShake{0%{transform:translate(-3px,1px) rotate(-1.5deg)}50%{transform:translate(3px,-1px) rotate(1.5deg)}100%{transform:translate(-3px,1px) rotate(-1.5deg)}}'
+  + '.gr-beam{position:absolute;left:8%;right:8%;top:34%;height:8px;border-radius:9px;background:var(--gc);opacity:0;filter:blur(5px)}.gr-back.charge .gr-beam{animation:grBeam 1.5s ease-in forwards}@keyframes grBeam{0%{opacity:0;height:4px}60%{opacity:.9;height:12px}100%{opacity:1;height:70px}}'
+  + '.gr-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}.gr-back.flash .gr-flash{animation:grFl .5s ease-out}@keyframes grFl{0%{opacity:.95}100%{opacity:0}}'
+  + '.gr-reel{position:absolute;inset:0;direction:ltr;overflow:hidden;display:flex;align-items:center;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}.gr-trk{display:flex;gap:10px;will-change:transform}'
+  + '.gr-mk{position:absolute;left:50%;top:8px;bottom:8px;width:3px;margin-left:-1.5px;background:linear-gradient(transparent,var(--gc),transparent);z-index:2;box-shadow:0 0 10px var(--gc)}'
+  + '.gr-cd2{flex:none;width:84px;height:104px;border-radius:14px;background:linear-gradient(#232833,#12151b);border:2px solid var(--cc);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative;box-shadow:inset 0 -18px 24px -14px var(--cc)}.gr-cd2 .e{font-size:34px}.gr-cd2 b{font-size:15px;color:#fff}.gr-cd2.w{box-shadow:inset 0 -18px 24px -10px var(--cc),0 0 18px var(--cc)}'
+  + '.gr-win{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;animation:grPop .6s}.gr-wc{width:62%;max-width:230px;text-align:center;padding:14px 8px;border-radius:18px;border:2px solid var(--cc);background:linear-gradient(#262b36,#12151b);box-shadow:0 0 30px -4px var(--cc)}.gr-tg{font-size:11px;font-weight:900;letter-spacing:1px;color:var(--cc)}.gr-we{font-size:46px;margin:2px 0}.gr-wn{font-size:14px;font-weight:800}.gr-wp{font-size:18px;color:var(--cc);margin-top:4px}@keyframes grPop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}'
+  + '.gr-rar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:12px 2px 8px;font-size:12px;color:#c9ced8}.gr-rar span{display:flex;align-items:center;gap:5px}.gr-rar i{width:10px;height:10px;border-radius:3px;display:inline-block}.gr-rar em{margin-inline-start:auto;font-style:normal;color:var(--gc);font-weight:800}'
+  + '.gr-ds{font-size:14px;line-height:1.7;color:#e7eaf0;margin:6px 2px 12px;min-height:44px}.gr-st{display:flex;align-items:center;gap:10px;margin-bottom:14px}.gr-fi{font-size:26px}.gr-st b{display:block;font-size:15px}.gr-st small{color:#8f97a6;font-size:12px}.gr-sg{display:flex;gap:5px;flex:1;direction:ltr}.gr-sg i{flex:1;height:18px;transform:skewX(-20deg);border-radius:3px;background:#2a2f3a}.gr-sg i.on{background:linear-gradient(#5fffa8,#1fcf73);box-shadow:0 0 8px rgba(46,232,139,.5)}.gr-sg i.nx{background:transparent;border:2px solid #5fffa8;animation:grNx 1.2s infinite}@keyframes grNx{50%{opacity:.35}}'
+  + '.gr-btn{width:100%;padding:15px;border:0;border-radius:14px;background:linear-gradient(#6bff3a,#3fd60f);color:#0b1a05;font:inherit;font-size:17px;font-weight:900;cursor:pointer}.gr-btn:disabled{background:#222730;color:#555d6b;cursor:default}.gr-ft{text-align:center;font-size:12.5px;color:#8f97a6;margin-top:10px}.gr-ft b{color:#fff;font-variant-numeric:tabular-nums}'
+  + '.gr-top{position:relative}.gr-top.off{opacity:.45}.gr-dot{position:absolute;top:3px;right:3px;width:10px;height:10px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 0 2px var(--surface,#12151b);animation:grDot 1.4s infinite}@keyframes grDot{50%{transform:scale(1.35)}}'
+  + '.gr-pt{position:absolute;pointer-events:none}';
+  document.head.appendChild(s);
+}
+gfCss();
 function countUp(node, to, ms){
   if(!node) return; var t0 = performance.now();
   function step(t){ var k = Math.min(1,(t-t0)/ms), e = 1-Math.pow(1-k,3); node.textContent = Math.round(to*e); if(k<1) requestAnimationFrame(step); else node.textContent = to; }
