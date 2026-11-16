@@ -22627,6 +22627,7 @@ function milStartTimer(){
     g2.timeLeft--;
     const el = document.getElementById('mil-timer');
     if(el){ el.textContent = '⏱️ '+Math.max(0,g2.timeLeft)+' ث'; el.classList.toggle('warn', g2.timeLeft<=5); el.style.setProperty('--p', Math.max(0,g2.timeLeft/g2.timerSec*100)+'%'); }
+    if(window.QFX) QFX.ring('mil-ring', Math.max(0,g2.timeLeft/g2.timerSec));
     if(g2.timeLeft<=0){ milStopTimer(); doMilTimeout(); }
   }, 1000);
 }
@@ -22748,7 +22749,7 @@ function milRenderShell(){
       </div>
       <div class="mil-center">
         ${g.finished ? milOverCardHtml(g) : `
-          <div class="mil-question${qAnimCls}">${qq.q}</div>
+          <div class="mil-question${qAnimCls}${(g.revealed && g.selected!==qq.c)?' qfx-wrong':''}">${window.QFX?QFX.ringHtml('mil-ring', Math.max(0,g.timeLeft/g.timerSec), '+'+MIL_LADDER[g.level-1].points):''}${qq.q}</div>
           <div class="mil-options">
             ${qq.o.map((opt,i)=>{
               const elim = g.eliminated.includes(i);
@@ -36800,7 +36801,7 @@ document.addEventListener('click', (e)=>{
   else if(action==='stack-reset'){ stkResetGame(); }
   else if(action==='mil-close'){ closeMillionaireGame(); }
   else if(action==='mil-reset'){ milResetGame(); }
-  else if(action==='mil-start'){ initMillionaireGame(); milRenderShell(); milStartTimer(); SND.click(); }
+  else if(action==='mil-start'){ initMillionaireGame(); milRenderShell(); SND.click(); if(window.QFX){ QFX.countdown(function(){ if(state.millionaire && !state.millionaire.finished) milStartTimer(); }); } else milStartTimer(); }
   else if(action==='mil-pick'){ doMilPick(parseInt(el.dataset.idx,10)); }
   else if(action==='mil-fifty'){ doMilFifty(); }
   else if(action==='mil-audience'){ doMilAudience(); }
@@ -58007,7 +58008,7 @@ async function start(){
   var res = await ju(KR, function(o){ o = o||{}; o[qz.id] = o[qz.id]||{}; if(!o[qz.id][m]) o[qz.id][m] = {st:Date.now(), ans:[], done:0}; return o; });
   if(!res){ showToast('معرفتش أبدأ — جرّب تاني', true); return; }
   await load(true); if((myRes(qz.id)||{}).done){ render(); return; }
-  Q.phase = 'play'; Q.i = 0; Q.ans = []; Q.hid = {}; Q.used = {}; render(); beginQ(qz);
+  Q.phase = 'play'; Q.i = 0; Q.ans = []; Q.hid = {}; Q.used = {}; render(); if(window.QFX){ QFX.countdown(function(){ if(Q.phase==='play' && Q.id===qz.id) beginQ(qz); }); } else beginQ(qz);
 }
 /* الاختيارات بتظهر واحد واحد ببطء، والتايمر بيبدأ بعد ما يظهروا كلهم */
 function revealMs(qz){ var n = (qz.qs[Q.i]||{o:[]}).o.length; return Math.round((0.7 + (n-1)*0.9 + 0.8)*1000); }
@@ -58544,7 +58545,7 @@ async function startDuel(id){
   if(!ok){ showToast('معرفتش أبدأ — جرّب تاني', true); return; }
   stopDT(); D = {id:id, i:0, locked:false, sel:null, t0:0, dl:0, qz:qz, pend:null, timer:null};
   if(had){ showToast('التحدّي ده كان مفتوح قبل كده — هيتحسب بإجاباته'); await finishDuel(id); return; }
-  beginDuelQ();
+  if(window.QFX){ var _dd = D; QFX.countdown(function(){ if(D && D===_dd) beginDuelQ(); }); } else beginDuelQ();
 }
 function beginDuelQ(){
   var qz = D.qz, q = qz.qs[D.i]; stopDT(); D.locked = false; D.sel = null; Q.i = D.i; Q.hs = (q.t==='riddle') ? 1 : 0;
@@ -60577,5 +60578,80 @@ document.addEventListener('click', function(ev){ var el = ev.target.closest && e
 })();
 </script>
 
+
+<style id="qfx-css">
+/* ===== QFX: شكل الأسئلة (عدّاد 3-2-1 + حلقة وقت + كشف الإجابة) ===== */
+.qfx-cd{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  background:radial-gradient(circle at 50% 45%,rgba(12,16,40,.78),rgba(5,8,22,.93));-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);animation:qfxFade .18s ease-out both;}
+.qfx-cd .n{font-family:'Cairo','Tajawal',sans-serif;font-weight:900;font-size:min(46vw,200px);line-height:1;color:#fff;text-shadow:0 6px 40px rgba(244,183,64,.55);animation:qfxPop .9s cubic-bezier(.2,.9,.3,1.2) both;}
+.qfx-cd .t{font-weight:800;font-size:15px;color:rgba(255,255,255,.75);letter-spacing:.3px;}
+.qfx-cd.out{animation:qfxFadeOut .22s ease-in both;}
+@keyframes qfxFade{from{opacity:0}to{opacity:1}}
+@keyframes qfxFadeOut{to{opacity:0}}
+@keyframes qfxPop{0%{transform:scale(1.9);opacity:0}25%{transform:scale(1);opacity:1}80%{transform:scale(.92);opacity:.9}100%{transform:scale(.6);opacity:0}}
+.qfx-ring{position:absolute!important;top:8px;inset-inline-end:8px;width:58px;height:58px;z-index:2;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.qfx-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);}
+.qfx-ring .bg{fill:none;stroke:rgba(255,255,255,.14);stroke-width:5;}
+.qfx-ring .fg{fill:none;stroke:#3FDCC9;stroke-width:5;stroke-linecap:round;stroke-dasharray:151.8;stroke-dashoffset:0;transition:stroke-dashoffset .95s linear,stroke .3s;}
+.qfx-ring b{position:relative;font-family:'Cairo','Tajawal',sans-serif;font-size:11.5px;font-weight:900;color:var(--text,#fff);}
+.qfx-ring.hot .fg{animation:qfxHot .6s ease-in-out infinite alternate;}
+@keyframes qfxHot{to{opacity:.45}}
+.mil-question{padding-inline-end:76px;}
+/* حالة الإجابة الغلط: علامة ✕ كبيرة على السؤال */
+.mil-question.qfx-wrong,
+.qz-play:has(.qz-opt.wrong) .qz-q,.qz-play:has(.qz-time) .qz-q,
+.quiz-qtext:has(+ .quiz-opts .quiz-wrong){position:relative;border-color:rgba(255,77,109,.7)!important;box-shadow:inset 0 0 0 1px rgba(255,77,109,.5),0 0 22px rgba(255,77,109,.22);padding-inline-end:70px;}
+.mil-question.qfx-wrong .qfx-ring{display:none;}
+.mil-question.qfx-wrong::after,
+.qz-play:has(.qz-opt.wrong) .qz-q::after,.qz-play:has(.qz-time) .qz-q::after,
+.quiz-qtext:has(+ .quiz-opts .quiz-wrong)::after{content:'✕';position:absolute;top:50%;inset-inline-end:12px;width:46px;height:46px;margin-top:-23px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;background:#ff4d3d;color:#fff;font-size:26px;font-weight:900;line-height:1;box-shadow:0 4px 16px rgba(255,77,61,.5);animation:qfxStamp .35s cubic-bezier(.2,.9,.3,1.3) both;}
+@keyframes qfxStamp{from{transform:scale(2.2) rotate(-18deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+/* شارات صح/غلط على الاختيارات */
+.qz-opt.right,.qz-opt.wrong,.quiz-opt.quiz-correct,.quiz-opt.quiz-wrong,.fx-v-o.ok,.fx-v-o.bad{position:relative;}
+.qz-opt.right::after,.quiz-opt.quiz-correct::after,.fx-v-o.ok::after,
+.qz-opt.wrong::after,.quiz-opt.quiz-wrong::after,.fx-v-o.bad::after{position:absolute;top:50%;inset-inline-end:8px;width:22px;height:22px;margin-top:-11px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;line-height:1;color:#fff;animation:qfxStamp .3s cubic-bezier(.2,.9,.3,1.3) both;}
+.qz-opt.right::after,.quiz-opt.quiz-correct::after,.fx-v-o.ok::after{content:'✓';background:#22c55e;}
+.qz-opt.wrong::after,.quiz-opt.quiz-wrong::after,.fx-v-o.bad::after{content:'✕';background:#ef4444;}
+.mil-option-btn.correct{box-shadow:0 0 0 1px rgba(95,224,164,.55) inset,0 0 18px rgba(95,224,164,.25);}
+.mil-option-btn.wrong{box-shadow:0 0 0 1px rgba(255,107,107,.55) inset,0 0 18px rgba(255,107,107,.22);}
+@media (prefers-reduced-motion:reduce){.qfx-cd .n,.qfx-ring .fg{animation:none!important;transition:none!important}}
+</style>
+
+<script id="qfx-js">
+(function(){
+  if(window.QFX) return;
+  var C=2*Math.PI*24;
+  function col(f){ return f>.5?'#3FDCC9':f>.25?'#FFD66B':'#FF4D6D'; }
+  window.QFX={
+    /* عدّاد 3-2-1 قبل أول سؤال. cb بيتنفّذ لما يخلص */
+    countdown:function(cb){
+      var old=document.getElementById('qfx-cd'); if(old) old.remove();
+      var el=document.createElement('div'); el.id='qfx-cd'; el.className='qfx-cd'; document.body.appendChild(el);
+      var n=3, done=false;
+      function finish(){ if(done) return; done=true; el.classList.add('out'); setTimeout(function(){ try{el.remove();}catch(e){} try{cb&&cb();}catch(e){console.error(e);} },220); }
+      function step(){
+        if(!document.body.contains(el)){ finish(); return; }
+        if(n<=0){ finish(); return; }
+        el.innerHTML='<div class="n">'+n+'</div><div class="t">استعد للسؤال…</div>';
+        try{ if(window.SND&&SND.click) SND.click(); }catch(e){}
+        try{ if(navigator.vibrate) navigator.vibrate(10); }catch(e){}
+        n--; setTimeout(step,900);
+      }
+      step();
+    },
+    ringHtml:function(id,frac,label){
+      frac=Math.max(0,Math.min(1,frac));
+      return '<div class="qfx-ring'+(frac<=.25?' hot':'')+'" id="'+id+'"><svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="24"/><circle class="fg" cx="28" cy="28" r="24" style="stroke:'+col(frac)+';stroke-dashoffset:'+(C*(1-frac)).toFixed(1)+'"/></svg><b>'+(label||'')+'</b></div>';
+    },
+    ring:function(id,frac){
+      var r=document.getElementById(id); if(!r) return; frac=Math.max(0,Math.min(1,frac));
+      var fg=r.querySelector('.fg'); if(fg){ fg.style.strokeDashoffset=(C*(1-frac)).toFixed(1); fg.style.stroke=col(frac); }
+      r.classList.toggle('hot',frac<=.25);
+    }
+  };
+})();
+</script>
 </body>
 </html>
