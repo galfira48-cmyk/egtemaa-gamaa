@@ -59862,7 +59862,13 @@ window.FXADMIN.remind = function(){
     + '<button type="button" class="btn btn-primary" style="width:100%;margin-top:12px" data-rt="csave">💾 احفظ الإعدادات</button><button type="button" class="btn btn-ghost" style="width:100%;margin-top:8px" data-rt="cnow">📣 ابعت تذكير الاجتماع دلوقتي</button></div>'
     + (keys.length ? '<div class="fx-sep">آخر ما اتبعت</div>'+keys.map(function(k){ return '<div class="card" style="padding:10px;margin-bottom:6px;font-size:13px">'+(k.indexOf('rem')===0?'⏰ تذكير الاجتماع':'📖 آية اليوم')+' — '+esc(k.split('-').slice(1).join('-'))+' <small class="fx-hint">('+new Date(sent[k]).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})+')</small></div>'; }).join('') : '');
 };
-function remText(c){ var d = new Date(), t = (c.time||'').split(':'); return '⏰ النهارده '+DOW[d.getDay()]+' اجتماع'+(c.topic?' «'+c.topic+'»':'')+(c.place?' في '+c.place:'')+' — ما تفوتوش! 🙏'; }
+function remText(c){
+  var d = new Date(), dw = c.dow==null ? 4 : +c.dow, diff = (dw - d.getDay() + 7) % 7, nm = DOW[dw] || DOW[4];
+  var when = diff===0 ? 'النهارده '+nm : diff===1 ? 'بكرة '+nm : 'يوم '+nm+' الجاي';
+  var t = String(c.time||'').split(':'), tx = '';
+  if(t.length>=2 && !isNaN(+t[0])){ var h = +t[0], mm = t[1], ap = h>=12 ? 'م' : 'ص'; h = h%12 || 12; tx = ' الساعة '+h+':'+mm+' '+ap; }
+  return '⏰ '+when+' اجتماع'+tx+(c.topic?' «'+c.topic+'»':'')+(c.place?' في '+c.place:'')+' — ما تفوتوش! 🙏';
+}
 async function broadcast(text, icon){ PARTICIPANTS.forEach(function(p){ try{ pushNotification(p.id, text, icon); }catch(e){} }); }
 async function claimAndSend(key, text, icon){
   var got = false; var ok = await ju(KS, function(o){ o = o||{}; Object.keys(o).forEach(function(k){ if(Date.now()-o[k] > 14*864e5) delete o[k]; }); if(!o[key]){ o[key] = Date.now(); got = true; } return o; });
