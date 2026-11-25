@@ -3872,6 +3872,38 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .nv-ref{ padding:4px 14px; border-radius:99px; font-size:11.5px; font-weight:900; color:#2a1c00; background:linear-gradient(100deg,var(--gold-2),var(--gold)); box-shadow:0 6px 16px -6px var(--gold); }
   .nr-verse .nr-meta{ margin-top:10px; align-self:center; }
 
+  /* --- كارت الآية الكرييتف (يفتح من إشعار آية اليوم) --- */
+  .nr-verse{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .nr-verse:active{ transform:scale(.985); }
+  .nv-open{ display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:5px 14px; border-radius:99px; font-size:11px; font-weight:800; color:var(--gold-2);
+    background:color-mix(in srgb,var(--gold) 12%,transparent); border:1px dashed color-mix(in srgb,var(--gold) 50%,transparent); animation:vcHint 2.6s ease-in-out infinite; }
+  @keyframes vcHint{ 50%{ background:color-mix(in srgb,var(--gold) 26%,transparent); transform:translateY(-1px); } }
+  #vc-overlay{ position:fixed; inset:0; z-index:121; display:flex; align-items:center; justify-content:center; padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));
+    background:radial-gradient(80% 60% at 50% 35%, rgba(244,183,64,.22), rgba(4,3,16,.92) 72%); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); animation:vcFade .35s ease both; overflow:hidden; }
+  #vc-overlay.out{ opacity:0; transition:opacity .22s; }
+  @keyframes vcFade{ from{ opacity:0; } }
+  .vc-wrap{ position:relative; display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; max-width:480px; font-family:'Cairo',sans-serif; }
+  .vc-x{ position:absolute; top:-4px; inset-inline-start:2px; z-index:3; width:38px; height:38px; display:grid; place-items:center; border-radius:50%; border:1px solid rgba(255,255,255,.2); color:#fff; background:rgba(255,255,255,.1); cursor:pointer; }
+  .vc-title{ margin:0; padding-top:4px; font-size:13px; font-weight:900; letter-spacing:.5px; color:#FFDE94; text-align:center; }
+  .vc-cvbox{ position:relative; width:min(86vw, calc((100dvh - 250px) * .8), 440px); border-radius:22px; overflow:hidden; line-height:0;
+    box-shadow:0 0 0 1px rgba(255,222,148,.35), 0 30px 70px -18px rgba(244,183,64,.55), 0 18px 40px -10px rgba(0,0,0,.8); animation:vcPop .7s cubic-bezier(.2,1.25,.3,1) both; }
+  .vc-cvbox canvas{ width:100%; height:auto; display:block; animation:vcFade .35s ease both; }
+  .vc-cvbox::after{ content:''; position:absolute; inset:-20% -60%; background:linear-gradient(105deg, transparent 42%, rgba(255,255,255,.28) 50%, transparent 58%); transform:translateX(-80%); animation:vcSweep 1.6s ease .5s 1 both; pointer-events:none; }
+  @keyframes vcPop{ from{ opacity:0; transform:translateY(40px) scale(.86) rotate(-2deg); } }
+  @keyframes vcSweep{ to{ transform:translateX(80%); } }
+  .vc-themes{ display:flex; gap:12px; align-items:center; justify-content:center; }
+  .vc-sw{ width:42px; height:42px; border-radius:50%; border:2px solid rgba(255,255,255,.25); cursor:pointer; padding:0; position:relative; transition:transform .2s, border-color .2s; box-shadow:0 6px 14px -4px rgba(0,0,0,.6); }
+  .vc-sw.on{ border-color:#FFDE94; transform:scale(1.18); box-shadow:0 0 0 3px rgba(255,222,148,.25), 0 8px 18px -4px rgba(0,0,0,.7); }
+  .vc-sw span{ position:absolute; top:100%; left:50%; transform:translateX(-50%); margin-top:4px; font-size:10px; font-weight:800; color:rgba(255,255,255,.7); white-space:nowrap; }
+  .vc-actions{ display:flex; gap:10px; width:100%; margin-top:14px; }
+  .vc-btn{ flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:14px 10px; border-radius:18px; font-family:'Cairo',sans-serif; font-weight:900; font-size:14.5px; cursor:pointer; color:#fff;
+    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.22); transition:transform .15s; }
+  .vc-btn:active{ transform:scale(.96); }
+  .vc-btn svg{ width:19px; height:19px; flex:none; }
+  .vc-btn.pri{ flex:1.35; color:#2a1c00; border:0; background:linear-gradient(100deg,#FFDE94,#F4B740); box-shadow:0 14px 28px -10px rgba(244,183,64,.9); }
+  .vc-btn.done{ background:linear-gradient(100deg,#9BF0B8,#3FDCC9); color:#06281c; }
+  @media (prefers-reduced-motion:reduce){ .vc-cvbox,.vc-cvbox::after,.nv-open,#vc-overlay,.vc-cvbox canvas{ animation:none !important; } }
+
   /* --- التحويلات: سهم جاري --- */
   .nr-flow::before{ content:''; display:block !important; position:absolute; inset:0; height:auto; top:0; inset-inline-start:0; inset-inline-end:0; pointer-events:none; opacity:.5;
     background:repeating-linear-gradient(115deg, transparent 0 22px, color-mix(in srgb,var(--t) 14%,transparent) 22px 34px); background-size:68px 100%; animation:nfRun 2.2s linear infinite; }
@@ -39434,8 +39466,8 @@ function notifRowHtml(n, hist, i){
   /* آية اليوم: كارت نور خاص */
   const vm = clean.match(/^آية اليوم\s*[:：]\s*(.+)\s[–—-]\s([^–—-]+)$/);
   if(vm){
-    return `<div class="nr nr-verse k-gold ${un}" data-nid="${escapeHtml(n.id||'')}" style="--i:${i||0}"><div class="nv-rays"></div><span class="nv-q">”</span>
-      <div class="nv-tag">آية اليوم</div><p class="nv-txt">${escapeHtml(vm[1].trim())}</p><div class="nv-ref">${escapeHtml(vm[2].trim())}</div>${meta}</div>`;
+    return `<div class="nr nr-verse k-gold ${un}" role="button" tabindex="0" aria-label="افتح كارت الآية" data-nid="${escapeHtml(n.id||'')}" style="--i:${i||0}"><div class="nv-rays"></div><span class="nv-q">”</span>
+      <div class="nv-tag">آية اليوم</div><p class="nv-txt">${escapeHtml(vm[1].trim())}</p><div class="nv-ref">${escapeHtml(vm[2].trim())}</div><div class="nv-open">اضغط لفتح الكارت ✨</div>${meta}</div>`;
   }
   const gift = n.icon==='🎁', flow = n.icon==='📥' || n.icon==='📤';
   const coins = gift ? '<div class="ng-coins">' + [8,22,38,54,70,86].map((x,k)=>`<i style="--x:${x};--d:${(k*.5).toFixed(1)};--dx:${k%2?14:-14}px"></i>`).join('') + '</div><span class="ng-rib">🎁 هدية</span>' : '';
@@ -39591,6 +39623,168 @@ function closeNotifPanel(){
   if(overlay) overlay.remove();
   render();
 }
+
+/* ============ كارت الآية الكرييتف: اضغط على آية الإشعارات فيتفتح كصورة (حفظ + مشاركة) ============ */
+(function(){
+  var VC = { text:'', ref:'', theme:0, cv:null, box:null };
+  var THEMES = [
+    {n:'نور',  bg:['#150f3d','#2d1b69','#4a2a8f'], glow:[255,214,120,.55], text:'#FFF6DE', a:'#FFDE94', b:'#F4B740', ink:'#2a1c00', sub:'rgba(255,240,210,.78)', ray:'rgba(255,222,148,.075)', sw:'linear-gradient(135deg,#2d1b69,#F4B740)'},
+    {n:'فجر',  bg:['#2b0f2e','#a3341f','#f2a03d'], glow:[255,230,170,.6],  text:'#FFF8EA', a:'#FFE6A8', b:'#FFC15E', ink:'#3a1500', sub:'rgba(255,244,225,.82)', ray:'rgba(255,236,190,.09)', sw:'linear-gradient(135deg,#a3341f,#f2a03d)'},
+    {n:'ليل',  bg:['#040b18','#0a2a3d','#0f5560'], glow:[120,230,220,.45], text:'#EAFBFF', a:'#9AF0E3', b:'#F4D27A', ink:'#04202a', sub:'rgba(220,250,255,.78)', ray:'rgba(154,240,227,.07)', sw:'linear-gradient(135deg,#0a2a3d,#3fdcc9)'},
+    {n:'ورق',  bg:['#fffaf0','#f6ebcb','#e8d6a0'], glow:[255,255,255,.9],  text:'#2a2150', a:'#C9A24A', b:'#8a6212', ink:'#fff8e6', sub:'rgba(60,45,20,.68)',   ray:'rgba(184,137,46,.08)',  sw:'linear-gradient(135deg,#fffaf0,#c9a24a)'}
+  ];
+  var CROSS = 'M36 4H64L58 15V42H85L96 36V64L85 58H58V85L64 96H36L42 85V58H15L4 64V36L15 42H42V15Z';
+  function rnd(seed){ return function(){ seed = (seed*1664525 + 1013904223) >>> 0; return seed/4294967296; }; }
+  function hashStr(s){ var h = 7; s = String(s); for(var i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) >>> 0; return h; }
+  function rr(x, px, py, w, h, r){ x.beginPath(); x.moveTo(px+r,py); x.arcTo(px+w,py,px+w,py+h,r); x.arcTo(px+w,py+h,px,py+h,r); x.arcTo(px,py+h,px,py,r); x.arcTo(px,py,px+w,py,r); x.closePath(); }
+  function star(x, cx, cy, r){ x.beginPath(); x.moveTo(cx,cy-r); x.quadraticCurveTo(cx,cy,cx+r,cy); x.quadraticCurveTo(cx,cy,cx,cy+r); x.quadraticCurveTo(cx,cy,cx-r,cy); x.quadraticCurveTo(cx,cy,cx,cy-r); x.closePath(); }
+  function wrap(x, text, maxW){
+    var words = text.split(/\s+/), lines = [], cur = '';
+    words.forEach(function(w){ var t = cur ? cur+' '+w : w; if(x.measureText(t).width > maxW && cur){ lines.push(cur); cur = w; } else cur = t; });
+    if(cur) lines.push(cur); return lines;
+  }
+  function draw(){
+    var T = THEMES[VC.theme], W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+    var x = c.getContext('2d'), R = rnd(hashStr(VC.text + VC.ref));
+    /* الخلفية */
+    var g = x.createLinearGradient(0,0,W*.35,H); g.addColorStop(0,T.bg[0]); g.addColorStop(.55,T.bg[1]); g.addColorStop(1,T.bg[2]); x.fillStyle = g; x.fillRect(0,0,W,H);
+    /* أشعة نور من فوق */
+    x.save(); x.translate(540,200);
+    for(var i=0;i<20;i++){ var a0 = (i/20)*Math.PI*2, a1 = a0 + Math.PI/40; x.beginPath(); x.moveTo(0,0); x.arc(0,0,1700,a0,a1); x.closePath(); x.fillStyle = T.ray; x.fill(); }
+    x.restore();
+    var gl = T.glow, rg = x.createRadialGradient(540,200,10,540,200,640);
+    rg.addColorStop(0,'rgba('+gl[0]+','+gl[1]+','+gl[2]+','+gl[3]+')'); rg.addColorStop(1,'rgba('+gl[0]+','+gl[1]+','+gl[2]+',0)'); x.fillStyle = rg; x.fillRect(0,0,W,H);
+    var rb = x.createRadialGradient(540,H,10,540,H,520); rb.addColorStop(0,'rgba('+gl[0]+','+gl[1]+','+gl[2]+','+(gl[3]*.35)+')'); rb.addColorStop(1,'rgba('+gl[0]+','+gl[1]+','+gl[2]+',0)'); x.fillStyle = rb; x.fillRect(0,0,W,H);
+    /* بوكيه ونجوم */
+    for(i=0;i<34;i++){ var px = R()*W, py = R()*H, r = 3 + R()*14; x.globalAlpha = .06 + R()*.2; x.fillStyle = T.a; x.beginPath(); x.arc(px,py,r,0,7); x.fill(); }
+    for(i=0;i<16;i++){ x.globalAlpha = .35 + R()*.5; x.fillStyle = T.a; star(x, 90 + R()*(W-180), 90 + R()*(H-180), 7 + R()*12); x.fill(); }
+    x.globalAlpha = 1;
+    /* الإطار المزدوج */
+    var fg = x.createLinearGradient(0,0,W,H); fg.addColorStop(0,T.a); fg.addColorStop(.5,T.b); fg.addColorStop(1,T.a);
+    x.strokeStyle = fg; x.lineWidth = 4; rr(x,40,40,W-80,H-80,44); x.stroke();
+    x.globalAlpha = .5; x.lineWidth = 1.6; rr(x,64,64,W-128,H-128,30); x.stroke(); x.globalAlpha = 1;
+    x.fillStyle = fg; [[40,40],[W-40,40],[40,H-40],[W-40,H-40]].forEach(function(p){ x.save(); x.translate(p[0],p[1]); x.rotate(Math.PI/4); x.fillRect(-11,-11,22,22); x.restore(); });
+    /* الصليب والهالة */
+    var hg = x.createRadialGradient(540,200,10,540,200,130); hg.addColorStop(0,'rgba('+gl[0]+','+gl[1]+','+gl[2]+',.55)'); hg.addColorStop(1,'rgba('+gl[0]+','+gl[1]+','+gl[2]+',0)'); x.fillStyle = hg; x.beginPath(); x.arc(540,200,130,0,7); x.fill();
+    x.strokeStyle = T.a; x.lineWidth = 2.5; x.globalAlpha = .7; x.beginPath(); x.arc(540,200,96,0,7); x.stroke();
+    x.setLineDash([1,13]); x.lineWidth = 4; x.lineCap = 'round'; x.beginPath(); x.arc(540,200,116,0,7); x.stroke(); x.setLineDash([]); x.globalAlpha = 1;
+    x.save(); x.translate(540-50,200-50); x.scale(1,1); x.fillStyle = fg; x.shadowColor = 'rgba('+gl[0]+','+gl[1]+','+gl[2]+',.9)'; x.shadowBlur = 30; x.fill(new Path2D(CROSS)); x.restore();
+    /* عنوان "آية اليوم" */
+    x.direction = 'rtl'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.shadowBlur = 0;
+    x.font = '800 36px Cairo, Tahoma, Arial, sans-serif'; var tw = x.measureText('آية اليوم').width;
+    x.fillStyle = T.a; x.fillText('آية اليوم', 540, 372);
+    var lg1 = x.createLinearGradient(180,0,540-tw/2-34,0); lg1.addColorStop(0,'rgba(255,255,255,0)'); lg1.addColorStop(1,T.a);
+    var lg2 = x.createLinearGradient(540+tw/2+34,0,900,0); lg2.addColorStop(0,T.a); lg2.addColorStop(1,'rgba(255,255,255,0)');
+    x.lineWidth = 2.5; x.strokeStyle = lg1; x.beginPath(); x.moveTo(180,372); x.lineTo(540-tw/2-34,372); x.stroke();
+    x.strokeStyle = lg2; x.beginPath(); x.moveTo(540+tw/2+34,372); x.lineTo(900,372); x.stroke();
+    x.fillStyle = T.a; star(x,540-tw/2-22,372,9); x.fill(); star(x,540+tw/2+22,372,9); x.fill();
+    /* علامة الاقتباس الكبيرة */
+    x.globalAlpha = .17; x.fillStyle = T.a; x.font = '700 320px Georgia, serif'; x.fillText('\u201D', 540, 560); x.globalAlpha = 1;
+    /* نص الآية (بيصغّر لوحده لو طويل) */
+    var size = 84, lh, lines, top = 500, areaH = 510;
+    for(; size>=38; size-=2){ x.font = '700 '+size+'px Amiri, Cairo, Tahoma, serif'; lines = wrap(x, VC.text, 880); lh = size*1.72; if(lines.length*lh <= areaH) break; }
+    var y0 = top + (areaH - lines.length*lh)/2;
+    x.fillStyle = T.text; x.shadowColor = 'rgba('+gl[0]+','+gl[1]+','+gl[2]+',.5)'; x.shadowBlur = 26;
+    lines.forEach(function(l,k){ x.fillText(l, 540, y0 + (k+.5)*lh); });
+    x.shadowBlur = 0;
+    /* فاصل */
+    var dg = x.createLinearGradient(300,0,780,0); dg.addColorStop(0,'rgba(255,255,255,0)'); dg.addColorStop(.5,T.a); dg.addColorStop(1,'rgba(255,255,255,0)');
+    x.strokeStyle = dg; x.lineWidth = 2.5; x.beginPath(); x.moveTo(300,1050); x.lineTo(780,1050); x.stroke();
+    x.fillStyle = T.a; x.save(); x.translate(540,1050); x.rotate(Math.PI/4); x.fillRect(-9,-9,18,18); x.restore();
+    /* الشاهد (المرجع) */
+    x.font = '800 46px Cairo, Tahoma, Arial, sans-serif'; var rw = x.measureText(VC.ref||'').width + 120, rh = 86, rx = 540 - rw/2;
+    if(VC.ref){
+      var pg = x.createLinearGradient(rx,0,rx+rw,0); pg.addColorStop(0,T.a); pg.addColorStop(1,T.b);
+      x.save(); x.shadowColor = 'rgba('+gl[0]+','+gl[1]+','+gl[2]+',.65)'; x.shadowBlur = 30; x.shadowOffsetY = 8; x.fillStyle = pg; rr(x,rx,1088,rw,rh,rh/2); x.fill(); x.restore();
+      x.fillStyle = T.ink; x.fillText(VC.ref, 540, 1088+rh/2+2);
+    }
+    /* الفوتر */
+    x.font = '800 34px Cairo, Tahoma, Arial, sans-serif'; x.fillStyle = T.sub; x.fillText('اجتماع جامعة', 540, 1238);
+    var dt = ''; try{ dt = new Date().toLocaleDateString('ar-EG',{weekday:'long', day:'numeric', month:'long'}); }catch(e){}
+    x.font = '600 27px Cairo, Tahoma, Arial, sans-serif'; x.globalAlpha = .8; x.fillText(dt, 540, 1284); x.globalAlpha = 1;
+    return c;
+  }
+  function paint(){
+    if(!VC.box) return;
+    VC.cv = draw(); VC.box.innerHTML = ''; VC.box.appendChild(VC.cv);
+  }
+  function loadFonts(){
+    try{
+      var p = Promise.all([document.fonts.load('700 60px Amiri','آية'), document.fonts.load('800 40px Cairo','آية'), document.fonts.load('600 30px Cairo','اجتماع')]);
+      return Promise.race([p, new Promise(function(r){ setTimeout(r,1800); })]);
+    }catch(e){ return Promise.resolve(); }
+  }
+  var ICON_SAVE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 20h14"/></svg>';
+  var ICON_SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg>';
+  var ICON_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  function flash(btn, label, icon, orig){
+    btn.classList.add('done'); btn.innerHTML = icon + label;
+    setTimeout(function(){ btn.classList.remove('done'); btn.innerHTML = orig; }, 1800);
+  }
+  function getBlob(){ return new Promise(function(res){ try{ VC.cv.toBlob(res,'image/png'); }catch(e){ res(null); } }); }
+  async function doSave(btn){
+    var orig = btn.innerHTML, b = await getBlob();
+    if(!b){ flash(btn,'معرفتش أحفظ ⚠️',ICON_SAVE,orig); return; }
+    var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'آية-اليوم-'+Date.now()+'.png'; a.style.display = 'none';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} }, 5000);
+    try{ vibrate([14,10,22]); }catch(e){}
+    flash(btn,'اتحفظت على الهاتف',ICON_OK,orig);
+  }
+  async function doShare(btn){
+    var orig = btn.innerHTML, b = await getBlob(), txt = '«'+VC.text+'»\n— '+VC.ref+'\n\nاجتماع جامعة';
+    try{
+      var f = b ? new File([b],'آية-اليوم.png',{type:'image/png'}) : null;
+      if(f && navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:'آية اليوم', text:txt}); return; }
+      if(navigator.share){ await navigator.share({title:'آية اليوم', text:txt}); return; }
+    }catch(err){ if(err && err.name==='AbortError') return; }
+    if(b){ doSave(btn); return; }
+    try{ await navigator.clipboard.writeText(txt); flash(btn,'اتنسخت الآية',ICON_OK,orig); }catch(e){}
+  }
+  function close(){
+    var o = document.getElementById('vc-overlay'); if(!o) return;
+    document.removeEventListener('keydown', onKey); o.classList.add('out'); setTimeout(function(){ o.remove(); },230); VC.box = null;
+  }
+  function onKey(e){ if(e.key==='Escape') close(); }
+  async function open(text, ref){
+    text = String(text||'').replace(/[«»“”"]/g,'').trim(); ref = String(ref||'').trim();
+    if(!text || document.getElementById('vc-overlay')) return;
+    VC.text = text; VC.ref = ref; VC.theme = 0;
+    var X = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    var o = document.createElement('div'); o.id = 'vc-overlay';
+    o.innerHTML = '<div class="vc-wrap"><button type="button" class="vc-x" data-vc="close" aria-label="إغلاق">'+X+'</button>'
+      + '<h3 class="vc-title">✦ كارت الآية ✦</h3><div class="vc-cvbox"></div>'
+      + '<div class="vc-themes">'+THEMES.map(function(t,i){ return '<button type="button" class="vc-sw'+(i===0?' on':'')+'" data-vc="theme" data-i="'+i+'" aria-label="ثيم '+t.n+'" style="background:'+t.sw+'"><span>'+t.n+'</span></button>'; }).join('')+'</div>'
+      + '<div class="vc-actions"><button type="button" class="vc-btn pri" data-vc="save">'+ICON_SAVE+'حفظ على الهاتف</button><button type="button" class="vc-btn" data-vc="share">'+ICON_SHARE+'مشاركة</button></div></div>';
+    document.body.appendChild(o); VC.box = o.querySelector('.vc-cvbox');
+    document.addEventListener('keydown', onKey);
+    o.addEventListener('click', function(e){
+      var b = e.target.closest && e.target.closest('[data-vc]');
+      if(!b){ if(e.target===o) close(); return; }
+      var k = b.dataset.vc;
+      if(k==='close') close();
+      else if(k==='theme'){ VC.theme = +b.dataset.i; o.querySelectorAll('.vc-sw').forEach(function(s){ s.classList.toggle('on', s===b); }); try{ vibrate(8); }catch(e){} paint(); }
+      else if(k==='save') doSave(b);
+      else if(k==='share') doShare(b);
+    });
+    try{ vibrate([10,8,18]); }catch(e){}
+    await loadFonts(); paint();
+    try{ var r = VC.box.getBoundingClientRect(); setTimeout(function(){ try{ goldDustBurst(r.left+r.width/2, r.top+r.height*.3, 26); }catch(e){} }, 450); }catch(e){}
+  }
+  window.openVerseCard = open;
+  /* الضغط على كارت الآية في الإشعارات (مع تجاهل السحب للحذف) */
+  var dx0 = 0, dy0 = 0;
+  document.addEventListener('pointerdown', function(e){ dx0 = e.clientX; dy0 = e.clientY; }, true);
+  function fromRow(el){ open((el.querySelector('.nv-txt')||{}).textContent, (el.querySelector('.nv-ref')||{}).textContent); }
+  document.addEventListener('click', function(e){
+    var el = e.target.closest && e.target.closest('#notif-inner .nr-verse'); if(!el) return;
+    if(Math.abs(e.clientX-dx0) > 10 || Math.abs(e.clientY-dy0) > 10) return;
+    fromRow(el);
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key!=='Enter' && e.key!==' ') return;
+    var el = e.target && e.target.classList && e.target.classList.contains('nr-verse') ? e.target : null; if(el){ e.preventDefault(); fromRow(el); }
+  });
+})();
 
 /* ============================= COPY ROOM CODE ============================= */
 async function doCopyRoomCode(btn){
