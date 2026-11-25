@@ -34761,10 +34761,22 @@ function attNewSync(type, src){
   } else if(wd && dt.value){ wd.value = String(attParseDay(dt.value).getDay()); }
   if(nm && !nm.dataset.t && dt.value){ nm.value = attDefaultName(type, dt.value); }
 }
-function attNewCfg(type, day){
+function attNewCfg(type, day, keepCode){
   let t = Date.now();
   if(day && day!==attTodayISO()){ const d = attParseDay(day); d.setHours(12,0,0,0); t = d.getTime(); }
-  return { open:false, code:attGenCode(type), sessionId:'s'+t.toString(36)+Math.random().toString(36).slice(2,5), name:attDefaultName(type, day), startedAt:t, points:(ATT_TYPES[type].pts||0), history:[] };
+  return { open:false, code:(keepCode||attGenCode(type)), sessionId:'s'+t.toString(36)+Math.random().toString(36).slice(2,5), name:attDefaultName(type, day), startedAt:t, points:(ATT_TYPES[type].pts||0), history:[] };
+}
+/* ===== كود QR ثابت للاجتماع: بيتطبع مرة واحدة ومبيتغيرش، واليوم بيتفتح لوحده بتاريخ النهارده ===== */
+function attFixedQr(type){ return type==='meeting'; }
+function attIsoOf(ts){ const d = new Date(ts), z = n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate()); }
+function attDaySid(iso){ return 'd'+String(iso).replace(/-/g,''); }
+function attStaleFixed(type, c){ return !!(c && attFixedQr(type) && c.startedAt && attIsoOf(c.startedAt) < attTodayISO()); }
+function attRollDay(o, type){
+  const cur = o && o[type]; if(!cur || !attStaleFixed(type, cur)) return false;
+  const iso = attTodayISO(), n = attNewCfg(type, undefined, cur.code);
+  n.sessionId = attDaySid(iso); n.points = (cur.points!=null ? cur.points : n.points); n.open = !!cur.open;
+  n.history = (cur.history||[]).concat([attDaySnap(cur)]).slice(-60);
+  o[type] = n; return true;
 }
 function attFmtTime(ts){
   try{ return new Date(ts).toLocaleString('ar-EG', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'}); }catch(e){ return ''; }
@@ -35290,7 +35302,7 @@ async function tryAttendance(codeRaw, typeArg){
   }
   if(!cfg[type]){ showToast('التسجيل لسه ما اتفتحش', true); return false; }
   if(!viaCache) ATT_CONFIG = cfg;
-  const c = cfg[type];
+  let c = cfg[type];
   if(!c.open){ showToast('التسجيل في '+t.label+' مقفول حاليًا', true); render(); return false; }
   if(code !== attNormCode(c.code)){
     apShake();
@@ -35298,6 +35310,17 @@ async function tryAttendance(codeRaw, typeArg){
     if(other) showToast('ده كود '+ATT_TYPES[other].label+' — مش كود '+t.label, true);
     else showToast('كود الحضور غير صحيح أو منتهي', true);
     return false;
+  }
+  if(attStaleFixed(type, c)){
+    /* الكود ثابت: أول مسح في يوم جديد بيفتح يوم النهارده لوحده (من غير ما الأدمن ينشئ يوم) */
+    if(viaCache){
+      c = Object.assign({}, c, { sessionId: attDaySid(attTodayISO()), name: attDefaultName(type), startedAt: Date.now() });
+    } else {
+      const rolled = await attCfgUpdate(o=>{ attRollDay(o, type); });
+      if(!rolled){ showToast('تعذر فتح يوم النهارده — حاول مرة أخرى', true); return false; }
+      c = (ATT_CONFIG && ATT_CONFIG[type]) || c;
+      if(!c.open){ showToast('التسجيل في '+t.label+' مقفول حاليًا', true); render(); return false; }
+    }
   }
   const pid = state.pid, rkey = attRecKey(pid, type, c.sessionId);
   let dup = false; const pts = attPtsOfCfg(type, c);
@@ -35339,7 +35362,7 @@ function renderAdminAttendanceTab(){
 function attNewDayFormHtml(type, t, c, noCancel){
   const todayWd = new Date().getDay();
   return `<div class="card att-newsess aa-form">
-      <div class="att-ns-top"><span class="att-ns-ico">${t.icon}</span><div><b>يوم ${escapeHtml(t.label)} جديد</b><small>اختار اليوم والتاريخ واكتب اسم اليوم</small></div></div>
+      <div class="att-ns-top"><span class="att-ns-ico">${t.icon}</span><div><b>يوم ${escapeHtml(t.label)} جديد</b><small>${attFixedQr(type) ? 'كود الـQR ثابت ومش هيتغيّر' : 'اختار اليوم والتاريخ واكتب اسم اليوم'}</small></div></div>
       <div class="att-ns-grid">
         <label class="att-ns-f"><span>📆 اليوم</span><select class="field" id="att-new-wd" onchange="attNewSync('${type}','wd')">${ATT_WEEKDAYS.map((w,i)=>`<option value="${i}"${i===todayWd?' selected':''}>${w}</option>`).join('')}</select></label>
         <label class="att-ns-f"><span>📅 التاريخ</span><input class="field" type="date" id="att-new-date" value="${attTodayISO()}" dir="ltr" onchange="attNewSync('${type}','date')" /></label>
@@ -35495,7 +35518,7 @@ function renderAdminAttendanceTabInner(){
   if(nav.page==='audit') return attAuditHtml(type);
   /* ---------- صفحة النشاط ---------- */
   const isStale = !!c.startedAt && new Date(c.startedAt).toDateString() !== new Date().toDateString();
-  const staleBanner = isStale ? `<div class="att-stale"><div class="att-stale-txt"><b>⚠️ اليوم الحالي من تاريخ سابق</b><small>${escapeHtml(c.name||'')} · ${attFmtTime(c.startedAt)}</small></div><button type="button" class="btn btn-primary" data-action="att-admin-today" data-type="${type}">ابدأ يوم النهارده</button></div>` : '';
+  const staleBanner = isStale ? (attFixedQr(type) ? `<div class="att-stale"><div class="att-stale-txt"><b>✅ الكود ثابت — اليوم بيتفتح لوحده</b><small>أول ما تفتح الاستقبال أو حد يمسح الكود بيتعمل يوم النهارده تلقائي (آخر يوم: ${escapeHtml(c.name||'')})</small></div></div>` : `<div class="att-stale"><div class="att-stale-txt"><b>⚠️ اليوم الحالي من تاريخ سابق</b><small>${escapeHtml(c.name||'')} · ${attFmtTime(c.startedAt)}</small></div><button type="button" class="btn btn-primary" data-action="att-admin-today" data-type="${type}">ابدأ يوم النهارده</button></div>`) : '';
   const formOpen = nav.page==='new';
   const cntSid = sid => Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===sid).length;
   const daysAll = [{sid:c.sessionId, name:c.name, t:c.startedAt, cur:true}].concat((c.history||[]).slice().reverse().map(h=>({sid:h.sessionId, name:h.name, t:h.startedAt, cur:false})));
@@ -36047,7 +36070,7 @@ async function attAdminAction(action, el){
         const prev = o[type]; if(!prev) return;
         if(prev.sessionId===sid){
           const hist = (prev.history||[]).slice(); const last = hist.pop();
-          if(last){ o[type] = Object.assign({}, prev, {sessionId:last.sessionId, name:last.name, startedAt:last.startedAt, code:last.code||attGenCode(type), points:(last.points!=null?last.points:prev.points), history:hist}); }
+          if(last){ o[type] = Object.assign({}, prev, {sessionId:last.sessionId, name:last.name, startedAt:last.startedAt, code:(attFixedQr(type) ? (prev.code||last.code||attGenCode(type)) : (last.code||attGenCode(type))), points:(last.points!=null?last.points:prev.points), history:hist}); }
           else { delete o[type]; }
         } else { prev.history = (prev.history||[]).filter(x=>x.sessionId!==sid); }
       });
@@ -36062,7 +36085,7 @@ async function attAdminAction(action, el){
     showConfirmDialog('هتفعّل اليوم ده بكوده، واليوم الحالي هيتحفظ في الأيام. متأكد؟', async ()=>{
       const ok = await attCfgUpdate(o=>{
         const prev = o[type]; const h = prev && (prev.history||[]).find(x=>x.sessionId===sid); if(!h) return;
-        const n = Object.assign({}, prev, {sessionId:h.sessionId, name:h.name, startedAt:h.startedAt, code:h.code||attGenCode(type), points:(h.points!=null?h.points:prev.points)});
+        const n = Object.assign({}, prev, {sessionId:h.sessionId, name:h.name, startedAt:h.startedAt, code:(attFixedQr(type) ? (prev.code||h.code||attGenCode(type)) : (h.code||attGenCode(type))), points:(h.points!=null?h.points:prev.points)});
         n.history = (prev.history||[]).filter(x=>x.sessionId!==sid).concat([attDaySnap(prev)]).slice(-60);
         o[type] = n;
       });
@@ -36159,11 +36182,11 @@ async function attAdminAction(action, el){
   }
   if(action==='att-admin-toggle'){
     const want = !(attCfg(type) && attCfg(type).open);
-    const ok = await attCfgUpdate(o=>{ o[type].open = want; if(want) o[type].closedAt = null; });
+    const ok = await attCfgUpdate(o=>{ if(want) attRollDay(o, type); o[type].open = want; if(want) o[type].closedAt = null; });
     saveToast(ok, want ? 'تم فتح استقبال الحضور' : 'تم قفل استقبال الحضور');
   }
   else if(action==='att-admin-regen'){
-    showConfirmDialog('هيتغير كود QR، والكود المطبوع القديم مش هيشتغل تاني. متأكد؟', async ()=>{
+    showConfirmDialog(attFixedQr(type) ? 'كود الاجتماع ثابت ومطبوع — لو غيّرته الكود القديم هيقف ولازم تطبع الجديد. متأكد؟' : 'هيتغير كود QR، والكود المطبوع القديم مش هيشتغل تاني. متأكد؟', async ()=>{
       const ok = await attCfgUpdate(o=>{ o[type].code = attGenCode(type); });
       saveToast(ok, 'تم عمل كود جديد — اطبعه وعلّقه');
     }, {icon:'🔄', confirmLabel:'كود جديد'});
@@ -36176,7 +36199,7 @@ async function attAdminAction(action, el){
     showConfirmDialog('هتبدأ جلسة جديدة بكود جديد وعدّاد من صفر'+(newPts>0?' وقيمتها '+newPts+' نقطة':' من غير نقاط')+'، والجلسة الحالية هتتحفظ في السجل. متأكد؟', async ()=>{
       const ok = await attCfgUpdate(o=>{
         const prev = o[type];
-        const n = attNewCfg(type);
+        const n = attNewCfg(type, undefined, attFixedQr(type) && prev && prev.code);
         if(newName) n.name = newName;
         n.open = !!prev.open; n.points = newPts;
         n.history = (prev.history||[]).concat([attDaySnap(prev)]).slice(-60);
@@ -36263,7 +36286,7 @@ async function attAdminAction(action, el){
     await (async ()=>{
       let freshSid = '';
       const ok = await attCfgUpdate(o=>{
-        const prev = o[type]; const n = attNewCfg(type, day); freshSid = n.sessionId;
+        const prev = o[type]; const n = attNewCfg(type, day, attFixedQr(type) && prev && prev.code); freshSid = n.sessionId;
         n.name = finalName; n.points = pts; n.open = openNow;
         n.history = prev ? (prev.history||[]).concat([attDaySnap(prev)]).slice(-60) : [];
         o[type] = n;
