@@ -15638,32 +15638,53 @@ function khSrvNow(){ return Date.now() + (khSrvOff||0); }
 function khDayNum(){ return Math.floor((khSrvNow() - new Date().getTimezoneOffset()*60000)/864e5); }
 async function khWaitSrv(){ for(var i=0;i<40 && khSrvOff===null;i++) await new Promise(function(r){ setTimeout(r,100); }); return khSrvOff!==null; }
 function khClaimedToday(){ try{ const ex = myExtra(state.pid); return !!(ex.questsClaimed && ex.questsClaimed['khalwa_d'+khDayNum()]); }catch(e){ return false; } }
+function khWhyHtml(g){
+  if(!g || g.earned) return '';
+  let t;
+  if(g.whyNo==='already' || (!g.whyNo && khClaimedToday())) t = 'نقاط خلوة النهارده اتسجلت قبل كده ✓';
+  else if(g.whyNo==='net') t = '⚠️ النت ضعيف فالنقاط ماتسجلتش ولسه ماتحسبتش عليك. ابدأ خلوة موجّهة تانية لما النت يثبت وهتتسجل.';
+  else t = 'اكتب تأمّل أو التزام في الخلوة الجاية عشان النقاط تتسجل.';
+  return '<p class="gp" style="font-size:12px;opacity:.8;">'+t+'</p>';
+}
 async function khAward(g){
+  g.whyNo = '';
   const pid = state.pid; if(!pid) return 0;
-  if(!(g.refl||'').trim() && !(g.commit||'').trim()) return 0;   /* لازم تكتب تأمّل أو التزام عشان النقاط تتسجل */
-  if(!(await khWaitSrv())) return 0;                               /* من غير اتصال بالسيرفر مفيش نقاط */
-  const day = khDayNum(), ckey = 'glavera-kh-claim-'+pid;
-  let streak = 1;
+  if(!(g.refl||'').trim() && !(g.commit||'').trim()){ g.whyNo = 'text'; return 0; }   /* لازم تكتب تأمّل أو التزام */
+  if(!(await khWaitSrv())){ g.whyNo = 'net'; return 0; }                              /* من غير اتصال بالسيرفر مفيش نقاط */
+  const day = khDayNum(), ckey = 'glavera-kh-claim-'+pid, tok = Math.random().toString(36).slice(2)+Date.now().toString(36);
+  let streak = 1, already = false;
   /* حجز نقاط اليوم على السيرفر (عملية ذرّية): جهازين في نفس اللحظة ياخدوا مرة واحدة بس */
-  const r = await window.storage.update(ckey, function(cur){
-    if(cur && cur.day===day) return undefined;
+  let r = await window.storage.update(ckey, function(cur){
+    already = false;
+    if(cur && cur.day===day){ already = true; return undefined; }
     streak = (cur && cur.day===day-1) ? ((cur.streak||1)+1) : 1;
-    return {day:day, streak:streak, ts:khSrvNow(), prev: cur ? {day:cur.day, streak:cur.streak||1} : null};
+    return {day:day, streak:streak, ts:khSrvNow(), tok:tok, prev: cur ? {day:cur.day, streak:cur.streak||1} : null};
   }, true);
-  if(!r) return 0;
-  const pts = khPointsFor(g.secs), bonus = (streak % KH_STREAK_EVERY === 0) ? KH_STREAK_BONUS : 0;
-  g.earnedBonus = bonus;
-  BONUS[pid] = (BONUS[pid]||0) + pts + bonus;
-  const ok = await saveBonus(BONUS);
-  if(!ok){   /* لو الحفظ فشل نفك الحجز عشان المستخدم ما يخسرش نقاطه */
-    BONUS[pid] = (BONUS[pid]||0) - pts - bonus;
-    try{ await window.storage.update(ckey, function(cur){ return (cur && cur.day===day) ? (cur.prev || {day:0, streak:0}) : undefined; }, true); }catch(e){}
-    return 0;
+  if(!r){
+    if(already){ g.whyNo = 'already'; return 0; }
+    /* المهلة خلصت: ممكن الحجز يكون اتكتب فعلاً على السيرفر، فنتأكد بالقراءة بدل ما نضيّع يوم المستخدم */
+    try{ const chk = await window.storage.get(ckey, true); const v = chk && chk.value; if(v && typeof v==='object' && v.tok===tok){ streak = v.streak||1; r = chk; } }catch(e){}
+    if(!r){ g.whyNo = 'net'; return 0; }
   }
+  const release = async function(){ try{ await window.storage.update(ckey, function(cur){ return (cur && cur.day===day) ? (cur.prev || {day:0, streak:0}) : undefined; }, true); }catch(e){} };
+  const pts = khPointsFor(g.secs), bonus = (streak % KH_STREAK_EVERY === 0) ? KH_STREAK_BONUS : 0, total = pts + bonus;
+  /* إضافة النقاط بترانزاكشن على أحدث نسخة من السيرفر: مفيش نسخة قديمة بتتكتب فوق نقاط غيرك، ومفيش blocked بسبب نسخة الكاش */
+  let saved = null;
+  try{
+    saved = await window.storage.update('glavera-bonus', function(cur){
+      let o; try{ o = (typeof cur==='string') ? JSON.parse(cur) : cur; }catch(e){ return undefined; }
+      if(!o || typeof o!=='object') o = {};
+      o[pid] = (+o[pid]||0) + total;
+      return JSON.stringify(o);
+    }, true);
+  }catch(e){ saved = null; }
+  if(!saved){ await release(); g.whyNo = 'net'; return 0; }   /* لو الحفظ فشل نفك الحجز عشان المستخدم ما يخسرش نقاطه */
+  g.earnedBonus = bonus;
+  try{ const nb = JSON.parse(saved.value); if(nb && typeof nb==='object') BONUS = nb; else BONUS[pid] = (BONUS[pid]||0) + total; }catch(e){ BONUS[pid] = (BONUS[pid]||0) + total; }
   try{ const ex = myExtra(pid); ex.questsClaimed = ex.questsClaimed || {}; ex.questsClaimed['khalwa_d'+day] = true; }catch(e){}
-  try{ pushNotification(pid, '🕊 خلوتك النهارده: +'+(pts+bonus)+' نقطة'+(bonus?' (منها '+bonus+' بونص '+bbAr(streak)+' أيام متتالية)':''), '🕊'); }catch(e){}
+  try{ pushNotification(pid, '🕊 خلوتك النهارده: +'+total+' نقطة'+(bonus?' (منها '+bonus+' بونص '+bbAr(streak)+' أيام متتالية)':''), '🕊'); }catch(e){}
   try{ SND.coinChime(); goldDustBurst(innerWidth/2, innerHeight/2, 16); }catch(e){}
-  return pts + bonus;
+  return total;
 }
 async function bbGuideFinish(){
   const g = BB.g, d = bbData(), l = bibleLast();
@@ -15671,7 +15692,7 @@ async function bbGuideFinish(){
   const date = new Date().toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
   g.secs = Math.round(g.active||0); g.finished = true; g.refOut = ref; try{ khbAuto('guided'); }catch(e){}
   d.sess.unshift({ts:Date.now(), ref, q:g.q, refl:g.refl.trim(), commit:g.commit.trim(), secs:g.secs}); if(d.sess.length>60) d.sess.length = 60;
-  try{ g.earned = await khAward(g); }catch(e){ g.earned = 0; }
+  try{ g.earned = await khAward(g); }catch(e){ g.earned = 0; g.whyNo = 'net'; }
   let t = '🕊 خلوة '+date; if(ref) t += '\n📖 '+ref; if(g.refl.trim()) t += '\n💭 '+g.q+'\n'+g.refl.trim(); if(g.commit.trim()) t += '\n🎯 التزامي: '+g.commit.trim();
   await bbAppendNote(t); await bbPersist();
 }
@@ -15689,7 +15710,7 @@ function bbGuideRender(){
   }
   else if(i===2) body = `<div class="bb-gcard"><div class="gi">💭</div><h4>تأمّل</h4><p class="gp">${escapeHtml(g.q)}</p><textarea id="g-refl" class="bb-ta" placeholder="اكتب تأمّلك…">${escapeHtml(g.refl)}</textarea></div>`;
   else if(i===3) body = `<div class="bb-gcard"><div class="gi">🎯</div><h4>التزام</h4><p class="gp">خطوة عملية واحدة هتعملها النهارده.</p><textarea id="g-commit" class="bb-ta" placeholder="أنا هلتزم بأن…">${escapeHtml(g.commit)}</textarea></div>`;
-  else body = `<div class="bb-gcard"><div class="gi">🎉</div><h4>تمّت خلوتك</h4>${g.refOut?`<p class="gp" style="margin-bottom:10px;">📖 ${escapeHtml(g.refOut)}</p>`:''}<div class="bb-g2"><span>🔥 ${bbAr(bbStreak())} يوم متتالي</span><span>⏱ ${bbAr(Math.max(1,Math.round((g.secs||0)/60)))} دقيقة</span>${g.earned?`<span>🎁 +${bbAr(g.earned)} نقطة${g.earnedBonus?` (منها ${bbAr(g.earnedBonus)} بونص)`:''}</span>`:''}</div>${(!g.earned && khClaimedToday())?'<p class="gp" style="font-size:12px;opacity:.8;">نقاط خلوة النهارده اتسجلت قبل كده ✓</p>':(!g.earned?'<p class="gp" style="font-size:12px;opacity:.8;">اكتب تأمّل أو التزام في الخلوة الجاية عشان النقاط تتسجل.</p>':'')}<p class="gp">«أشكرك يا ربّ على كلمتك. ثبّتني في الخطوة التي التزمت بها، واحفظني في محبتك. آمين.»</p><p class="gp" style="font-size:12px;">اتحفظت في ملاحظاتك وفي سجل خلواتي ✝️</p></div>`;
+  else body = `<div class="bb-gcard"><div class="gi">🎉</div><h4>تمّت خلوتك</h4>${g.refOut?`<p class="gp" style="margin-bottom:10px;">📖 ${escapeHtml(g.refOut)}</p>`:''}<div class="bb-g2"><span>🔥 ${bbAr(bbStreak())} يوم متتالي</span><span>⏱ ${bbAr(Math.max(1,Math.round((g.secs||0)/60)))} دقيقة</span>${g.earned?`<span>🎁 +${bbAr(g.earned)} نقطة${g.earnedBonus?` (منها ${bbAr(g.earnedBonus)} بونص)`:''}</span>`:''}</div>${khWhyHtml(g)}<p class="gp">«أشكرك يا ربّ على كلمتك. ثبّتني في الخطوة التي التزمت بها، واحفظني في محبتك. آمين.»</p><p class="gp" style="font-size:12px;">اتحفظت في ملاحظاتك وفي سجل خلواتي ✝️</p></div>`;
   const foot = i<4 ? `<div class="bb-foot"><button type="button" class="bb-b" data-g="prev" ${i===0?'disabled':''}>‹ السابق</button><button type="button" class="bb-b pri" data-g="next">${i===3?'إنهاء الخلوة ✓':'التالي ›'}</button></div>` : `<div class="bb-foot"><button type="button" class="bb-b pri" data-g="close">إغلاق</button></div>`;
   sh.innerHTML = `<div class="bb-grab"></div><div class="bb-head"><div class="bb-ttl"><h3>الخلوة الموجّهة</h3><div class="bb-crumb">الخطوة ${bbAr(i+1)} من ٥ — ${names[i]}</div></div><button type="button" class="bb-ib" data-g="close" aria-label="إغلاق">✕</button></div><div class="bb-prog"><i style="width:${(i+1)*20}%"></i></div>${i<4?`<div class="bb-ptsline" id="bb-pts-now">${khLiveHint(g)}</div>`:''}<div class="bb-body">${body}</div>${foot}`;
 }
@@ -34708,13 +34729,19 @@ function attApplyTypes(arr){
   });
   return added;
 }
+let _attFresh = false; /* اتأكدنا إن حالة الحضور جاية من السيرفر مش من الكاش */
 let ATT_CONFIG = {}, ATT_RECORDS = {}, _attLoading = false, _attLastLoad = 0, _attVer = 0, _attLoadedOnce = false, _attInitBusy = false, _attInitFailedAt = 0;
 
 function attGenCode(type){
   /* كود بسيط من 4 حاجات: حرفين + رقمين (مثال: KX47) */
   const L = 'ABCDEFGHJKMNPQRSTUVWXYZ', D = '23456789'; let s = '';
-  for(let i=0;i<2;i++) s += L[Math.floor(Math.random()*L.length)];
-  for(let i=0;i<2;i++) s += D[Math.floor(Math.random()*D.length)];
+  const used = {}; try{ Object.keys(ATT_CONFIG||{}).forEach(k=>{ const c = ATT_CONFIG[k]; if(c && c.code) used[attNormCode(c.code)] = 1; }); }catch(e){}
+  for(let n=0;n<60;n++){
+    s = '';
+    for(let i=0;i<2;i++) s += L[Math.floor(Math.random()*L.length)];
+    for(let i=0;i<2;i++) s += D[Math.floor(Math.random()*D.length)];
+    if(!used[s]) break; /* مايتكررش كود نشاط تاني */
+  }
   return s;
 }
 function attNormCode(c){ return String(c||'').trim().toUpperCase().replace(/[^A-Z0-9-]/g,''); }
@@ -34767,7 +34794,8 @@ function attNewCfg(type, day, keepCode){
   return { open:false, code:(keepCode||attGenCode(type)), sessionId:'s'+t.toString(36)+Math.random().toString(36).slice(2,5), name:attDefaultName(type, day), startedAt:t, points:(ATT_TYPES[type].pts||0), history:[] };
 }
 /* ===== كود QR ثابت للاجتماع: بيتطبع مرة واحدة ومبيتغيرش، واليوم بيتفتح لوحده بتاريخ النهارده ===== */
-function attFixedQr(type){ return type==='meeting'; }
+const ATT_FIXED_TYPES = ['mass','meeting','praise'];
+function attFixedQr(type){ return ATT_FIXED_TYPES.indexOf(type)>=0; }
 function attIsoOf(ts){ const d = new Date(ts), z = n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate()); }
 function attDaySid(iso){ return 'd'+String(iso).replace(/-/g,''); }
 function attStaleFixed(type, c){ return !!(c && attFixedQr(type) && c.startedAt && attIsoOf(c.startedAt) < attTodayISO()); }
@@ -34827,6 +34855,7 @@ async function attRefresh(force){
     const [c0, r0, tl, lv] = await Promise.all([attLoadJson(ATT_CONFIG_KEY), attLoadJson(ATT_RECORDS_KEY), attLoadJson(ATT_TYPES_KEY), attLoadJson(ATT_LOGOV_KEY)]);
     let c = c0, r = r0;
     const gotCfg = !!(c0 && Object.keys(c0).length);
+    if(gotCfg && !(window.storageFromCache && window.storageFromCache(ATT_CONFIG_KEY))) _attFresh = true;
     if(gotCfg){ attCfgCacheSet(c0); attRecCacheSet(r0); }
     else{ /* مفيش اتصال: نكمّل بآخر نسخة محفوظة بدل ما الشاشة تفضى */
       const cc = attCfgCacheGet(); if(cc) c = cc;
@@ -34954,6 +34983,7 @@ function attHomeSectionHtml(){
   if(openList.length) live = {cls:'open', txt:'التسجيل مفتوح الآن: '+openList.join(' · ')};
   else if(doneN)     live = {cls:'done', txt:'تم تسجيل حضورك'};
   else               live = {cls:'',     txt:'لا يوجد تسجيل مفتوح حاليًا'};
+  if(!_attFresh && !openList.length && !doneN) live = {cls:'', txt:'⏳ بنتأكد من حالة التسجيل… (لو النت ضعيف ادخل وجرّب)'};
   if(featureLockedForMe('attendance')) live = {cls:'', txt:'🔧 جاري التحديث'};
   const dots = [0,1,2,3,4].map(r=>[0,1,2,3,4].map(c=>`<circle cx="${20+c*6}" cy="${20+r*6}" r="1.5"/>`).join('')).join('');
   return `
@@ -35158,7 +35188,7 @@ function renderAttendanceScanPage(){
   const done = attDone(pid, type); const open = !!(c && c.open);
   const mine = attMine(pid, type);
   const c1 = (t.color.match(/#[0-9A-Fa-f]{6}/)||['#F4B740'])[0];
-  const st = done ? {cls:'done', txt:'تم تسجيل حضورك'} : open ? {cls:'open', txt:'التسجيل مفتوح الآن'} : {cls:'', txt:c ? 'التسجيل مقفول' : 'في انتظار المنظمين'};
+  const st = done ? {cls:'done', txt:'تم تسجيل حضورك'} : open ? {cls:'open', txt:'التسجيل مفتوح الآن'} : {cls:'', txt:!_attFresh ? 'بنتأكد من حالة التسجيل…' : (c ? 'التسجيل مقفول' : 'في انتظار المنظمين')};
   const sessionName = c && c.name ? escapeHtml(c.name) : 'في انتظار المنظمين';
   const apK = pid+'|'+type, anim = _apKey !== apK; _apKey = apK;
   const celebrate = done && _apCelebrate; _apCelebrate = false;
@@ -35292,7 +35322,14 @@ async function tryAttendance(codeRaw, typeArg){
   if(!code){ showToast('الكود غير صحيح', true); return false; }
   let cfg = null, viaCache = false;
   if(!(typeof navigator!=='undefined' && navigator.onLine===false)){
-    cfg = await Promise.race([attLoadJson(ATT_CONFIG_KEY), new Promise(r=>setTimeout(()=>r(null), 6000))]);
+    /* بنحاول 3 مرات ونرفض أي نسخة جاية من الكاش: النسخة القديمة هي سبب رسالة \"الكود قديم/مقفول\" الغلط */
+    for(let k=0; k<3 && !cfg; k++){
+      const got = await Promise.race([attLoadJson(ATT_CONFIG_KEY), new Promise(r=>setTimeout(()=>r(null), 7000))]);
+      const fromCache = !!(window.storageFromCache && window.storageFromCache(ATT_CONFIG_KEY));
+      if(got && Object.keys(got).length && !fromCache) cfg = got;
+      else if(k<2) await new Promise(r=>setTimeout(r, 600));
+    }
+    if(cfg) _attFresh = true;
   }
   if(!cfg || !Object.keys(cfg).length){
     /* أوفلاين: نتحقق من آخر نسخة محفوظة من إعدادات الجلسة ونسجّل في الطابور */
@@ -35300,11 +35337,12 @@ async function tryAttendance(codeRaw, typeArg){
     if(cc){ cfg = cc; viaCache = true; }
     else { showToast('مفيش اتصال — افتح التطبيق وفيه نت مرة على الأقل عشان تقدر تسجّل حضور أوفلاين', true); return false; }
   }
-  if(!cfg[type]){ showToast('التسجيل لسه ما اتفتحش', true); return false; }
+  if(!cfg[type]){ showToast(viaCache ? 'النت ضعيف ومقدرناش نتأكد من حالة التسجيل أو الكود — جرّب تاني بعد ثواني' : 'التسجيل لسه ما اتفتحش', true); return false; }
   if(!viaCache) ATT_CONFIG = cfg;
   let c = cfg[type];
-  if(!c.open){ showToast('التسجيل في '+t.label+' مقفول حاليًا', true); render(); return false; }
+  if(!c.open){ showToast(viaCache ? 'النت ضعيف ومقدرناش نتأكد من حالة التسجيل أو الكود — جرّب تاني بعد ثواني' : 'التسجيل في '+t.label+' مقفول حاليًا', true); if(!viaCache) render(); return false; }
   if(code !== attNormCode(c.code)){
+    if(viaCache){ showToast('النت ضعيف ومقدرناش نتأكد من حالة التسجيل أو الكود — جرّب تاني بعد ثواني', true); return false; }   /* الكاش ممكن يكون قديم: مانقولش للمستخدم إن الكود غلط */
     apShake();
     const other = ATT_KEYS.find(k=>k!==type && cfg[k] && attNormCode(cfg[k].code)===code);
     if(other) showToast('ده كود '+ATT_TYPES[other].label+' — مش كود '+t.label, true);
@@ -35652,7 +35690,7 @@ function attPrintCode(type){
       @media print{ html,body{ background:#fff; } .perf::before,.perf::after{ background:#fff; } }
     </style></head><body>
     <div class="page" id="pg">
-      <div class="head"><div class="ico">${icoHtml}</div><h1>${t.full}</h1><div class="date">${escapeHtml(c.name||'')}</div></div>
+      <div class="head"><div class="ico">${icoHtml}</div><h1>${t.full}</h1>${attFixedQr(type) ? '' : `<div class="date">${escapeHtml(c.name||'')}</div>`}</div>
       <div class="body">
         <div class="qr-wrap"><i></i><i></i><i></i><i></i><div id="print-qr-holder"></div></div>
         <div class="scan">امسح الكود <span>وسجّل حضورك</span> ✨</div>
@@ -36186,7 +36224,7 @@ async function attAdminAction(action, el){
     saveToast(ok, want ? 'تم فتح استقبال الحضور' : 'تم قفل استقبال الحضور');
   }
   else if(action==='att-admin-regen'){
-    showConfirmDialog(attFixedQr(type) ? 'كود الاجتماع ثابت ومطبوع — لو غيّرته الكود القديم هيقف ولازم تطبع الجديد. متأكد؟' : 'هيتغير كود QR، والكود المطبوع القديم مش هيشتغل تاني. متأكد؟', async ()=>{
+    showConfirmDialog(attFixedQr(type) ? 'كود '+t.label+' ثابت ومطبوع — لو غيّرته الكود القديم هيقف ولازم تطبع الجديد. متأكد؟' : 'هيتغير كود QR، والكود المطبوع القديم مش هيشتغل تاني. متأكد؟', async ()=>{
       const ok = await attCfgUpdate(o=>{ o[type].code = attGenCode(type); });
       saveToast(ok, 'تم عمل كود جديد — اطبعه وعلّقه');
     }, {icon:'🔄', confirmLabel:'كود جديد'});
