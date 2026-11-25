@@ -3752,6 +3752,94 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .np-hist:active{ opacity:1; }
   .notif-btn.has-unread{ animation:none; } .notif-dot{ animation:none; }
   @media (prefers-reduced-motion:reduce){ .nr{ animation:none; } }
+  /* ================= إشعارات v3 — "خيط النجوم" ================= */
+  .notif-overlay{ background:radial-gradient(120% 55% at 50% 100%, color-mix(in srgb,var(--violet) 34%,transparent), rgba(4,3,16,.62) 70%); }
+  .notif-panel{ position:relative; overflow-x:hidden; border-top:1px solid color-mix(in srgb,var(--violet) 45%,transparent);
+    background:
+      radial-gradient(80% 28% at 92% 0%, color-mix(in srgb,var(--violet) 34%,transparent), transparent 72%),
+      radial-gradient(60% 24% at 4% 0%, color-mix(in srgb,var(--gold) 20%,transparent), transparent 72%),
+      linear-gradient(180deg, var(--surface), var(--bg-2));
+    box-shadow:0 -26px 70px -12px color-mix(in srgb,var(--violet) 55%,transparent);
+    animation:npSheet .55s cubic-bezier(.18,1.05,.3,1) both; }
+  @keyframes npSheet{ from{ transform:translateY(70px) scale(.98); opacity:0; } to{ transform:none; opacity:1; } }
+
+  /* الهيدر: كورة جرس بحلقة بتلف */
+  .np-head{ flex-direction:row; gap:12px; padding:8px 2px 14px; position:relative; }
+  .np-ttl{ flex:1; min-width:0; }
+  .np-ttl b{ font-size:20px; }
+  .np-orb{ position:relative; flex:0 0 auto; width:48px; height:48px; border-radius:50%; display:grid; place-items:center; color:#2a1c00; isolation:isolate; }
+  .np-orb::before{ content:''; position:absolute; inset:0; border-radius:50%; z-index:-2;
+    background:conic-gradient(from 0deg, var(--gold), var(--coral), var(--violet), var(--teal), var(--gold)); animation:npSpin 6s linear infinite; }
+  .np-orb::after{ content:''; position:absolute; inset:3px; border-radius:50%; z-index:-1; background:linear-gradient(145deg,var(--gold-2),var(--gold)); }
+  .np-orb svg{ width:23px; height:23px; transform-origin:50% 12%; }
+  .np-orb.ring svg{ animation:npBell 3s ease-in-out infinite; }
+  @keyframes npSpin{ to{ transform:rotate(360deg); } }
+  @keyframes npBell{ 0%,70%,100%{ transform:rotate(0);} 74%{ transform:rotate(-16deg);} 78%{ transform:rotate(14deg);} 82%{ transform:rotate(-10deg);} 86%{ transform:rotate(6deg);} 90%{ transform:rotate(0);} }
+  .np-burst{ position:absolute; inset-inline-start:26px; top:32px; width:0; height:0; pointer-events:none; }
+  .np-burst i{ position:absolute; width:6px; height:6px; border-radius:2px; background:var(--c); opacity:0; animation:npBurst .9s cubic-bezier(.1,.8,.3,1) .25s both; }
+  @keyframes npBurst{ 0%{ opacity:1; transform:rotate(var(--a)) translateY(0) scale(1);} 100%{ opacity:0; transform:rotate(var(--a)) translateY(-62px) scale(.3) rotate(240deg);} }
+  .np-x{ width:36px; height:36px; background:color-mix(in srgb,var(--text) 8%,transparent); border:1px solid color-mix(in srgb,var(--text) 10%,transparent); transition:transform .2s; }
+  .np-x:active{ transform:scale(.88) rotate(90deg); }
+
+  /* بانر الموبايل: كبسولة زجاجية */
+  .notif-panel .vst-notif{ margin:0 0 6px; padding:8px 8px 8px 14px; border-radius:999px; border:1px solid color-mix(in srgb,var(--good) 32%,transparent);
+    background:linear-gradient(90deg, color-mix(in srgb,var(--good) 13%,transparent), color-mix(in srgb,var(--text) 4%,transparent)); font-size:11.5px; font-weight:700; }
+  .notif-panel .vst-notif button{ padding:6px 14px; border-radius:999px; font-size:11px; }
+
+  /* العناوين: خط مضيء */
+  .nr-sec{ margin:14px 4px 10px; font-size:11.5px; color:var(--text); }
+  .nr-sec::after{ content:''; flex:1; height:1px; order:5; background:linear-gradient(90deg, color-mix(in srgb,var(--gold) 55%,transparent), transparent); }
+  .nr-sec em{ box-shadow:0 0 14px color-mix(in srgb,var(--gold) 70%,transparent); animation:npPulse 1.8s ease-in-out infinite; }
+  @keyframes npPulse{ 50%{ transform:scale(1.18); } }
+
+  /* الخيط اللي بيربط الإشعارات */
+  .nr-group{ position:relative; display:flex; flex-direction:column; gap:12px; background:none; border:0; border-radius:0; overflow:visible; }
+  .nr-group::before{ content:''; position:absolute; top:20px; bottom:20px; inset-inline-start:35px; width:2px; border-radius:2px;
+    background:repeating-linear-gradient(180deg, color-mix(in srgb,var(--violet) 60%,transparent) 0 6px, transparent 6px 11px); opacity:.55; }
+
+  /* الكارت */
+  .nr{ --card:color-mix(in srgb,var(--surface-2) 88%,var(--t) 6%); gap:13px; padding:12px 14px 12px 12px; border-radius:22px; border:1px solid color-mix(in srgb,var(--t) 22%,transparent);
+    background:linear-gradient(115deg, color-mix(in srgb,var(--t) 14%,var(--surface-2)), var(--card) 55%); overflow:hidden;
+    box-shadow:0 10px 26px -16px color-mix(in srgb,var(--t) 70%,#000); transition:transform .18s;
+    animation:nrIn .6s cubic-bezier(.2,1.25,.3,1) both; animation-delay:calc(var(--i)*70ms); }
+  .nr:active{ transform:scale(.975); }
+  .nr + .nr::before{ display:none; }
+  @keyframes nrIn{ from{ opacity:0; transform:translateX(-26px) scale(.92); } to{ opacity:1; transform:none; } }
+  .nr::after{ content:''; position:absolute; inset:0; pointer-events:none; opacity:0;
+    background:linear-gradient(105deg, transparent 35%, color-mix(in srgb,var(--t) 28%,transparent) 50%, transparent 65%); transform:translateX(120%); }
+  .nr.unread{ border-color:color-mix(in srgb,var(--t) 65%,transparent); box-shadow:0 0 0 1px color-mix(in srgb,var(--t) 25%,transparent), 0 14px 34px -14px color-mix(in srgb,var(--t) 85%,#000); }
+  .nr.unread::after{ opacity:1; animation:npSweep 3.4s ease-in-out 1s infinite; }
+  @keyframes npSweep{ 0%{ transform:translateX(120%);} 45%,100%{ transform:translateX(-120%);} }
+
+  /* الأيقونة = جوهرة */
+  .nr-ico{ position:relative; width:46px; height:46px; border-radius:16px; color:#fff; border:0;
+    background:linear-gradient(150deg, color-mix(in srgb,var(--t) 92%,#fff 8%), color-mix(in srgb,var(--t) 55%,#000));
+    box-shadow:0 8px 18px -6px var(--t), inset 0 1.5px 0 rgba(255,255,255,.45), inset 0 -3px 6px rgba(0,0,0,.18); transform:rotate(-6deg); }
+  .nr-ico svg{ width:23px; height:23px; stroke-width:2.1; filter:drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+  .nr.unread .nr-ico{ animation:npFloat 2.8s ease-in-out infinite; }
+  @keyframes npFloat{ 50%{ transform:rotate(5deg) translateY(-3px); } }
+  .nr.unread .nr-ico::before, .nr.unread .nr-ico::after{ content:'✦'; position:absolute; font-size:10px; color:var(--t); text-shadow:0 0 8px var(--t); animation:npTwinkle 2.2s ease-in-out infinite; }
+  .nr.unread .nr-ico::before{ top:-8px; inset-inline-end:-5px; }
+  .nr.unread .nr-ico::after{ bottom:-7px; inset-inline-start:-6px; font-size:8px; animation-delay:1.1s; }
+  @keyframes npTwinkle{ 0%,100%{ opacity:0; transform:scale(.3) rotate(0);} 50%{ opacity:1; transform:scale(1.2) rotate(90deg);} }
+
+  .nr-txt{ font-size:13.5px; line-height:1.6; font-weight:700; }
+  .nr-meta{ margin-top:5px; }
+  .nr-meta{ display:inline-flex; align-items:center; gap:6px; padding:2px 9px; border-radius:99px; background:color-mix(in srgb,var(--text) 7%,transparent); font-size:10.5px; }
+  .nr-mid{ display:flex; flex-direction:column; align-items:flex-start; }
+  .nr-dot{ background:var(--t); box-shadow:0 0 8px var(--t); }
+
+  /* المبلغ = تذكرة بخط تقطيع */
+  .nr-amt{ position:relative; width:auto; min-width:66px; padding:2px 0 2px 12px; margin-inline-start:2px; border-inline-start:2px dashed color-mix(in srgb,var(--t) 45%,transparent); align-items:center; text-align:center; }
+  .nr-amt b{ font-size:23px; font-weight:900; line-height:1; text-shadow:0 0 18px currentColor; animation:npPop .7s cubic-bezier(.2,1.6,.3,1) both; animation-delay:calc(var(--i)*70ms + .25s); }
+  .nr-amt b i{ font-size:17px; }
+  .nr-amt small{ text-align:center; margin-top:3px; font-weight:800; letter-spacing:.3px; }
+  @keyframes npPop{ from{ transform:scale(.3); opacity:0; } to{ transform:none; opacity:1; } }
+
+  .np-empty{ padding:46px 10px 36px; }
+  .np-empty span{ font-size:44px; animation:npFloat 3.5s ease-in-out infinite; filter:drop-shadow(0 8px 18px color-mix(in srgb,var(--violet) 60%,transparent)); }
+  .np-hist{ margin:16px auto 4px; padding:8px 16px; border-radius:99px; opacity:1; background:color-mix(in srgb,var(--text) 7%,transparent); border:1px solid color-mix(in srgb,var(--text) 10%,transparent); font-size:11.5px; font-weight:700; }
+  @media (prefers-reduced-motion:reduce){ .nr,.nr *,.np-orb,.np-orb *,.nr-amt b,.nr-sec em,.np-empty span,.notif-panel{ animation:none !important; } }
   /* بانر الإشعار اللحظي: زجاجي وأنحف */
   .vtx-banner{ padding:11px 13px; border-radius:22px; border:1px solid rgba(255,255,255,.12); border-inline-start:1px solid rgba(255,255,255,.12);
     background:color-mix(in srgb,var(--surface) 78%,transparent); -webkit-backdrop-filter:blur(22px) saturate(1.5); backdrop-filter:blur(22px) saturate(1.5);
@@ -39333,6 +39421,8 @@ async function glvPushEnableUi(){
 function notifPanelInner(mode){
   const pid = state.pid;
   const X = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  const BELL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="${NI.bell}"/></svg>`;
+  const burst = '<div class="np-burst">' + ['--gold','--coral','--violet','--teal','--gold','--good','--coral','--violet'].map((c,k)=>`<i style="--a:${k*45}deg;--c:var(${c})"></i>`).join('') + '</div>';
   if(mode==='history'){
     const all = (myExtra(pid).notifs||[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
     const days = [], map = {};
@@ -39340,8 +39430,9 @@ function notifPanelInner(mode){
     const body = days.map(d=>notifGroup(d, map[d], true)).join('');
     return `
       <div class="np-head">
-        <button type="button" class="np-x" data-action="notif-back" aria-label="رجوع">${ICO.chev}</button>
+        <div class="np-orb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${NI.clock}"/></svg></div>
         <div class="np-ttl"><b>سجل الإشعارات</b><span>${all.length} إشعار · آخر 30 يوم</span></div>
+        <button type="button" class="np-x" data-action="notif-back" aria-label="رجوع">${ICO.chev}</button>
       </div>
       ${body || '<div class="np-empty"><span>🗂️</span>السجل فاضي</div>'}`;
   }
@@ -39354,8 +39445,10 @@ function notifPanelInner(mode){
   const hasAny = (myExtra(pid).notifs||[]).length > 0;
   return `
       <div class="np-head">
-        <button type="button" class="np-x" data-action="close-notifs" aria-label="إغلاق">${X}</button>
+        <div class="np-orb ${fresh.length?'ring':''}">${BELL}</div>
+        ${fresh.length ? burst : ''}
         <div class="np-ttl"><b>الإشعارات</b><span>${fresh.length ? fresh.length+' جديد · ' : ''}آخر 24 ساعة</span></div>
+        <button type="button" class="np-x" data-action="close-notifs" aria-label="إغلاق">${X}</button>
       </div>
       ${glvPushBannerHtml()}
       ${body}
