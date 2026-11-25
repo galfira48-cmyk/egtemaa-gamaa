@@ -9757,7 +9757,7 @@ if(window.__GLV_LOCAL){
     }
     function setupDc(ch){
       dc = ch;
-      dc.onopen = function(){ clearTimeout(window.__glvLinkT); send({op:'snap', items:snapshot()}); setStatus(); try{ showToast('✅ اتربطت بالهاتف التاني', false); }catch(e){} closeModal(); };
+      dc.onopen = function(){ clearTimeout(window.__glvLinkT); send({op:'snap', items:snapshot()}); setStatus(); try{ if(navigator.vibrate) navigator.vibrate([20,40,20]); }catch(e){} if(modal){ try{ card(celebrate()); }catch(e){} setTimeout(closeModal, 1900); } else { try{ showToast('✅ اتربطت بالهاتف التاني', false); }catch(e){} } };
       dc.onclose = function(){ setStatus(); };
       dc.onmessage = onMsg;
     }
@@ -9800,15 +9800,32 @@ if(window.__GLV_LOCAL){
       try{ stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); v.srcObject = stream; await v.play(); }catch(e){ stop(); alert('مقدرتش أفتح الكاميرا'); return; }
       (async function loop(){ while(run){ try{ var r = await det.detect(v); if(r && r.length){ ta.value = r[0].rawValue; stop(); after(); return; } }catch(e){} await new Promise(function(r){ setTimeout(r,150); }); } })();
     }
-    var CSS = 'background:#fff;color:#171449;border-radius:18px;padding:16px;width:min(92vw,360px);max-height:90vh;overflow:auto;text-align:center;font-family:Cairo,sans-serif;direction:rtl';
-    var B = 'display:block;width:100%;margin:8px 0;padding:12px;border:0;border-radius:12px;background:#171449;color:#ffd76a;font:800 14px Cairo,sans-serif';
-    var B2 = B.replace('#171449','#e8e6f5').replace('#ffd76a','#171449');
-    var TA = 'width:100%;height:70px;font:11px monospace;direction:ltr;border:1px solid #bbb;border-radius:8px;box-sizing:border-box';
+    var CSS = 'position:relative;overflow:hidden;background:radial-gradient(120% 90% at 50% -10%,#3a2f9a 0%,#1d1a52 45%,#0e0d2b 100%);color:#fff;border:1px solid rgba(255,222,148,.28);border-radius:28px;padding:22px 16px 16px;width:min(92vw,370px);max-height:90vh;overflow-y:auto;text-align:center;font-family:Cairo,sans-serif;direction:rtl;box-shadow:0 24px 70px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);animation:lrmPop .45s cubic-bezier(.2,1.1,.3,1) both';
+    var B = 'display:block;width:100%;margin:8px 0;padding:12px;border:0;border-radius:16px;background:linear-gradient(95deg,#F4B740,#FFDE94);color:#2a1a00;font:800 14px Cairo,sans-serif;box-shadow:0 8px 22px -6px rgba(244,183,64,.55)';
+    var B2 = 'display:block;width:100%;margin:8px 0;padding:12px;border-radius:16px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);font:800 14px Cairo,sans-serif';
+    var TA = 'width:100%;height:70px;font:11px monospace;direction:ltr;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.35);color:#fff;border-radius:12px;box-sizing:border-box;padding:8px';
     function card(html){ modal.firstChild.innerHTML = html; return modal.firstChild; }
+    function lrmCss(){
+      if(document.getElementById('lrm-css')) return;
+      var st = document.createElement('style'); st.id = 'lrm-css';
+      st.textContent = '@keyframes lrmPing{0%{transform:scale(.5);opacity:.8}100%{transform:scale(1.55);opacity:0}}@keyframes lrmFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes lrmPop{0%{transform:scale(.88);opacity:0}100%{transform:scale(1);opacity:1}}@keyframes lrmScan{0%,100%{top:14px}50%{top:calc(100% - 17px)}}@keyframes lrmConf{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}@keyframes lrmDot{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1.2)}}'
+      + '.lrm-radar{position:relative;width:104px;height:104px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center}.lrm-radar i{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(95,224,164,.6);animation:lrmPing 2.4s ease-out infinite}.lrm-radar i:nth-child(2){animation-delay:.8s}.lrm-radar i:nth-child(3){animation-delay:1.6s}.lrm-radar>div{position:relative;animation:lrmFloat 3s ease-in-out infinite}'
+      + '.lrm-title{font:900 22px Cairo,sans-serif;margin:2px 0;background:linear-gradient(95deg,#FFDE94,#F4B740);-webkit-background-clip:text;background-clip:text;color:transparent}.lrm-sub{font-size:12.5px;opacity:.8;margin:4px 0 14px;line-height:1.7}.lrm-ok{display:inline-block;margin-bottom:8px;padding:5px 14px;border-radius:99px;background:rgba(95,224,164,.16);border:1px solid rgba(95,224,164,.5);color:#5FE0A4;font-weight:800;font-size:13px}'
+      + '.lrm-role{display:grid;grid-template-columns:44px 1fr;grid-template-rows:auto auto;column-gap:12px;align-items:center;width:100%;margin:9px 0;padding:13px 14px;border:0;border-radius:20px;color:#fff;text-align:right;font-family:Cairo,sans-serif;box-shadow:0 10px 26px -8px var(--sh);background:linear-gradient(155deg,var(--c1),var(--c2))}.lrm-role:active{transform:scale(.97)}.lrm-role.h{--c1:#43e97b;--c2:#0ba5a0;--sh:rgba(11,165,160,.6)}.lrm-role.g{--c1:#b96bff;--c2:#5b47fb;--sh:rgba(91,71,251,.6)}.lrm-role span{grid-row:1/3;font-size:26px;width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}.lrm-role b{font-size:15.5px;font-weight:900}.lrm-role small{font-size:11.5px;opacity:.85}.lrm-hint{margin-top:10px;font-size:11.5px;opacity:.6;line-height:1.6}'
+      + '.lrm-qr{position:relative;display:flex;justify-content:center;margin:12px auto;padding:14px;width:max-content;max-width:100%;border-radius:24px;background:#fff;box-shadow:0 0 0 3px rgba(244,183,64,.95),0 0 38px rgba(244,183,64,.5)}.lrm-qr canvas{border-radius:10px}.lrm-qr::after{content:"";position:absolute;left:12px;right:12px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#0ba5a0,transparent);box-shadow:0 0 12px #0ba5a0;animation:lrmScan 2.2s ease-in-out infinite}'
+      + '.lrm-wait{display:inline-flex;align-items:center;gap:8px;margin:2px 0 4px;font-size:13px;font-weight:800;color:#5FE0A4}.lrm-wait i{width:7px;height:7px;border-radius:50%;background:#5FE0A4;animation:lrmDot 1.2s infinite}.lrm-wait i:nth-child(2){animation-delay:.2s}.lrm-wait i:nth-child(3){animation-delay:.4s}.lrm-h{font-weight:900;font-size:17px;margin:2px 0}';
+      document.head.appendChild(st);
+    }
+    function celebrate(){
+      var cols = ['#5FE0A4','#FFDE94','#F4B740','#7C9CFF','#FF9EC7'], p = '';
+      for(var i=0;i<24;i++){ var a = Math.random()*6.283, d = 70+Math.random()*100; p += '<i style="position:absolute;left:50%;top:40%;width:8px;height:12px;border-radius:2px;background:'+cols[i%5]+';--dx:'+Math.round(Math.cos(a)*d)+'px;--dy:'+Math.round(Math.sin(a)*d-20)+'px;--r:'+Math.round(Math.random()*720-360)+'deg;animation:lrmConf 1.3s ease-out forwards"></i>'; }
+      return '<div style="position:relative;padding:26px 0 18px">'+p+'<div style="font-size:64px;animation:lrmPop .6s both">🤝</div><div class="lrm-title" style="font-size:24px">اتربطنا!</div><div class="lrm-sub" style="margin-bottom:0">الهاتفين متصلين — يلا نلعب 🎮</div></div>';
+    }
     function openModal(){
+      lrmCss();
       closeModal();
       modal = document.createElement('div');
-      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2147483646;display:flex;align-items:center;justify-content:center';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(8,7,28,.74);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:2147483646;display:flex;align-items:center;justify-content:center';
       modal.innerHTML = '<div style="'+CSS+'"></div>';
       modal.addEventListener('click', function(e){ if(e.target===modal) closeModal(); });
       document.body.appendChild(modal);
@@ -9817,12 +9834,12 @@ if(window.__GLV_LOCAL){
     /* ===== واجهة مبسّطة: خطوة واحدة في كل شاشة ===== */
     var BIG = B.replace('padding:12px','padding:16px').replace('font:800 14px','font:900 16px');
     var BIG2 = B2.replace('padding:12px','padding:16px').replace('font:800 14px','font:900 16px');
-    function dots(n,t){ var h='<div style="display:flex;gap:6px;justify-content:center;margin-bottom:10px">'; for(var i=1;i<=t;i++) h+='<i style="width:'+(i===n?26:8)+'px;height:8px;border-radius:9px;background:'+(i<=n?'#171449':'#d5d3e8')+'"></i>'; return h+'</div><div style="font-size:11px;opacity:.6;margin-bottom:6px">الخطوة '+n+' من '+t+'</div>'; }
-    function backBtn(){ return '<button id="p-back" style="background:none;border:0;color:#171449;opacity:.7;font:700 12px Cairo,sans-serif;margin-top:6px">◀ رجوع</button>'; }
-    function manualBox(ph, okLabel){ return '<details style="margin-top:8px;text-align:right"><summary style="font-size:12px;opacity:.7;cursor:pointer">مش بيمسح؟ الصق الكود يدوي</summary><textarea id="p-in" placeholder="'+ph+'" style="'+TA+';margin-top:6px"></textarea><button style="'+B2+'" id="p-ok">'+okLabel+'</button></details>'; }
+    function dots(n,t){ var h='<div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px">'; for(var i=1;i<=t;i++) h+='<i style="width:'+(i===n?30:9)+'px;height:9px;border-radius:9px;background:'+(i<=n?'linear-gradient(90deg,#F4B740,#FFDE94)':'rgba(255,255,255,.18)')+';transition:.3s"></i>'; return h+'</div><div style="font-size:11px;opacity:.65;margin-bottom:8px">الخطوة '+n+' من '+t+'</div>'; }
+    function backBtn(){ return '<button id="p-back" style="background:none;border:0;color:#fff;opacity:.65;font:700 12.5px Cairo,sans-serif;margin-top:8px;padding:6px 14px">▶ رجوع</button>'; }
+    function manualBox(ph, okLabel){ return '<details style="margin-top:10px;text-align:right"><summary style="font-size:12px;opacity:.75;cursor:pointer">📋 مش بيمسح؟ الصق الكود يدوي</summary><textarea id="p-in" placeholder="'+ph+'" style="'+TA+';margin-top:8px"></textarea><button style="'+B2+'" id="p-ok">'+okLabel+'</button></details>'; }
     function copyCode(code, el){ try{ navigator.clipboard.writeText(code).then(function(){ el.textContent='✅ اتنسخ'; }); }catch(e){ el.textContent='انسخ من الخانة'; } }
     function home(){
-      var c = card('<div style="display:flex;justify-content:center;filter:drop-shadow(0 6px 12px rgba(0,0,0,.35))"><svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block"><defs><linearGradient id="lrmBg" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#1fd6a0"/><stop offset=".55" stop-color="#0c8f7a"/><stop offset="1" stop-color="#063f45"/></linearGradient><linearGradient id="lrmRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".5" stop-color="#f4c14d"/><stop offset="1" stop-color="#b9770e"/></linearGradient><linearGradient id="lrmPh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#bfeede"/></linearGradient><linearGradient id="lrmScr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#13a58c"/><stop offset="1" stop-color="#05524f"/></linearGradient><radialGradient id="lrmGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c9" stop-opacity=".95"/><stop offset="1" stop-color="#ffd76a" stop-opacity="0"/></radialGradient><clipPath id="lrmClip"><circle cx="32" cy="32" r="26"/></clipPath></defs><circle cx="32" cy="32" r="30" fill="url(#lrmRing)"/><circle cx="32" cy="32" r="27.6" fill="url(#lrmBg)"/><g clip-path="url(#lrmClip)"><ellipse cx="25" cy="10" rx="30" ry="14" fill="#fff" opacity=".13"/><circle cx="32" cy="32" r="21" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="1"/></g><g transform="rotate(-9 19 36)"><rect x="10" y="20" width="16" height="29" rx="4" fill="url(#lrmPh)" stroke="#06353a" stroke-width="1.6"/><rect x="12.2" y="24" width="11.6" height="20" rx="1.8" fill="url(#lrmScr)"/><rect x="16" y="21.8" width="4" height="1.2" rx=".6" fill="#06353a" opacity=".55"/><circle cx="18" cy="46.6" r="1" fill="#06353a" opacity=".6"/></g><g transform="rotate(9 45 36)"><rect x="38" y="20" width="16" height="29" rx="4" fill="url(#lrmPh)" stroke="#06353a" stroke-width="1.6"/><rect x="40.2" y="24" width="11.6" height="20" rx="1.8" fill="url(#lrmScr)"/><rect x="44" y="21.8" width="4" height="1.2" rx=".6" fill="#06353a" opacity=".55"/><circle cx="46" cy="46.6" r="1" fill="#06353a" opacity=".6"/></g><circle cx="32" cy="31" r="9" fill="url(#lrmGlow)"/><path d="M25.5 28.5 q6.5 -7.5 13 0" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M22.4 23.6 q9.6 -11.4 19.2 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".6"/><path d="M28.6 33 q3.4 -3.6 6.8 0" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="32" cy="37.4" r="3" fill="#ffd76a" stroke="#8a5a06" stroke-width="1"/><circle cx="31.1" cy="36.5" r="1" fill="#fff" opacity=".85"/><path d="M13 53 q19 8 38 0" fill="none" stroke="#fff" stroke-opacity=".0" stroke-width="1"/></svg></div><div style="font-weight:900;font-size:18px;margin:6px 0 4px">Local Room</div><div style="font-size:12px;opacity:.75;margin:4px 0 12px">اربط هاتفين بدون نت — الاتنين على نفس الواي فاي أو هوت سبوت</div>'+(connected()?'<div style="color:#1a8a3a;font-weight:800;margin-bottom:8px">✅ متصلين دلوقتي</div>':'')+'<button style="'+BIG+'" id="p-host">📤 أنا هعمل الغرفة</button><button style="'+BIG2+'" id="p-guest">📥 أنا هدخل غرفة صاحبي</button>');
+      var c = card('<div class="lrm-radar"><i></i><i></i><i></i><div style="filter:drop-shadow(0 8px 14px rgba(0,0,0,.45))"><svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block"><defs><linearGradient id="lrmBg" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#1fd6a0"/><stop offset=".55" stop-color="#0c8f7a"/><stop offset="1" stop-color="#063f45"/></linearGradient><linearGradient id="lrmRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".5" stop-color="#f4c14d"/><stop offset="1" stop-color="#b9770e"/></linearGradient><linearGradient id="lrmPh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#bfeede"/></linearGradient><linearGradient id="lrmScr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#13a58c"/><stop offset="1" stop-color="#05524f"/></linearGradient><radialGradient id="lrmGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c9" stop-opacity=".95"/><stop offset="1" stop-color="#ffd76a" stop-opacity="0"/></radialGradient><clipPath id="lrmClip"><circle cx="32" cy="32" r="26"/></clipPath></defs><circle cx="32" cy="32" r="30" fill="url(#lrmRing)"/><circle cx="32" cy="32" r="27.6" fill="url(#lrmBg)"/><g clip-path="url(#lrmClip)"><ellipse cx="25" cy="10" rx="30" ry="14" fill="#fff" opacity=".13"/><circle cx="32" cy="32" r="21" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="1"/></g><g transform="rotate(-9 19 36)"><rect x="10" y="20" width="16" height="29" rx="4" fill="url(#lrmPh)" stroke="#06353a" stroke-width="1.6"/><rect x="12.2" y="24" width="11.6" height="20" rx="1.8" fill="url(#lrmScr)"/><rect x="16" y="21.8" width="4" height="1.2" rx=".6" fill="#06353a" opacity=".55"/><circle cx="18" cy="46.6" r="1" fill="#06353a" opacity=".6"/></g><g transform="rotate(9 45 36)"><rect x="38" y="20" width="16" height="29" rx="4" fill="url(#lrmPh)" stroke="#06353a" stroke-width="1.6"/><rect x="40.2" y="24" width="11.6" height="20" rx="1.8" fill="url(#lrmScr)"/><rect x="44" y="21.8" width="4" height="1.2" rx=".6" fill="#06353a" opacity=".55"/><circle cx="46" cy="46.6" r="1" fill="#06353a" opacity=".6"/></g><circle cx="32" cy="31" r="9" fill="url(#lrmGlow)"/><path d="M25.5 28.5 q6.5 -7.5 13 0" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M22.4 23.6 q9.6 -11.4 19.2 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".6"/><path d="M28.6 33 q3.4 -3.6 6.8 0" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="32" cy="37.4" r="3" fill="#ffd76a" stroke="#8a5a06" stroke-width="1"/><circle cx="31.1" cy="36.5" r="1" fill="#fff" opacity=".85"/><path d="M13 53 q19 8 38 0" fill="none" stroke="#fff" stroke-opacity=".0" stroke-width="1"/></svg></div></div><div class="lrm-title">Local Room</div><div class="lrm-sub">العب مع صاحبك من غير إنترنت 📡<br>هاتفين على نفس الواي فاي أو هوت سبوت — وبكود QR بتتربطوا في ثواني</div>'+(connected()?'<div class="lrm-ok">✅ متصلين دلوقتي</div>':'')+'<button class="lrm-role h" id="p-host"><span>📤</span><b>أنا هعمل الغرفة</b><small>هعرض كود وصاحبي يمسحه</small></button><button class="lrm-role g" id="p-guest"><span>📥</span><b>أنا هدخل غرفة صاحبي</b><small>هفتح الكاميرا وأمسح كوده</small></button><div class="lrm-hint">💡 أول واحد يعمل الغرفة، والتاني يدخل — وبعدها كل الألعاب بتشتغل بينكم</div>');
       c.querySelector('#p-host').onclick = host; c.querySelector('#p-guest').onclick = guest;
     }
     async function host(){
@@ -9831,14 +9848,14 @@ if(window.__GLV_LOCAL){
       await pc.setLocalDescription(await pc.createOffer()); await waitIce(pc);
       var code = await pack({t:'o', s: pc.localDescription.sdp});
       function step1(){
-        var c = card(dots(1,2)+'<div style="font-weight:900;font-size:16px">خلّي صاحبك يمسح الكود ده</div><div style="font-size:12px;opacity:.7;margin:4px 0">على هاتفه: Local Room ← أنا هدخل غرفة صاحبي</div><div id="p-qr" style="display:flex;justify-content:center;margin:10px 0"></div><button style="'+BIG+'" id="p-next">صاحبي مسحه ◀ التالي</button><button style="'+B2+'" id="p-copy">📋 نسخ الكود بدل المسح</button>'+backBtn());
+        var c = card(dots(1,2)+'<div class="lrm-h">خلّي صاحبك يمسح الكود ده</div><div style="font-size:12px;opacity:.7;margin:4px 0">على هاتفه: Local Room ← أنا هدخل غرفة صاحبي</div><div id="p-qr" class="lrm-qr"></div><button style="'+BIG+'" id="p-next">صاحبي مسحه ◀ التالي</button><button style="'+B2+'" id="p-copy">📋 نسخ الكود بدل المسح</button>'+backBtn());
         drawQR(c.querySelector('#p-qr'), code);
         c.querySelector('#p-next').onclick = function(){ step2(true); };
         c.querySelector('#p-copy').onclick = function(){ copyCode(code, this); };
         c.querySelector('#p-back').onclick = home;
       }
       function step2(autoScan){
-        var c = card(dots(2,2)+'<div style="font-weight:900;font-size:16px">دلوقتي امسح الكود اللي ظهر عند صاحبك</div><div style="font-size:12px;opacity:.7;margin:4px 0 10px">أول ما تمسحه هتتربطوا تلقائي</div><button style="'+BIG+'" id="p-scan">📷 افتح الكاميرا</button>'+manualBox('الصق كود صاحبك هنا','اتصال')+backBtn());
+        var c = card(dots(2,2)+'<div class="lrm-h">دلوقتي امسح الكود اللي ظهر عند صاحبك</div><div style="font-size:12px;opacity:.7;margin:4px 0 10px">أول ما تمسحه هتتربطوا تلقائي</div><button style="'+BIG+'" id="p-scan">📷 افتح الكاميرا</button>'+manualBox('الصق كود صاحبك هنا','اتصال')+backBtn());
         var ta = c.querySelector('#p-in');
         async function go(){ try{ var a = await unpack(ta.value); await pc.setRemoteDescription({type:'answer', sdp:a.s}); card('<div style="padding:30px 0;font-weight:800">⏳ بيتم الربط...</div>'); clearTimeout(window.__glvLinkT); window.__glvLinkT = setTimeout(function(){ if(!connected() && modal){ var cc = card('<div style="font-weight:900;font-size:16px;margin:10px 0">⚠️ الربط اتأخر</div><div style="font-size:12px;opacity:.75;margin-bottom:8px">تأكد إن الهاتفين على نفس الواي فاي وجرّب من الأول</div><button style="'+BIG+'" id="p-retry">🔄 جرّب تاني</button>'); cc.querySelector('#p-retry').onclick = home; } }, 20000); }catch(e){ alert('الكود غلط أو ناقص — جرّب تمسح تاني'); step2(); } }
         c.querySelector('#p-scan').onclick = function(){ scanInto(ta, go); };
@@ -9850,7 +9867,7 @@ if(window.__GLV_LOCAL){
     }
     function guest(){
       function step1(){
-        var c = card(dots(1,2)+'<div style="font-weight:900;font-size:16px">امسح الكود اللي ظاهر عند صاحبك</div><div style="font-size:12px;opacity:.7;margin:4px 0 10px">على هاتفه: Local Room ← أنا هعمل الغرفة</div><button style="'+BIG+'" id="p-scan">📷 افتح الكاميرا</button>'+manualBox('الصق كود صاحبك هنا','متابعة')+backBtn());
+        var c = card(dots(1,2)+'<div class="lrm-h">امسح الكود اللي ظاهر عند صاحبك</div><div style="font-size:12px;opacity:.7;margin:4px 0 10px">على هاتفه: Local Room ← أنا هعمل الغرفة</div><button style="'+BIG+'" id="p-scan">📷 افتح الكاميرا</button>'+manualBox('الصق كود صاحبك هنا','متابعة')+backBtn());
         var ta = c.querySelector('#p-in');
         async function go(){
           try{
@@ -9858,7 +9875,7 @@ if(window.__GLV_LOCAL){
             await pc.setRemoteDescription({type:'offer', sdp:o.s});
             await pc.setLocalDescription(await pc.createAnswer()); await waitIce(pc);
             var code = await pack({t:'a', s: pc.localDescription.sdp});
-            var c2 = card(dots(2,2)+'<div style="font-weight:900;font-size:16px">خلّي صاحبك يمسح الكود ده</div><div id="p-qr" style="display:flex;justify-content:center;margin:10px 0"></div><div style="font-size:13px;font-weight:800;color:#0f766e">⏳ استنى... هتتربطوا تلقائي أول ما يمسحه</div><button style="'+B2+'" id="p-copy">📋 نسخ الكود بدل المسح</button>'+backBtn());
+            var c2 = card(dots(2,2)+'<div class="lrm-h">خلّي صاحبك يمسح الكود ده</div><div id="p-qr" class="lrm-qr"></div><div class="lrm-wait"><i></i><i></i><i></i><span>استنى… هتتربطوا لوحدكم أول ما يمسحه</span></div><button style="'+B2+'" id="p-copy">📋 نسخ الكود بدل المسح</button>'+backBtn());
             drawQR(c2.querySelector('#p-qr'), code);
             c2.querySelector('#p-copy').onclick = function(){ copyCode(code, this); };
             c2.querySelector('#p-back').onclick = home;
@@ -9938,6 +9955,8 @@ async function loadBonus(){
     stale = !!(window.storageFromCache && window.storageFromCache('glavera-bonus'));
   }catch(e){ stale = true; }
   if(typeof b!=='object' || b===null) b = {};
+  /* نسخة أساس: saveBonus بتحسب الفرق عنها وتضيفه على أحدث قيمة في السيرفر (محدش بيمسح نقاط حد تاني) */
+  try{ Object.defineProperty(b, '__base', { value:Object.assign({}, b), enumerable:false, configurable:true, writable:true }); }catch(e){}
   if(stale){
     try{ const ps = new Set(); obGet().forEach(function(o){ ps.add(o.pid); }); ps.forEach(function(p){ const d = obDelta(p, 'bon'); if(d) b[p] = (b[p]||0) + d; }); }catch(e){}
     try{ Object.defineProperty(b, '__stale', { value:true, enumerable:false, configurable:true }); }catch(e){}
@@ -9946,6 +9965,30 @@ async function loadBonus(){
 }
 async function saveBonus(obj){
   if(obj && obj.__stale){ console.error('saveBonus blocked: bonus came from offline cache'); return false; }
+  const base = obj && obj.__base;
+  if(base && typeof base==='object' && window.storage && typeof window.storage.update==='function'){
+    try{
+      const res = await window.storage.update('glavera-bonus', function(cur){
+        let srv; try{ srv = (typeof cur==='string') ? (JSON.parse(cur)||{}) : (cur||{}); }catch(e){ return undefined; }
+        if(typeof srv!=='object' || srv===null) srv = {};
+        const keys = {}; Object.keys(obj).forEach(function(k){ keys[k]=1; }); Object.keys(base).forEach(function(k){ keys[k]=1; });
+        Object.keys(keys).forEach(function(k){
+          const d = (+obj[k]||0) - (+base[k]||0); if(!d) return;
+          srv[k] = (+srv[k]||0) + d;
+          if(!(k in obj) && !srv[k]) delete srv[k];
+        });
+        return JSON.stringify(srv);
+      }, true);
+      if(!res || !res.value) return false;
+      let m = null; try{ m = JSON.parse(res.value); }catch(e){}
+      if(m && typeof m==='object'){   /* نزامن النسخة المحلية مع اللي اتدمج فعلاً */
+        Object.keys(obj).forEach(function(k){ if(!(k in m)) delete obj[k]; });
+        Object.keys(m).forEach(function(k){ obj[k] = m[k]; });
+        try{ Object.defineProperty(obj, '__base', { value:Object.assign({}, m), enumerable:false, configurable:true, writable:true }); }catch(e){}
+      }
+      return true;
+    }catch(e){ return false; }
+  }
   try{ const r = await window.storage.set('glavera-bonus', JSON.stringify(obj), true); return !!r; }catch(e){ return false; }
 }
 /* ============================= VISA (فيزا Games) ============================= */
@@ -29933,6 +29976,9 @@ function roomCodeCard(code, game, noHead){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A2.5 2.5 0 012 12.5v-8A2.5 2.5 0 014.5 2h8A2.5 2.5 0 0115 4.5V5"/></svg>
         <span>نسخ الكود</span>
       </button>
+      <button type="button" class="room-invite-btn" data-action="share-room-code" data-code="${code}" data-game="${game||''}" style="margin-top:8px">
+        <span>💬 ابعت الدعوة واتساب</span>
+      </button>
       <button type="button" class="room-invite-btn" data-action="invite-room-friend" data-code="${code}" data-game="${game||''}">
         ${ICO.invite}<span>دعوة صديق أونلاين</span>
       </button>
@@ -34746,10 +34792,11 @@ function attGenCode(type){
 }
 function attNormCode(c){ return String(c||'').trim().toUpperCase().replace(/[^A-Z0-9-]/g,''); }
 function attParseDay(v){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v||''); return m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(); }
-function attTodayISO(){ const d = new Date(), z = n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate()); }
+function attNowMs(){ try{ if(typeof khSrvOff!=='undefined' && khSrvOff!==null) return Date.now()+khSrvOff; }catch(e){} return Date.now(); } /* وقت السيرفر (مش ساعة الموبايل) */
+function attTodayISO(){ const d = new Date(attNowMs()), z = n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate()); }
 function attDefaultName(type, day){
   let d = '';
-  try{ d = (day ? attParseDay(day) : new Date()).toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'}); }catch(e){}
+  try{ d = (day ? attParseDay(day) : new Date(attNowMs())).toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'}); }catch(e){}
   return ATT_TYPES[type].label + ' ' + d;
 }
 const ATT_WEEKDAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -34789,7 +34836,7 @@ function attNewSync(type, src){
   if(nm && !nm.dataset.t && dt.value){ nm.value = attDefaultName(type, dt.value); }
 }
 function attNewCfg(type, day, keepCode){
-  let t = Date.now();
+  let t = attNowMs();
   if(day && day!==attTodayISO()){ const d = attParseDay(day); d.setHours(12,0,0,0); t = d.getTime(); }
   return { open:false, code:(keepCode||attGenCode(type)), sessionId:'s'+t.toString(36)+Math.random().toString(36).slice(2,5), name:attDefaultName(type, day), startedAt:t, points:(ATT_TYPES[type].pts||0), history:[] };
 }
@@ -35110,7 +35157,7 @@ function attGlassTilesHtml(anim){
     const cls = st.cls==='open' ? 'is-open' : st.cls==='done' ? 'is-done' : 'is-closed';
     const hasName = !!(c && c.name);
     const line = hasName ? escapeHtml(c.name) : 'في انتظار المنظمين';
-    let pillTxt = st.cls==='open' ? 'التسجيل مفتوح' : st.cls==='done' ? 'تم تسجيل حضورك' : (c ? 'التسجيل مقفول' : 'قريبًا');
+    let pillTxt = st.cls==='open' ? 'التسجيل مفتوح' : st.cls==='done' ? 'تم تسجيل حضورك' : (!_attFresh ? 'بنتأكد…' : (c ? 'التسجيل مقفول' : 'قريبًا'));
     const orbIco = st.cls==='done' ? ATT_TICK_SVG : st.cls==='open' ? ATT_SCAN_SVG : ATT_LOCK_SVG;
     const cc = (t.color.match(/#[0-9A-Fa-f]{6}/g)||[]);
     const ak = tkKeyOf(k, t);
@@ -35261,8 +35308,8 @@ function renderAttendanceScanPage(){
   } else {
     action = `<div class="ap-panel">
       <div class="ap-lock">${ATT_LOCK_SVG}</div>
-      <div class="ap-h">${c ? 'التسجيل مقفول حاليًا' : 'التسجيل لسه ما اتفتحش'}</div>
-      <div class="ap-p">${c ? 'المنظمين هيفتحوه أول ما النشاط يبدأ' : 'المنظمين هيفتحوه في وقته'}</div>
+      <div class="ap-h">${!_attFresh ? 'بنتأكد من حالة التسجيل…' : (c ? 'التسجيل مقفول حاليًا' : 'التسجيل لسه ما اتفتحش')}</div>
+      <div class="ap-p">${!_attFresh ? 'لو النت ضعيف استنى ثواني وهتتحدّث الصفحة لوحدها' : (c ? 'المنظمين هيفتحوه أول ما النشاط يبدأ' : 'المنظمين هيفتحوه في وقته')}</div>
     </div>`;
   }
   const hist = mine.slice(0,8).map((r,i)=>`<div class="ap-row" style="--i:${i}"><span class="ap-dot">${ATT_TICK_SVG}</span><div class="ap-row-n">${escapeHtml(r.sname||t.label)}</div><div class="ap-row-t">${attFmtTime(r.ts)}</div></div>`).join('');
@@ -35352,7 +35399,7 @@ async function tryAttendance(codeRaw, typeArg){
   if(attStaleFixed(type, c)){
     /* الكود ثابت: أول مسح في يوم جديد بيفتح يوم النهارده لوحده (من غير ما الأدمن ينشئ يوم) */
     if(viaCache){
-      c = Object.assign({}, c, { sessionId: attDaySid(attTodayISO()), name: attDefaultName(type), startedAt: Date.now() });
+      c = Object.assign({}, c, { sessionId: attDaySid(attTodayISO()), name: attDefaultName(type), startedAt: attNowMs() });
     } else {
       const rolled = await attCfgUpdate(o=>{ attRollDay(o, type); });
       if(!rolled){ showToast('تعذر فتح يوم النهارده — حاول مرة أخرى', true); return false; }
@@ -35364,7 +35411,7 @@ async function tryAttendance(codeRaw, typeArg){
   let dup = false; const pts = attPtsOfCfg(type, c);
   if(viaCache){
     if((ATT_RECORDS && ATT_RECORDS[rkey]) || attRecCacheGet()[rkey] || attPendGet().some(x=>attRecKey(x.pid,x.type,x.sid)===rkey)){ showToast('سجّلت حضورك في الجلسة دي قبل كده', true); render(); return false; }
-    const pl = attPendGet(); pl.push({ pid, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), pts, code });
+    const pl = attPendGet(); pl.push({ pid, type, sid:c.sessionId, sname:c.name||t.label, ts:attNowMs(), pts, code });
     attPendSet(pl);
     ATT_RECORDS = attOverlayPending(ATT_RECORDS);
     vibrate([18,40,18]);
@@ -35375,7 +35422,7 @@ async function tryAttendance(codeRaw, typeArg){
   }
   const ok = await attRecUpdate(o=>{
     dup = !!o[rkey];
-    if(!dup) o[rkey] = { pid, type, sid:c.sessionId, sname:c.name||t.label, ts:Date.now(), pts };
+    if(!dup) o[rkey] = { pid, type, sid:c.sessionId, sname:c.name||t.label, ts:attNowMs(), pts };
   });
   if(!ok){ showToast('تعذر حفظ الحضور — تحقق من الاتصال وحاول مرة أخرى', true); return false; }
   if(dup){ showToast('سجّلت حضورك في الجلسة دي قبل كده', true); render(); return false; }
@@ -35555,7 +35602,7 @@ function renderAdminAttendanceTabInner(){
   if(nav.page==='insights') return attInsightsHtml(type, c);
   if(nav.page==='audit') return attAuditHtml(type);
   /* ---------- صفحة النشاط ---------- */
-  const isStale = !!c.startedAt && new Date(c.startedAt).toDateString() !== new Date().toDateString();
+  const isStale = !!c.startedAt && new Date(c.startedAt).toDateString() !== new Date(attNowMs()).toDateString();
   const staleBanner = isStale ? (attFixedQr(type) ? `<div class="att-stale"><div class="att-stale-txt"><b>✅ الكود ثابت — اليوم بيتفتح لوحده</b><small>أول ما تفتح الاستقبال أو حد يمسح الكود بيتعمل يوم النهارده تلقائي (آخر يوم: ${escapeHtml(c.name||'')})</small></div></div>` : `<div class="att-stale"><div class="att-stale-txt"><b>⚠️ اليوم الحالي من تاريخ سابق</b><small>${escapeHtml(c.name||'')} · ${attFmtTime(c.startedAt)}</small></div><button type="button" class="btn btn-primary" data-action="att-admin-today" data-type="${type}">ابدأ يوم النهارده</button></div>`) : '';
   const formOpen = nav.page==='new';
   const cntSid = sid => Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===sid).length;
@@ -36975,6 +37022,11 @@ document.addEventListener('click', (e)=>{
   else if(action==='join-room'){ if(isFriendModeLockedForMe()){ showToast('🔒 اللعب مع صديق مقفول مؤقتًا'); return; } const inp = document.getElementById('room-join-code'); attemptJoinRoom(inp?inp.value:''); }
   else if(action==='leave-room'){ confirmLeaveGameRoom(); }
   else if(action==='copy-room-code'){ doCopyRoomCode(el); }
+  else if(action==='share-room-code'){
+    const code = el.dataset.code || '', gm = (typeof jrGame==='function' && el.dataset.game) ? (jrGame(el.dataset.game)||{}).title : '';
+    const txt = '🎮 تعالى نلعب'+(gm?' '+gm:'')+' سوا!\nكود الغرفة: '+code+'\nافتح التطبيق ← العب ضد صديق ← أونلاين ← انضمام لغرفة، واكتب الكود 🔑';
+    try{ if(navigator.share){ navigator.share({text:txt}).catch(function(){}); } else { window.open('https://wa.me/?text='+encodeURIComponent(txt), '_blank'); } }catch(e){ try{ window.open('https://wa.me/?text='+encodeURIComponent(txt), '_blank'); }catch(_){} }
+  }
   else if(action==='invite-room-friend'){ openInvitePicker(el.dataset.code, el.dataset.game); }
   else if(action==='close-invite-picker'){ closeInvitePicker(); }
   else if(action==='send-room-invite'){ sendRoomInvite(el.dataset.pid, el.dataset.name, el); }
@@ -40843,7 +40895,7 @@ function startLivePolling(){
       /* البونص: نحدّثهم كل دورة (وبس لو القراءة نجحت) عشان تصفير/استرجاع النقاط يظهر عند الكل ومحدش يكتب فوقه ببيانات قديمة */
       const readObj = async (key)=>{ const r = await window.storage.get(key, true); if(!r || !r.value) return null; const v = JSON.parse(r.value); return (v && typeof v==='object') ? v : null; };
       const fb = await readObj('glavera-bonus');
-      if(fb && JSON.stringify(fb) !== JSON.stringify(BONUS)) BONUS = fb;
+      if(fb && JSON.stringify(fb) !== JSON.stringify(BONUS)){ try{ Object.defineProperty(fb, '__base', { value:Object.assign({}, fb), enumerable:false, configurable:true, writable:true }); }catch(e){} BONUS = fb; }
     }catch(e){}
     try{
       if(state.view==='wall'){
