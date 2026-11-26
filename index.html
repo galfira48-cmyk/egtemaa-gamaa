@@ -5346,6 +5346,36 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .nf-ev-body{ padding:0 14px 12px; }
   .nf-ev-body h4{ margin:8px 0 2px; font-size:12px; color:#FFDE94; }
   .nf-ev-body p{ margin:0; font-size:13.5px; line-height:1.9; font-weight:600; color:rgba(252,249,243,.9); }
+  #nfx{ position:fixed; inset:0; z-index:125; display:flex; flex-direction:column; direction:rtl; text-align:right; color:#FCF9F3; font-family:'Cairo',sans-serif; background:radial-gradient(80% 40% at 50% 0%,rgba(244,183,64,.18),transparent),linear-gradient(180deg,#0e1240,#2b1d55); }
+  .nfx-head{ display:flex; justify-content:space-between; align-items:center; padding:calc(10px + env(safe-area-inset-top,0px)) 16px 8px; color:#FFDE94; font-size:17px; }
+  .nfx-x{ width:34px; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.08); color:#fff; cursor:pointer; }
+  .nfx-tabs{ display:flex; gap:5px; padding:0 10px 8px; border-bottom:1px solid rgba(244,183,64,.2); }
+  .nfx-tab{ flex:1; display:flex; flex-direction:column; align-items:center; padding:6px 0; font:800 10.5px 'Cairo',sans-serif; color:#E3D8C6; background:rgba(255,255,255,.06); border:1px solid transparent; border-radius:11px; cursor:pointer; }
+  .nfx-tab.on{ border-color:#F4B740; color:#FFDE94; background:rgba(244,183,64,.15); }
+  .nfx-body{ position:relative; flex:1; overflow-y:auto; overscroll-behavior:contain; width:100%; max-width:480px; margin:0 auto; padding:10px 14px calc(30px + env(safe-area-inset-bottom,0px)); box-sizing:border-box; }
+  .nfx-hint{ margin:6px 0 10px; text-align:center; font-size:12px; font-weight:700; color:rgba(252,249,243,.72); }
+  .nfx-map{ position:relative; direction:ltr; } .nfx-map svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .nfx-node{ position:absolute; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%; border:2px solid #F4B740; background:#232a6e; color:#fff; font:900 15px 'Cairo',sans-serif; cursor:pointer; }
+  .nfx-node.seen{ background:#1f6b57; } .nfx-node.lock{ border-color:rgba(255,255,255,.18); background:#181b45; opacity:.65; cursor:default; }
+  .nfx-node.now{ width:60px; height:60px; margin:-30px 0 0 -30px; font-size:28px; box-shadow:0 0 0 6px rgba(244,183,64,.2),0 0 28px 8px rgba(244,183,64,.55); }
+  .nfx-pop{ position:fixed; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(4,3,26,.8); }
+  .nfx-box{ width:100%; max-width:400px; max-height:82vh; overflow-y:auto; direction:rtl; padding:16px; box-sizing:border-box; border-radius:20px; background:#222865; border:1px solid rgba(244,183,64,.45); }
+  .nfx-box h3{ margin:0; text-align:center; color:#FFDE94; font-size:17px; }
+  .nfx-box p,.nfx-q p{ font-size:13.5px; line-height:1.9; margin:8px 0; }
+  .nfx-box h4,.nfx-q h4{ margin:8px 0 4px; color:#FFDE94; font-size:14px; }
+  #nfx .nfx-verse{ text-align:center; font-family:'Amiri','Tajawal',serif; font-size:19px; font-weight:700; } .nfx-verse small{ display:block; font:700 11px 'Cairo',sans-serif; color:#E3D8C6; }
+  .nfx-b,.nfx-row{ display:block; width:100%; box-sizing:border-box; margin-top:8px; padding:11px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.08); color:#FCF9F3; font:800 13px 'Cairo',sans-serif; cursor:pointer; text-align:center; }
+  .nfx-row{ text-align:right; } .nfx-row.done{ border-color:#3FDCC9; cursor:default; } .nfx-row.done b{ float:left; color:#9BF0B8; } .nfx-row.lock{ opacity:.55; cursor:default; }
+  .nfx-b.gold{ border:0; color:#2a1c00; background:linear-gradient(100deg,#FFDE94,#F4B740); }
+  .nfx-b.good{ background:#1f7a5c; border-color:#9BF0B8; } .nfx-b.bad{ background:#7a2f45; border-color:#ff9db0; }
+  .nfx-q,.nfx-bible{ margin-top:8px; padding:12px 14px; border-radius:15px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); }
+  .nfx-bible{ border-color:#F4B740; }
+  .nfx-q textarea{ width:100%; box-sizing:border-box; padding:11px; border-radius:12px; border:1px solid rgba(244,183,64,.5); background:#11153f; color:#fff; font:600 14px 'Cairo',sans-serif; direction:rtl; }
+  .nfx-center{ text-align:center; } .nfx-big{ font-size:54px; }
+  .nfx-scene{ position:relative; height:290px; overflow:hidden; border-radius:18px; border:1px solid rgba(244,183,64,.35); background:linear-gradient(180deg,#10164a,#3a2440); }
+  .nfx-scene::before{ content:""; position:absolute; left:6%; right:6%; bottom:-4%; height:78%; border-radius:50% 50% 0 0; background:rgba(244,183,64,.13); border-top:3px solid rgba(244,183,64,.35); }
+  .nfx-scene span{ position:absolute; transform:translate(50%,-50%); line-height:1; }
+  .nfx-scene em{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-style:normal; font-weight:700; font-size:13px; color:#E3D8C6; }
   #nf-greet{ position:fixed; inset:0; z-index:130; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(4,3,26,.78); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); animation:vcFade .3s ease both; }
   .nf-g-card{ width:100%; max-width:380px; text-align:center; direction:rtl; padding:26px 22px 22px; border-radius:24px; color:#FCF9F3; font-family:'Cairo',sans-serif;
     background:radial-gradient(90% 60% at 50% 0%,rgba(244,183,64,.25),transparent 70%),linear-gradient(160deg,#1a1f5e,#2b1d55); border:1px solid rgba(244,183,64,.4); box-shadow:0 30px 70px -20px rgba(0,0,0,.8); animation:vcPop .6s cubic-bezier(.2,1.25,.3,1) both; }
@@ -12968,21 +12998,22 @@ function nfSeason(){
   const n = new Date(), sy = n.getMonth()===0 ? n.getFullYear()-1 : n.getFullYear();
   const start = new Date(sy,10,25), eid = new Date(sy+1,0,7), today = new Date(n.getFullYear(), n.getMonth(), n.getDate());
   const day = Math.round((today-start)/864e5)+1;
-  return { sy:sy, today:today, day:day, total:43, left:Math.round((eid-today)/864e5), active: day>=1 && day<=43 };
+  return { sy:sy, today:today, day:day, total:43, left:Math.round((eid-today)/864e5), active: day>=1 && day<=50 };
 }
 function nfCardHtml(pid){
   try{
     const S = nfSeason(); if(!S.active || !pid) return '';
     const nf = myExtra(pid).nfast || {};
-    const v = NF_VERSES[S.day-1] || NF_VERSES[0], pct = Math.round(S.day*100/S.total);
-    if(nf.greeted !== S.sy) nfGreetOnce(pid, S);
+    const v = NF_VERSES[S.day-1] || NF_VERSES[NF_VERSES.length-1], pct = Math.min(100, Math.round(S.day*100/S.total));
+    if(S.day<=S.total && nf.greeted !== S.sy) nfGreetOnce(pid, S);
     return `<div class="nf-card">
-      <div class="nf-top"><span class="nf-head">🕯️ صوم الميلاد المجيد</span><span class="nf-day">اليوم ${nfAr(S.day)} من ${nfAr(S.total)}</span></div>
-      <div class="nf-count"><b>${nfAr(S.left)}</b><span>${S.left===1?'يوم واحد':'يوم'} على العيد</span></div>
+      <div class="nf-top"><span class="nf-head">🕯️ صوم الميلاد المجيد</span><span class="nf-day">${S.day>S.total?'أيام العيد 🎄':'اليوم '+nfAr(S.day)+' من '+nfAr(S.total)}</span></div>
+      ${S.left>0?`<div class="nf-count"><b>${nfAr(S.left)}</b><span>${S.left===1?'يوم واحد':'يوم'} على العيد</span></div>`:'<div class="nf-count"><span>كل سنة وإنتم طيبين 🎄</span></div>'}
       <div class="nf-bar"><i style="width:${pct}%"></i></div>
       <div class="nf-verse">«${escapeHtml(v[0])}»<small>${escapeHtml(v[1])}</small></div>
+      <div style="padding:8px 14px 0;display:flex"><button type="button" class="nf-btn pri" data-nfx="open">🌌 رحلة النجم</button></div>
       <div class="nf-acts" style="padding-bottom:12px">
-        <button type="button" class="nf-btn pri" data-nf="events">📖 أحداث الصوم</button>
+        <button type="button" class="nf-btn" data-nf="events">📖 أحداث الصوم</button>
         <button type="button" class="nf-btn" data-nf="card">🎄 كارت الآية</button>
       </div>
     </div>`;
@@ -13047,7 +13078,227 @@ function nfShowGreeting(S){
     if(k==='greet-close'){ if(o) o.remove(); }
     else if(k==='events'){ nfShowEvents(); }
     else if(k==='events-close'){ if(ev) ev.remove(); }
-    else if(k==='card'){ const S = nfSeason(), v = NF_VERSES[S.day-1] || NF_VERSES[0]; try{ window.openVerseCard(v[0], v[1]); }catch(err){} }
+    else if(k==='card'){ const S = nfSeason(), v = NF_VERSES[S.day-1] || NF_VERSES[NF_VERSES.length-1]; try{ window.openVerseCard(v[0], v[1]); }catch(err){} }
+  });
+})();
+/* ---------- رحلة النجم + المغارة + لو كنت مكانهم + مين اللي بيتكلم + هدية للمذود ---------- */
+(function(){
+  if(window.__nfxInit) return; window.__nfxInit = 1;
+
+  /* قطعة لكل حدث (بنفس ترتيب NF_EVENTS): [القطعة، اسمها، السؤال، الاختيارات، رقم الإجابة الصح] */
+  const QUIZ = [
+    ['🛖','المغارة','صوم الميلاد مدته كام يوم؟',['٤٠ يوم','٤٣ يوم','٥٥ يوم'],1],
+    ['🌟','النجم','شهر كيهك معروف باسم إيه؟',['الشهر المريمي','شهر الرسل','شهر الشهداء'],0],
+    ['🌿','القش','زكريا كان بيعمل إيه لما ظهر له الملاك؟',['بيرعى الغنم','بيبخّر في الهيكل','مسافر في الطريق'],1],
+    ['👼','الملاك','مين الملاك اللي بشّر العذراء؟',['ميخائيل','رافائيل','جبرائيل'],2],
+    ['👩','العذراء مريم','العذراء زارت مين؟',['أليصابات','حنة النبية','مرثا'],0],
+    ['🕯️','الشمعة','زكريا كتب إن اسم ابنه إيه؟',['زكريا','يوحنا','يشوع'],1],
+    ['🧔','يوسف النجار','يوسف عرف الحقيقة من الملاك إزاي؟',['في حلم','في الهيكل','في الطريق'],0],
+    ['🫏','الحمار','ليه يوسف ومريم راحوا بيت لحم؟',['علشان عيد الفصح','علشان الاكتتاب','علشان الشغل'],1],
+    ['🐂','الثور','البرمون هو إيه؟',['أول يوم في الصوم','الاستعداد الأخير قبل العيد','تاني يوم العيد'],1],
+    ['🐑','الراعي وخرافه','الملاك بشّر مين ليلة الميلاد؟',['رعاة سهرانين','الكهنة','جنود الرومان'],0],
+    ['👑','المجوس','إيه هدايا المجوس؟',['فضة وزيت وعسل','ذهب ولبان ومر','ذهب وفضة وبخور'],1]
+  ];
+  /* مكان كل قطعة في المغارة: [من اليمين %، من فوق %، الحجم] */
+  const SPOTS = [[50,48,96],[50,9,42],[50,88,34],[18,22,38],[66,66,46],[88,80,26],[34,66,46],[84,62,40],[14,66,42],[22,87,34],[78,38,34]];
+
+  const STORIES = [
+    { ico:'🧔', who:'يوسف النجار', ref:'متى ١ : ١٨–٢٥', steps:[
+      { q:'عرفت إن مريم حبلى ومش فاهم اللي حصل. قلبك موجوع. هتعمل إيه؟', c:['أحكي للناس وأسأل رأيهم','أبعد عنها بهدوء من غير ما أشهّر بيها','أواجهها قدام أهلها'], r:'يوسف كان بارًا ومارضيش يشهّر بيها، وفكّر يسيبها سرًا.' },
+      { q:'ملاك الرب قال لك في حلم: لا تخف أن تأخذ مريم امرأتك. صحيت من النوم. وبعدين؟', c:['أستنى دليل تاني','أطيع على طول','أسأل حد كبير الأول'], r:'لما استيقظ يوسف فعل كما أمره ملاك الرب، وأخذ امرأته.' }
+    ], think:'إمتى آخر مرة أطعت ربنا من غير ما تكون فاهم كل حاجة؟' },
+    { ico:'🐑', who:'راعي في بيت لحم', ref:'لوقا ٢ : ٨–٢٠', steps:[
+      { q:'إنت سهران بالليل مع الغنم، وفجأة نور ومجد حواليك. إحساسك وتصرفك؟', c:['أخاف وأجري','أقف وأسمع رغم الخوف','أقول أكيد بيتهيأ لي'], r:'الرعاة خافوا خوفًا عظيمًا، والملاك قال لهم: لا تخافوا، وبشّرهم بالمخلّص.' },
+      { q:'الملايكة مشيت والدنيا رجعت ضلمة. هتعمل إيه؟', c:['أستنى للصبح','أروح بيت لحم دلوقتي','أبعت حد يشوف بدالي'], r:'قالوا: لنذهب الآن إلى بيت لحم، وجاءوا مسرعين.' },
+      { q:'شفت الطفل في المذود. وإنت راجع؟', c:['أخلّي اللي شفته سر','أخبّر الناس وأمجّد الله','أرجع لشغلي وأنسى'], r:'أخبروا بالكلام اللي اتقال لهم، ورجعوا وهم يمجّدون الله ويسبّحونه.' }
+    ], think:'إيه الخبر الحلو عن ربنا اللي ممكن تشاركه مع حد الأسبوع ده؟' },
+    { ico:'👑', who:'واحد من المجوس', ref:'متى ٢ : ١–١٢', steps:[
+      { q:'ظهر نجم مختلف في المشرق، والطريق طويل ومتعب. هتعمل إيه؟', c:['أراقبه من بيتي','أسافر وراه','أستنى حد يروح قبلي'], r:'المجوس سافروا من المشرق وقالوا: رأينا نجمه وأتينا لنسجد له.' },
+      { q:'وصلت للطفل. مش في قصر زي ما ممكن تتوقع. إيه رد فعلك؟', c:['أحس إني غلطت في المكان','أسجد له وأقدّم هداياي','أسأل فين القصر'], r:'خرّوا وسجدوا له، ثم فتحوا كنوزهم وقدّموا ذهبًا ولبانًا ومرًا.' },
+      { q:'هيرودس طلب ترجع تقول له مكان الصبي، وبعدين جالك تحذير في حلم.', c:['أرجع له علشان وعدته','أرجع من طريق تاني','أبعت له رسالة بالمكان'], r:'أوحي إليهم في حلم ألا يرجعوا إلى هيرودس، فانصرفوا في طريق أخرى.' }
+    ], think:'إيه «الطريق التاني» اللي محتاج تمشي فيه بعد ما تقابل المسيح؟' }
+  ];
+
+  /* من ترجمة فان دايك: [الجملة، القائل، الشاهد] */
+  const WHO = [
+    ['لا تخف يا زكريا لأن طلبتك قد سمعت','الملاك','لوقا ١ : ١٣'],
+    ['كيف أعلم هذا لأني أنا شيخ','زكريا','لوقا ١ : ١٨'],
+    ['كيف يكون هذا وأنا لست أعرف رجلا','العذراء مريم','لوقا ١ : ٣٤'],
+    ['مباركة أنت في النساء ومباركة هي ثمرة بطنك','أليصابات','لوقا ١ : ٤٢'],
+    ['تعظم نفسي الرب','العذراء مريم','لوقا ١ : ٤٦'],
+    ['لا بل يسمى يوحنا','أليصابات','لوقا ١ : ٦٠'],
+    ['وأنت أيها الصبي نبي العلي تدعى','زكريا','لوقا ١ : ٧٦'],
+    ['يا يوسف ابن داود لا تخف أن تأخذ مريم امرأتك','الملاك','متى ١ : ٢٠'],
+    ['فها أنا أبشركم بفرح عظيم يكون لجميع الشعب','الملاك','لوقا ٢ : ١٠'],
+    ['لنذهب الآن إلى بيت لحم','الرعاة','لوقا ٢ : ١٥'],
+    ['أين هو المولود ملك اليهود','المجوس','متى ٢ : ٢'],
+    ['اذهبوا وافحصوا بالتدقيق عن الصبي','هيرودس','متى ٢ : ٨']
+  ];
+  const SPEAKERS = ['الملاك','زكريا','العذراء مريم','أليصابات','الرعاة','المجوس','هيرودس'];
+
+  let tab = 'road', openSt = 0, quizOpen = -1, wrong = -1, story = null, game = null;
+  const ar = nfAr;
+  const data = function(){ const ex = myExtra(state.pid); const n = ex.nfast || (ex.nfast = {}); const k = 'j'+nfSeason().sy; return n[k] || (n[k] = { seen:{}, pieces:{} }); };
+  const save = function(){ try{ saveProfileExtra(PROFILE_EXTRA); }catch(e){} };
+  const shuffle = function(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)), t=a[i]; a[i]=a[j]; a[j]=t; } return a; };
+  const giftKey = function(){ return 'nf-gift-'+nfSeason().sy+'-'+state.pid; };
+  const readGift = function(){ try{ return localStorage.getItem(giftKey()) || ''; }catch(e){ return ''; } };
+  const btn = function(act, val, label, cls){ return `<button type="button" class="${cls||'nfx-b'}" data-nfx="${act}" data-v="${val}">${label}</button>`; };
+
+  /* رقم يوم الصوم لكل حدث (آحاد كيهك بتتحسب حسب السنة) */
+  function eventDays(){
+    const sy = nfSeason().sy, start = new Date(sy,10,25);
+    const k1 = new Date(sy,11,((sy+1)%4===0)?11:10);
+    const num = function(d){ return Math.round((d-start)/864e5)+1; };
+    const sun = new Date(k1); sun.setDate(sun.getDate()+((7-sun.getDay())%7));
+    const s = [0,7,14,21].map(function(a){ const d = new Date(sun); d.setDate(d.getDate()+a); return num(d); });
+    return [1, num(k1), s[0], s[1], s[2], s[3], 41, 42, 43, 44, 44];
+  }
+
+  function road(){
+    const S = nfSeason(), J = data(), now = Math.min(S.day,44), ev = eventDays();
+    const X = function(i){ return 50 + 30*Math.sin(i*0.75); }, Y = function(i){ return 40 + (i-1)*62; };
+    let pts = '', nodes = '';
+    for(let i=1;i<=44;i++){
+      pts += X(i)+','+Y(i)+' ';
+      const locked = i>now, has = ev.indexOf(i)>=0;
+      const face = i===now ? '🌟' : i===44 ? '🏚️' : locked ? '🔒' : has ? '📖' : J.seen[i] ? '✓' : ar(i);
+      nodes += `<button type="button" class="nfx-node${locked?' lock':''}${J.seen[i]?' seen':''}${i===now?' now':''}" style="left:${X(i)}%;top:${Y(i)}px" data-nfx="station" data-v="${i}" ${locked?'disabled':''} aria-label="المحطة ${i}">${face}</button>`;
+    }
+    let pop = '';
+    if(openSt){
+      const v = NF_VERSES[openSt-1] || NF_VERSES[NF_VERSES.length-1];
+      const here = NF_EVENTS.filter(function(e,i){ return ev[i]===openSt; });
+      pop = `<div class="nfx-pop"><div class="nfx-box">
+        <h3>${openSt===44?'🏚️ المغارة: عيد الميلاد':'المحطة '+ar(openSt)}</h3>
+        <p class="nfx-verse">«${escapeHtml(v[0])}»<small>${escapeHtml(v[1])}</small></p>
+        ${here.map(function(e){ return `<h4>${e.ico} ${e.t}</h4><p>${e.story}</p><p><b>تدريب:</b> ${e.life}</p>`; }).join('')}
+        ${here.length?btn('tab','cave','🏚️ حل السؤال وخد القطعة','nfx-b gold'):''}
+        ${btn('close-st','','تمام')}
+      </div></div>`;
+    }
+    return `<p class="nfx-hint">رحلة رمزية من الناصرة لبيت لحم. كل يوم بتتفتح محطة جديدة. زرت ${ar(Object.keys(J.seen).length)} من ${ar(44)}</p>
+      <div class="nfx-map" style="height:${Y(44)+50}px"><svg viewBox="0 0 100 ${Y(44)+50}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="#F4B740" stroke-width="2" stroke-dasharray="3 7" vector-effect="non-scaling-stroke" opacity=".55"/></svg>${nodes}</div>${pop}`;
+  }
+
+  function cave(){
+    const J = data(), got = Object.keys(J.pieces).length, ev = eventDays(), day = nfSeason().day;
+    const scene = SPOTS.map(function(s,i){ return J.pieces[i] ? `<span style="right:${s[0]}%;top:${s[1]}%;font-size:${s[2]}px">${QUIZ[i][0]}</span>` : ''; }).join('') + (day>=44 ? '<span style="right:50%;top:74%;font-size:44px">👶</span>' : '');
+    const list = QUIZ.map(function(q,i){
+      if(J.pieces[i]) return `<div class="nfx-row done">${q[0]} ${q[1]} <b>✓</b></div>`;
+      if(day < ev[i]) return `<div class="nfx-row lock">🔒 قطعة بتتفتح في المحطة ${ar(ev[i])}</div>`;
+      if(quizOpen!==i) return btn('quiz',i,`❓ ${NF_EVENTS[i].t}`,'nfx-row');
+      const e = NF_EVENTS[i];
+      return `<div class="nfx-q"><h4>${e.ico} ${e.t}</h4><p>${e.story}</p><p><b>${q[2]}</b></p>
+        ${q[3].map(function(c,k){ return btn('answer',k,c,'nfx-b'+(wrong===k?' bad':'')); }).join('')}
+        ${wrong>=0?'<p class="nfx-hint">قريبة! اقرا الحدث تاني وجرّب.</p>':''}</div>`;
+    }).join('');
+    return `<div class="nfx-scene">${scene}${got||day>=44?'':'<em>المغارة لسه فاضية. حل أول سؤال!</em>'}</div>
+      <p class="nfx-hint">جمعت ${ar(got)} من ${ar(QUIZ.length)} قطعة</p>
+      ${got===QUIZ.length?'<p class="nfx-hint">🎉 مغارتك اكتملت!</p>':''}
+      ${got?btn('share','','📤 شارك صورة مغارتك','nfx-b gold'):''}${list}`;
+  }
+
+  function stories(){
+    if(!story) return '<p class="nfx-hint">اختار شخصية وعيش الحدث من مكانها</p>' + STORIES.map(function(s,i){ return btn('story',i,`${s.ico} ${s.who}`,'nfx-row'); }).join('');
+    const s = STORIES[story.i];
+    if(story.step >= s.steps.length) return `<div class="nfx-q"><h4>🙏 وقفة تأمل</h4><p>${s.think}</p><p class="nfx-hint">اقرا القصة: ${s.ref}</p>${btn('story-back','','شخصية تانية','nfx-b gold')}</div>`;
+    const st = s.steps[story.step];
+    return `<div class="nfx-q"><h4>${s.ico} إنت دلوقتي ${s.who} (${ar(story.step+1)} من ${ar(s.steps.length)})</h4><p><b>${st.q}</b></p>
+      ${story.pick<0 ? st.c.map(function(c,k){ return btn('pick',k,c); }).join('')
+        : `<p>اختيارك: «${st.c[story.pick]}»</p><div class="nfx-bible"><b>📖 اللي حصل في الإنجيل</b><p>${st.r}</p></div>${btn('next','','كمّل','nfx-b gold')}`}
+      ${btn('story-back','','رجوع')}</div>`;
+  }
+
+  function newRound(){
+    const q = game.deck[game.n], others = shuffle(SPEAKERS.filter(function(x){ return x!==q[1]; })).slice(0,2);
+    game.opts = shuffle(others.concat(q[1])); game.pick = null;
+  }
+  function who(){
+    if(!game) return `<div class="nfx-q"><h4>🎧 مين اللي بيتكلم؟</h4><p>${ar(WHO.length)} جملة من أحداث الميلاد. اعرف مين اللي قالها.</p>${btn('start','','ابدأ اللعب','nfx-b gold')}</div>`;
+    if(game.n >= game.deck.length) return `<div class="nfx-q"><h4>خلصت اللعبة 🎉</h4><p>جاوبت صح على ${ar(game.score)} من ${ar(game.deck.length)}</p>${btn('start','','العب تاني','nfx-b gold')}</div>`;
+    const q = game.deck[game.n];
+    return `<div class="nfx-q"><p class="nfx-hint">${ar(game.n+1)} من ${ar(game.deck.length)}</p><p class="nfx-verse">«${q[0]}»</p>
+      ${game.opts.map(function(o){ const c = game.pick===null ? '' : o===q[1] ? ' good' : o===game.pick ? ' bad' : ''; return btn('guess',o,o,'nfx-b'+c); }).join('')}
+      ${game.pick===null?'':`<p><b>${game.pick===q[1]?'صح! 👏':'اللي قالها: '+q[1]}</b> (${q[2]})</p>${btn('again','','التالي','nfx-b gold')}`}</div>`;
+  }
+
+  function gift(){
+    const text = readGift(), open = nfSeason().day >= 43;
+    if(open) return `<div class="nfx-q nfx-center"><div class="nfx-big">🎁</div><h4>ليلة العيد: هديتك للمذود</h4>
+      ${text?`<p class="nfx-verse">${escapeHtml(text)}</p><p>قدّمها للمسيح في صلاتك الليلة.</p>`:'<p>مفيش هدية محفوظة على الموبايل ده. قدّم له قلبك في صلاتك الليلة 🤍</p>'}</div>`;
+    if(text) return `<div class="nfx-q nfx-center"><div class="nfx-big">🎁🔒</div><h4>هديتك مقفولة</h4><p>هتتفتح لك ليلة العيد، يوم ٦ يناير. خليك أمين في تنفيذها.</p></div>`;
+    return `<div class="nfx-q"><h4>🎁 هدية للمذود</h4><p>هتقدّم إيه للمسيح في الصوم ده؟ مثلًا: أصالح حد، أو أواظب على قراية الإنجيل.</p>
+      <textarea id="nfx-gift" rows="4" maxlength="400" placeholder="اكتب هديتك..."></textarea>
+      <p class="nfx-hint">بتتحفظ على الموبايل ده بس، ومش بتتبعت لحد. بعد القفل مش هتتعرض ولا تتعدّل لحد ليلة العيد. لو مسحت بيانات المتصفح أو غيّرت الموبايل هتضيع.</p>
+      ${btn('lock','','🔒 اقفل هديتي','nfx-b gold')}</div>`;
+  }
+
+  function draw(){
+    const o = document.getElementById('nfx'); if(!o) return;
+    const body = o.querySelector('.nfx-body'), top = body.scrollTop;
+    const keep = body.dataset.tab === tab;
+    body.innerHTML = ({ road:road, cave:cave, story:stories, who:who, gift:gift })[tab]();
+    o.querySelectorAll('.nfx-tabs button').forEach(function(b){ b.classList.toggle('on', b.dataset.v===tab); });
+    body.dataset.tab = tab; body.scrollTop = keep ? top : 0;
+    if(!keep && tab==='road'){ const n = body.querySelector('.nfx-node.now'); if(n) body.scrollTop = Math.max(0, n.offsetTop - body.clientHeight/2); }
+  }
+  function openHub(){
+    if(!state.pid || document.getElementById('nfx')) return;
+    tab = 'road'; openSt = 0; quizOpen = -1; wrong = -1; story = null; game = null;
+    const o = document.createElement('div'); o.id = 'nfx'; o.setAttribute('role','dialog'); o.setAttribute('aria-modal','true');
+    o.innerHTML = `<div class="nfx-head"><b>🌌 رحلة النجم</b>${btn('exit','','✕','nfx-x')}</div>
+      <div class="nfx-tabs">${[['road','🌟<span>الرحلة</span>'],['cave','🏚️<span>المغارة</span>'],['story','🎭<span>لو مكانهم</span>'],['who','🎧<span>مين قالها</span>'],['gift','🎁<span>هديتي</span>']].map(function(t){ return btn('tab',t[0],t[1],'nfx-tab'); }).join('')}</div>
+      <div class="nfx-body"></div>`;
+    document.body.appendChild(o); draw();
+  }
+
+  /* صورة المغارة للمشاركة */
+  function shareCave(){
+    const J = data(), c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
+    const g = c.getContext('2d'), bg = g.createLinearGradient(0,0,0,1350);
+    bg.addColorStop(0,'#141a4e'); bg.addColorStop(1,'#46263a'); g.fillStyle = bg; g.fillRect(0,0,1080,1350);
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.direction = 'rtl';
+    g.fillStyle = '#FFDE94'; g.font = '900 72px Cairo, sans-serif'; g.fillText('مغارتي في صوم الميلاد',540,130);
+    g.fillStyle = 'rgba(244,183,64,.16)'; g.beginPath(); g.moveTo(90,1150); g.quadraticCurveTo(540,60,990,1150); g.fill();
+    SPOTS.forEach(function(s,i){ if(!J.pieces[i]) return; g.font = (s[2]*3)+'px sans-serif'; g.fillStyle = '#fff'; g.fillText(QUIZ[i][0], 1080*(1-s[0]/100), 250+900*s[1]/100); });
+    if(nfSeason().day>=44){ g.font = '132px sans-serif'; g.fillText('👶',540,250+900*.74); }
+    g.fillStyle = '#FCF9F3'; g.font = '700 46px Cairo, sans-serif'; g.fillText('المجد لله في الأعالي',540,1250);
+    c.toBlob(function(blob){
+      if(!blob) return;
+      const f = new File([blob],'maghara.png',{type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[f]})){ navigator.share({files:[f]}).catch(function(){}); return; }
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'maghara.png'; document.body.appendChild(a); a.click(); a.remove();
+    },'image/png');
+  }
+
+  document.addEventListener('click', function(e){
+    const b = e.target.closest && e.target.closest('[data-nfx]'); if(!b) return;
+    const k = b.dataset.nfx, v = b.dataset.v;
+    if(k==='open'){ openHub(); return; }
+    if(k==='exit'){ const o = document.getElementById('nfx'); if(o) o.remove(); return; }
+    if(k==='share'){ shareCave(); return; }
+    if(k==='tab'){ tab = v; openSt = 0; }
+    else if(k==='station'){ openSt = +v; data().seen[openSt] = 1; save(); }
+    else if(k==='close-st'){ openSt = 0; }
+    else if(k==='quiz'){ quizOpen = +v; wrong = -1; }
+    else if(k==='answer'){
+      if(+v === QUIZ[quizOpen][4]){ data().pieces[quizOpen] = 1; save(); try{ showToast('كسبت قطعة: '+QUIZ[quizOpen][1]+' '+QUIZ[quizOpen][0]); }catch(err){} quizOpen = -1; wrong = -1; }
+      else wrong = +v;
+    }
+    else if(k==='story'){ story = { i:+v, step:0, pick:-1 }; }
+    else if(k==='pick'){ story.pick = +v; }
+    else if(k==='next'){ story.step++; story.pick = -1; }
+    else if(k==='story-back'){ story = null; }
+    else if(k==='start'){ game = { deck:shuffle(WHO.slice()), n:0, score:0 }; newRound(); }
+    else if(k==='guess'){ if(game.pick!==null) return; game.pick = v; if(v===game.deck[game.n][1]) game.score++; }
+    else if(k==='again'){ game.n++; if(game.n < game.deck.length) newRound(); }
+    else if(k==='lock'){
+      const t = ((document.getElementById('nfx-gift')||{}).value || '').trim();
+      if(!t){ try{ showToast('اكتب هديتك الأول',true); }catch(err){} return; }
+      try{ localStorage.setItem(giftKey(), t); }catch(err){ try{ showToast('المتصفح مش سامح بالحفظ دلوقتي',true); }catch(x){} return; }
+    }
+    draw();
   });
 })();
 /* ---------- مهمة اليوم: تحدي بسيط بيحطه المنظمين لكل يوم، إنجازه بياخد نقط إضافية فورية ---------- */
