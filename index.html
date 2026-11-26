@@ -5346,6 +5346,124 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .nf-ev-body{ padding:0 14px 12px; }
   .nf-ev-body h4{ margin:8px 0 2px; font-size:12px; color:#FFDE94; }
   .nf-ev-body p{ margin:0; font-size:13.5px; line-height:1.9; font-weight:600; color:rgba(252,249,243,.9); }
+  /* ---- أحداث الصوم: المشاهد المتحركة ---- */
+  .nfs-card{ display:flex; flex-direction:column; width:100%; max-width:440px; max-height:94vh; overflow:hidden; direction:rtl; text-align:right; border-radius:20px; color:#FCF9F3; font-family:'Cairo',sans-serif; background:linear-gradient(160deg,#1a1f5e,#2b1d55); border:1px solid rgba(244,183,64,.4); touch-action:pan-y; }
+  .nfs-stage{ position:relative; flex:none; height:236px; overflow:hidden; border-bottom:1px solid rgba(244,183,64,.3); }
+  .nfs-stage>*{ position:absolute; }
+  .nfs-sky{ inset:-6%; animation:nfsK 14s ease-in-out infinite alternate; }
+  .nfs-rays{ left:50%; top:-40%; width:170%; height:170%; translate:-50% 0; transform-origin:50% 30%; background:repeating-conic-gradient(from 0deg at 50% 30%,rgba(255,222,140,.24) 0 5deg,transparent 5deg 17deg); mix-blend-mode:screen; -webkit-mask:radial-gradient(circle at 50% 30%,#000,transparent 62%); mask:radial-gradient(circle at 50% 30%,#000,transparent 62%); animation:nfsR2 70s linear infinite; pointer-events:none; }
+  .nfs-h{ left:-8%; bottom:0; width:116%; height:46%; }
+  .nfs-h.h1{ animation:nfsDr 16s ease-in-out infinite alternate; } .nfs-h.h2{ height:30%; animation:nfsDr 9s ease-in-out infinite alternate-reverse; }
+  .nfs-i{ translate:-50% 0; line-height:1; transform-origin:50% 100%; filter:drop-shadow(0 10px 10px rgba(0,0,0,.55)) drop-shadow(0 0 14px rgba(255,214,120,.25)); }
+  .nfs-i.aw{ translate:0 0; }
+  .nfs-i.af{ animation:nfsF 3.6s ease-in-out infinite; } .nfs-i.ap{ animation:nfsP 2.8s ease-in-out infinite; }
+  .nfs-i.ad{ animation:nfsD 5s ease-in-out infinite; } .nfs-i.aw{ animation:nfsW 11s linear infinite; }
+  .nfs-i.ar{ animation:nfsRi 4.5s ease-out infinite; } .nfs-i.as{ animation:nfsS 6s ease-in-out infinite; }
+  .nfs-p{ border-radius:50%; width:var(--z); height:var(--z); pointer-events:none; }
+  .nfs-p.stars{ background:#fff; animation:nfsT 3s ease-in-out infinite; }
+  .nfs-p.spark{ background:#ffd56b; box-shadow:0 0 9px #ffd56b; animation:nfsUp 7s linear infinite; }
+  .nfs-p.dust{ background:#ffe7b0; opacity:.6; animation:nfsUp 9s linear infinite; }
+  .nfs-p.smoke{ background:rgba(225,215,235,.3); filter:blur(7px); animation:nfsUp 8s linear infinite; }
+  .nfs-fx{ inset:0; pointer-events:none; background:radial-gradient(ellipse at 50% 45%,transparent 48%,rgba(0,0,0,.62)); }
+  .nfs-fx::after{ content:''; position:absolute; inset:0; opacity:.13; mix-blend-mode:overlay; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .nfs-cap{ left:0; right:0; bottom:0; display:flex; gap:10px; align-items:center; padding:26px 14px 10px; background:linear-gradient(transparent,rgba(5,4,28,.9)); animation:nfsWd .7s both; }
+  .nfs-cap>span{ font-size:28px; } .nfs-cap b{ display:block; font-size:15px; color:#FFDE94; } .nfs-cap small{ font-size:11px; color:#E3D8C6; }
+  .nfs-path{ display:flex; gap:4px; padding:10px 14px 2px; }
+  .nfs-path i{ flex:1; height:5px; border-radius:5px; background:rgba(255,255,255,.18); cursor:pointer; transition:.4s; }
+  .nfs-path i.d{ background:#F4B740; } .nfs-path i.a{ flex:2.4; background:linear-gradient(90deg,#FFDE94,#F4B740); box-shadow:0 0 10px #F4B740; }
+  .nfs-tabs{ display:flex; gap:6px; padding:8px 14px 0; }
+  .nfs-t{ flex:1; padding:7px 4px; border-radius:11px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#E3D8C6; font:800 12px 'Cairo',sans-serif; cursor:pointer; }
+  .nfs-t.on{ background:rgba(244,183,64,.2); border-color:#F4B740; color:#FFDE94; }
+  .nfs-txt{ padding:8px 16px 2px; min-height:110px; max-height:30vh; overflow-y:auto; font-size:14.5px; line-height:2; font-weight:600; color:rgba(252,249,243,.94); }
+  .nfs-txt span{ display:inline-block; opacity:0; animation:nfsWd .45s forwards; }
+  .nfs-nav{ display:flex; gap:8px; padding:8px 14px 14px; }
+  .nfs-b{ flex:1; padding:10px; border-radius:12px; border:1px solid rgba(244,183,64,.4); background:rgba(255,255,255,.08); color:#FCF9F3; font:800 13.5px 'Cairo',sans-serif; cursor:pointer; }
+  .nfs-b.m{ background:linear-gradient(135deg,#F4B740,#FFDE94); color:#2a1d55; border:0; }
+  @keyframes nfsK{ to{ transform:scale(1.13) translate(-2%,1.5%); } }
+  @keyframes nfsR2{ to{ transform:rotate(360deg); } }
+  @keyframes nfsDr{ to{ transform:translateX(5%); } }
+  @keyframes nfsF{ 50%{ transform:translateY(-8px); } }
+  @keyframes nfsP{ 50%{ transform:scale(1.18); filter:drop-shadow(0 0 20px #ffd56b); } }
+  @keyframes nfsD{ 0%{ transform:translateY(-80px); opacity:0; } 25%{ opacity:1; } 75%{ transform:none; opacity:1; } 100%{ transform:none; opacity:0; } }
+  @keyframes nfsW{ 0%{ left:-16%; opacity:0; } 10%{ opacity:1; } 90%{ opacity:1; } 100%{ left:72%; opacity:0; } }
+  @keyframes nfsRi{ 0%{ transform:translateY(0); opacity:0; } 25%{ opacity:1; } 100%{ transform:translate(12px,-90px); opacity:0; } }
+  @keyframes nfsS{ 0%,40%{ transform:rotate(0); } 65%,100%{ transform:rotate(180deg); } }
+  @keyframes nfsT{ 50%{ opacity:.12; } }
+  @keyframes nfsUp{ 0%{ transform:translateY(0); opacity:0; } 15%{ opacity:.85; } 100%{ transform:translateY(-230px); opacity:0; } }
+  @keyframes nfsWd{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){ .nfw *{ animation-duration:.01s !important; animation-iteration-count:1 !important; } }
+  /* ---- أحداث الصوم: عالم الرحلة ---- */
+  #nf-ev.nfw-on{ display:block; padding:0; background:#04031a; }
+  .nfw{ position:relative; container-type:inline-size; width:100%; max-width:520px; height:100%; margin:0 auto; overflow:hidden; direction:rtl; color:#FCF9F3; font-family:'Cairo',sans-serif; background:#06051f; touch-action:pan-y; }
+  .nfw>*{ position:absolute; }
+  .nfw-sky{ top:0; bottom:0; right:0; width:400cqw; transition:transform 2.2s cubic-bezier(.65,0,.25,1); }
+  .nfw-sky>div{ position:absolute; inset:0; -webkit-mask:linear-gradient(0deg,#000 5%,transparent 62%); mask:linear-gradient(0deg,#000 5%,transparent 62%); }
+  .nfw-sky::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(3,2,20,.88),transparent 58%); }
+  .nfw-stars{ top:0; right:0; height:60%; width:300cqw; transition:transform 2.6s cubic-bezier(.65,0,.25,1); animation:nfsT 4s ease-in-out infinite; background:radial-gradient(1.6px 1.6px at 12% 20%,#fff,transparent),radial-gradient(1px 1px at 40% 55%,#fff,transparent),radial-gradient(1.4px 1.4px at 70% 12%,#fff,transparent),radial-gradient(1px 1px at 88% 62%,#ffe9b0,transparent); background-size:170px 170px; }
+  .nfw .nfs-rays{ z-index:1; }
+  .nfw-world{ top:0; right:0; height:74%; display:flex; direction:rtl; z-index:2; transition:transform 1.9s cubic-bezier(.65,0,.25,1); }
+  .nfw-panel{ position:relative; height:100%; overflow:hidden; }
+  .nfw-panel>*{ position:absolute; }
+  .nfw-panel .nfs-h{ left:0; width:100%; animation:none !important; }
+  .nfw-img{ inset:0; animation:nfsK 14s ease-in-out infinite alternate; }
+  .nfw>.nfs-fx{ inset:0; z-index:3; }
+  .nfw-top{ top:0; left:0; right:0; z-index:6; display:flex; justify-content:space-between; align-items:center; padding:calc(10px + env(safe-area-inset-top)) 14px 14px; background:linear-gradient(rgba(4,3,26,.85),transparent); color:#FFDE94; font-size:14px; }
+  .nfw-chap{ left:0; right:0; top:17%; z-index:5; text-align:center; pointer-events:none; animation:nfwCh 3.2s ease both; text-shadow:0 2px 18px #000; }
+  .nfw-chap small{ display:block; font-size:11px; letter-spacing:1px; color:#E3D8C6; } .nfw-chap span{ display:block; font-size:56px; filter:drop-shadow(0 0 22px #ffd56b); } .nfw-chap b{ font-size:21px; color:#FFDE94; }
+  .nfw-sheet{ left:0; right:0; bottom:0; z-index:6; padding:6px 0 calc(8px + env(safe-area-inset-bottom)); background:linear-gradient(180deg,rgba(6,5,32,.55),rgba(6,5,32,.93) 28%); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border-top:1px solid rgba(244,183,64,.35); border-radius:22px 22px 0 0; }
+  .nfw-sheet .nfs-txt{ max-height:24vh; }
+  .nfw-beam{ left:50%; top:0; width:42%; height:85%; translate:-50% 0; background:linear-gradient(180deg,rgba(255,236,170,.6),transparent); clip-path:polygon(42% 0,58% 0,100% 100%,0 100%); mix-blend-mode:screen; animation:nfsP 3.4s ease-in-out infinite; }
+  .nfw-ring{ left:50%; top:42%; width:22px; height:22px; translate:-50% -50%; border:2px solid #ffd56b; border-radius:50%; animation:nfwRg 3s ease-out infinite; }
+  .nfw-comet{ left:-25%; top:8%; width:100px; height:3px; rotate:16deg; background:linear-gradient(90deg,transparent,#fff); box-shadow:0 0 10px #fff; animation:nfwCm 5s ease-in infinite; }
+  .nfw-sp{ position:absolute; width:6px; height:6px; border-radius:50%; background:#ffd56b; box-shadow:0 0 10px #ffd56b; pointer-events:none; z-index:7; animation:nfwSp .9s ease-out forwards; }
+  .nfs-i{ cursor:pointer; } .nfs-j{ animation:nfwJ .6s !important; }
+  .nfw-guide{ z-index:4; font-size:26px; pointer-events:none; filter:drop-shadow(0 0 14px #ffd56b); animation:nfsP 2.6s ease-in-out infinite; transition:right 2.2s cubic-bezier(.65,0,.25,1),top 2.2s cubic-bezier(.65,0,.25,1),scale 2.2s; }
+  .nfw-guide::after{ content:''; position:absolute; right:60%; top:50%; width:70px; height:2px; background:linear-gradient(270deg,rgba(255,222,140,.7),transparent); }
+  .nfw-hint{ left:0; right:0; top:calc(70% - 44px); text-align:center; font-size:12px; font-weight:800; color:#FFDE94; z-index:5; pointer-events:none; opacity:0; animation:nfwHi 7s 3s both; }
+  .nfw-q{ z-index:8; translate:-50% 0; width:max-content; max-width:210px; padding:9px 13px; border-radius:15px; background:rgba(255,248,225,.97); color:#2a1d55; font-weight:800; font-size:13px; line-height:1.7; text-align:center; box-shadow:0 8px 26px rgba(0,0,0,.55); pointer-events:none; opacity:0; }
+  .nfw-q small{ display:block; font-size:10.5px; color:#a8741a; }
+  .nfw-q.on{ animation:nfwQ 4.2s both; }
+  @keyframes nfwHi{ 0%,100%{ opacity:0; } 15%,85%{ opacity:1; } }
+  @keyframes nfwQ{ 0%{ opacity:0; transform:translateY(12px) scale(.9); } 8%{ opacity:1; transform:none; } 86%{ opacity:1; } 100%{ opacity:0; } }
+  .nfw-sky{ top:-10px; bottom:-10px; right:-30px; width:calc(400cqw + 60px); translate:calc(var(--tx,0)*6px) calc(var(--ty,0)*4px); }
+  .nfw-stars{ translate:calc(var(--tx,0)*12px) calc(var(--ty,0)*8px); }
+  .nfw .nfs-rays{ translate:calc(-50% + var(--tx,0)*8px) calc(var(--ty,0)*5px); }
+  .nfw-panel .nfs-h{ left:-5%; width:110%; bottom:-14px; }
+  .nfw-panel .nfs-h.h1{ translate:calc(var(--tx,0)*-8px) calc(var(--ty,0)*-5px); }
+  .nfw-panel .nfs-h.h2{ translate:calc(var(--tx,0)*-16px) calc(var(--ty,0)*-9px); }
+  .nfw-panel .nfs-i{ translate:calc(-50% + var(--tx,0)*-26px) calc(var(--ty,0)*-14px); }
+  .nfw-panel .nfs-i.aw{ translate:calc(var(--tx,0)*-26px) calc(var(--ty,0)*-14px); }
+  .nfw-tools{ left:10px; top:62px; z-index:6; display:flex; flex-direction:column; gap:7px; }
+  .nfw-tb{ width:48px; padding:5px 0 4px; border-radius:14px; border:1px solid rgba(244,183,64,.4); background:rgba(8,6,38,.62); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); color:#FFDE94; cursor:pointer; font-family:inherit; line-height:1.15; }
+  .nfw-tb span{ display:block; font-size:19px; } .nfw-tb small{ font-size:8.5px; font-weight:800; }
+  .nfw-tool{ inset:0; z-index:9; display:none; flex-direction:column; background:rgba(4,3,26,.97); padding-top:env(safe-area-inset-top); }
+  .nfw-tool.on{ display:flex; animation:nfsWd .4s both; }
+  .nfw-th{ display:flex; justify-content:space-between; align-items:center; padding:12px 14px; color:#FFDE94; font-size:15px; }
+  .nfw-tbody{ flex:1; overflow-y:auto; padding:4px 14px 24px; font-weight:700; font-size:14px; line-height:1.9; }
+  .nfw-tbody h3{ margin:6px 0 10px; font-size:16px; color:#FCF9F3; line-height:1.8; } .nfw-tbody small{ display:block; color:#E3D8C6; font-size:11.5px; }
+  .nfw-mgs{ position:relative; height:300px; margin-top:8px; border-radius:18px; overflow:hidden; background:linear-gradient(180deg,#0a1030,#33306a 60%,#c46a3a); border:1px solid rgba(244,183,64,.35); }
+  .nfw-mgs::after{ content:''; position:absolute; left:0; right:0; bottom:0; height:10%; background:#1a0f2e; }
+  .mg{ position:absolute; translate:-50% 0; line-height:1; cursor:pointer; z-index:1; }
+  .mg.off{ filter:grayscale(1) brightness(.45); opacity:.3; } .mg.on{ animation:nfwPop .7s both; filter:drop-shadow(0 0 10px rgba(255,214,120,.45)); }
+  .mg.baby{ animation:nfwPop .9s .3s both,nfsP 2.6s 1.2s infinite; }
+  .nfw-map{ width:100%; border-radius:16px; } .nfw-map text{ font-family:'Cairo',sans-serif; font-weight:800; font-size:11px; fill:#2a1d55; } .nfw-map .pin{ cursor:pointer; }
+  .nfw-map .rt{ fill:none; stroke-width:2.6; stroke-dasharray:6 5; stroke-linecap:round; animation:nfwDa 1.4s linear infinite; }
+  .nfw-leg{ display:flex; flex-direction:column; gap:2px; margin-top:8px; }
+  .nfw-ch{ display:block; width:100%; margin:6px 0; text-align:right; } .nfw-ch.ok{ background:rgba(60,200,130,.28); border-color:#4cd08a; } .nfw-ch.no{ opacity:.55; }
+  .nfw-res{ margin-top:8px; padding:10px 12px; border-radius:14px; background:rgba(255,255,255,.08); border:1px solid rgba(244,183,64,.3); }
+  .nfw-line{ display:flex; gap:6px; margin:8px 0 12px; } .nfw-line i{ flex:1; text-align:center; padding:8px 0; border-radius:12px; border:1px dashed rgba(244,183,64,.5); font-style:normal; font-size:18px; color:#FFDE94; } .nfw-line i.ok{ background:rgba(244,183,64,.22); border-style:solid; animation:nfwPop .5s both; }
+  .nfw-cards{ display:flex; flex-direction:column; gap:8px; } .nfw-card{ text-align:right; }
+  .nfw-shk{ animation:nfwSh .4s; border-color:#ff6b6b !important; }
+  .nfw-fin{ text-align:center; margin-top:14px; font-size:44px; } .nfw-fin h3{ margin:4px 0; font-size:20px; color:#FFDE94; } .nfw-fin p{ margin:0 0 10px; font-size:14px; }
+  @keyframes nfwPop{ 0%{ transform:scale(0) rotate(-20deg); opacity:0; } 60%{ transform:scale(1.25); } 100%{ transform:none; opacity:1; } }
+  @keyframes nfwDa{ to{ stroke-dashoffset:-22; } }
+  @keyframes nfwSh{ 25%{ transform:translateX(-7px); } 75%{ transform:translateX(7px); } }
+  .nfw .nfs-tabs{ display:none; }
+  @keyframes nfwCh{ 0%{ opacity:0; transform:scale(.88); } 16%{ opacity:1; transform:none; } 72%{ opacity:1; } 100%{ opacity:0; transform:scale(1.08); } }
+  @keyframes nfwRg{ from{ transform:scale(1); opacity:.9; } to{ transform:scale(15); opacity:0; } }
+  @keyframes nfwCm{ 0%{ transform:translateX(0); opacity:0; } 10%{ opacity:1; } 60%,100%{ transform:translateX(125cqw) translateY(18cqw); opacity:0; } }
+  @keyframes nfwSp{ to{ transform:translate(var(--dx),var(--dy)) scale(.2); opacity:0; } }
+  @keyframes nfwJ{ 35%{ transform:translateY(-36px) scale(1.25) rotate(-8deg); } 70%{ transform:none; } }
   #nfx{ position:fixed; inset:0; z-index:125; display:flex; flex-direction:column; direction:rtl; text-align:right; color:#FCF9F3; font-family:'Cairo',sans-serif; background:radial-gradient(80% 40% at 50% 0%,rgba(244,183,64,.18),transparent),linear-gradient(180deg,#0e1240,#2b1d55); }
   .nfx-head{ display:flex; justify-content:space-between; align-items:center; padding:calc(10px + env(safe-area-inset-top,0px)) 16px 8px; color:#FFDE94; font-size:17px; }
   .nfx-x{ width:34px; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.08); color:#fff; cursor:pointer; }
@@ -13030,29 +13148,169 @@ function nfGreetOnce(pid, S){
 }
 /* ---------- أحداث الصوم: عدّل أو ضيف أي حدث من القايمة دي ---------- */
 const NF_EVENTS = [
-  { ico:'🕯️', t:'ليه بنصوم صوم الميلاد؟', ref:'', story:'بنستعد بالصوم والصلاة والتوبة علشان نستقبل ميلاد السيد المسيح، كلمة الله اللي صار جسدًا. مدته ٤٣ يوم: ٤٠ يوم على مثال صوم موسى النبي قبل ما يستلم الشريعة، و٣ أيام تذكار الصوم اللي سبق معجزة نقل جبل المقطم أيام البابا أبرآم بن زرعة.', mean:'زي ما موسى صام قبل ما يستلم كلمة الله مكتوبة، إحنا بنصوم علشان نستقبل الكلمة المتجسد.', life:'اختار حاجة واحدة تبعدك عن ربنا وابدأ تسيبها من النهارده.' },
-  { ico:'🌟', t:'شهر كيهك: الشهر المريمي', ref:'', story:'شهر كيهك بييجي جوه صوم الميلاد، والكنيسة بتكرّم فيه العذراء مريم بتسابيح معروفة باسم «سبعة وأربعة»: سبع ثيؤطوكيات وأربع هوسات.', mean:'التسبيح بيحضّر القلب للفرح بالميلاد، والعذراء مثال للقلب المستعد لسكنى الله.', life:'احضر تسبحة كيهك مرة على الأقل مع أصحابك.' },
-  { ico:'👴', t:'الأحد الأول من كيهك: بشارة زكريا', ref:'لوقا ١ : ١–٢٥', story:'الملاك جبرائيل ظهر لزكريا الكاهن وهو بيبخّر في الهيكل، وبشّره إن أليصابات هتخلف ابن اسمه يوحنا رغم كبر سنهم. زكريا شك، ففضل صامت لحد ما الوعد اتحقق.', mean:'ربنا مابينساش الصلاة حتى لو الاستجابة اتأخرت، ويوحنا هو اللي هيهيّئ الطريق قدام المسيح.', life:'فيه طلبة بطّلت تصليها علشان اتأخرت؟ ارجع صلّيها بثقة.' },
-  { ico:'🕊️', t:'الأحد الثاني من كيهك: بشارة العذراء', ref:'لوقا ١ : ٢٦–٣٨', story:'الملاك جبرائيل راح للعذراء مريم في الناصرة، وبشّرها إنها هتحبل بالروح القدس وتلد ابن تسميه يسوع، وابن العلي يُدعى. فردت: «هوذا أنا أمة الرب، ليكن لي كقولك».', mean:'دي بداية سر التجسد. العذراء سألت علشان تفهم، وبعدين سلّمت لمشيئة الله باتضاع.', life:'قول لربنا النهارده «لتكن مشيئتك» في موضوع قلقان منه.' },
-  { ico:'🤝', t:'الأحد الثالث من كيهك: زيارة العذراء لأليصابات', ref:'لوقا ١ : ٣٩–٥٦', story:'العذراء قامت بسرعة وزارت أليصابات. ولما سمعت أليصابات سلامها، ارتكض الجنين في بطنها وامتلأت من الروح القدس، والعذراء سبّحت: «تعظم نفسي الرب».', mean:'اللي قلبه مليان بربنا بيروح يخدم غيره وينقل له الفرح.', life:'زور أو كلّم حد محتاج سؤال أو مساعدة.' },
-  { ico:'👶', t:'الأحد الرابع من كيهك: ميلاد يوحنا المعمدان', ref:'لوقا ١ : ٥٧–٨٠', story:'أليصابات ولدت ابنها، وزكريا كتب «اسمه يوحنا»، فلسانه اتفك في الحال وسبّح الله وتنبأ عن الخلاص وعن دور ابنه.', mean:'يوحنا هو السابق اللي بيمهّد للمسيح، وزكريا لما رجع يتكلم بدأ بالتسبيح.', life:'اشكر ربنا بصوتك على حاجة عملها معاك السنة دي.' },
-  { ico:'💭', t:'ملاك الرب ويوسف النجار', ref:'متى ١ : ١٨–٢٥', story:'يوسف عرف إن مريم حبلى، ولأنه كان بارًا مارضيش يشهّر بيها. ملاك الرب ظهر له في حلم وعرّفه إن المولود من الروح القدس، فأطاع وأخدها عنده.', mean:'اسم «يسوع» معناه إن الله يخلّص، و«عمانوئيل» تفسيره الله معنا.', life:'قبل ما تحكم على حد، استنى وصلّي واستر عليه.' },
-  { ico:'🛤️', t:'الرحلة لبيت لحم والميلاد', ref:'لوقا ٢ : ١–٧', story:'بسبب أمر أغسطس قيصر بالاكتتاب، سافر يوسف ومريم من الناصرة لبيت لحم. وهناك ولدت ابنها وقمطته وأضجعته في المذود، لأنه ماكانش لهما موضع في المنزل.', mean:'ملك الملوك اتولد في اتضاع، واتحققت نبوة ميخا إن المخلّص يخرج من بيت لحم (ميخا ٥ : ٢).', life:'افتح مكان لربنا في يومك: وقت ثابت للصلاة والإنجيل.' },
-  { ico:'⏳', t:'برمون الميلاد', ref:'', story:'البرمون هو الاستعداد الأخير قبل العيد، وفيه الصوم بيكون بزهد أكتر ومن غير سمك.', mean:'كل ما العيد يقرّب، استعدادنا بيزيد.', life:'راجع رحلتك في الصوم، وجهّز قلبك بالتوبة والاعتراف.' },
-  { ico:'🐑', t:'عيد الميلاد: بشارة الرعاة', ref:'لوقا ٢ : ٨–٢٠', story:'ملاك الرب بشّر رعاة سهرانين على قطيعهم: «ولد لكم اليوم في مدينة داود مخلص هو المسيح الرب». وسبّحت الملائكة، والرعاة راحوا بسرعة وشافوا الطفل ورجعوا يمجدوا الله.', mean:'البشارة وصلت لناس بسطاء وساهرين، والفرح ده لجميع الشعب.', life:'شارك فرحة العيد مع حد وحيد أو محتاج.' },
-  { ico:'⭐', t:'المجوس والنجم', ref:'متى ٢ : ١–١٢', story:'مجوس من المشرق تبعوا النجم يدوّروا على المولود ملك اليهود. ولما وصلوا له سجدوا وقدّموا هدايا: ذهب ولبان ومر، ورجعوا من طريق تاني من غير ما يعدّوا على هيرودس.', mean:'المسيح جه للعالم كله. والتقليد الكنسي بيشوف في الذهب إشارة لملكه، وفي اللبان لكهنوته، وفي المر لآلامه.', life:'هتقدّم إيه هدية للمسيح السنة دي؟ وقتك، موهبتك، قلبك.' }
+  { ico:'🕯️', t:'ليه بنصوم صوم الميلاد؟', ref:'', story:'بنستعد بالصوم والصلاة والتوبة علشان نستقبل ميلاد السيد المسيح، كلمة الله اللي صار جسدًا. مدته ٤٣ يوم: ٤٠ يوم على مثال صوم موسى النبي قبل ما يستلم الشريعة، و٣ أيام تذكار الصوم اللي سبق معجزة نقل جبل المقطم أيام البابا أبرآم بن زرعة.' },
+  { ico:'🌟', t:'شهر كيهك: الشهر المريمي', ref:'', story:'شهر كيهك بييجي جوه صوم الميلاد، والكنيسة بتكرّم فيه العذراء مريم بتسابيح معروفة باسم «سبعة وأربعة»: سبع ثيؤطوكيات وأربع هوسات.' },
+  { ico:'👴', t:'الأحد الأول من كيهك: بشارة زكريا', ref:'لوقا ١ : ١–٢٥', story:'الملاك جبرائيل ظهر لزكريا الكاهن وهو بيبخّر في الهيكل، وبشّره إن أليصابات هتخلف ابن اسمه يوحنا رغم كبر سنهم. زكريا شك، ففضل صامت لحد ما الوعد اتحقق.' },
+  { ico:'🕊️', t:'الأحد الثاني من كيهك: بشارة العذراء', ref:'لوقا ١ : ٢٦–٣٨', story:'الملاك جبرائيل راح للعذراء مريم في الناصرة، وبشّرها إنها هتحبل بالروح القدس وتلد ابن تسميه يسوع، وابن العلي يُدعى. فردت: «هوذا أنا أمة الرب، ليكن لي كقولك».' },
+  { ico:'🤝', t:'الأحد الثالث من كيهك: زيارة العذراء لأليصابات', ref:'لوقا ١ : ٣٩–٥٦', story:'العذراء قامت بسرعة وزارت أليصابات. ولما سمعت أليصابات سلامها، ارتكض الجنين في بطنها وامتلأت من الروح القدس، والعذراء سبّحت: «تعظم نفسي الرب».' },
+  { ico:'👶', t:'الأحد الرابع من كيهك: ميلاد يوحنا المعمدان', ref:'لوقا ١ : ٥٧–٨٠', story:'أليصابات ولدت ابنها، وزكريا كتب «اسمه يوحنا»، فلسانه اتفك في الحال وسبّح الله وتنبأ عن الخلاص وعن دور ابنه.' },
+  { ico:'💭', t:'ملاك الرب ويوسف النجار', ref:'متى ١ : ١٨–٢٥', story:'يوسف عرف إن مريم حبلى، ولأنه كان بارًا مارضيش يشهّر بيها. ملاك الرب ظهر له في حلم وعرّفه إن المولود من الروح القدس، فأطاع وأخدها عنده.' },
+  { ico:'🛤️', t:'الرحلة لبيت لحم والميلاد', ref:'لوقا ٢ : ١–٧', story:'بسبب أمر أغسطس قيصر بالاكتتاب، سافر يوسف ومريم من الناصرة لبيت لحم. وهناك ولدت ابنها وقمطته وأضجعته في المذود، لأنه ماكانش لهما موضع في المنزل.' },
+  { ico:'⏳', t:'برمون الميلاد', ref:'', story:'البرمون هو الاستعداد الأخير قبل العيد، وفيه الصوم بيكون بزهد أكتر ومن غير سمك.' },
+  { ico:'🐑', t:'عيد الميلاد: بشارة الرعاة', ref:'لوقا ٢ : ٨–٢٠', story:'ملاك الرب بشّر رعاة سهرانين على قطيعهم: «ولد لكم اليوم في مدينة داود مخلص هو المسيح الرب». وسبّحت الملائكة، والرعاة راحوا بسرعة وشافوا الطفل ورجعوا يمجدوا الله.' },
+  { ico:'⭐', t:'المجوس والنجم', ref:'متى ٢ : ١–١٢', story:'مجوس من المشرق تبعوا النجم يدوّروا على المولود ملك اليهود. ولما وصلوا له سجدوا وقدّموا هدايا: ذهب ولبان ومر، ورجعوا من طريق تاني من غير ما يعدّوا على هيرودس.' }
 ];
+/* ===== أحداث الصوم — مشهد سينمائي متحرك لكل حدث (حط صورة حقيقية في img:'رابط' جوه أي حدث وهتاخد مكان المشهد) ===== */
+const NF_SC=[
+ [['#1b1146','#6a3a8c','#f2a65a'],'dust',[['⛰️',50,20,130,'f',0],['📜',50,56,46,'p',.4],['🕯️',84,18,38,'p',.2]]],
+ [['#050522','#1a1f5e','#3b2b7a'],'spark',[['⛪',50,16,100,'f',0],['🌟',50,56,64,'p',0],['🎶',24,44,32,'r',0],['🎵',74,40,30,'r',1.4]]],
+ [['#1a0f2e','#5a3a2a','#d9a05b'],'smoke',[['🕍',50,16,112,'f',0],['👴',26,16,46,'f',.3],['👼',74,50,56,'d',.6]]],
+ [['#0b1a4a','#4a6fb5','#f4d7a0'],'spark',[['🏠',76,16,72,'f',0],['🪷',28,18,44,'p',0],['🕊️',50,62,60,'d',.3],['✨',50,40,36,'p',1]]],
+ [['#2a1450','#c8658a','#ffc98a'],'dust',[['⛰️',24,18,100,'f',0],['🏠',82,18,76,'f',0],['🚶‍♀️',0,16,52,'w',0]]],
+ [['#0f2a3a','#3a7a7a','#ffe1a8'],'dust',[['👶',50,18,70,'p',0],['📜',24,22,40,'f',.3],['🎶',76,40,30,'r',0]]],
+ [['#08081f','#20205e','#4a3a8a'],'stars',[['🛏️',36,16,74,'f',0],['😴',36,34,40,'f',.2],['💭',62,50,54,'p',0],['👼',72,62,40,'d',.8]]],
+ [['#0a1030','#33306a','#e9a35e'],'stars',[['⭐',80,64,50,'p',0],['🛖',86,16,56,'f',0],['🫏',0,16,56,'w',0],['🚶‍♂️',0,16,44,'w',1.2]]],
+ [['#12082e','#3d2060','#c46a3a'],'spark',[['⏳',50,34,84,'s',0],['🕯️',20,16,52,'p',0],['🕯️',80,16,52,'p',.5],['🌙',84,66,38,'f',0]]],
+ [['#020418','#0d2a5a','#2a6a4a'],'spark',[['👼',50,60,72,'d',0],['✨',50,46,46,'p',.5],['🐑',22,14,44,'f',0],['🐑',46,12,38,'f',.4],['🐑',70,15,40,'f',.8],['🧑‍🌾',88,16,48,'f',.2]]],
+ [['#150d3a','#5a3a8a','#f0b060'],'stars',[['⭐',64,60,78,'p',0],['🐪',0,16,64,'w',0],['🐪',0,16,58,'w',1.6],['🎁',88,16,38,'f',0]]]
+];
+const NF_X=['','ring','beam','beam','','','beam','comet','','ring','comet'];
+function nfPanel(e,i,L){
+  const s=NF_SC[i%NF_SC.length], r=Math.random, sm=s[1]==='smoke', x=NF_X[i%NF_X.length];
+  const parts=Array.from({length:sm?6:10},function(){return `<span class="nfs-p ${s[1]}" style="left:${(r()*100).toFixed(1)}%;top:${(s[1]==='stars'?r()*55:40+r()*55).toFixed(1)}%;--z:${(1+r()*(sm?30:3)).toFixed(1)}px;animation-delay:${(-r()*6).toFixed(2)}s;animation-duration:${(4+r()*6).toFixed(1)}s"></span>`;}).join('');
+  const items=s[2].map(function(a){return `<span class="nfs-i a${a[4]}" style="left:${a[1]}%;bottom:${a[2]}%;font-size:${a[3]}px;animation-delay:${a[5]}s">${a[0]}</span>`;}).join('');
+  const fx=x==='ring'?'<b class="nfw-ring"></b><b class="nfw-ring" style="animation-delay:1s"></b><b class="nfw-ring" style="animation-delay:2s"></b>':x==='beam'?'<b class="nfw-beam"></b>':x==='comet'?'<b class="nfw-comet"></b><b class="nfw-comet" style="animation-delay:2.4s;top:26%"></b>':'';
+  const land=e.img?`<div class="nfw-img" style="background:url(${e.img}) center/cover"></div>`:`<svg class="nfs-h h1" viewBox="-20 0 440 100" preserveAspectRatio="none"><path d="M-20 50L0 50Q70 18 140 44T270 36T400 50L420 50V100H-20Z" fill="rgba(10,6,34,.5)"/></svg><svg class="nfs-h h2" viewBox="-20 0 440 100" preserveAspectRatio="none"><path d="M-20 70L0 70Q90 44 190 66T400 70L420 70V100H-20Z" fill="rgba(5,3,22,.85)"/></svg>${items}`;
+  return `<div class="nfw-panel" style="flex:0 0 ${100/L}%">${parts}${fx}${land}</div>`;
+}
 function nfShowEvents(){
   if(document.getElementById('nf-ev')) return;
-  const o = document.createElement('div'); o.id = 'nf-ev';
-  o.innerHTML = `<div class="nf-ev-card" role="dialog" aria-modal="true" aria-label="أحداث الصوم">
-    <div class="nf-ev-top"><b>📖 أحداث صوم الميلاد</b><button type="button" class="nf-ev-x" data-nf="events-close" aria-label="إغلاق">✕</button></div>
-    <div class="nf-ev-list">${NF_EVENTS.map(function(e){ return `<details class="nf-ev-item">
-      <summary><span>${e.ico}</span><span>${e.t}${e.ref?`<small>${e.ref}</small>`:''}</span></summary>
-      <div class="nf-ev-body"><h4>الحدث</h4><p>${e.story}</p><h4>التأمل</h4><p>${e.mean}</p><h4>تدريب عملي</h4><p>${e.life}</p></div>
-    </details>`; }).join('')}</div>
-  </div>`;
+  const L=NF_EVENTS.length, T=[['📖','الحدث','story'],['💡','التأمل','mean'],['🙏','تدريب','life']], SC=[392,440,523,587,659,784];
+  const Q=[['النبي يوئيل','«ارجعوا إليّ بكل قلوبكم وبالصوم»'],['العذراء مريم','«تعظّم نفسي الرب»'],['الملاك جبرائيل','«لا تخف يا زكريا، لأن طلبتك قد سُمعت»'],['العذراء مريم','«هوذا أنا أمة الرب، ليكن لي كقولك»'],['أليصابات','«من أين لي هذا أن تأتي أم ربي إليّ؟»'],['زكريا','«اسمه يوحنا»'],['ملاك الرب','«لا تخف أن تأخذ امرأتك مريم»'],['البشير لوقا','«ولم يكن لهما موضع في المنزل»'],['الرب يسوع','«اسهروا إذًا لأنكم لا تعلمون اليوم ولا الساعة»'],['الملاك','«لا تخافوا، فها أنا أبشركم بفرح عظيم»'],['المجوس','«أين هو المولود ملك اليهود؟ فإننا رأينا نجمه»']];
+  let i=0, st=0, last=-1, auto=false, tok=0, snd=true, AC;
+  const o=document.createElement('div'); o.id='nf-ev'; o.className='nfw-on';
+  const mids=NF_SC.map(function(s){return s[0][1];}).join(','), glows=NF_SC.map(function(s){return s[0][2];}).join(',');
+  o.innerHTML=`<div class="nfw" role="dialog" aria-modal="true" aria-label="أحداث الصوم">
+    <div class="nfw-sky" style="background:linear-gradient(270deg,${mids})"><div style="background:linear-gradient(270deg,${glows})"></div></div>
+    <div class="nfw-stars"></div><div class="nfs-rays"></div>
+    <div class="nfw-world" style="width:${L*100}cqw">${NF_EVENTS.map(function(e,k){return nfPanel(e,k,L);}).join('')}</div>
+    <div class="nfs-fx"></div><div class="nfw-chap"></div><div class="nfw-guide">⭐</div><div class="nfw-hint">👆 المس الشخصيات • 📱 ميّل الموبايل علشان المشهد يبان مجسّم</div><div class="nfw-q"></div><div class="nfw-tools">${[["m","🛖","المذود"],["p","🗺️","الخريطة"],["d","🎭","قرار"],["g","🧩","رتّب"]].map(function(x){return `<button type="button" class="nfw-tb" data-tl="${x[0]}"><span>${x[1]}</span><small>${x[2]}</small></button>`;}).join("")}</div><div class="nfw-tool"></div>
+    <div class="nfw-top"><b>📖 أحداث صوم الميلاد</b><span><button type="button" class="nf-ev-x" data-t="1" aria-label="مجسّم" style="opacity:.45">📱</button> <button type="button" class="nf-ev-x" data-s="1">🔔</button> <button type="button" class="nf-ev-x" data-nf="events-close" aria-label="إغلاق">✕</button></span></div>
+    <div class="nfw-sheet"><div class="nfs-path"></div><div class="nfs-tabs"></div><div class="nfs-txt"></div><div class="nfs-nav"></div></div></div>`;
   document.body.appendChild(o);
+  const q=function(c){return o.querySelector(c);}, box=q('.nfw');
+  function chime(f){ if(!snd) return; try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); const t=AC.currentTime; [1,2].forEach(function(m){ const s=AC.createOscillator(), g=AC.createGain(); s.frequency.value=f*m; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.11/m,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+1.9); s.connect(g); g.connect(AC.destination); s.start(t); s.stop(t+2); }); }catch(e){} }
+  function say(t,cb){ setTimeout(cb,t.split(' ').length*400+1600); }
+  function R(){
+    const e=NF_EVENTS[i], p=i/(L-1);
+    q('.nfw-world').style.transform=`translateX(${i*100}cqw)`;
+    q('.nfw-sky').style.transform=`translateX(${(p*300).toFixed(1)}cqw)`;
+    q('.nfw-stars').style.transform=`translateX(${(p*140).toFixed(1)}cqw)`;
+    const g=q('.nfw-guide'); g.style.right=(8+p*68)+'%'; g.style.top=(24-Math.sin(p*Math.PI)*13)+'%'; g.style.scale=(1+p*1.1).toFixed(2);
+    if(last!==i){ last=i; const c=q('.nfw-chap'); c.innerHTML=`<small>الحدث ${nfAr(i+1)} من ${nfAr(L)}</small><span>${e.ico}</span><b>${e.t}</b>`; c.style.animation='none'; void c.offsetWidth; c.style.animation=''; chime(SC[i%6]); if(i===L-1) [0,600,1200,1800,2400].forEach(function(d){ setTimeout(function(){ burst(40+Math.random()*(box.clientWidth-80),50+Math.random()*190); chime(SC[Math.random()*6|0]*2); },d); }); }
+    seen.add(i); try{ localStorage.setItem('nf_seen',JSON.stringify(Array.from(seen))); }catch(e){}
+    q('[data-tl="m"] small').textContent='مذود '+seen.size+'/'+L;
+    q('.nfs-path').innerHTML=NF_EVENTS.map(function(x,j){return `<i data-j="${j}" class="${j<i?'d':j===i?'a':''}"></i>`;}).join('');
+    q('.nfs-txt').innerHTML=String(e[T[st][2]]).split(' ').map(function(w,k){return `<span style="animation-delay:${(k*(auto?.4:.05)).toFixed(2)}s">${w}</span>`;}).join(' ');
+    q('.nfs-nav').innerHTML=`<button type="button" class="nfs-b" data-a="p">→</button><button type="button" class="nfs-b m" data-a="g">${auto?'⏸ وقّف':'▶ شغّل الحكاية'}</button><button type="button" class="nfs-b" data-a="n">←</button>`;
+  }
+  function stop(){ auto=false; tok++; }
+  function N(d){ stop(); i=Math.max(0,Math.min(L-1,i+d)); R(); }
+  function play(){ auto=true; const t=++tok, e=NF_EVENTS[i], sq=[e.story]; let k=0;
+    (function nx(){ if(!auto||t!==tok||!document.body.contains(o)) return;
+      if(k>0){ if(i<L-1){ i++; st=0; R(); setTimeout(function(){ if(auto&&t===tok) play(); },3200); } else { stop(); R(); } return; }
+      st=k; R(); say(sq[k],function(){ k++; nx(); }); })(); }
+  function burst(x,y){ for(let k=0;k<14;k++){ const s=document.createElement('i'), a=Math.random()*6.28, d=40+Math.random()*80; s.className='nfw-sp'; s.style.cssText=`left:${x}px;top:${y}px;--dx:${(Math.cos(a)*d).toFixed(0)}px;--dy:${(Math.sin(a)*d).toFixed(0)}px`; box.appendChild(s); setTimeout(function(){ s.remove(); },950); } }
+  let tgt=[0,0], cur=[0,0], raf=0, tiltOn=false;
+  function tb(){ const b=q('[data-t]'); if(b) b.style.opacity=tiltOn?1:.45; }
+  function loop(){ cur[0]+=(tgt[0]-cur[0])*.12; cur[1]+=(tgt[1]-cur[1])*.12; box.style.setProperty('--tx',cur[0].toFixed(3)); box.style.setProperty('--ty',cur[1].toFixed(3)); raf=(Math.abs(tgt[0]-cur[0])+Math.abs(tgt[1]-cur[1])>.003)?requestAnimationFrame(loop):0; }
+  function kick(){ if(!raf) raf=requestAnimationFrame(loop); }
+  function onO(e){ if(!document.body.contains(o)){ window.removeEventListener('deviceorientation',onO); return; } if(e.gamma==null) return; tgt=[Math.max(-1,Math.min(1,e.gamma/22)),Math.max(-1,Math.min(1,((e.beta==null?45:e.beta)-45)/22))]; kick(); }
+  function onM(e){ if(e.pointerType!=='mouse') return; const r=box.getBoundingClientRect(); tgt=[((e.clientX-r.left)/r.width-.5)*2,((e.clientY-r.top)/r.height-.5)*2]; kick(); }
+  function tiltOff(){ window.removeEventListener('deviceorientation',onO); tiltOn=false; tgt=[0,0]; kick(); tb(); }
+  function tiltEnable(){ const D=window.DeviceOrientationEvent; if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    const go=function(){ window.addEventListener('deviceorientation',onO); tiltOn=true; tb(); };
+    if(D&&typeof D.requestPermission==='function'){ D.requestPermission().then(function(r){ if(r==='granted') go(); }).catch(function(){}); } else if(D) go(); }
+  o.addEventListener('pointermove',onM);
+  const seen=new Set(); try{ JSON.parse(localStorage.getItem('nf_seen')||'[]').forEach(function(x){ seen.add(x); }); }catch(e){}
+  function closeTool(){ const t=q('.nfw-tool'); t.classList.remove('on'); t.innerHTML=''; t.onclick=null; }
+  function jump(n){ closeTool(); stop(); i=n; st=0; R(); }
+  const TL={};
+  TL.m=function(b){
+    const MG=[['🪵',50,11,96,'المذود'],['🌾',50,22,46,'القش'],['🕯️',14,13,40,'شمعة'],['🪷',86,13,40,'زنبقة'],['🫏',18,34,58,'الحمار'],['🐂',82,34,58,'الثور'],['🧔',32,46,54,'يوسف'],['🛖',50,58,112,'المغارة'],['🌙',88,78,36,'القمر'],['👼',50,80,52,'الملاك'],['⭐',50,92,50,'النجم']];
+    const all=seen.size>=L;
+    b.innerHTML=`<small>كل حدث بتعدّي عليه بيضيف حاجة للمذود. المس أي حاجة تروح لحدثها.</small><div class="nfw-mgs">${MG.map(function(m,k){ return `<span class="mg ${seen.has(k)?'on':'off'}" data-ev="${k}" style="left:${m[1]}%;bottom:${m[2]}%;font-size:${m[3]}px;animation-delay:${(k*.12).toFixed(2)}s">${m[0]}</span>`; }).join('')}${all?'<span class="mg baby" style="left:50%;bottom:27%;font-size:52px">👶</span>':''}</div>
+    <div class="nfw-fin" style="font-size:15px">${all?'🎄 <b style="color:#FFDE94">وُلد المخلّص! المذود اكتمل</b>':'اكتشفت <b style="color:#FFDE94">'+nfAr(seen.size)+'</b> من '+nfAr(L)+' — كمّل الأحداث علشان المذود يكتمل'}</div>`;
+    return function(ev){ const x=ev.target.closest('[data-ev]'); if(x) jump(+x.dataset.ev); };
+  };
+  TL.p=function(b){
+    const PN=[[170,62,'الناصرة',3,0],[100,214,'عين كارم',4,1],[142,224,'أورشليم',2,0],[152,268,'بيت لحم',7,0]];
+    const RT=[['M170 62Q190 130 175 190T152 268','#7a1f3d','🫏',7,'رحلة يوسف ومريم من الناصرة لبيت لحم'],['M170 62Q122 128 100 214','#d6336c','🚶‍♀️',4,'زيارة العذراء لأليصابات'],['M296 28Q240 120 196 204T152 268','#a06a00','🐪',10,'رحلة المجوس من المشرق']];
+    b.innerHTML=`<svg viewBox="0 0 300 330" class="nfw-map"><defs><linearGradient id="mpg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ecdcae"/><stop offset="1" stop-color="#c9a96b"/></linearGradient></defs>
+    <rect width="300" height="330" rx="16" fill="url(#mpg)"/><path d="M0 0H62Q40 70 66 130T54 250T70 330H0Z" fill="#3b7aa8"/><path d="M215 78Q228 130 222 175T232 248" stroke="#3b7aa8" stroke-width="5" fill="none"/><ellipse cx="214" cy="70" rx="14" ry="10" fill="#3b7aa8"/><ellipse cx="236" cy="262" rx="15" ry="22" fill="#3b7aa8"/>
+    <text x="14" y="170" transform="rotate(-90 14 170)" fill="#fff" style="fill:#fff">البحر المتوسط</text>
+    ${RT.map(function(r){ return `<path class="rt" d="${r[0]}" stroke="${r[1]}"/><text font-size="17" dx="-8" dy="5"><animateMotion dur="8s" repeatCount="indefinite" path="${r[0]}"/>${r[2]}</text>`; }).join('')}
+    ${PN.map(function(p){ return `<g class="pin" data-ev="${p[3]}"><circle cx="${p[0]}" cy="${p[1]}" r="7" fill="#7a1f3d" stroke="#fff" stroke-width="2"/><text x="${p[4]?p[0]-11:p[0]+11}" y="${p[1]+4}" text-anchor="${p[4]?'start':'end'}">${p[2]}</text></g>`; }).join('')}</svg>
+    <div class="nfw-leg">${RT.map(function(r){ return `<button type="button" class="nfs-b nfw-ch" data-ev="${r[3]}">${r[2]} ${r[4]}</button>`; }).join('')}</div>`;
+    return function(ev){ const x=ev.target.closest('[data-ev]'); if(x) jump(+x.dataset.ev); };
+  };
+  TL.d=function(b){
+    const D=[[2,'الملاك بشّر زكريا إن امرأته العاقر هتخلّف ابن. هتعمل إيه لو مكانه؟',['أصدّق فورًا','أسأل: «كيف أعلم هذا؟»'],'زكريا سأل «كيف أعلم هذا؟» فصمت لحد ما اتولد يوحنا (لوقا ١ : ١٨–٢٠).'],[3,'الملاك قال للعذراء إنها هتلد ابن العلي. ردّك إيه؟',['أرفض خوفًا','أسأل علشان أفهم وبعدين أسلّم'],'العذراء سألت «كيف يكون هذا؟» وبعدها قالت «ليكن لي كقولك» (لوقا ١ : ٣٤–٣٨).'],[6,'يوسف عرف إن مريم حبلى. هتعمل إيه لو مكانه؟',['أفضحها قدام الناس','أستر عليها وأصلّي'],'يوسف كان بارًّا ومارضيش يشهّر بيها، وظهر له الملاك في حلم (متى ١ : ١٩–٢٠).'],[9,'إنت راعي وسمعت بشارة الملاك بالليل. هتعمل إيه؟',['أكمّل شغلي وأروح بكره','أروح حالًا أشوف الطفل'],'الرعاة قالوا «لنذهب الآن إلى بيت لحم» وراحوا مسرعين (لوقا ٢ : ١٥–١٦).'],[10,'هيرودس طلب منكم ترجعوا تبلّغوه مكان الطفل. هتعمل إيه؟',['نرجع نبلّغه','نرجع من طريق تاني'],'أُوحي إليهم في حلم ألا يرجعوا لهيرودس، فرجعوا من طريق آخر (متى ٢ : ١٢).']];
+    let k=0, sc=0;
+    function V(){ if(k>=D.length){ b.innerHTML=`<div class="nfw-fin">🌟<h3>خلّصت!</h3><p>قراراتك زي القصة: ${nfAr(sc)} من ${nfAr(D.length)}</p><button type="button" class="nfs-b m" data-x="r">ابدأ من الأول</button></div>`; return; }
+      const d=D[k], o=[0,1].sort(function(){ return Math.random()-.5; });
+      b.innerHTML=`<small>${nfAr(k+1)} / ${nfAr(D.length)} • ${NF_EVENTS[d[0]].t}</small><h3>${d[1]}</h3>${o.map(function(x){ return `<button type="button" class="nfs-b nfw-ch" data-x="${x}">${d[2][x]}</button>`; }).join('')}<div class="nfw-res" hidden></div>`; }
+    V();
+    return function(ev){ const x=ev.target.closest('[data-x]'); if(!x) return; const v=x.dataset.x;
+      if(v==='r'){ k=0; sc=0; V(); return; } if(v==='n'){ k++; V(); return; }
+      if(b.querySelector('.nfw-res').hidden===false) return;
+      const good=v==='1'; if(good) sc++; chime(good?784:392);
+      b.querySelectorAll('.nfw-ch').forEach(function(c){ c.classList.add(c.dataset.x==='1'?'ok':'no'); });
+      const r=b.querySelector('.nfw-res'); r.hidden=false; r.innerHTML=(good?'✨ زي القصة بالظبط!':'🤔 فكرة معقولة، بس اللي حصل فعلًا:')+'<br>'+D[k][3]+'<br><button type="button" class="nfs-b m" data-x="n" style="margin-top:8px;width:100%">التالي ←</button>'; };
+  };
+  TL.g=function(b){
+    let pick, shuf, done, err;
+    function init(){ pick=Array.from({length:L},function(_,x){ return x; }).sort(function(){ return Math.random()-.5; }).slice(0,5).sort(function(a,c){ return a-c; }); shuf=pick.slice().sort(function(){ return Math.random()-.5; }); done=[]; err=0; V(); }
+    function V(){ const fin=done.length===5;
+      b.innerHTML=`<small>اضغط على الأحداث بالترتيب الصح، من الأول للآخر</small><div class="nfw-line">${pick.map(function(x,n){ return `<i class="${n<done.length?'ok':''}">${n<done.length?NF_EVENTS[x].ico:nfAr(n+1)}</i>`; }).join('')}</div><div class="nfw-cards">${shuf.filter(function(x){ return done.indexOf(x)<0; }).map(function(x){ return `<button type="button" class="nfs-b nfw-card" data-x="${x}">${NF_EVENTS[x].ico} ${NF_EVENTS[x].t}</button>`; }).join('')}</div>${fin?`<div class="nfw-fin">🎉<h3>برافو!</h3><p>عدد الأخطاء: ${nfAr(err)}</p><button type="button" class="nfs-b m" data-x="r">جولة جديدة</button></div>`:''}`; }
+    init();
+    return function(ev){ const x=ev.target.closest('[data-x]'); if(!x) return; if(x.dataset.x==='r'){ init(); return; }
+      if(+x.dataset.x===pick[done.length]){ done.push(+x.dataset.x); chime(SC[done.length]); V(); if(done.length===5){ [0,300,600].forEach(function(d){ setTimeout(function(){ burst(60+Math.random()*(box.clientWidth-120),160+Math.random()*200); },d); }); } }
+      else { err++; x.classList.add('nfw-shk'); chime(196); setTimeout(function(){ x.classList.remove('nfw-shk'); },420); } };
+  };
+  function openTool(k){ stop(); const t=q('.nfw-tool'), T={m:'🛖 المذود',p:'🗺️ خريطة الرحلة',d:'🎭 لو كنت مكانهم',g:'🧩 رتّب الأحداث'};
+    t.innerHTML='<div class="nfw-th"><b>'+T[k]+'</b><button type="button" class="nf-ev-x" data-tc="1" aria-label="رجوع">✕</button></div><div class="nfw-tbody"></div>'; t.classList.add('on');
+    const h=TL[k](t.querySelector('.nfw-tbody')); t.onclick=function(ev){ if(ev.target.closest('[data-tc]')){ closeTool(); return; } h(ev); }; }
+  function bub(x,y){ const b=q('.nfw-q'); b.innerHTML='<small>'+Q[i][0]+'</small>'+Q[i][1]; b.style.left=Math.min(Math.max(x,110),box.clientWidth-110)+'px'; b.style.top=Math.max(y-78,70)+'px'; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); }
+  o.addEventListener('click',function(ev){
+    const t=ev.target;
+    if(t.closest('[data-nf="events-close"]')){ stop(); return; }
+    const b=t.closest('[data-a],[data-k],[data-j],[data-s],[data-t],[data-tl]');
+    if(b){ if(b.dataset.tl){ openTool(b.dataset.tl); }
+      else if(b.dataset.t){ if(tiltOn) tiltOff(); else tiltEnable(); }
+      else if(b.dataset.s){ snd=!snd; b.textContent=snd?'🔔':'🔕'; }
+      else if(b.dataset.a==='g'){ if(auto){ stop(); R(); } else play(); }
+      else if(b.dataset.a){ N(b.dataset.a==='n'?1:-1); }
+      else if(b.dataset.k){ stop(); st=+b.dataset.k; R(); }
+      else { stop(); i=+b.dataset.j; st=0; R(); } return; }
+    if(t.closest('.nfw-world')){ const it=t.closest('.nfs-i'); if(it){ it.classList.add('nfs-j'); setTimeout(function(){ it.classList.remove('nfs-j'); },650); }
+      const r=box.getBoundingClientRect(); burst(ev.clientX-r.left,ev.clientY-r.top); chime(SC[Math.random()*6|0]*(Math.random()<.4?2:1)); bub(ev.clientX-r.left,ev.clientY-r.top); try{ navigator.vibrate&&navigator.vibrate(18); }catch(e){} }
+  });
+  let x0=null;
+  o.addEventListener('touchstart',function(ev){ x0=ev.touches[0].clientX; },{passive:true});
+  o.addEventListener('touchend',function(ev){ if(x0===null||q('.nfw-tool').classList.contains('on')) return; const dx=ev.changedTouches[0].clientX-x0; x0=null; if(Math.abs(dx)>60) N(dx<0?1:-1); },{passive:true});
+  R();
+  { const D=window.DeviceOrientationEvent; if(!(D&&typeof D.requestPermission==='function')) tiltEnable(); }
+}
+function nfOpenPage(){
+  try{
+    const css=Array.from(document.querySelectorAll('style')).map(function(x){return x.textContent;}).join('\n');
+    const a=css.indexOf('#nf-ev{'), m='70%{ transform:none; } }', b=css.indexOf(m,css.indexOf('@keyframes nfwJ'))+m.length;
+    const fn=[nfAr,nfPanel,nfShowEvents].map(function(f){return f.toString();}).join('\n');
+    const html='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>أحداث صوم الميلاد</title><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet"><style>html,body{margin:0;height:100%;background:#04031a}'+css.slice(a,b)+'</style></head><body><script>const NF_EVENTS='+JSON.stringify(NF_EVENTS)+',NF_SC='+JSON.stringify(NF_SC)+',NF_X='+JSON.stringify(NF_X)+';'+fn+';nfShowEvents();document.addEventListener("click",function(e){if(e.target.closest("[data-nf=\\"events-close\\"]")){if(window.opener){window.close();}else{history.back();}}});<\/script></body></html>';
+    const w=window.open(URL.createObjectURL(new Blob([html],{type:'text/html'})),'_blank');
+    if(!w) nfShowEvents();
+  }catch(e){ nfShowEvents(); }
 }
 function nfShowGreeting(S){
   if(document.getElementById('nf-greet')) return;
@@ -13076,7 +13334,7 @@ function nfShowGreeting(S){
     if(!b){ if(o && e.target===o) o.remove(); if(ev && e.target===ev) ev.remove(); return; }
     const k = b.dataset.nf;
     if(k==='greet-close'){ if(o) o.remove(); }
-    else if(k==='events'){ nfShowEvents(); }
+    else if(k==='events'){ nfOpenPage(); }
     else if(k==='events-close'){ if(ev) ev.remove(); }
     else if(k==='card'){ const S = nfSeason(), v = NF_VERSES[S.day-1] || NF_VERSES[NF_VERSES.length-1]; try{ window.openVerseCard(v[0], v[1]); }catch(err){} }
   });
@@ -13172,7 +13430,7 @@ function nfShowGreeting(S){
       pop = `<div class="nfx-pop"><div class="nfx-box">
         <h3>${openSt===44?'🏚️ المغارة: عيد الميلاد':'المحطة '+ar(openSt)}</h3>
         <p class="nfx-verse">«${escapeHtml(v[0])}»<small>${escapeHtml(v[1])}</small></p>
-        ${here.map(function(e){ return `<h4>${e.ico} ${e.t}</h4><p>${e.story}</p><p><b>تدريب:</b> ${e.life}</p>`; }).join('')}
+        ${here.map(function(e){ return `<h4>${e.ico} ${e.t}</h4><p>${e.story}</p>`; }).join('')}
         ${here.length?btn('tab','cave','🏚️ حل السؤال وخد القطعة','nfx-b gold'):''}
         ${btn('close-st','','تمام')}
       </div></div>`;
