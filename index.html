@@ -5333,6 +5333,19 @@ body:has(.snp) .room-chat-launcher:not(.open),body:has(.snp) .att-fab{display:no
   .nf-btn.pri.done{ color:#06281c; background:linear-gradient(100deg,#9BF0B8,#3FDCC9); opacity:.9; }
   .nf-btn:active{ transform:scale(.97); }
   .nf-stats{ display:flex; flex-wrap:wrap; gap:4px 12px; justify-content:center; padding:6px 14px 11px; font-family:'Cairo',sans-serif; font-weight:700; font-size:11px; color:rgba(252,249,243,.7); }
+  #nf-ev{ position:fixed; inset:0; z-index:130; display:flex; align-items:center; justify-content:center; padding:14px; background:rgba(4,3,26,.82); }
+  .nf-ev-card{ display:flex; flex-direction:column; width:100%; max-width:440px; max-height:86vh; overflow:hidden; direction:rtl; text-align:right; border-radius:20px; color:#FCF9F3; font-family:'Cairo',sans-serif; background:linear-gradient(160deg,#1a1f5e,#2b1d55); border:1px solid rgba(244,183,64,.4); }
+  .nf-ev-top{ display:flex; align-items:center; justify-content:space-between; padding:13px 16px; color:#FFDE94; font-size:15px; border-bottom:1px solid rgba(244,183,64,.2); }
+  .nf-ev-x{ width:32px; height:32px; border-radius:10px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.08); color:#FCF9F3; cursor:pointer; }
+  .nf-ev-list{ overflow-y:auto; overscroll-behavior:contain; padding:10px 12px 14px; }
+  .nf-ev-item{ flex:none; margin-bottom:8px; border-radius:13px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); }
+  .nf-ev-item summary{ display:flex; gap:10px; align-items:center; padding:11px 13px; cursor:pointer; list-style:none; font-weight:800; font-size:13.5px; }
+  .nf-ev-item summary::-webkit-details-marker{ display:none; }
+  .nf-ev-item summary small{ display:block; font-size:11px; color:#E3D8C6; }
+  .nf-ev-item[open]{ border-color:rgba(244,183,64,.45); }
+  .nf-ev-body{ padding:0 14px 12px; }
+  .nf-ev-body h4{ margin:8px 0 2px; font-size:12px; color:#FFDE94; }
+  .nf-ev-body p{ margin:0; font-size:13.5px; line-height:1.9; font-weight:600; color:rgba(252,249,243,.9); }
   #nf-greet{ position:fixed; inset:0; z-index:130; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(4,3,26,.78); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); animation:vcFade .3s ease both; }
   .nf-g-card{ width:100%; max-width:380px; text-align:center; direction:rtl; padding:26px 22px 22px; border-radius:24px; color:#FCF9F3; font-family:'Cairo',sans-serif;
     background:radial-gradient(90% 60% at 50% 0%,rgba(244,183,64,.25),transparent 70%),linear-gradient(160deg,#1a1f5e,#2b1d55); border:1px solid rgba(244,183,64,.4); box-shadow:0 30px 70px -20px rgba(0,0,0,.8); animation:vcPop .6s cubic-bezier(.2,1.25,.3,1) both; }
@@ -12948,8 +12961,6 @@ const NF_VERSES = [
   ["المجد لله في الأعالي وعلى الأرض السلام وبالناس المسرة","لوقا ٢ : ١٤"],
   ["أنه ولد لكم اليوم في مدينة داود مخلص هو المسيح الرب","لوقا ٢ : ١١"]
 ];
-const NF_PTS = 10, NF_WEEK_BONUS = 25;
-let nfBusy = false;
 function nfAr(n){ try{ return (+n).toLocaleString('ar-EG'); }catch(e){ return String(n); } }
 function nfDK(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 /* الصوم من 25 نوفمبر لحد 6 يناير (43 يوم)، والعيد 7 يناير */
@@ -12962,10 +12973,7 @@ function nfSeason(){
 function nfCardHtml(pid){
   try{
     const S = nfSeason(); if(!S.active || !pid) return '';
-    const ex = myExtra(pid), nf = ex.nfast || {}, days = nf.days || {}, key = nfDK(S.today), done = !!days[key];
-    const cnt = Object.keys(days).length;
-    let st = 0, d = new Date(S.today); if(!done) d.setDate(d.getDate()-1);
-    while(days[nfDK(d)]){ st++; d.setDate(d.getDate()-1); }
+    const nf = myExtra(pid).nfast || {};
     const v = NF_VERSES[S.day-1] || NF_VERSES[0], pct = Math.round(S.day*100/S.total);
     if(nf.greeted !== S.sy) nfGreetOnce(pid, S);
     return `<div class="nf-card">
@@ -12973,41 +12981,47 @@ function nfCardHtml(pid){
       <div class="nf-count"><b>${nfAr(S.left)}</b><span>${S.left===1?'يوم واحد':'يوم'} على العيد</span></div>
       <div class="nf-bar"><i style="width:${pct}%"></i></div>
       <div class="nf-verse">«${escapeHtml(v[0])}»<small>${escapeHtml(v[1])}</small></div>
-      <div class="nf-acts">
-        <button type="button" class="nf-btn pri${done?' done':''}" data-nf="fast" ${done?'disabled':''}>${done?'✅ صمت النهارده':'🙏 صمت النهارده (+'+nfAr(NF_PTS)+' نقطة)'}</button>
+      <div class="nf-acts" style="padding-bottom:12px">
+        <button type="button" class="nf-btn pri" data-nf="events">📖 أحداث الصوم</button>
         <button type="button" class="nf-btn" data-nf="card">🎄 كارت الآية</button>
       </div>
-      <div class="nf-stats"><span>صمت ${nfAr(cnt)} يوم</span><span>🔥 ${nfAr(st)} ورا بعض</span><span>⭐ بونص ${nfAr(NF_WEEK_BONUS)} كل ٧ أيام</span></div>
     </div>`;
   }catch(e){ return ''; }
-}
-async function nfMark(){
-  if(nfBusy || !state.pid) return;
-  const S = nfSeason(); if(!S.active) return;
-  const ex = myExtra(state.pid); ex.nfast = ex.nfast || {}; ex.nfast.days = ex.nfast.days || {};
-  const key = nfDK(S.today); if(ex.nfast.days[key]) return;
-  nfBusy = true;
-  try{
-    ex.nfast.days[key] = 1;
-    const total = Object.keys(ex.nfast.days).length, bonus = (total%7===0) ? NF_WEEK_BONUS : 0, pts = NF_PTS + bonus;
-    await saveProfileExtra(PROFILE_EXTRA);
-    BONUS[state.pid] = (BONUS[state.pid]||0) + pts;
-    const ok = await saveBonus(BONUS);
-    if(ok === false){ BONUS[state.pid] = Math.max(0,(BONUS[state.pid]||0)-pts); delete ex.nfast.days[key]; await saveProfileExtra(PROFILE_EXTRA); try{ showToast('معرفتش أسجّل دلوقتي، جرّب تاني',true); }catch(e){} return; }
-    try{ vibrate([20,15,30]); }catch(e){} try{ SND.coinChime(); }catch(e){}
-    try{ pushNotification(state.pid, '🕯️ صمت اليوم '+nfAr(S.day)+' من صوم الميلاد واحصلت على +'+nfAr(pts)+' نقطة'+(bonus?' (فيها بونص الأسبوع)':''), '🕯️'); }catch(e){}
-    try{ showToast('+'+nfAr(pts)+' نقطة! ربنا يقبل صومك 🙏'); }catch(e){}
-    render();
-  } finally { nfBusy = false; }
 }
 function nfGreetOnce(pid, S){
   const ex = myExtra(pid); ex.nfast = ex.nfast || {};
   if(ex.nfast.greeted === S.sy) return;
   ex.nfast.greeted = S.sy; try{ saveProfileExtra(PROFILE_EXTRA); }catch(e){}
   setTimeout(function(){
-    try{ pushNotification(pid, '🎄 كل سنة وإنتم طيبين! بدأ صوم الميلاد المجيد، ونقدر نتابع صومنا ونكسب نقط كل يوم', '🕯️'); }catch(e){}
+    try{ pushNotification(pid, '🎄 كل سنة وإنتم طيبين! بدأ صوم الميلاد المجيد', '🕯️'); }catch(e){}
     nfShowGreeting(S);
   }, 800);
+}
+/* ---------- أحداث الصوم: عدّل أو ضيف أي حدث من القايمة دي ---------- */
+const NF_EVENTS = [
+  { ico:'🕯️', t:'ليه بنصوم صوم الميلاد؟', ref:'', story:'بنستعد بالصوم والصلاة والتوبة علشان نستقبل ميلاد السيد المسيح، كلمة الله اللي صار جسدًا. مدته ٤٣ يوم: ٤٠ يوم على مثال صوم موسى النبي قبل ما يستلم الشريعة، و٣ أيام تذكار الصوم اللي سبق معجزة نقل جبل المقطم أيام البابا أبرآم بن زرعة.', mean:'زي ما موسى صام قبل ما يستلم كلمة الله مكتوبة، إحنا بنصوم علشان نستقبل الكلمة المتجسد.', life:'اختار حاجة واحدة تبعدك عن ربنا وابدأ تسيبها من النهارده.' },
+  { ico:'🌟', t:'شهر كيهك: الشهر المريمي', ref:'', story:'شهر كيهك بييجي في نص صوم الميلاد، والكنيسة بتكرّم فيه العذراء مريم بتسابيح معروفة باسم «سبعة وأربعة»: سبع ثيؤطوكيات وأربع هوسات.', mean:'التسبيح بيحضّر القلب للفرح بالميلاد، والعذراء مثال للقلب المستعد لسكنى الله.', life:'احضر تسبحة كيهك مرة على الأقل مع أصحابك.' },
+  { ico:'👴', t:'الأحد الأول من كيهك: بشارة زكريا', ref:'لوقا ١ : ١–٢٥', story:'الملاك جبرائيل ظهر لزكريا الكاهن وهو بيبخّر في الهيكل، وبشّره إن أليصابات هتخلف ابن اسمه يوحنا رغم كبر سنهم. زكريا شك، ففضل صامت لحد ما الوعد اتحقق.', mean:'ربنا مابينساش الصلاة حتى لو الاستجابة اتأخرت، ويوحنا هو اللي هيهيّئ الطريق قدام المسيح.', life:'فيه طلبة بطّلت تصليها علشان اتأخرت؟ ارجع صلّيها بثقة.' },
+  { ico:'🕊️', t:'الأحد الثاني من كيهك: بشارة العذراء', ref:'لوقا ١ : ٢٦–٣٨', story:'الملاك جبرائيل راح للعذراء مريم في الناصرة، وبشّرها إنها هتحبل بالروح القدس وتلد ابن تسميه يسوع، وابن العلي يُدعى. فردت: «هوذا أنا أمة الرب، ليكن لي كقولك».', mean:'دي بداية سر التجسد. العذراء سألت علشان تفهم، وبعدين سلّمت لمشيئة الله باتضاع.', life:'قول لربنا النهارده «لتكن مشيئتك» في موضوع قلقان منه.' },
+  { ico:'🤝', t:'الأحد الثالث من كيهك: زيارة العذراء لأليصابات', ref:'لوقا ١ : ٣٩–٥٦', story:'العذراء قامت بسرعة وزارت أليصابات. ولما سمعت أليصابات سلامها، ارتكض الجنين في بطنها وامتلأت من الروح القدس، والعذراء سبّحت: «تعظم نفسي الرب».', mean:'اللي قلبه مليان بربنا بيروح يخدم غيره وينقل له الفرح.', life:'زور أو كلّم حد محتاج سؤال أو مساعدة.' },
+  { ico:'👶', t:'الأحد الرابع من كيهك: ميلاد يوحنا المعمدان', ref:'لوقا ١ : ٥٧–٨٠', story:'أليصابات ولدت ابنها، وزكريا كتب «اسمه يوحنا»، فلسانه اتفك في الحال وسبّح الله وتنبأ عن الخلاص وعن دور ابنه.', mean:'يوحنا هو السابق اللي بيمهّد للمسيح، وزكريا لما رجع يتكلم بدأ بالتسبيح.', life:'اشكر ربنا بصوتك على حاجة عملها معاك السنة دي.' },
+  { ico:'💭', t:'ملاك الرب ويوسف النجار', ref:'متى ١ : ١٨–٢٥', story:'يوسف عرف إن مريم حبلى، ولأنه كان بارًا مارضيش يشهّر بيها. ملاك الرب ظهر له في حلم وعرّفه إن المولود من الروح القدس، فأطاع وأخدها عنده.', mean:'اسم «يسوع» معناه إن الله يخلّص، و«عمانوئيل» تفسيره الله معنا.', life:'قبل ما تحكم على حد، استنى وصلّي واستر عليه.' },
+  { ico:'🛤️', t:'الرحلة لبيت لحم والميلاد', ref:'لوقا ٢ : ١–٧', story:'بسبب أمر أغسطس قيصر بالاكتتاب، سافر يوسف ومريم من الناصرة لبيت لحم. وهناك ولدت ابنها وقمطته وأضجعته في المذود، لأنه ماكانش لهم موضع في المنزل.', mean:'ملك الملوك اتولد في اتضاع، واتحققت نبوة ميخا إن المخلّص يخرج من بيت لحم (ميخا ٥ : ٢).', life:'افتح مكان لربنا في يومك: وقت ثابت للصلاة والإنجيل.' },
+  { ico:'⏳', t:'برمون الميلاد', ref:'', story:'البرمون هو الاستعداد الأخير قبل العيد، وفيه الصوم بيكون بزهد أكتر ومن غير سمك.', mean:'كل ما العيد يقرّب، استعدادنا بيزيد.', life:'راجع رحلتك في الصوم، وجهّز قلبك بالتوبة والاعتراف.' },
+  { ico:'🐑', t:'عيد الميلاد: بشارة الرعاة', ref:'لوقا ٢ : ٨–٢٠', story:'ملاك الرب بشّر رعاة سهرانين على قطيعهم: «ولد لكم اليوم في مدينة داود مخلص هو المسيح الرب». وسبّحت الملائكة، والرعاة راحوا بسرعة وشافوا الطفل ورجعوا يمجدوا الله.', mean:'البشارة وصلت لناس بسطاء وساهرين، والفرح ده لجميع الشعب.', life:'شارك فرحة العيد مع حد وحيد أو محتاج.' },
+  { ico:'⭐', t:'المجوس والنجم', ref:'متى ٢ : ١–١٢', story:'مجوس من المشرق تبعوا النجم يدوّروا على المولود ملك اليهود. ولما وصلوا له سجدوا وقدّموا هدايا: ذهب ولبان ومر، ورجعوا من طريق تاني من غير ما يعدّوا على هيرودس.', mean:'المسيح جه للعالم كله. والتقليد الكنسي بيشوف في الذهب إشارة لملكه، وفي اللبان لكهنوته، وفي المر لآلامه.', life:'هتقدّم إيه هدية للمسيح السنة دي؟ وقتك، موهبتك، قلبك.' }
+];
+function nfShowEvents(){
+  if(document.getElementById('nf-ev')) return;
+  const o = document.createElement('div'); o.id = 'nf-ev';
+  o.innerHTML = `<div class="nf-ev-card" role="dialog" aria-modal="true" aria-label="أحداث الصوم">
+    <div class="nf-ev-top"><b>📖 أحداث صوم الميلاد</b><button type="button" class="nf-ev-x" data-nf="events-close" aria-label="إغلاق">✕</button></div>
+    <div class="nf-ev-list">${NF_EVENTS.map(function(e){ return `<details class="nf-ev-item">
+      <summary><span>${e.ico}</span><span>${e.t}${e.ref?`<small>${e.ref}</small>`:''}</span></summary>
+      <div class="nf-ev-body"><h4>الحدث</h4><p>${e.story}</p><h4>التأمل</h4><p>${e.mean}</p><h4>تدريب عملي</h4><p>${e.life}</p></div>
+    </details>`; }).join('')}</div>
+  </div>`;
+  document.body.appendChild(o);
 }
 function nfShowGreeting(S){
   if(document.getElementById('nf-greet')) return;
@@ -13016,7 +13030,7 @@ function nfShowGreeting(S){
     <div class="nf-g-star">✦</div>
     <div class="nf-g-t">كل سنة وإنتم طيبين 🕯️</div>
     <div class="nf-g-h">بدأ صوم الميلاد المجيد</div>
-    <div class="nf-g-p">${nfAr(S.total)} يوم نصوم فيهم ونصلّي ونستعد لاستقبال المولود في بيت لحم. كل يوم تعلّم فيه إنك صمت بتاخد نقط، وفيه آية جديدة كل يوم، وفوازير الميلاد مستنياك في الألعاب.</div>
+    <div class="nf-g-p">${nfAr(S.total)} يوم نصوم فيهم ونصلّي ونستعد لاستقبال المولود في بيت لحم. كل يوم فيه آية جديدة كل يوم، وفوازير الميلاد مستنياك في الألعاب.</div>
     <button type="button" class="nf-g-b" data-nf="greet-close">يلا نبدأ الرحلة 🙏</button>
   </div>`;
   document.body.appendChild(o);
@@ -13027,10 +13041,12 @@ function nfShowGreeting(S){
   document.addEventListener('click', function(e){
     const b = e.target.closest && e.target.closest('[data-nf]'); 
     const o = document.getElementById('nf-greet');
-    if(!b){ if(o && e.target===o) o.remove(); return; }
+    const ev = document.getElementById('nf-ev');
+    if(!b){ if(o && e.target===o) o.remove(); if(ev && e.target===ev) ev.remove(); return; }
     const k = b.dataset.nf;
     if(k==='greet-close'){ if(o) o.remove(); }
-    else if(k==='fast'){ nfMark(); }
+    else if(k==='events'){ nfShowEvents(); }
+    else if(k==='events-close'){ if(ev) ev.remove(); }
     else if(k==='card'){ const S = nfSeason(), v = NF_VERSES[S.day-1] || NF_VERSES[0]; try{ window.openVerseCard(v[0], v[1]); }catch(err){} }
   });
 })();
