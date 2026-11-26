@@ -35802,8 +35802,14 @@ function attRecKey(pid, type, sid){ return pid+'__'+type+'__'+sid; }
 function attMine(pid, type){
   return Object.values(ATT_RECORDS||{}).filter(r=>r && r.pid===pid && r.type===type).sort((a,b)=>b.ts-a.ts);
 }
-function attDone(pid, type){
+/* للمخدوم: لو اليوم المفتوح قديم (من يوم فات) نعرضه على إنه يوم النهارده — أول مسح بيفتحه فعلاً */
+function attViewCfg(type){
   const c = attCfg(type);
+  if(!c || !c.open || !attStaleFixed(type, c)) return c;
+  return Object.assign({}, c, { sessionId: attDaySid(attTodayISO()), name: attDefaultName(type), startedAt: attNowMs() });
+}
+function attDone(pid, type){
+  const c = attViewCfg(type);
   return !!(c && ATT_RECORDS && ATT_RECORDS[attRecKey(pid,type,c.sessionId)]);
 }
 function attStateOf(pid, type){
@@ -36086,7 +36092,7 @@ function attGlassTilesHtml(anim){
   const order = ATT_KEYS.map((k,i)=>({k,i,r:rank[attStateOf(state.pid,k).cls]})).sort((x,y)=>(x.r-y.r)||(x.i-y.i));
   return `<div class="att-page-list">${order.map((o,pos)=>{
     const k = o.k, i = o.i;
-    const t = ATT_TYPES[k]; const st = attStateOf(state.pid, k); const c = attCfg(k);
+    const t = ATT_TYPES[k]; const st = attStateOf(state.pid, k); const c = attViewCfg(k);
     const mine = attMine(state.pid, k);
     const cls = st.cls==='open' ? 'is-open' : st.cls==='done' ? 'is-done' : 'is-closed';
     const hasName = !!(c && c.name);
@@ -36165,7 +36171,7 @@ function renderAttendancePage(){
 function renderAttendanceScanPage(){
   const type = state.attType; const t = ATT_TYPES[type];
   if(!t) return renderAttendancePage();
-  const c = attCfg(type); const pid = state.pid;
+  const c = attViewCfg(type); const pid = state.pid;
   const done = attDone(pid, type); const open = !!(c && c.open);
   const mine = attMine(pid, type);
   const c1 = (t.color.match(/#[0-9A-Fa-f]{6}/)||['#F4B740'])[0];
@@ -37189,7 +37195,7 @@ async function attAdminAction(action, el){
   if(action==='att-admin-closeday'){
     const cc0 = attCfg(type); if(!cc0) return;
     if(cc0.closedAt && !cc0.open){
-      const ok = await attCfgUpdate(o=>{ o[type].open = true; o[type].closedAt = null; });
+      const ok = await attCfgUpdate(o=>{ attRollDay(o, type); o[type].open = true; o[type].closedAt = null; });
       saveToast(ok, 'تم إعادة فتح اليوم'); return;
     }
     const n0 = new Set(Object.values(ATT_RECORDS||{}).filter(r=>r && r.type===type && r.sid===cc0.sessionId).map(r=>r.pid)).size;
