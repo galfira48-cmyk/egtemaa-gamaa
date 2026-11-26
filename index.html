@@ -13334,7 +13334,7 @@ function nfShowGreeting(S){
     if(!b){ if(o && e.target===o) o.remove(); if(ev && e.target===ev) ev.remove(); return; }
     const k = b.dataset.nf;
     if(k==='greet-close'){ if(o) o.remove(); }
-    else if(k==='events'){ nfOpenPage(); }
+    else if(k==='events'){ nfShowEvents(); }
     else if(k==='events-close'){ if(ev) ev.remove(); }
     else if(k==='card'){ const S = nfSeason(), v = NF_VERSES[S.day-1] || NF_VERSES[NF_VERSES.length-1]; try{ window.openVerseCard(v[0], v[1]); }catch(err){} }
   });
